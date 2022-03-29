@@ -1,7 +1,7 @@
 #ifndef _VEC_HPP_
 #define _VEC_HPP_
 
-namespace ge {
+namespace ge::vec {
 
     /**
      * @brief A 3 dimentional vector.
@@ -70,24 +70,48 @@ namespace ge {
         vec3 operator*(const vec3 &rhs);
         
         /**
+         * @brief Get the product of a vector and a scalar
+         * 
+         * @param s the scalar value
+         * @return the new scaled vector
+         */
+        vec3 operator*(const float s);
+
+        /**
          * @brief Multiply the vector by a scalar
          * 
          * @param rhs the scalar value
          */
-        void operator*=(const float &rhs);
+        void operator*=(const float rhs);
 
     };
 
-    namespace vec {
+    /**
+     * @brief Calculate the dot product of 2 vec3's
+     * 
+     * @param v1 the first vector
+     * @param v2 the second vector
+     * @return float the scalar dot product
+     */
+    float dot_prod(const vec3 &v1, const vec3 &v2);
 
-        /**
-         * @brief Get the squared magnitude of the vector
-         * 
-         * @return float the squared magnitude
-         */
-        float mag_sqd(const vec3 &rhs);
-        
-    } // namespace vec
-} // namespace ge
+    /**
+     * @brief Calculate the dot product of a vector and itself
+     * 
+     * @param v the vector
+     * @return float the vectors dot product
+     */
+    float dot_prod(const vec3 &v);
+
+    /**
+     * @brief linearly interpolate a vector from two other vectors
+     * 
+     * @param v1 the first vector
+     * @param v2 the second vector
+     * @param b the weight
+     * @return the new interpolated vector
+     */
+    vec3 lerp(const vec3 &v1, const vec3 &v2, float b);
+} // namespace ge::vec
 
 #endif // _VEC_HPP_

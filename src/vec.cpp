@@ -7,7 +7,7 @@
  * 
  * @param rhs the other vector
  */
-void ge::vec3::operator+=(const vec3 &rhs) {
+void ge::vec::vec3::operator+=(const vec3 &rhs) {
     this->x += rhs.x;
     this->y += rhs.y;
     this->z += rhs.z;
@@ -19,7 +19,7 @@ void ge::vec3::operator+=(const vec3 &rhs) {
  * @param rhs the other vector
  * @return vec3 the new sum vector
  */
-ge::vec3 ge::vec3::operator+(const vec3 &rhs) {
+ge::vec::vec3 ge::vec::vec3::operator+(const vec3 &rhs) {
     vec3 v{
         this->x + rhs.x,
         this->y + rhs.y,
@@ -33,7 +33,7 @@ ge::vec3 ge::vec3::operator+(const vec3 &rhs) {
  * 
  * @param rhs the other vector
  */
-void ge::vec3::operator-=(const vec3 &rhs) {
+void ge::vec::vec3::operator-=(const vec3 &rhs) {
     this->x -= rhs.x;
     this->y -= rhs.y;
     this->z -= rhs.z;
@@ -45,7 +45,7 @@ void ge::vec3::operator-=(const vec3 &rhs) {
  * @param rhs the other vector
  * @return vec3 the new difference vector
  */
-ge::vec3 ge::vec3::operator-(const vec3 &rhs) {
+ge::vec::vec3 ge::vec::vec3::operator-(const vec3 &rhs) {
     vec3 v{
         this->x - rhs.x,
         this->y - rhs.y,
@@ -59,7 +59,7 @@ ge::vec3 ge::vec3::operator-(const vec3 &rhs) {
  * 
  * @param rhs the other vector
  */
-void ge::vec3::operator*=(const vec3 &rhs) {
+void ge::vec::vec3::operator*=(const vec3 &rhs) {
     this->x *= rhs.x;
     this->y *= rhs.y;
     this->z *= rhs.z;
@@ -71,11 +71,26 @@ void ge::vec3::operator*=(const vec3 &rhs) {
  * @param rhs the other vector
  * @return vec3 the new product vector
  */
-ge::vec3 ge::vec3::operator*(const vec3 &rhs) {
+ge::vec::vec3 ge::vec::vec3::operator*(const vec3 &rhs) {
     vec3 v{
         this->x * rhs.x,
         this->y * rhs.y,
         this->z * rhs.z
+    };
+    return v;
+}
+
+/**
+ * @brief Get the product of a vector and a scalar
+ * 
+ * @param s the scalar value
+ * @return the new scaled vector
+ */
+ge::vec::vec3 ge::vec::vec3::operator*(const float s) {
+    vec3 v{
+        this->x * s,
+        this->y * s,
+        this->z * s
     };
     return v;
 }
@@ -85,17 +100,41 @@ ge::vec3 ge::vec3::operator*(const vec3 &rhs) {
  * 
  * @param s the scalar value
  */
-void ge::vec3::operator*=(const float &s) {
+void ge::vec::vec3::operator*=(const float s) {
     this->x *= s;
     this->y *= s;
     this->z *= s;
 }
 
 /**
- * @brief Get the magnitude of the vector
+ * @brief Calculate the dot product of 2 vec3's
  * 
- * @return float the magnitude
+ * @param v1 the first vector
+ * @param v2 the second vector
+ * @return float the scalar dot product
  */
-float ge::vec::mag_sqd(const vec3 &rhs) {
-    return (rhs.x * rhs.x) + (rhs.y * rhs.y) + (rhs.z * rhs.z);
+float ge::vec::dot_prod(const vec3 &v1, const vec3 &v2) {
+    return (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z);
+}
+
+/**
+ * @brief Calculate the dot product of a vector and itself
+ * 
+ * @param v the vector
+ * @return float the vectors dot product
+ */
+float ge::vec::dot_prod(const vec3 &v) {
+    return (v.x * v.x) + (v.y * v.y) + (v.z * v.z);   
+}
+
+/**
+ * @brief linearly interpolate a vector from two other vectors
+ * 
+ * @param v1 the first vector
+ * @param v2 the second vector
+ * @param b the weight
+ * @return the new interpolated vector
+ */
+ge::vec::vec3 ge::vec::lerp(const vec3 &v1, const vec3 &v2, float b) {
+    // TODO
 }
