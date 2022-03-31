@@ -2,6 +2,8 @@
 #define _VEC_HPP_
 
 namespace ge::vec {
+    
+    using vec3 = float[2];
 
 } // namespace ge::vec
 
