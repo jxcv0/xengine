@@ -12,5 +12,5 @@ set(
         include/KHR/khrplatform.h
 )
 
-add_library(glad ${HEADERS} ${SOURCES})
+add_library(glad SHARED ${HEADERS} ${SOURCES})
 target_include_directories(glad PUBLIC include/glad/)
