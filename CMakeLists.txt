@@ -8,14 +8,21 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a")
 
 enable_testing()
 
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+
 include(FetchContent)
 
 FetchContent_Declare(
   googletest
-  GIT_REPOSITORY https://github.com/google/googletest.git
-  GIT_TAG        c9461a9b55ba954df0489bab6420eb297bed846b
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG        c9461a9b55ba954df0489bab6420eb297bed846b
 )
 FetchContent_MakeAvailable(googletest)
+
+find_package(OpenGL REQUIRED)
+find_package(glfw3 3.3 REQUIRED)
 
 set(
   SOURCES
@@ -31,8 +38,13 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES} ${HEADERS})
 
 target_include_directories(
   ${PROJECT_NAME}
-  PUBLIC
-  ${PROJECT_SOURCE_DIR}/include
+    PUBLIC
+      ${PROJECT_SOURCE_DIR}/include
+      ${PROJECT_SOURCE_DIR}/lib
+      glad
+      glfw
+      OpenGL::GL
 )
 
+add_subdirectory(lib/glad)
 add_subdirectory(test)
