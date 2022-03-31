@@ -40,7 +40,11 @@ target_include_directories(
   ${PROJECT_NAME}
     PUBLIC
       ${PROJECT_SOURCE_DIR}/include
-      ${PROJECT_SOURCE_DIR}/lib
+)
+
+target_link_libraries(
+  ${PROJECT_NAME}
+    PUBLIC
       glad
       glfw
       OpenGL::GL
@@ -48,3 +52,7 @@ target_include_directories(
 
 add_subdirectory(lib/glad)
 add_subdirectory(test)
+
+set(CPACK_PROJECT_NAME ${PROJECT_NAME})
+set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
+include(CPack)
