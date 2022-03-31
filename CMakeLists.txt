@@ -52,6 +52,7 @@ target_link_libraries(
 
 add_subdirectory(lib/glad)
 add_subdirectory(test)
+add_subdirectory(engine)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
