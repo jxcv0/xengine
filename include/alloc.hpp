@@ -31,9 +31,18 @@ namespace ge::alloc {
      * @return void* the ptr to the address
      */
     void* alloc_aligned(std::size_t bytes, std::size_t align) {
-        std::size_t worst_case = bytes + align - 1;
-        int8_t* raw_mem = new int8_t[worst_case];
-        return align_ptr(raw_mem, align);
+        std::size_t actual_bytes = bytes + align;
+        uint8_t* raw_ptr = new uint8_t[actual_bytes];
+        uint8_t* aligned_ptr = align_ptr(raw_ptr, align);
+        
+        if (aligned_ptr == raw_ptr) {
+            aligned_ptr += align;
+        }
+
+        std::ptrdiff_t shift = aligned_ptr - raw_ptr;
+        assert(shift > 0 && shift <= 256);
+        aligned_ptr[-1] = static_cast<uint8_t>(shift & 0xFF);
+        return aligned_ptr;
     }
 
     /**

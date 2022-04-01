@@ -2,8 +2,12 @@
 
 #include "alloc.hpp"
 
+#include <random>
+
 // i dont think this test works
-TEST(alloc_tests, alloc_aligned) {
-    auto ptr = reinterpret_cast<uintptr_t>(ge::alloc::alloc_aligned(100, 2));
-    ASSERT_EQ(ptr % 2, 0);
+TEST(alloc_tests, alloc_aligned) {  
+    int *ptr;
+    int *aligned_ptr = ge::alloc::align_ptr(ptr, 16);
+    ASSERT_EQ(reinterpret_cast<uintptr_t>(aligned_ptr) % alignof(aligned_ptr), 0);
+    ASSERT_EQ((uintptr_t)aligned_ptr % 16, 0);
 }
