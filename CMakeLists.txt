@@ -27,11 +27,13 @@ find_package(glfw3 3.3 REQUIRED)
 set(
   SOURCES
     src/vec.cpp
+    src/alloc.cpp
 )
 
 set(
   HEADERS
     include/vec.hpp
+    include/alloc.hpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${HEADERS})

@@ -42,6 +42,9 @@ int main(int argc, char const *argv[]) {
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
+    std::cout << sizeof(size_t) << "\n";
+    std::cout << sizeof(void*) << "\n";
+
     while (!glfwWindowShouldClose(window)) {
         glfwSwapBuffers(window);
         glfwPollEvents();
