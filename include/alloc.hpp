@@ -46,6 +46,23 @@ namespace ge::alloc {
     }
 
     /**
+     * @brief Free aligned memory
+     * 
+     * @param ptr ptr to memory
+     */
+    void free_aligned(void* ptr) {
+        if (ptr) {
+            uint8_t *aligned_ptr = reinterpret_cast<uint8_t*>(ptr);
+            std::ptrdiff_t shift = aligned_ptr[-1];
+            if (shift == 0) {
+                shift = 256;
+            }
+            uint8_t *raw_ptr = aligned_ptr - shift;
+            delete[] raw_ptr;
+        }
+    }
+
+    /**
      * @brief A stack allocator that manages a contigious block of memory via a pointer to the top
      * of the memory stack. Addresses below this ptr are considered to be in use and addresses
      * above are considered free. The top pointer is initialized to the lowest memory address in
