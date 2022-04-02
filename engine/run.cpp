@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-#include <glm/ext/vector_float3.hpp>
+#include "shaders.hpp"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
@@ -29,6 +29,10 @@ int main(int argc, char const *argv[]) {
         std::cout << "Failed to initialize GLAD" << std::endl;;
         return -1;
     }
+
+    // shaders
+    ge::shader basic_shader("shaders/basic.vert", "shaders/basic.frag");
+    basic_shader.use();
 
     float vertices[] = {
         0.5f, -0.5f, 0.0f,

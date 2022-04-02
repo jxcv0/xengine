@@ -38,7 +38,15 @@ namespace ge {
     } // namespace shaders
 
     /**
-     * @brief Class for reading, compiling and linking shaders on initialization
+     * @brief Class for reading, compiling and linking shaders on initialization.
+     * This class manages a handle to the shader program and member functions call on the global gl
+     * functions.
+     * 
+     * 
+     * TODO - make singleton shader manager in future?
+     * or create an instance in each thing that needs its own shader?
+     * will know more after i understand more about memory managment and allocation models for ge
+     * ALSO - thread safety for multiple ge::shader instances
      * 
      */
     struct shader{
@@ -50,7 +58,8 @@ namespace ge {
         unsigned int id;
 
         /**
-         * @brief Construct a new Shader object
+         * @brief Compile and link a vertex and fragment shader into a shader program and
+         * get a handle to this program
          * 
          * @param v_path path to vertex source code
          * @param f_path path to fragment source code
@@ -69,7 +78,7 @@ namespace ge {
          * @param name shader name
          * @param val the value to set
          */
-        void set_bool(const std::string& name, bool val) const;
+        void set_bool(const char *name, bool val) const;
 
         /**
          * @brief Uniform utility function
@@ -77,7 +86,7 @@ namespace ge {
          * @param name shader name
          * @param val the value to set
          */
-        void set_int(const std::string& name, int val) const;
+        void set_int(const char *name, int val) const;
 
         /**
          * @brief Uniform utility function
@@ -85,7 +94,7 @@ namespace ge {
          * @param name shader name
          * @param val the value to set
          */
-        void set_float(const std::string& name, float val) const;
+        void set_float(const char *name, float val) const;
     };
 } // namespace shaders
 

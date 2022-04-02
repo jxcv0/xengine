@@ -74,7 +74,7 @@ ge::shader::shader(const char* v_path, const char* f_path) {
     int success;
     char info_log[512];
 
-    // vert
+    // compile vert
     vert = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vert, 1, &v_code_ptr, NULL);
     glCompileShader(vert);
@@ -86,7 +86,7 @@ ge::shader::shader(const char* v_path, const char* f_path) {
             << info_log << std::endl;
     }
 
-    // frag
+    // compile frag
     frag = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(frag, 1, &f_code_ptr, NULL);
     glCompileShader(frag);
@@ -98,7 +98,7 @@ ge::shader::shader(const char* v_path, const char* f_path) {
             << info_log << std::endl;
     }
 
-    // prgm
+    // linking
     unsigned int prgm = glCreateProgram();
     glAttachShader(prgm, vert);
     glAttachShader(prgm, frag);
@@ -107,11 +107,11 @@ ge::shader::shader(const char* v_path, const char* f_path) {
     glGetProgramiv(prgm, GL_LINK_STATUS, &success);
     if(!success) {
         glGetShaderInfoLog(prgm, 512, NULL, info_log);
-        std::cout << "ERROR::SHADER::VERTEX::LINKING_FAILED\n"
+        std::cout << "ERROR::SHADER::PRGM::LINKING_FAILED\n"
             << info_log << std::endl;
     }
 
-    // Delete shaders
+    // delete shaders
     glDeleteShader(vert);
     glDeleteShader(frag);
 }
@@ -120,14 +120,14 @@ void ge::shader::use() {
     glUseProgram(id);
 }
 
-void ge::shader::set_bool(const std::string& name, bool val) const {
-    glUniform1i(glGetUniformLocation(id, name.c_str()), (int)val); 
+void ge::shader::set_bool(const char *name, bool val) const {
+    glUniform1i(glGetUniformLocation(id, name), (int)val); 
 }
 
-void ge::shader::set_int(const std::string& name, int val) const {
-    glUniform1i(glGetUniformLocation(id, name.c_str()), val); 
+void ge::shader::set_int(const char *name, int val) const {
+    glUniform1i(glGetUniformLocation(id, name), val); 
 }
 
-void ge::shader::set_float(const std::string& name, float val) const {
-    glUniform1f(glGetUniformLocation(id, name.c_str()), val); 
+void ge::shader::set_float(const char *name, float val) const {
+    glUniform1f(glGetUniformLocation(id, name), val); 
 }
