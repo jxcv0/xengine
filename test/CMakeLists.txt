@@ -10,6 +10,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a")
 
 set(SOURCES
     alloc_tests.cpp
+    shaders_tests.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

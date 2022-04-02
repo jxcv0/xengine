@@ -29,11 +29,15 @@ find_package(glfw3 3.3 REQUIRED)
 set(
   SOURCES
     src/alloc.cpp
+    src/util.cpp
+    src/shaders.cpp
 )
 
 set(
   HEADERS
     include/alloc.hpp
+    include/util.hpp
+    include/shaders.hpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${HEADERS})
