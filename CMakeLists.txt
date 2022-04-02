@@ -26,13 +26,11 @@ find_package(glfw3 3.3 REQUIRED)
 
 set(
   SOURCES
-    src/vec.cpp
     src/alloc.cpp
 )
 
 set(
   HEADERS
-    include/vec.hpp
     include/alloc.hpp
 )
 
@@ -42,6 +40,7 @@ target_include_directories(
   ${PROJECT_NAME}
     PUBLIC
       ${PROJECT_SOURCE_DIR}/include
+      ${PROJECT_SOURCE_DIR}/lib/glm
 )
 
 target_link_libraries(

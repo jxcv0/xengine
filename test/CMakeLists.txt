@@ -9,7 +9,6 @@ set(CMAKE_BUILD_TYPE debug)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a")
 
 set(SOURCES
-    vec_tests.cpp
     alloc_tests.cpp
 )
 
