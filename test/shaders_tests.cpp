@@ -13,7 +13,7 @@ TEST(ShadersTests, read_shader_file_test) {
 
     std::string expected(p_expected);
 
-    std::string actual = ge::shaders::read_shader_file("shaders/basic.vert");
+    std::string actual = ge::shaders::read_shader_file("shaders/test.vert");
 
     ASSERT_EQ(actual, expected);
 }
