@@ -3,12 +3,13 @@
 
 #include <iostream>
 
+#include <glm/ext/vector_float3.hpp>
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
 int main(int argc, char const *argv[]) {
-
     
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -39,9 +40,6 @@ int main(int argc, char const *argv[]) {
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    std::cout << sizeof(size_t) << "\n";
-    std::cout << sizeof(void*) << "\n";
 
     while (!glfwWindowShouldClose(window)) {
         glfwSwapBuffers(window);

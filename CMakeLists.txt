@@ -8,6 +8,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a")
 
 enable_testing()
 
+## deps ##
+
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
@@ -40,7 +42,6 @@ target_include_directories(
   ${PROJECT_NAME}
     PUBLIC
       ${PROJECT_SOURCE_DIR}/include
-      ${PROJECT_SOURCE_DIR}/lib/glm
 )
 
 target_link_libraries(
@@ -49,9 +50,11 @@ target_link_libraries(
       glfw
       glad
       OpenGL::GL
+      glm::glm
 )
 
 add_subdirectory(lib/glad)
+add_subdirectory(lib/glm)
 add_subdirectory(test)
 add_subdirectory(engine)
 
