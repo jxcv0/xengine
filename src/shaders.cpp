@@ -78,37 +78,34 @@ ge::shader::shader(const char* v_path, const char* f_path) {
     vert = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vert, 1, &v_code_ptr, NULL);
     glCompileShader(vert);
-    glGetShaderiv(vert, GL_COMPILE_STATUS, &success);
 
+    glGetShaderiv(vert, GL_COMPILE_STATUS, &success);
     if(!success) {
         glGetShaderInfoLog(vert, 512, NULL, info_log);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n"
-            << info_log << std::endl;
+        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << info_log << std::endl;
     }
 
     // compile frag
     frag = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(frag, 1, &f_code_ptr, NULL);
     glCompileShader(frag);
-    glGetShaderiv(frag, GL_COMPILE_STATUS, &success);
 
+    glGetShaderiv(frag, GL_COMPILE_STATUS, &success);
     if(!success) {
         glGetShaderInfoLog(frag, 512, NULL, info_log);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n"
-            << info_log << std::endl;
+        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << info_log << std::endl;
     }
 
     // linking
-    unsigned int prgm = glCreateProgram();
-    glAttachShader(prgm, vert);
-    glAttachShader(prgm, frag);
-    glLinkProgram(prgm);
+    id = glCreateProgram();
+    glAttachShader(id, vert);
+    glAttachShader(id, frag);
+    glLinkProgram(id);
 
-    glGetProgramiv(prgm, GL_LINK_STATUS, &success);
+    glGetProgramiv(id, GL_LINK_STATUS, &success);
     if(!success) {
-        glGetShaderInfoLog(prgm, 512, NULL, info_log);
-        std::cout << "ERROR::SHADER::PRGM::LINKING_FAILED\n"
-            << info_log << std::endl;
+        glGetShaderInfoLog(id, 512, NULL, info_log);
+        std::cout << "ERROR::SHADER::PRGM::LINKING_FAILED\n" << info_log << std::endl;
     }
 
     // delete shaders
@@ -118,6 +115,10 @@ ge::shader::shader(const char* v_path, const char* f_path) {
 
 void ge::shader::use() {
     glUseProgram(id);
+}
+
+void ge::shader::del() {
+    glDeleteProgram(id);
 }
 
 void ge::shader::set_bool(const char *name, bool val) const {

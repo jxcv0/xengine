@@ -73,6 +73,12 @@ namespace ge {
         void use();
 
         /**
+         * @brief Dealocate shader program resources
+         * 
+         */
+        void del();
+        
+        /**
          * @brief Uniform utility function
          * 
          * @param name shader name
