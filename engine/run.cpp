@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
+#include <math.h>
 
 #include "shaders.hpp"
 #include "util.hpp"
@@ -71,7 +72,11 @@ int main(int argc, char const *argv[]) {
         glClear(GL_COLOR_BUFFER_BIT);
 
         // draw triangle
+        float t = glfwGetTime();
+        float green = (sin(t) / 2.0f) + 0.5f;
+        int uni_loc = glGetUniformLocation(basic_shader.id, "uni_col");
         basic_shader.use();
+        glUniform4f(uni_loc, 0.0f, green, 0.0f, 1.0f);
         glBindVertexArray(VAO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
