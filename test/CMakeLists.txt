@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22.2)
-project(ge_tests)
+project(xengine_tests)
 
 enable_testing()
 
@@ -15,7 +15,7 @@ set(SOURCES
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ge gtest_main)
+target_link_libraries(${PROJECT_NAME} PUBLIC xengine gtest_main)
 
 add_test(
     NAME ${PROJECT_NAME}

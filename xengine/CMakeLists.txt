@@ -8,4 +8,4 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a")
 
 add_executable(${PROJECT_NAME} run.cpp)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE ge)
+target_link_libraries(${PROJECT_NAME} PRIVATE xengine)

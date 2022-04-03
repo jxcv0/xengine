@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.18.4)
-project(Glad)
+project(glad)
 
 set(
     SOURCES
@@ -12,5 +12,5 @@ set(
         include/KHR/khrplatform.h
 )
 
-add_library(glad SHARED ${HEADERS} ${SOURCES})
-target_include_directories(glad PUBLIC include/glad/)
+add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})
+target_include_directories(${PROJECT_NAME} PUBLIC include/glad/)
