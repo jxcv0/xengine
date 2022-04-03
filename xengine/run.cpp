@@ -29,7 +29,7 @@ int main(int argc, char const *argv[]) {
     }
 
     // shaders
-    xen::shader basic_shader("shaders/basic.vert", "shaders/basic.frag");
+    xen::shader basic_shader("assets/shaders/basic.vert", "assets/shaders/basic.frag");
 
     float vertices[] = {
         -0.5f, -0.5f, 0.0f, // bottom left

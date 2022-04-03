@@ -46,6 +46,7 @@ target_include_directories(
   ${PROJECT_NAME}
     PUBLIC
       ${PROJECT_SOURCE_DIR}/include
+      ${PROJECT_SOURCE_DIR}/lib/glm
 )
 
 target_link_libraries(
@@ -54,11 +55,9 @@ target_link_libraries(
       glfw
       glad
       OpenGL::GL
-      glm::glm
 )
 
 add_subdirectory(lib/glad)
-add_subdirectory(lib/glm)
 add_subdirectory(test)
 add_subdirectory(xengine)
 
