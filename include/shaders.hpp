@@ -9,7 +9,7 @@
  * @brief Reading, compiling and linking shaders
  * 
  */
-namespace ge {
+namespace xen {
     namespace shaders {
     
         /**
@@ -49,7 +49,7 @@ namespace ge {
      * ALSO - thread safety for multiple ge::shader instances
      * 
      */
-    struct shader{
+    struct shader {
 
         /**
          * @brief Shader id
@@ -102,6 +102,6 @@ namespace ge {
          */
         void set_float(const char *name, float val) const;
     };
-} // namespace shaders
+} // namespace xen
 
 #endif

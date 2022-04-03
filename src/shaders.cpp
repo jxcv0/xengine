@@ -10,7 +10,7 @@
  * @param path the file path
  * @return the shader program as a string
  */
-std::string ge::shaders::read_shader_file(const char* path) {
+std::string xen::shaders::read_shader_file(const char* path) {
     std::ifstream f_stream(path);
 
     if (!f_stream.is_open()) {
@@ -28,18 +28,18 @@ std::string ge::shaders::read_shader_file(const char* path) {
     return str;
 }
 
-void ge::shaders::shader_source(GLuint shader, const std::string& shader_string) {
+void xen::shaders::shader_source(GLuint shader, const std::string& shader_string) {
     const GLchar *shader_source = shader_string.c_str();
     const GLint shader_length = shader_string.length();
 
     glShaderSource(shader, 1, &shader_source, &shader_length);
 }
 
-void ge::shaders::load_shader(GLuint shader_obj, const char *path) {
+void xen::shaders::load_shader(GLuint shader_obj, const char *path) {
     shader_source(shader_obj, read_shader_file(path));
 }
 
-ge::shader::shader(const char* v_path, const char* f_path) {
+xen::shader::shader(const char* v_path, const char* f_path) {
     std::string v_code;
     std::string f_code;
     std::ifstream v_file;
@@ -113,22 +113,22 @@ ge::shader::shader(const char* v_path, const char* f_path) {
     glDeleteShader(frag);
 }
 
-void ge::shader::use() {
+void xen::shader::use() {
     glUseProgram(id);
 }
 
-void ge::shader::del() {
+void xen::shader::del() {
     glDeleteProgram(id);
 }
 
-void ge::shader::set_bool(const char *name, bool val) const {
+void xen::shader::set_bool(const char *name, bool val) const {
     glUniform1i(glGetUniformLocation(id, name), (int)val); 
 }
 
-void ge::shader::set_int(const char *name, int val) const {
+void xen::shader::set_int(const char *name, int val) const {
     glUniform1i(glGetUniformLocation(id, name), val); 
 }
 
-void ge::shader::set_float(const char *name, float val) const {
+void xen::shader::set_float(const char *name, float val) const {
     glUniform1f(glGetUniformLocation(id, name), val); 
 }

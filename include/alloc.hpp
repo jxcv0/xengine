@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <cstdint>
 
-namespace ge::alloc {
+namespace xen::alloc {
 
     /**
      * @brief Shift and address upwards as necessary to align to a given number of bytes
@@ -90,6 +90,6 @@ namespace ge::alloc {
     public:
 
     };
-} // namespace ge::alloc
+} // namespace xen::alloc
 
 #endif // _ALLOC_HPP_

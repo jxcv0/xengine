@@ -4,7 +4,7 @@
 #include "glad.h"
 #include <GLFW/glfw3.h>
 
-namespace ge::util {
+namespace xen::util {
 
     /**
      * @brief Frambuffer size callback function
@@ -21,6 +21,6 @@ namespace ge::util {
      * @param window the window
      */
     void process_input(GLFWwindow *window);
-} // namespace ge::util
+} // namespace xen::util
 
 #endif

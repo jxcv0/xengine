@@ -21,7 +21,7 @@ int main(int argc, char const *argv[]) {
         return -1;
     }
     glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, ge::util::framebuffer_size_callback);
+    glfwSetFramebufferSizeCallback(window, xen::util::framebuffer_size_callback);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cout << "Failed to initialize GLAD" << std::endl;;
@@ -29,7 +29,7 @@ int main(int argc, char const *argv[]) {
     }
 
     // shaders
-    ge::shader basic_shader("shaders/basic.vert", "shaders/basic.frag");
+    xen::shader basic_shader("shaders/basic.vert", "shaders/basic.frag");
 
     float vertices[] = {
         -0.5f, -0.5f, 0.0f, // bottom left
@@ -65,7 +65,7 @@ int main(int argc, char const *argv[]) {
 
     while (!glfwWindowShouldClose(window)) {
         // input
-        ge::util::process_input(window);
+        xen::util::process_input(window);
 
         // background
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
