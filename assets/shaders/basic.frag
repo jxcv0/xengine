@@ -1,8 +1,11 @@
 #version 460 core
-out vec4 frag_colour;
+out vec4 out_col;
 
-uniform vec4 uni_col;
+in vec3 f_col;
+in vec2 f_tex;
+
+uniform sampler2D, out_tex;
 
 void main() {
-    frag_colour = uni_col;
+    out_col = texture(out_tex, f_tex);
 }

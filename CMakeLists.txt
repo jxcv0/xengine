@@ -8,8 +8,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a")
 
 enable_testing()
 
-## deps ##
-
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
@@ -22,6 +20,13 @@ FetchContent_Declare(
     GIT_TAG        c9461a9b55ba954df0489bab6420eb297bed846b
 )
 FetchContent_MakeAvailable(googletest)
+
+FetchContent_Declare(
+  assimp
+    GIT_REPOSITORY https://github.com/assimp/assimp.git
+    GIT_TAG        75ab2beb062d56abfe717355ccfb574980f8f2fd
+)
+FetchContent_MakeAvailable(assimp)
 
 find_package(OpenGL REQUIRED)
 find_package(glfw3 3.3 REQUIRED)
@@ -47,6 +52,7 @@ target_include_directories(
     PUBLIC
       ${PROJECT_SOURCE_DIR}/include
       ${PROJECT_SOURCE_DIR}/lib/glm
+      ${PROJECT_SOURCE_DIR}/lib/stb
 )
 
 target_link_libraries(
