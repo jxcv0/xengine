@@ -3,12 +3,9 @@
 #include <glad.h>
 
 /**
- * @brief Create a mesh object
+ * @brief Set up VAO, VBO, and EBO for a mesh
  * 
- * @param v vertices
- * @param i indices
- * @param t textures
- * @return the mesh
+ * @param m mesh
  */
 void xen::setup_mesh(mesh &m) {
 
