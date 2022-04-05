@@ -10,24 +10,24 @@
  * @param t textures
  * @return the mesh
  */
-void setup_mesh(xen::mesh m) {
+void xen::setup_mesh(mesh &m) {
 
-    // TODO - aquire lock here for multithreading 
-    
+    // TODO - aquire lock here? or can these be overwritten on every call? (too slow surely)
+
     // generate buffers
-    glGenVertexArrays(1, &m.VAO_);
-    glGenBuffers(1, &m.VBO_);
-    glGenBuffers(1, &m.EBO_);
+    glGenVertexArrays(1, &m.VAO);
+    glGenBuffers(1, &m.VBO);
+    glGenBuffers(1, &m.EBO);
 
     // bind and buffer data
-    glBindVertexArray(m.VAO_);
+    glBindVertexArray(m.VAO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, m.VBO_);
-    glBufferData(GL_ARRAY_BUFFER, m.vertices_.size() * sizeof(xen::mesh::vertex), &m.vertices_[0],
+    glBindBuffer(GL_ARRAY_BUFFER, m.VBO);
+    glBufferData(GL_ARRAY_BUFFER, m.vertices.size() * sizeof(xen::mesh::vertex), &m.vertices[0],
         GL_STATIC_DRAW);
     
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m.EBO_);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m.indices_.size() * sizeof(unsigned int), &m.indices_[0],
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m.EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m.indices.size() * sizeof(unsigned int), &m.indices[0],
         GL_STATIC_DRAW);
     
     // vertex positions
@@ -45,5 +45,34 @@ void setup_mesh(xen::mesh m) {
         (void*)offsetof(xen::mesh::vertex, xen::mesh::vertex::tex_coords));
     
     // unbind
+    glBindVertexArray(0);
+}
+
+/**
+ * @brief Draw a mesh using a shader program
+ * 
+ * @param m mesh
+ * @param s the shader program
+ */
+void xen::draw_mesh(const mesh &m, shader &s) {
+    unsigned int diffuse_no = 1;
+    unsigned int specular_no = 1;
+
+    for (unsigned int i = 0; i < m.textures.size(); i++) {
+        glActiveTexture(GL_TEXTURE0 + i);
+        std::string num;
+        std::string name = m.textures[i].type;
+        if (name == "texture_diffuse") {
+            num = std::to_string(diffuse_no++); 
+        } else if (name == "texture_specular") {
+            num = std::to_string(specular_no++);
+        }
+        s.set_float(("material." + name + num).c_str(), i);
+        glBindTexture(GL_TEXTURE_2D, m.textures[1].id);
+    }
+    glActiveTexture(GL_TEXTURE0);
+
+    glBindVertexArray(m.VAO);
+    glDrawElements(GL_TRIANGLES, m.indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }

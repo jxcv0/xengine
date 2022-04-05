@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 
 #include <vector>
+#include <string>
 
 #include "shaders.hpp"
 
@@ -34,15 +35,15 @@ namespace xen {
          */
         struct texture {
             unsigned int id;
-            char type[64];
+            std::string type;
         };
 
         // opengl buffer handles
-        unsigned int VAO_, VBO_, EBO_;
+        unsigned int VAO, VBO, EBO;
 
-        std::vector<vertex> vertices_;
-        std::vector<unsigned int> indices_;
-        std::vector<texture> textures_;
+        std::vector<vertex> vertices;
+        std::vector<unsigned int> indices;
+        std::vector<texture> textures;
     };
 
     /**
@@ -58,7 +59,7 @@ namespace xen {
      * @param m mesh
      * @param s the shader program
      */
-    void draw_mesh(const mesh &m, xen::shader &s);
+    void draw_mesh(const mesh &m, shader &s);
 
     /**
      * @brief 
