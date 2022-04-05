@@ -30,6 +30,7 @@ FetchContent_MakeAvailable(assimp)
 
 find_package(OpenGL REQUIRED)
 find_package(glfw3 3.3 REQUIRED)
+find_package(glm REQUIRED)
 
 set(
   SOURCES
@@ -51,7 +52,6 @@ target_include_directories(
   ${PROJECT_NAME}
     PUBLIC
       ${PROJECT_SOURCE_DIR}/include
-      ${PROJECT_SOURCE_DIR}/lib/glm
       ${PROJECT_SOURCE_DIR}/lib/stb
 )
 
