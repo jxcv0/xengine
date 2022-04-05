@@ -37,6 +37,7 @@ set(
     src/alloc.cpp
     src/util.cpp
     src/shaders.cpp
+    src/model.cpp
 )
 
 set(
@@ -44,6 +45,7 @@ set(
     include/alloc.hpp
     include/util.hpp
     include/shaders.hpp
+    include/model.hpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${HEADERS})
