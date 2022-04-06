@@ -82,6 +82,9 @@ namespace xen {
      */
     void load_model(Model &m, const std::string &path);
 
+
+    unsigned int load_texture(const char *path, const std::string &dir);
+
     /**
      * @brief Draw a model using a shader program
      * 

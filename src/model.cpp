@@ -90,40 +90,74 @@ void xen::draw_mesh(const Mesh &m, Shader &s) {
     glActiveTexture(GL_TEXTURE0);
 }
 
-/**
- * @brief Load a model from a filepath
- * 
- * @param m model
- * @param path path to model file
- */
-void xen::load_model(Model &m, const std::string &path) {
+unsigned int xen::load_texture(const char *path, const std::string &dir) {
+    std::string filename(path);
+    filename = dir + '/' + filename;
 
-    Assimp::Importer imp;
-    const aiScene *scene = imp.ReadFile(path,
-          aiProcess_Triangulate
-        | aiProcess_GenSmoothNormals
-        | aiProcess_FlipUVs
-        | aiProcess_CalcTangentSpace);
+    unsigned int tex_id;
+    glGenTextures(1, &tex_id);
     
-    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-        std::cout << "ERROR::ASSIMP:: " << imp.GetErrorString() << std::endl;
-        return;
+    int w, h, no;
+    unsigned char *data = stbi_load(filename.c_str(), &w, &h, &no, 0);
+
+    if (data) {
+        GLenum format;
+        if (no == 1) {
+            format = GL_RED;
+        } else if (no == 3) {
+            format = GL_RGB;
+        } else if (no = 4) {
+            format = GL_RGBA;
+        }
+
+        glBindTexture(GL_TEXTURE_2D, tex_id);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, w, h, 0, format, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        stbi_image_free(data);
+    } else {
+        std::cout << "Unable to load texture from " << path << std::endl;
+        stbi_image_free(data);
     }
 
-    m.dir = path.substr(0, path.find_last_of('/'));
-
-    process_node(m, scene->mRootNode, scene);
+    return tex_id;
 }
 
-void process_node(xen::Model &m, aiNode *node, const aiScene *scene) {
-    for (size_t i = 0; i < node->mNumMeshes; i++) {
-        aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-        m.meshes.push_back(process_mesh(m, mesh, scene));
-    }
+std::vector<xen::Mesh::Texture> load_material_tex(
+    xen::Model &m,
+    aiMaterial *mat,
+    aiTextureType type,
+    std::string type_name
+) {
+    std::vector<xen::Mesh::Texture> textures;
+    for (size_t i = 0; i < mat->GetTextureCount(type); i++) {
+        aiString str;
+        mat->GetTexture(type, i, &str);
+        bool skip = false;
 
-    for (size_t i = 0; i < node->mNumChildren; i++) {
-        process_node(m, node->mChildren[i], scene);
+        for (size_t j = 0; m.loaded_textures.size(); i++) {
+            if (std::strcmp(m.loaded_textures[j].path.data(), str.C_Str()) == 0) {
+                textures.push_back(m.loaded_textures[j]);
+                skip = true;
+                break;
+            }
+        }
+
+        if (!skip) {
+            xen::Mesh::Texture texture;
+            texture.id = xen::load_texture(str.C_Str(), m.dir);
+            texture.type = type_name;
+            texture.path = str.C_Str();
+            textures.push_back(texture);
+            m.loaded_textures.push_back(texture);
+        }
     }
+    return textures;   
 }
 
 xen::Mesh process_mesh(xen::Model &m, aiMesh *mesh, const aiScene *scene) {
@@ -180,20 +214,22 @@ xen::Mesh process_mesh(xen::Model &m, aiMesh *mesh, const aiScene *scene) {
 
     // diffuse
     std::vector<xen::Mesh::Texture> diffuseMaps =
-        load_mat_tex(m, mat, aiTextureType_DIFFUSE, "texture_diffuse");
+        load_material_tex(m, mat, aiTextureType_DIFFUSE, "texture_diffuse");
     textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
     // specular
     std::vector<xen::Mesh::Texture> specularMaps =
-        load_mat_tex(m, mat, aiTextureType_SPECULAR, "texture_specular");
+        load_material_tex(m, mat, aiTextureType_SPECULAR, "texture_specular");
     textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 
     // normal
-    std::vector<xen::Mesh::Texture> normalMaps = load_mat_tex(m, mat, aiTextureType_HEIGHT, "texture_normal");
+    std::vector<xen::Mesh::Texture> normalMaps = 
+        load_material_tex(m, mat, aiTextureType_HEIGHT, "texture_normal");
     textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 
     // height
-    std::vector<xen::Mesh::Texture> heightMaps = load_mat_tex(m, mat, aiTextureType_AMBIENT, "texture_height");
+    std::vector<xen::Mesh::Texture> heightMaps =
+        load_material_tex(m, mat, aiTextureType_AMBIENT, "texture_height");
     textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
     xen::Mesh x_mesh;
@@ -203,74 +239,40 @@ xen::Mesh process_mesh(xen::Model &m, aiMesh *mesh, const aiScene *scene) {
     return x_mesh;
 }
 
-std::vector<xen::Mesh::Texture> load_mat_tex(
-    xen::Model &m,
-    aiMaterial *mat,
-    aiTextureType type,
-    std::string type_name
-) {
-    std::vector<xen::Mesh::Texture> textures;
-    for (size_t i = 0; i < mat->GetTextureCount(type); i++) {
-        aiString str;
-        mat->GetTexture(type, i, &str);
-        bool skip = false;
+void process_node(xen::Model &m, aiNode *node, const aiScene *scene) {
+    for (size_t i = 0; i < node->mNumMeshes; i++) {
+        aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
+        m.meshes.push_back(process_mesh(m, mesh, scene));
+    }
 
-        for (size_t j = 0; m.loaded_textures.size(); i++) {
-            if (std::strcmp(m.loaded_textures[j].path.data(), str.C_Str()) == 0) {
-                textures.push_back(m.loaded_textures[j]);
-                skip = true;
-                break;
-            }
-        }
-
-        if (!skip) {
-            xen::Mesh::Texture texture;
-            texture.id = tex_from_file(str.C_Str(), m.dir);
-            texture.type = type_name;
-            texture.path = str.C_Str();
-            textures.push_back(texture);
-            m.loaded_textures.push_back(texture);
-        }
-        return textures;   
+    for (size_t i = 0; i < node->mNumChildren; i++) {
+        process_node(m, node->mChildren[i], scene);
     }
 }
 
-unsigned int tex_from_file(const char *path, const std::string &dir) {
-    std::string filename(path);
-    filename = dir + '/' + filename;
+/**
+ * @brief Load a model from a filepath
+ * 
+ * @param m model
+ * @param path path to model file
+ */
+void xen::load_model(Model &m, const std::string &path) {
 
-    unsigned int tex_id;
-    glGenTextures(1, &tex_id);
+    Assimp::Importer imp;
+    const aiScene *scene = imp.ReadFile(path,
+          aiProcess_Triangulate
+        | aiProcess_GenSmoothNormals
+        | aiProcess_FlipUVs
+        | aiProcess_CalcTangentSpace);
     
-    int w, h, no;
-    unsigned char *data = stbi_load(filename.c_str(), &w, &h, &no, 0);
-
-    if (data) {
-        GLenum format;
-        if (no == 1) {
-            format = GL_RED;
-        } else if (no == 3) {
-            format = GL_RGB;
-        } else if (no = 4) {
-            format = GL_RGBA;
-        }
-
-        glBindTexture(GL_TEXTURE_2D, tex_id);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, w, h, 0, format, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        stbi_image_free(data);
-    } else {
-        std::cout << "Unable to load texture from " << path << std::endl;
-        stbi_image_free(data);
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
+        std::cout << "ERROR::ASSIMP:: " << imp.GetErrorString() << std::endl;
+        return;
     }
 
-    return tex_id;
+    m.dir = path.substr(0, path.find_last_of('/'));
+
+    process_node(m, scene->mRootNode, scene);
 }
 
 /**
@@ -279,6 +281,6 @@ unsigned int tex_from_file(const char *path, const std::string &dir) {
  * @param m mesh
  * @param s shader program
  */
-void xen::draw_model(const Shader &s) {
+void xen::draw_model(Model &m, const Shader &s) {
 
 }
