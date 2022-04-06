@@ -18,7 +18,7 @@ namespace xen::util {
     /**
      * @brief Process input
      * 
-     * @param window the window
+     * @param window
      */
     void process_input(GLFWwindow *window);
 } // namespace xen::util

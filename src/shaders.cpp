@@ -4,6 +4,8 @@
 #include <iostream>
 #include <sstream>
 
+#include <glm/ext.hpp>
+
 /**
  * @brief Read a shader file
  * 
@@ -174,4 +176,14 @@ void xen::Shader::set_vec2(const char* name, const glm::vec3 &v) {
  */
 void xen::Shader::set_vec3(const char* name, const glm::vec3 &v) {
     glUniform3fv(glGetUniformLocation(id, name), 1, &v[0]);
+}
+
+/**
+ * @brief Uniform utility function
+ * 
+ * @param name shader name
+ * @param val value
+ */
+void xen::Shader::set_mat4(const char* name, const glm::mat4 &v) {
+    glUniformMatrix4fv(id, 1, GL_FALSE, glm::value_ptr(v));
 }

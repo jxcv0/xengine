@@ -107,6 +107,14 @@ namespace xen {
          * @param val value
          */
         void set_vec3(const char* name, const glm::vec3 &v);
+
+        /**
+         * @brief Uniform utility function
+         * 
+         * @param name shader name
+         * @param val value
+         */
+        void set_mat4(const char* name, const glm::mat4 &v);
     };
 
     /**

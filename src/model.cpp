@@ -66,6 +66,7 @@ void xen::draw_mesh(const Mesh &m, Shader &s) {
     unsigned int normal_no = 1;
     unsigned int height_no = 1;
 
+    // TODO - this should be moved outside the game loop
     for (unsigned int i = 0; i < m.textures.size(); i++) {
         glActiveTexture(GL_TEXTURE0 + i);
         std::string num;
@@ -96,7 +97,9 @@ unsigned int xen::load_texture(const char *path, const std::string &dir) {
 
     unsigned int tex_id;
     glGenTextures(1, &tex_id);
-    
+
+    stbi_set_flip_vertically_on_load(true);
+
     int w, h, no;
     unsigned char *data = stbi_load(filename.c_str(), &w, &h, &no, 0);
 
