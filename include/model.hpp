@@ -17,13 +17,13 @@ namespace xen {
      * @brief Contains mesh data imported from asset files
      * 
      */
-    struct mesh {
+    struct Mesh {
 
         /**
          * @brief individial mesh vertices
          * 
          */
-        struct vertex {
+        struct Vertex {
             glm::vec3 pos;  // vertex position in model space
             glm::vec3 norm; // normal vector of this vertex (will this lead to duplicate data?)
             glm::vec2 tex_coords;  // texture coords 
@@ -33,17 +33,18 @@ namespace xen {
          * @brief texture data
          * 
          */
-        struct texture {
+        struct Texture {
             unsigned int id;
             std::string type;
+            std::string path;
         };
 
         // opengl buffer handles
         unsigned int VAO, VBO, EBO;
 
-        std::vector<vertex> vertices;
+        std::vector<Vertex> vertices;
         std::vector<unsigned int> indices;
-        std::vector<texture> textures;
+        std::vector<Texture> textures;
     };
 
     /**
@@ -52,7 +53,7 @@ namespace xen {
      * 
      * @param m mesh
      */
-    void setup_mesh(mesh &m);
+    void setup_mesh(Mesh &m);
 
     /**
      * @brief Draw a mesh using a shader program
@@ -60,15 +61,15 @@ namespace xen {
      * @param m mesh
      * @param s shader program
      */
-    void draw_mesh(const mesh &m, shader &s);
+    void draw_mesh(const Mesh &m, Shader &s);
 
     /**
      * @brief 
      * 
      */
-    struct model {
-        std::vector<mesh::texture> loaded_textures;
-        std::vector<mesh> meshes;
+    struct Model {
+        std::vector<Mesh::Texture> loaded_textures;
+        std::vector<Mesh> meshes;
         std::string dir;
         bool gamma_correction;
     };
@@ -76,17 +77,18 @@ namespace xen {
     /**
      * @brief Load a model from a filepath
      * 
-     * @param path the file path to the model
+     * @param m model
+     * @param path path to model file
      */
-    model load_model(const char* path);
+    void load_model(Model &m, const std::string &path);
 
     /**
      * @brief Draw a model using a shader program
      * 
-     * @param m mesh
+     * @param m model
      * @param s shader program
      */
-    void draw_model(const shader &s);
+    void draw_model(Model &m, const Shader &s);
 
 } // namespace xen
 

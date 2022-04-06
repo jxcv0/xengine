@@ -48,7 +48,7 @@ namespace xen {
      * ALSO - thread safety for multiple ge::shader instances
      * 
      */
-    class shader {
+    class Shader {
 
         /**
          * @brief Shader id
@@ -65,7 +65,7 @@ namespace xen {
          * @param v_path path to vertex source code
          * @param f_path path to fragment source code
          */
-        shader(const char* v_path, const char* f_path);
+        Shader(const char* v_path, const char* f_path);
 
         /**
          * @brief Use/activate the shader

@@ -21,16 +21,10 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
-FetchContent_Declare(
-  assimp
-    GIT_REPOSITORY https://github.com/assimp/assimp.git
-    GIT_TAG        75ab2beb062d56abfe717355ccfb574980f8f2fd
-)
-FetchContent_MakeAvailable(assimp)
-
 find_package(OpenGL REQUIRED)
 find_package(glfw3 3.3 REQUIRED)
 find_package(glm REQUIRED)
+find_package(assimp REQUIRED)
 
 set(
   SOURCES

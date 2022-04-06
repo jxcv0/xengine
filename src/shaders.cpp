@@ -39,7 +39,7 @@ void xen::load_shader(GLuint shader_obj, const char *path) {
     shader_source(shader_obj, read_shader_file(path));
 }
 
-xen::shader::shader(const char* v_path, const char* f_path) {
+xen::Shader::Shader(const char* v_path, const char* f_path) {
     std::string v_code;
     std::string f_code;
     std::ifstream v_file;
@@ -113,11 +113,11 @@ xen::shader::shader(const char* v_path, const char* f_path) {
     glDeleteShader(frag);
 }
 
-void xen::shader::use() {
+void xen::Shader::use() {
     glUseProgram(id_);
 }
 
-void xen::shader::del() {
+void xen::Shader::del() {
     glDeleteProgram(id_);
 }
 
@@ -127,7 +127,7 @@ void xen::shader::del() {
  * @param name shader name
  * @param val value
  */
-void xen::shader::set_bool(const char *name, bool val) const {
+void xen::Shader::set_bool(const char *name, bool val) const {
     glUniform1i(glGetUniformLocation(id_, name), (int)val); 
 }
 
@@ -137,7 +137,7 @@ void xen::shader::set_bool(const char *name, bool val) const {
  * @param name shader name
  * @param val value
  */
-void xen::shader::set_int(const char *name, int val) const {
+void xen::Shader::set_int(const char *name, int val) const {
     glUniform1i(glGetUniformLocation(id_, name), val); 
 }
 
@@ -147,7 +147,7 @@ void xen::shader::set_int(const char *name, int val) const {
  * @param name shader name
  * @param val value
  */
-void xen::shader::set_float(const char *name, float val) const {
+void xen::Shader::set_float(const char *name, float val) const {
     glUniform1f(glGetUniformLocation(id_, name), val); 
 }
 
@@ -157,7 +157,7 @@ void xen::shader::set_float(const char *name, float val) const {
  * @param name shader name
  * @param val value
  */
-void xen::shader::set_vec2(const char* name, const glm::vec3 &v) {
+void xen::Shader::set_vec2(const char* name, const glm::vec3 &v) {
     glUniform2fv(glGetUniformLocation(id_, name), 1, &v[0]);
 }
 
@@ -167,6 +167,6 @@ void xen::shader::set_vec2(const char* name, const glm::vec3 &v) {
  * @param name shader name
  * @param val value
  */
-void xen::shader::set_vec3(const char* name, const glm::vec3 &v) {
+void xen::Shader::set_vec3(const char* name, const glm::vec3 &v) {
     glUniform3fv(glGetUniformLocation(id_, name), 1, &v[0]);
 }
