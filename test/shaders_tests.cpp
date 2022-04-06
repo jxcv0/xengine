@@ -13,7 +13,7 @@ TEST(ShadersTests, read_shader_file_test) {
 
     std::string expected(p_expected);
 
-    std::string actual = xen::shaders::read_shader_file("assets/shaders/test.vert");
+    std::string actual = xen::read_shader_file("assets/shaders/test.vert");
 
     ASSERT_EQ(actual, expected);
 }

@@ -54,6 +54,8 @@ void xen::setup_mesh(mesh &m) {
 void xen::draw_mesh(const mesh &m, shader &s) {
     unsigned int diffuse_no = 1;
     unsigned int specular_no = 1;
+    unsigned int normal_no = 1;
+    unsigned int height_no = 1;
 
     for (unsigned int i = 0; i < m.textures.size(); i++) {
         glActiveTexture(GL_TEXTURE0 + i);
@@ -63,13 +65,18 @@ void xen::draw_mesh(const mesh &m, shader &s) {
             num = std::to_string(diffuse_no++); 
         } else if (name == "texture_specular") {
             num = std::to_string(specular_no++);
+        } else if (name == "texture_normal") {
+            num = std::to_string(normal_no++);
+        } else if (name == "texture_height") {
+            num = std::to_string(height_no++);
         }
         s.set_float(("material." + name + num).c_str(), i);
         glBindTexture(GL_TEXTURE_2D, m.textures[i].id);
     }
-    glActiveTexture(GL_TEXTURE0);
 
     glBindVertexArray(m.VAO);
-    glDrawElements(GL_TRIANGLES, m.indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(m.indices.size()), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+    
+    glActiveTexture(GL_TEXTURE0);
 }

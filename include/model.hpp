@@ -48,6 +48,7 @@ namespace xen {
 
     /**
      * @brief Set up VAO, VBO, and EBO for a mesh
+     * vertices, indices and textures must be set up first
      * 
      * @param m mesh
      */
@@ -57,7 +58,7 @@ namespace xen {
      * @brief Draw a mesh using a shader program
      * 
      * @param m mesh
-     * @param s the shader program
+     * @param s shader program
      */
     void draw_mesh(const mesh &m, shader &s);
 
@@ -65,17 +66,28 @@ namespace xen {
      * @brief 
      * 
      */
-    class model {
-
-    public:
-
-        /**
-         * @brief Load a model from a filepath
-         * 
-         * @param path the file path to the model
-         */
-        void load(const char* path);
+    struct model {
+        std::vector<mesh::texture> loaded_textures;
+        std::vector<mesh> meshes;
+        std::string dir;
+        bool gamma_correction;
     };
+
+    /**
+     * @brief Load a model from a filepath
+     * 
+     * @param path the file path to the model
+     */
+    model load_model(const char* path);
+
+    /**
+     * @brief Draw a model using a shader program
+     * 
+     * @param m mesh
+     * @param s shader program
+     */
+    void draw_model(const shader &s);
+
 } // namespace xen
 
 #endif
