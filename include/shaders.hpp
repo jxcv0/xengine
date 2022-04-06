@@ -48,24 +48,13 @@ namespace xen {
      * ALSO - thread safety for multiple ge::shader instances
      * 
      */
-    class Shader {
+    struct Shader {
 
         /**
          * @brief Shader id
          * 
          */
-        unsigned int id_;
-
-    public:
-
-        /**
-         * @brief Compile and link a vertex and fragment shader into a shader program and
-         * get a handle to this program
-         * 
-         * @param v_path path to vertex source code
-         * @param f_path path to fragment source code
-         */
-        Shader(const char* v_path, const char* f_path);
+        unsigned int id;
 
         /**
          * @brief Use/activate the shader
@@ -119,6 +108,16 @@ namespace xen {
          */
         void set_vec3(const char* name, const glm::vec3 &v);
     };
+
+    /**
+     * @brief Compile and link a vertex and fragment shader into a shader program and
+     * get a handle to this program
+     * 
+     * @param v_path path to vertex source code
+     * @param f_path path to fragment source code
+     */
+    Shader load_shader(const char* v_path, const char* f_path);
+
 } // namespace xen
 
 #endif

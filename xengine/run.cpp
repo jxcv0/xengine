@@ -41,7 +41,7 @@ int main(int argc, char const *argv[]) {
     }
 
     // shaders
-    xen::Shader basic_shader("assets/shaders/basic.vert", "assets/shaders/basic.frag");
+    auto basic_shader = xen::load_shader("assets/shaders/basic.vert", "assets/shaders/basic.frag");
 
     // view pos = projection . view . global . local
 
