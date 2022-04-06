@@ -281,6 +281,9 @@ void xen::load_model(Model &m, const std::string &path) {
  * @param m mesh
  * @param s shader program
  */
-void xen::draw_model(Model &m, const Shader &s) {
-
+void xen::draw_model(Model &m, Shader &s) {
+    for (size_t i = 0; i < m.meshes.size(); i++) {
+        xen::draw_mesh(m.meshes[i], s);
+    }
+    
 }

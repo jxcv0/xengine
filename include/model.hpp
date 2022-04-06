@@ -91,7 +91,7 @@ namespace xen {
      * @param m model
      * @param s shader program
      */
-    void draw_model(Model &m, const Shader &s);
+    void draw_model(Model &m, Shader &s);
 
 } // namespace xen
 
