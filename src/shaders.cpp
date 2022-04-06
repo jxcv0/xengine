@@ -10,7 +10,7 @@
  * @param path the file path
  * @return the shader program as a string
  */
-std::string xen::shaders::read_shader_file(const char* path) {
+std::string xen::read_shader_file(const char* path) {
     std::ifstream f_stream(path);
 
     if (!f_stream.is_open()) {
@@ -28,14 +28,14 @@ std::string xen::shaders::read_shader_file(const char* path) {
     return str;
 }
 
-void xen::shaders::shader_source(GLuint shader, const std::string& shader_string) {
+void xen::shader_source(GLuint shader, const std::string& shader_string) {
     const GLchar *shader_source = shader_string.c_str();
     const GLint shader_length = shader_string.length();
 
     glShaderSource(shader, 1, &shader_source, &shader_length);
 }
 
-void xen::shaders::load_shader(GLuint shader_obj, const char *path) {
+void xen::load_shader(GLuint shader_obj, const char *path) {
     shader_source(shader_obj, read_shader_file(path));
 }
 
@@ -97,14 +97,14 @@ xen::shader::shader(const char* v_path, const char* f_path) {
     }
 
     // linking
-    id = glCreateProgram();
-    glAttachShader(id, vert);
-    glAttachShader(id, frag);
-    glLinkProgram(id);
+    id_ = glCreateProgram();
+    glAttachShader(id_, vert);
+    glAttachShader(id_, frag);
+    glLinkProgram(id_);
 
-    glGetProgramiv(id, GL_LINK_STATUS, &success);
+    glGetProgramiv(id_, GL_LINK_STATUS, &success);
     if(!success) {
-        glGetShaderInfoLog(id, 512, NULL, info_log);
+        glGetShaderInfoLog(id_, 512, NULL, info_log);
         std::cout << "ERROR::SHADER::PRGM::LINKING_FAILED\n" << info_log << std::endl;
     }
 
@@ -114,21 +114,59 @@ xen::shader::shader(const char* v_path, const char* f_path) {
 }
 
 void xen::shader::use() {
-    glUseProgram(id);
+    glUseProgram(id_);
 }
 
 void xen::shader::del() {
-    glDeleteProgram(id);
+    glDeleteProgram(id_);
 }
 
+/**
+ * @brief Uniform utility function
+ * 
+ * @param name shader name
+ * @param val value
+ */
 void xen::shader::set_bool(const char *name, bool val) const {
-    glUniform1i(glGetUniformLocation(id, name), (int)val); 
+    glUniform1i(glGetUniformLocation(id_, name), (int)val); 
 }
 
+/**
+ * @brief Uniform utility function
+ * 
+ * @param name shader name
+ * @param val value
+ */
 void xen::shader::set_int(const char *name, int val) const {
-    glUniform1i(glGetUniformLocation(id, name), val); 
+    glUniform1i(glGetUniformLocation(id_, name), val); 
 }
 
+/**
+ * @brief Uniform utility function
+ * 
+ * @param name shader name
+ * @param val value
+ */
 void xen::shader::set_float(const char *name, float val) const {
-    glUniform1f(glGetUniformLocation(id, name), val); 
+    glUniform1f(glGetUniformLocation(id_, name), val); 
+}
+
+/**
+ * @brief Uniform utility function
+ * 
+ * @param name shader name
+ * @param val value
+ */
+void xen::shader::set_vec2(const char* name, const glm::vec3 &v) {
+    glUniform2fv(glGetUniformLocation(id_, name), 1, &v[0]);
+}
+
+/**
+ * @brief Uniform utility function
+ * 
+ * @param name shader name
+ * @param val value
+ */
+void xen::shader::set_vec3(const char* name, const glm::vec3 &v) {
+    glUniform3fv(glGetUniformLocation(id_, name), 1, &v[0]);
 }

@@ -2,6 +2,7 @@
 #define SHADERS_HPP
 
 #include "glad.h"
+#include <glm/glm.hpp>
 
 #include <string>
 
@@ -10,32 +11,30 @@
  * 
  */
 namespace xen {
-    namespace shaders {
     
-        /**
-         * @brief Read a shader file
-         * 
-         * @param path the file path
-         * @return the shader program as a string
-         */
-        std::string read_shader_file(const char* path);
+    /**
+     * @brief Read a shader file
+     * 
+     * @param path the file path
+     * @return the shader program as a string
+     */
+    std::string read_shader_file(const char* path);
 
-        /**
-         * @brief Assign shader source code
-         * 
-         * @param shader the shader onj int
-         * @param shader_string the shader code
-         */
-        void shader_source(GLuint shader, const std::string& shader_string);
+    /**
+     * @brief Assign shader source code
+     * 
+     * @param shader the shader onj int
+     * @param shader_string the shader code
+     */
+    void shader_source(GLuint shader, const std::string& shader_string);
 
-        /**
-         * @brief Attach vertex shader source code to a shader object and compile
-         * 
-         * @param shader_obj the shader obj
-         * @param path the path to the shader source code
-         */
-        void load_shader(GLuint shader_obj, const char *path);
-    } // namespace shaders
+    /**
+     * @brief Attach vertex shader source code to a shader object and compile
+     * 
+     * @param shader_obj the shader obj
+     * @param path the path to the shader source code
+     */
+    void load_shader(GLuint shader_obj, const char *path);
 
     /**
      * @brief Class for reading, compiling and linking shaders on initialization.
@@ -49,13 +48,15 @@ namespace xen {
      * ALSO - thread safety for multiple ge::shader instances
      * 
      */
-    struct shader {
+    class shader {
 
         /**
          * @brief Shader id
          * 
          */
-        unsigned int id;
+        unsigned int id_;
+
+    public:
 
         /**
          * @brief Compile and link a vertex and fragment shader into a shader program and
@@ -82,7 +83,7 @@ namespace xen {
          * @brief Uniform utility function
          * 
          * @param name shader name
-         * @param val the value to set
+         * @param val value
          */
         void set_bool(const char *name, bool val) const;
 
@@ -90,7 +91,7 @@ namespace xen {
          * @brief Uniform utility function
          * 
          * @param name shader name
-         * @param val the value to set
+         * @param val value
          */
         void set_int(const char *name, int val) const;
 
@@ -98,9 +99,25 @@ namespace xen {
          * @brief Uniform utility function
          * 
          * @param name shader name
-         * @param val the value to set
+         * @param val value
          */
         void set_float(const char *name, float val) const;
+
+        /**
+         * @brief Uniform utility function
+         * 
+         * @param name shader name
+         * @param val value
+         */
+        void set_vec2(const char* name, const glm::vec3 &v);
+        
+        /**
+         * @brief Uniform utility function
+         * 
+         * @param name shader name
+         * @param val value
+         */
+        void set_vec3(const char* name, const glm::vec3 &v);
     };
 } // namespace xen
 
