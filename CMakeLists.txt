@@ -57,6 +57,7 @@ target_link_libraries(
       glfw
       glad
       OpenGL::GL
+      assimp
 )
 
 add_subdirectory(lib/glad)

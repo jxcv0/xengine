@@ -256,7 +256,9 @@ void process_node(xen::Model &m, aiNode *node, const aiScene *scene) {
  * @param m model
  * @param path path to model file
  */
-void xen::load_model(Model &m, const std::string &path) {
+xen::Model xen::load_model(const std::string &path) {
+
+    xen::Model m;
 
     Assimp::Importer imp;
     const aiScene *scene = imp.ReadFile(path,
@@ -267,12 +269,14 @@ void xen::load_model(Model &m, const std::string &path) {
     
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
         std::cout << "ERROR::ASSIMP:: " << imp.GetErrorString() << std::endl;
-        return;
+        return m;
     }
 
     m.dir = path.substr(0, path.find_last_of('/'));
 
     process_node(m, scene->mRootNode, scene);
+
+    return m;
 }
 
 /**

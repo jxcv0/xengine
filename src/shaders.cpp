@@ -114,6 +114,8 @@ xen::Shader xen::load_shader(const char* v_path, const char* f_path) {
     // delete shaders
     glDeleteShader(vert);
     glDeleteShader(frag);
+
+    return shader;
 }
 
 void xen::Shader::use() {

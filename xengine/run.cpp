@@ -2,14 +2,9 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
-#include <math.h>
 
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+#include <glm/ext.hpp>
 
 #include "shaders.hpp"
 #include "util.hpp"
@@ -39,9 +34,12 @@ int main(int argc, char const *argv[]) {
         std::cout << "Failed to initialize GLAD" << std::endl;;
         return -1;
     }
+    
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
 
-    // shaders
-    auto basic_shader = xen::load_shader("assets/shaders/basic.vert", "assets/shaders/basic.frag");
+    auto shader = xen::load_shader("assets/shaders/basic.vert", "assets/shaders/basic.frag");
+    auto model = xen::load_model("assets/models/female_base.obj");
 
     // view pos = projection . view . global . local
 

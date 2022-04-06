@@ -64,14 +64,14 @@ namespace xen {
     void draw_mesh(const Mesh &m, Shader &s);
 
     /**
-     * @brief 
+     * @brief A 3D model with mesh and textures
      * 
      */
     struct Model {
         std::vector<Mesh::Texture> loaded_textures;
         std::vector<Mesh> meshes;
         std::string dir;
-        bool gamma_correction;
+        // bool gamma_correction = false;
     };
 
     /**
@@ -80,7 +80,7 @@ namespace xen {
      * @param m model
      * @param path path to model file
      */
-    void load_model(Model &m, const std::string &path);
+    Model load_model(const std::string &path);
 
 
     unsigned int load_texture(const char *path, const std::string &dir);
