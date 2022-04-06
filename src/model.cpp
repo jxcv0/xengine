@@ -65,7 +65,7 @@ void xen::draw_mesh(const mesh &m, shader &s) {
             num = std::to_string(specular_no++);
         }
         s.set_float(("material." + name + num).c_str(), i);
-        glBindTexture(GL_TEXTURE_2D, m.textures[1].id);
+        glBindTexture(GL_TEXTURE_2D, m.textures[i].id);
     }
     glActiveTexture(GL_TEXTURE0);
 
