@@ -10,15 +10,21 @@
 #include "util.hpp"
 #include "model.hpp"
 #include "render.hpp"
+#include "camera.hpp"
 
 #define WINDOW_WIDTH 1080
 #define WINDOW_HEIGHT 800
 
-xen::RenderManager render_manager;
+xen::Camera gl_camera;
+xen::RenderManager gl_render_manager;
+
+void mouse_callback(GLFWwindow* window, double x_in, double y_in);
 
 int main(int argc, char const *argv[]) {
 
-    render_manager.start_up();
+    gl_render_manager.start_up();
+    gl_render_manager.set_mouse_pos_callback(mouse_callback);
+    gl_camera.set_last((float)WINDOW_WIDTH / 2.0, (float)WINDOW_HEIGHT / 2.0);
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
@@ -32,7 +38,7 @@ int main(int argc, char const *argv[]) {
 
     // projection matrix
     glm::mat4 projection =
-    glm::perspective( glm::radians(50.0f), (float)WINDOW_WIDTH/(float)WINDOW_HEIGHT, 0.1f, 100.0f);
+        glm::perspective(glm::radians(50.0f), (float)WINDOW_WIDTH/(float)WINDOW_HEIGHT, 0.1f, 100.0f);
 
     // global position matrix
     glm::mat4 global(1.0f);
@@ -42,9 +48,9 @@ int main(int argc, char const *argv[]) {
     glm::mat4 view(1.0f);
     view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
 
-    while (!render_manager.should_close()) {
+    while (!gl_render_manager.should_close()) {
         // input
-        xen::util::process_input(render_manager.window_ptr());
+        xen::process_input(gl_render_manager.window_ptr());
 
         // background
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -58,10 +64,21 @@ int main(int argc, char const *argv[]) {
         xen::draw_model(model, shader);
 
         // swap and poll
-        glfwSwapBuffers(render_manager.window_ptr());
+        glfwSwapBuffers(gl_render_manager.window_ptr());
         glfwPollEvents();
     }
 
     glfwTerminate();
     return 0;
+}
+
+void mouse_callback(GLFWwindow* window, double x_in, double y_in) {
+
+    float x_pos = static_cast<float>(x_in);
+    float y_pos = static_cast<float>(y_in);
+
+    if(gl_camera.initialized()) {
+        gl_camera.set_last(x_pos, y_pos);
+    }
+    gl_camera.process_mouse_input(x_pos, y_pos);
 }

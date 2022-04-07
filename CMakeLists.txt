@@ -31,15 +31,18 @@ set(
     src/alloc.cpp
     src/util.cpp
     src/shaders.cpp
+    src/render.cpp
+    src/camera.cpp
 )
 
 set(
   HEADERS
-    include/render.hpp
     include/alloc.hpp
     include/util.hpp
     include/shaders.hpp
     include/model.hpp
+    include/render.hpp
+    include/camera.hpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${HEADERS})

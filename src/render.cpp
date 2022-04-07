@@ -1,4 +1,5 @@
 #include "render.hpp"
+#include "camera.hpp"
 
 /**
  * @brief Initialize the render manager
@@ -22,8 +23,19 @@ void xen::RenderManager::start_up() {
         [](GLFWwindow *window, int width, int height){ glViewport(0, 0, width, height); });
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        std::cout << "Failed to initialize GLAD" << std::endl;;
+        std::cout << "Failed to initialize GLAD" << std::endl;
     }
+
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+}
+
+/**
+ * @brief Set the mouse pos callback
+ * 
+ * @param callback 
+ */
+void xen::RenderManager::set_mouse_pos_callback(GLFWcursorposfun callback) {
+    glfwSetCursorPosCallback(window, callback);
 }
 
 /**

@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
+#include <functional>
 
 #include "model.hpp"
 
@@ -15,6 +16,10 @@ namespace xen {
      * 
      */
     class RenderManager {
+
+        //temp
+        float last_x;
+        float last_y;
 
         GLFWwindow* window;
 
@@ -41,12 +46,33 @@ namespace xen {
          */
         void shut_down();
 
+        /**
+         * @brief Check if window should close
+         * 
+         * @return true 
+         * @return false 
+         */
         bool should_close();
 
-        GLFWwindow* window_ptr() {
-            return window;
-        }
+        /**
+         * @brief Get a pointer to the window
+         * 
+         * @return GLFWwindow* 
+         */
+        GLFWwindow* window_ptr();
 
+        /**
+         * @brief Set the mouse pos callback
+         * 
+         * @param callback 
+         */
+        void set_mouse_pos_callback(GLFWcursorposfun callback);
+
+        /**
+         * @brief Add model data to gl buffers
+         * 
+         * @param model 
+         */
         void buffer_model(Model &model);
 
         // TODO - replace model with xen::Renderable?

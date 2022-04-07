@@ -2,9 +2,12 @@
 #define UTIL_HPP
 
 #include "glad.h"
+#include "camera.hpp"
 #include <GLFW/glfw3.h>
 
-namespace xen::util {
+extern xen::Camera gl_camera;
+
+namespace xen {
 
     /**
      * @brief Frambuffer size callback function
