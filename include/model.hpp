@@ -17,7 +17,7 @@ namespace xen {
      * @brief Contains mesh data imported from asset files
      * 
      */
-    struct Mesh {
+    struct Model {
 
         /**
          * @brief individial mesh vertices
@@ -46,34 +46,7 @@ namespace xen {
         std::vector<unsigned int> indices;
         std::vector<Texture> textures;
     };
-
-    /**
-     * @brief Set up VAO, VBO, and EBO for a mesh
-     * vertices, indices and textures must be set up first
-     * 
-     * @param m mesh
-     */
-    void setup_mesh(Mesh &m);
-
-    /**
-     * @brief Draw a mesh using a shader program
-     * 
-     * @param m mesh
-     * @param s shader program
-     */
-    void draw_mesh(const Mesh &m, Shader &s);
-
-    /**
-     * @brief A 3D model with mesh and textures
-     * 
-     */
-    struct Model {
-        std::vector<Mesh::Texture> loaded_textures;
-        std::vector<Mesh> meshes;
-        std::string dir;
-        // bool gamma_correction = false;
-    };
-
+    
     /**
      * @brief Load a model from a filepath
      * 
@@ -82,8 +55,13 @@ namespace xen {
      */
     Model load_model(const std::string &path);
 
-
-    unsigned int load_texture(const char *path, const std::string &dir);
+    /**
+     * @brief Load a texture from an image file
+     * 
+     * @param path the path to the image file
+     * @return unsigned int ??
+     */
+    unsigned int load_texture(const char *path);
 
     /**
      * @brief Draw a model using a shader program

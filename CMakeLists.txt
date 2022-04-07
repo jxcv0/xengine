@@ -31,11 +31,11 @@ set(
     src/alloc.cpp
     src/util.cpp
     src/shaders.cpp
-    src/model.cpp
 )
 
 set(
   HEADERS
+    include/render.hpp
     include/alloc.hpp
     include/util.hpp
     include/shaders.hpp
