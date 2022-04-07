@@ -46,7 +46,7 @@ namespace xen {
         std::vector<unsigned int> indices;
         std::vector<Texture> textures;
     };
-    
+
     /**
      * @brief Load a model from a filepath
      * 
@@ -69,7 +69,7 @@ namespace xen {
      * @param m model
      * @param s shader program
      */
-    void draw_model(Model &m, Shader &s);
+    // void draw_model(Model &m, Shader &s);
 
 } // namespace xen
 

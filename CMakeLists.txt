@@ -31,6 +31,7 @@ set(
     src/alloc.cpp
     src/util.cpp
     src/shaders.cpp
+    src/model.cpp
     src/render.cpp
     src/camera.cpp
 )

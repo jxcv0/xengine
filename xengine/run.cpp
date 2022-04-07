@@ -15,23 +15,22 @@
 #define WINDOW_WIDTH 1080
 #define WINDOW_HEIGHT 800
 
-xen::Camera gl_camera;
-xen::RenderManager gl_render_manager;
+xen::Camera global_camera;
+xen::RenderManager global_render;
 
 void mouse_callback(GLFWwindow* window, double x_in, double y_in);
 
 int main(int argc, char const *argv[]) {
 
-    gl_render_manager.start_up();
-    gl_render_manager.set_mouse_pos_callback(mouse_callback);
-    gl_camera.set_last((float)WINDOW_WIDTH / 2.0, (float)WINDOW_HEIGHT / 2.0);
+    global_render.start_up();
+    global_render.set_mouse_pos_callback(mouse_callback);
+    global_camera.set_last((float)WINDOW_WIDTH / 2.0, (float)WINDOW_HEIGHT / 2.0);
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
     // renderable objs to be made up of shaders and models?
     auto shader = xen::load_shader("assets/shaders/basic.vert", "assets/shaders/basic.frag");
-    
     auto model = xen::load_model("assets/models/female_base.obj");
 
     // view pos = projection . view . global . local
@@ -48,9 +47,9 @@ int main(int argc, char const *argv[]) {
     glm::mat4 view(1.0f);
     view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
 
-    while (!gl_render_manager.should_close()) {
+    while (!global_render.should_close()) {
         // input
-        xen::process_input(gl_render_manager.window_ptr());
+        xen::process_input(global_render.window_ptr());
 
         // background
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -61,10 +60,10 @@ int main(int argc, char const *argv[]) {
         shader.set_mat4("view", view);
         shader.set_mat4("global", global);
 
-        xen::draw_model(model, shader);
+        // xen::draw_model(model, shader);
 
         // swap and poll
-        glfwSwapBuffers(gl_render_manager.window_ptr());
+        glfwSwapBuffers(global_render.window_ptr());
         glfwPollEvents();
     }
 
@@ -77,8 +76,8 @@ void mouse_callback(GLFWwindow* window, double x_in, double y_in) {
     float x_pos = static_cast<float>(x_in);
     float y_pos = static_cast<float>(y_in);
 
-    if(gl_camera.initialized()) {
-        gl_camera.set_last(x_pos, y_pos);
+    if(global_camera.initialized()) {
+        global_camera.set_last(x_pos, y_pos);
     }
-    gl_camera.process_mouse_input(x_pos, y_pos);
+    global_camera.process_mouse_input(x_pos, y_pos);
 }
