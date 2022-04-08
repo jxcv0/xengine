@@ -5,8 +5,6 @@
 #include "camera.hpp"
 #include <GLFW/glfw3.h>
 
-extern xen::Camera gl_camera;
-
 namespace xen {
 
     /**

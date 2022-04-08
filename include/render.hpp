@@ -4,10 +4,13 @@
 #include <glad.h>
 #include <GLFW/glfw3.h>
 
+#include "glm/glm.hpp"
+
 #include <iostream>
 #include <functional>
 
 #include "model.hpp"
+#include "camera.hpp"
 
 namespace xen {
 
@@ -17,9 +20,11 @@ namespace xen {
      */
     class RenderManager {
 
-        //temp
-        float last_x;
-        float last_y;
+        // projection matrix
+        glm::mat4 projection;
+
+        int scr_width;
+        int scr_height;
 
         GLFWwindow* window;
 
@@ -62,11 +67,11 @@ namespace xen {
         GLFWwindow* window_ptr();
 
         /**
-         * @brief Set the mouse pos callback
+         * @brief Set mouse callback function
          * 
-         * @param callback 
+         * @param mouse_callback 
          */
-        void set_mouse_pos_callback(GLFWcursorposfun callback);
+        void set_cursor_pos_callback(GLFWcursorposfun mouse_callback);
 
         /**
          * @brief Add model data to gl buffers

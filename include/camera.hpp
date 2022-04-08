@@ -1,11 +1,15 @@
 #ifndef _CAMERA_HPP_
 #define _CAMERA_HPP_
 
-#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
+#include <glad.h>
+#include <GLFW/glfw3.h>
+
+#include <iostream>
+
 namespace xen {
-    struct Camera {
+    class Camera {
         float last_x;
         float last_y;
         bool init = false;
@@ -20,6 +24,12 @@ namespace xen {
         glm::vec3 right;
         glm::vec3 world_up;
 
+        friend void process_cursor_movement(GLFWwindow* window, double x_in, double y_in) {
+            // TODO ...
+        }
+
+    public:
+
         void update() {
             glm::vec3 f;
             f.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
@@ -29,8 +39,6 @@ namespace xen {
             right = glm::normalize(glm::cross(front, world_up));
             up = glm::normalize(glm::cross(right, front));
         }
-    
-    public:
 
         Camera() {
             // do nothing ...
@@ -76,6 +84,8 @@ namespace xen {
             update();
         }
     };
+
+    void process_cursor_movement(GLFWwindow* window, double x_in, double y_in);
 } // namespace xen
 
 #endif // _CAMERA_HPP_

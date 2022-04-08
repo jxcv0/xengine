@@ -18,12 +18,12 @@
 xen::Camera global_camera;
 xen::RenderManager global_render;
 
-void mouse_callback(GLFWwindow* window, double x_in, double y_in);
+// void mouse_callback(GLFWwindow* window, double x_in, double y_in);
 
 int main(int argc, char const *argv[]) {
 
     global_render.start_up();
-    global_render.set_mouse_pos_callback(mouse_callback);
+    global_render.set_cursor_pos_callback(xen::process_cursor_movement);
     global_camera.set_last((float)WINDOW_WIDTH / 2.0, (float)WINDOW_HEIGHT / 2.0);
 
     glEnable(GL_DEPTH_TEST);
@@ -71,13 +71,13 @@ int main(int argc, char const *argv[]) {
     return 0;
 }
 
-void mouse_callback(GLFWwindow* window, double x_in, double y_in) {
+// void mouse_callback(GLFWwindow* window, double x_in, double y_in) {
 
-    float x_pos = static_cast<float>(x_in);
-    float y_pos = static_cast<float>(y_in);
+//     float x_pos = static_cast<float>(x_in);
+//     float y_pos = static_cast<float>(y_in);
 
-    if(global_camera.initialized()) {
-        global_camera.set_last(x_pos, y_pos);
-    }
-    global_camera.process_mouse_input(x_pos, y_pos);
-}
+//     if(global_camera.initialized()) {
+//         global_camera.set_last(x_pos, y_pos);
+//     }
+//     global_camera.process_mouse_input(x_pos, y_pos);
+// }
