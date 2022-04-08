@@ -17,11 +17,10 @@ namespace xen {
      */
     class RenderManager {
 
-        // projection matrix
-        glm::mat4 projection;
-
         int scr_width;
         int scr_height;
+
+        glm::mat4 projection_matrix;
 
         GLFWwindow* window;
 
@@ -62,6 +61,12 @@ namespace xen {
          * @return GLFWwindow* 
          */
         GLFWwindow* window_ptr();
+
+        /**
+         * @brief Swap buffers and poll events
+         * 
+         */
+        void swap_and_poll();
 
         /**
          * @brief Set mouse callback function

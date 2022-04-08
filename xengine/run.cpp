@@ -7,7 +7,6 @@
 #include <glm/ext.hpp>
 
 #include "shaders.hpp"
-#include "util.hpp"
 #include "model.hpp"
 #include "render.hpp"
 #include "camera.hpp"
@@ -49,7 +48,7 @@ int main(int argc, char const *argv[]) {
 
     while (!global_render.should_close()) {
         // input
-        xen::process_input(global_render.window_ptr());
+        global_camera.process_input(global_render.window_ptr());
 
         // background
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);

@@ -29,7 +29,6 @@ find_package(assimp REQUIRED)
 set(
   SOURCES
     src/alloc.cpp
-    src/util.cpp
     src/shaders.cpp
     src/model.cpp
     src/render.cpp
@@ -39,7 +38,6 @@ set(
 set(
   HEADERS
     include/alloc.hpp
-    include/util.hpp
     include/shaders.hpp
     include/model.hpp
     include/render.hpp

@@ -2,8 +2,6 @@
 
 #include "glm/ext.hpp"
 
-#include "util.hpp"
-
 namespace xen {
     /**
      * @brief Initialize the render manager
@@ -35,7 +33,7 @@ namespace xen {
 
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-        projection =
+        projection_matrix =
             glm::perspective(glm::radians(50.0f), (float)scr_width/(float)scr_height, 0.1f, 100.0f);
     }
 
@@ -54,6 +52,15 @@ namespace xen {
 
     GLFWwindow* RenderManager::window_ptr() {
         return window;
+    }
+
+    /**
+     * @brief Swap buffers and poll events
+     * 
+     */
+    void RenderManager::swap_and_poll() {
+        glfwSwapBuffers(window);
+        glfwPollEvents();
     }
     
     void RenderManager::set_cursor_pos_callback(GLFWcursorposfun fun) {

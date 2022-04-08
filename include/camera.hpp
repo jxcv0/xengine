@@ -1,10 +1,10 @@
 #ifndef _CAMERA_HPP_
 #define _CAMERA_HPP_
 
-#include <glm/glm.hpp>
-
 #include <glad.h>
 #include <GLFW/glfw3.h>
+
+#include <glm/glm.hpp>
 
 #include <iostream>
 
@@ -24,9 +24,10 @@ namespace xen {
         glm::vec3 right;
         glm::vec3 world_up;
 
-        friend void process_cursor_movement(GLFWwindow* window, double x_in, double y_in) {
+        friend void process_cursor_movement(GLFWwindow *window, double x_in, double y_in) {
             // TODO ...
         }
+
 
     public:
 
@@ -58,6 +59,10 @@ namespace xen {
             init = true;
         }
 
+        void process_input(GLFWwindow *window) {
+            // TODO ...
+        }
+
         void process_mouse_input(float x, float y) {
 
             float x_offset = x - last_x;
@@ -86,6 +91,8 @@ namespace xen {
     };
 
     void process_cursor_movement(GLFWwindow* window, double x_in, double y_in);
+
+    void process_input(GLFWwindow *window);
 } // namespace xen
 
 #endif // _CAMERA_HPP_

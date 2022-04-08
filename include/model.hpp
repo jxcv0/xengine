@@ -42,9 +42,13 @@ namespace xen {
         // opengl buffer handles
         unsigned int VAO, VBO, EBO;
 
+        // mesh data
         std::vector<Vertex> vertices;
         std::vector<unsigned int> indices;
         std::vector<Texture> textures;
+
+        // TODO - position and rotation in global space for generating a model matrix
+        glm::mat4 model_matrix;
     };
 
     /**
