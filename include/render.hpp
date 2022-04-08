@@ -7,7 +7,6 @@
 #include "glm/glm.hpp"
 
 #include "model.hpp"
-#include "camera.hpp"
 
 namespace xen {
 
