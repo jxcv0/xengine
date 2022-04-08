@@ -6,9 +6,6 @@
 
 #include "glm/glm.hpp"
 
-#include <iostream>
-#include <functional>
-
 #include "model.hpp"
 #include "camera.hpp"
 

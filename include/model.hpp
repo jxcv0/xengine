@@ -53,7 +53,7 @@ namespace xen {
      * @param m model
      * @param path path to model file
      */
-    Model load_model(const std::string &path);
+    Model import_model(const std::string &path);
 
     /**
      * @brief Load a texture from an image file

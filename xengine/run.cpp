@@ -31,7 +31,7 @@ int main(int argc, char const *argv[]) {
 
     // renderable objs to be made up of shaders and models?
     auto shader = xen::load_shader("assets/shaders/basic.vert", "assets/shaders/basic.frag");
-    auto model = xen::load_model("assets/models/female_base.obj");
+    auto model = xen::import_model("assets/models/female_base.obj");
 
     // view pos = projection . view . global . local
 
