@@ -14,16 +14,16 @@
 #define WINDOW_WIDTH 1080
 #define WINDOW_HEIGHT 800
 
-xen::Camera global_camera;
-xen::RenderManager global_render;
+xen::Camera CAMERA;
+xen::RenderManager RENDERMANAGER;
 
 // void mouse_callback(GLFWwindow* window, double x_in, double y_in);
 
 int main(int argc, char const *argv[]) {
 
-    global_render.start_up();
-    global_render.set_cursor_pos_callback(xen::process_cursor_movement);
-    global_camera.set_last((float)WINDOW_WIDTH / 2.0, (float)WINDOW_HEIGHT / 2.0);
+    RENDERMANAGER.start_up();
+    RENDERMANAGER.set_cursor_pos_callback(xen::process_cursor_movement);
+    CAMERA.set_last((float)WINDOW_WIDTH / 2.0, (float)WINDOW_HEIGHT / 2.0);
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
@@ -46,9 +46,9 @@ int main(int argc, char const *argv[]) {
     glm::mat4 view(1.0f);
     view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
 
-    while (!global_render.should_close()) {
+    while (!RENDERMANAGER.should_close()) {
         // input
-        global_camera.process_input(global_render.window_ptr());
+        CAMERA.process_input(RENDERMANAGER.window_ptr());
 
         // background
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -62,7 +62,7 @@ int main(int argc, char const *argv[]) {
         // xen::draw_model(model, shader);
 
         // swap and poll
-        glfwSwapBuffers(global_render.window_ptr());
+        glfwSwapBuffers(RENDERMANAGER.window_ptr());
         glfwPollEvents();
     }
 
@@ -75,8 +75,8 @@ int main(int argc, char const *argv[]) {
 //     float x_pos = static_cast<float>(x_in);
 //     float y_pos = static_cast<float>(y_in);
 
-//     if(global_camera.initialized()) {
-//         global_camera.set_last(x_pos, y_pos);
+//     if(CAMERA.initialized()) {
+//         CAMERA.set_last(x_pos, y_pos);
 //     }
-//     global_camera.process_mouse_input(x_pos, y_pos);
+//     CAMERA.process_mouse_input(x_pos, y_pos);
 // }
