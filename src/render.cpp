@@ -70,21 +70,21 @@ namespace xen {
         glfwSetCursorPosCallback(window, fun);
     }
 
-    void RenderManager::buffer_model(Model &model) {
+    void RenderManager::buffer_mesh(Model::Mesh &mesh) {
         // generate buffers
-        glGenVertexArrays(1, &model.VAO);
-        glGenBuffers(1, &model.VBO);
-        glGenBuffers(1, &model.EBO);
+        glGenVertexArrays(1, &mesh.VAO);
+        glGenBuffers(1, &mesh.VBO);
+        glGenBuffers(1, &mesh.EBO);
 
         // bind and buffer data
-        glBindVertexArray(model.VAO);
+        glBindVertexArray(mesh.VAO);
 
-        glBindBuffer(GL_ARRAY_BUFFER, model.VBO);
-        glBufferData(GL_ARRAY_BUFFER, model.vertices.size() * sizeof(Model::Vertex), &model.vertices[0],
+        glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
+        glBufferData(GL_ARRAY_BUFFER, mesh.vertices.size() * sizeof(Model::Vertex), &mesh.vertices[0],
             GL_STATIC_DRAW);
         
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, model.EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, model.indices.size() * sizeof(unsigned int), &model.indices[0],
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(unsigned int), &mesh.indices[0],
             GL_STATIC_DRAW);
         
         // vertex positions
@@ -106,13 +106,13 @@ namespace xen {
     }
 
     // TODO - replace model with Renderable?
-    void RenderManager::draw(Model &model, Shader &shader) {
+    void RenderManager::draw_mesh(Model::Mesh &mesh, Shader &shader) {
 
         // TODO - textures
 
-        glBindVertexArray(model.VAO);
+        glBindVertexArray(mesh.VAO);
         glDrawElements(
-            GL_TRIANGLES, static_cast<unsigned int>(model.indices.size()), GL_UNSIGNED_INT, 0);
+            GL_TRIANGLES, static_cast<unsigned int>(mesh.indices.size()), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }
 }; 

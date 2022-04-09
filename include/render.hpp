@@ -7,6 +7,7 @@
 #include "glm/glm.hpp"
 
 #include "model.hpp"
+#include "shaders.hpp"
 
 namespace xen {
 
@@ -79,10 +80,10 @@ namespace xen {
          * 
          * @param model 
          */
-        void buffer_model(Model &model);
+        void buffer_mesh(Model::Mesh &model);
 
         // TODO - replace model with xen::Renderable?
-        void draw(Model &model, Shader &shader);
+        void draw_mesh(Model::Mesh &model, Shader &shader);
 
         // unsigned int xen::load_texture(const char *path) {
 

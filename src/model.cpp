@@ -1,34 +1,39 @@
 #include "model.hpp"
 
-#include <iostream>
-
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-
 namespace xen {
 
     /**
-     * @brief Load a model from a filepath
+     * @brief Recursively process aiNodes within an aiScene and store the data in a Model
      * 
-     * @param m model
-     * @param path path to model file
+     * @param node node
+     * @param scene scene
      */
-    Model import_model(const std::string &path) {
-        Model model;
-        Assimp::Importer importer;
-        
-        const aiScene *scene = importer.ReadFile(path,
-            aiProcess_Triangulate |
-            aiProcess_GenSmoothNormals |
-            aiProcess_FlipUVs |
-            aiProcess_CalcTangentSpace);
-        
-        if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-            std::cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << "\n";
+    void Model::process_node(aiNode *node, const aiScene *scene) {
+
+        // process all meshes in this node
+        for (size_t i = 0; i < scene->mNumMeshes; i++) {
+            aiMesh * mesh = scene->mMeshes[node->mMeshes[i]];
+            meshes.push_back(process_mesh(mesh, scene));
         }
 
-
-        return model;
+        // process next node
+        for (size_t i = 0; i < node->mNumChildren; i++) {
+            process_node(node->mChildren[i], scene);
+        }
     }
+
+    /**
+     * @brief Recursively process meshes after importing
+     * 
+     * @param mesh imported assimp mesh
+     * @param scene imported assimp scene
+     * @return Model::Mesh 
+     */
+    Model::Mesh Model::process_mesh(aiMesh *mesh, const aiScene *scene) {
+        Mesh m;
+            // HERE
+        return m;
+    }
+
+
 }
