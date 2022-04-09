@@ -17,8 +17,6 @@
 xen::Camera CAMERA;
 xen::RenderManager RENDERMANAGER;
 
-// void mouse_callback(GLFWwindow* window, double x_in, double y_in);
-
 int main(int argc, char const *argv[]) {
 
     RENDERMANAGER.start_up();
@@ -30,13 +28,11 @@ int main(int argc, char const *argv[]) {
 
     // renderable objs to be made up of shaders and models?
     auto shader = xen::load_shader("assets/shaders/basic.vert", "assets/shaders/basic.frag");
-    auto model = xen::import_model("assets/models/female_base.obj");
+    auto model = xen::import_model("assets/models/female_base/test/female_base_texture_test.obj");
+    model.position = glm::vec3(0.0f);
+    RENDERMANAGER.buffer_model(model);
 
     // view pos = projection . view . global . local
-
-    // projection matrix
-    glm::mat4 projection =
-        glm::perspective(glm::radians(50.0f), (float)WINDOW_WIDTH/(float)WINDOW_HEIGHT, 0.1f, 100.0f);
 
     // global position matrix
     glm::mat4 global(1.0f);
@@ -51,32 +47,22 @@ int main(int argc, char const *argv[]) {
         CAMERA.process_input(RENDERMANAGER.window_ptr());
 
         // background
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        // glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        RENDERMANAGER.fill_bg();
 
         shader.use();
-        shader.set_mat4("projection", projection);
-        shader.set_mat4("view", view);
-        shader.set_mat4("global", global);
+        shader.set_mat4("projection", RENDERMANAGER.projection_matrix());
+        shader.set_mat4("view", CAMERA.view_matrix());
+        shader.set_mat4("model", model.model_matrix());
 
         // xen::draw_model(model, shader);
 
         // swap and poll
-        glfwSwapBuffers(RENDERMANAGER.window_ptr());
-        glfwPollEvents();
+        RENDERMANAGER.render_model(model, shader);
+        RENDERMANAGER.swap_and_poll();
     }
 
     glfwTerminate();
     return 0;
 }
-
-// void mouse_callback(GLFWwindow* window, double x_in, double y_in) {
-
-//     float x_pos = static_cast<float>(x_in);
-//     float y_pos = static_cast<float>(y_in);
-
-//     if(CAMERA.initialized()) {
-//         CAMERA.set_last(x_pos, y_pos);
-//     }
-//     CAMERA.process_mouse_input(x_pos, y_pos);
-// }

@@ -1,6 +1,7 @@
 #include "camera.hpp"
 
 namespace xen {
+
     void Camera::update() {
         glm::vec3 f;
         f.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));

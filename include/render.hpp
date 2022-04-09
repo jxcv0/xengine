@@ -17,15 +17,12 @@ namespace xen {
      */
     class RenderManager {
 
-        int scr_width;
-        int scr_height;
-
-        glm::mat4 projection_matrix;
+        int scr_width = 1000;
+        int scr_height = 800;
 
         GLFWwindow* window;
 
     public:
-    
 
         RenderManager() {
             // do nothing ...
@@ -46,6 +43,10 @@ namespace xen {
          * 
          */
         void shut_down();
+
+        glm::mat4 projection_matrix() {
+            return glm::perspective(glm::radians(50.0f), (float)scr_width/(float)scr_height, 0.1f, 100.0f);
+        }
 
         /**
          * @brief Check if window should close
@@ -80,48 +81,32 @@ namespace xen {
          * 
          * @param model 
          */
-        void buffer_mesh(Model::Mesh &model);
+        void buffer_mesh(Model::Mesh &mesh);
+
+        /**
+         * @brief Add model data to gl buffers
+         * 
+         * @param model 
+         */
+        void buffer_model(Model &model) {
+            for (size_t i = 0; i < model.meshes.size(); i++) {
+                buffer_mesh(model.meshes[i]);
+            }
+        }
 
         // TODO - replace model with xen::Renderable?
-        void draw_mesh(Model::Mesh &model, Shader &shader);
+        void draw_mesh(Model::Mesh &mesh, Shader &shader);
 
-        // unsigned int xen::load_texture(const char *path) {
+        void render_model(Model &model, Shader &shader) {
+            for (size_t i = 0; i < model.meshes.size(); i++) {
+                draw_mesh(model.meshes[i], shader);
+            }
+        }
 
-        //     unsigned int tex_id;
-        //     glGenTextures(1, &tex_id);
-
-        //     stbi_set_flip_vertically_on_load(true);
-
-        //     int w, h, no;
-        //     unsigned char *data = stbi_load(path, &w, &h, &no, 0);
-
-        //     if (data) {
-        //         GLenum format;
-        //         if (no == 1) {
-        //             format = GL_RED;
-        //         } else if (no == 3) {
-        //             format = GL_RGB;
-        //         } else if (no = 4) {
-        //             format = GL_RGBA;
-        //         }
-
-        //         glBindTexture(GL_TEXTURE_2D, tex_id);
-        //         glTexImage2D(GL_TEXTURE_2D, 0, format, w, h, 0, format, GL_UNSIGNED_BYTE, data);
-        //         glGenerateMipmap(GL_TEXTURE_2D);
-
-        //         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        //         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        //         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        //         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        //         stbi_image_free(data);
-        //     } else {
-        //         std::cout << "Unable to load texture from " << path << std::endl;
-        //         stbi_image_free(data);
-        //     }
-
-        //     return tex_id;
-        // }
+        void fill_bg(glm::vec4 col = glm::vec4(0.01f, 0.02f, 0.02f, 1.0f)) {
+            glClearColor(col.x, col.y, col.z, col.a);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        }
     };
 } // namespace xen
 #endif // _RENDER_HPP_

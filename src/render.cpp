@@ -35,9 +35,6 @@ namespace xen {
         }
 
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-        projection_matrix =
-            glm::perspective(glm::radians(50.0f), (float)scr_width/(float)scr_height, 0.1f, 100.0f);
     }
 
 
@@ -94,7 +91,7 @@ namespace xen {
         // vertex normals
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Model::Vertex),
-            (void*)offsetof(Model::Vertex, Model::Vertex::norm));
+            (void*)offsetof(Model::Vertex, Model::Vertex::normal));
 
         // texture coords
         glEnableVertexAttribArray(2);
@@ -109,7 +106,6 @@ namespace xen {
     void RenderManager::draw_mesh(Model::Mesh &mesh, Shader &shader) {
 
         // TODO - textures
-
         glBindVertexArray(mesh.VAO);
         glDrawElements(
             GL_TRIANGLES, static_cast<unsigned int>(mesh.indices.size()), GL_UNSIGNED_INT, 0);

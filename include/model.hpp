@@ -75,7 +75,17 @@ namespace xen {
          * @return Model::Mesh 
          */
         Model::Mesh process_mesh(aiMesh *mesh, const aiScene *scene);
-    
+
+        // /**
+        //  * @brief Import textures from a file and store them in a vector
+        //  * 
+        //  * @param mat 
+        //  * @param type 
+        //  * @param type_name 
+        //  * @return std::vector<Texture> 
+        //  */
+        // std::vector<Texture> import_textures(aiMaterial *mat, aiTextureType type, std::string type_name);
+
         /**
          * @brief Load a model from a filepath
          * 
@@ -100,7 +110,11 @@ namespace xen {
             model.process_node(scene->mRootNode, scene);
 
             return model;
-        }       
+        }
+
+        glm::mat4 model_matrix() {
+            return glm::translate(glm::mat4(1.0f), position);
+        }
     };
 
     /**
