@@ -72,7 +72,7 @@ namespace xen {
          */
         void swap_and_poll();
 
-        /**
+        /** 
          * @brief Set mouse callback function
          * 
          * @param mouse_callback 
@@ -91,16 +91,12 @@ namespace xen {
          * 
          * @param model 
          */
-        void buffer_model(Model &model) {
-            for (size_t i = 0; i < model.meshes.size(); i++) {
-                buffer_mesh(model.meshes[i]);
-            }
-        }
+        void buffer_model(Model &model);
 
         // TODO - replace model with xen::Renderable?
         void draw_mesh(Model::Mesh &mesh, Shader &shader);
 
-        void render_model(Model &model, Shader &shader);
+        void draw_model(Model &model, Shader &shader);
 
         void fill_bg(glm::vec4 col);
         void fill_bg();

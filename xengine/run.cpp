@@ -50,8 +50,7 @@ int main(int argc, char const *argv[]) {
         shader.set_mat4("projection", RENDERMANAGER.projection_matrix());
         shader.set_mat4("view", CAMERA.view_matrix());
         shader.set_mat4("model", model.model_matrix());
-        RENDERMANAGER.render_model(model, shader);
-        // swap and poll
+        RENDERMANAGER.draw_model(model, shader);
         RENDERMANAGER.swap_and_poll();
     }
 

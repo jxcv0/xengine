@@ -120,6 +120,17 @@ namespace xen {
         glBindVertexArray(0);
     }
 
+    /**
+     * @brief Add model data to gl buffers
+     * 
+     * @param model 
+     */
+    void RenderManager::buffer_model(Model &model) {
+        for (size_t i = 0; i < model.meshes.size(); i++) {
+            buffer_mesh(model.meshes[i]);
+        }
+    }
+
     // TODO - replace model with Renderable?
     void RenderManager::draw_mesh(Model::Mesh &mesh, Shader &shader) {
 
@@ -130,7 +141,7 @@ namespace xen {
         glBindVertexArray(0);
     }
 
-    void RenderManager::render_model(Model &model, Shader &shader) {
+    void RenderManager::draw_model(Model &model, Shader &shader) {
         for (auto m : model.meshes) {
             draw_mesh(m, shader);
         }
