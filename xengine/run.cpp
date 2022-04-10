@@ -6,7 +6,6 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
-#include "checkerr.h"
 #include "shaders.hpp"
 #include "model.hpp"
 #include "render.hpp"
@@ -19,7 +18,6 @@ xen::Camera CAMERA;
 xen::RenderManager RENDERMANAGER;
 
 int main(int argc, char const *argv[]) {
-
     RENDERMANAGER.start_up();
     CAMERA.startUp();
     
@@ -46,23 +44,15 @@ int main(int argc, char const *argv[]) {
 
     while (!RENDERMANAGER.should_close()) {
         CAMERA.process_input(RENDERMANAGER.window_ptr());
-        checkerr();
         RENDERMANAGER.fill_bg();
-        checkerr();
         shader.use();
-        checkerr();
-        
+
         shader.set_mat4("projection", RENDERMANAGER.projection_matrix());
-        checkerr();
         shader.set_mat4("view", CAMERA.view_matrix());
-        checkerr();
         shader.set_mat4("model", model.model_matrix());
-        checkerr();
         RENDERMANAGER.render_model(model, shader);
-        checkerr();
         // swap and poll
         RENDERMANAGER.swap_and_poll();
-        checkerr();
     }
 
     glfwTerminate();
