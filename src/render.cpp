@@ -3,9 +3,8 @@
 #include "glm/glm.hpp"
 #include "glm/ext.hpp"
 
-#include <iostream>
-
 #include "checkerr.h"
+#include <iostream>
 
 namespace xen {
     /**
