@@ -19,13 +19,12 @@ namespace xen {
             aiProcess_CalcTangentSpace);
 
         if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-            std::cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << "\n";
+            std::cout << "ERROR::ASSIMP::" << importer.GetErrorString() << "\n";
         }
 
         model.directory = path.substr(0, path.find_last_of('/'));
         model.process_node(scene->mRootNode, scene);
 
-        std::cout << "model loaded from " << model.directory << "\n";
         return model;
     }
 

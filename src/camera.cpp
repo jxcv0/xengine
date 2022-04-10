@@ -23,19 +23,19 @@ namespace xen {
         const float movement_speed = 0.05f;
 
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-            pos += movement_speed * front;
+            position += front * movement_speed;
         }
 
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-            pos -= movement_speed * front;
+            position -= front * movement_speed;
         }
 
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-            pos -= glm::normalize(glm::cross(front, world_up)) * movement_speed;
+            position -= glm::normalize(glm::cross(front, world_up)) * movement_speed;
         }
 
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-            pos += glm::normalize(glm::cross(front, world_up)) * movement_speed;
+            position += glm::normalize(glm::cross(front, world_up)) * movement_speed;
         }
         
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -55,8 +55,8 @@ namespace xen {
         x_offset *= sensitivity;
         y_offset *= sensitivity;
 
-        yaw *= x_offset;
-        pitch *= y_offset;
+        yaw += x_offset;
+        pitch += y_offset;
 
         if(pitch > 89.0f) {
             pitch = 89.0f;
@@ -70,6 +70,6 @@ namespace xen {
     }
 
     glm::mat4 Camera::view_matrix() {
-        return glm::lookAt(pos, pos + front, up);
+        return glm::lookAt(position, position + front, up);
     }
 } // namespace xen

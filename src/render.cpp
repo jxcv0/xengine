@@ -18,15 +18,13 @@ namespace xen {
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
         scr_width = 1600;
-        scr_width = 900;
+        scr_height = 900;
 
-        window = glfwCreateWindow(1600, 900, "xengine", NULL, NULL);
+        window = glfwCreateWindow(scr_width, scr_height, "xengine", NULL, NULL);
         if (!window) {
             std::cout << "Failed to create window" << std::endl;
             glfwTerminate();
         }
-        glfwMakeContextCurrent(window);
-
         glfwMakeContextCurrent(window);
         glfwSetFramebufferSizeCallback(window,
             [](GLFWwindow *window, int width, int height){ glViewport(0, 0, width, height); });
@@ -75,9 +73,12 @@ namespace xen {
      * @brief Swap buffers and poll events
      * 
      */
-    void RenderManager::swap_and_poll() {
-        glfwSwapBuffers(window);
+    void RenderManager::poll_events() {
         glfwPollEvents();
+    }
+
+    void RenderManager::swap_buffers() {
+        glfwSwapBuffers(window);
     }
     
     void RenderManager::set_cursor_pos_callback(GLFWcursorposfun fun) {

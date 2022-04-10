@@ -17,12 +17,12 @@ namespace xen {
      */
     class RenderManager {
 
-        int scr_width = 1000;
-        int scr_height = 800;
 
         GLFWwindow* window;
 
     public:
+        int scr_width;
+        int scr_height;
 
         RenderManager() {
             // do nothing ...
@@ -70,7 +70,9 @@ namespace xen {
          * @brief Swap buffers and poll events
          * 
          */
-        void swap_and_poll();
+        void poll_events();
+
+        void swap_buffers();
 
         /** 
          * @brief Set mouse callback function

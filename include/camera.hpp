@@ -16,7 +16,7 @@ namespace xen {
         float pitch;
 
         // camera normals - TODO - pos = bound_character.pos + offset
-        glm::vec3 pos;
+        glm::vec3 position;
         glm::vec3 front;
         glm::vec3 up;
         glm::vec3 right;
@@ -38,7 +38,6 @@ namespace xen {
         ~Camera() { /* do nothing */ }
 
         void startUp() {
-            pos = glm::vec3(0.0f, 0.0f, 0.0f);
             yaw = -90.0f;
             pitch = 0.0f;
         }
