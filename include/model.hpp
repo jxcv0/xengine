@@ -42,8 +42,13 @@ namespace xen {
             unsigned int id;    // texture id for binding to buffer
             std::string type;   // texture type
             std::string path;   // path to texture
+
         };
 
+        /**
+         * @brief Mesh data
+         * 
+         */
         struct Mesh {
             unsigned int VAO, VBO, EBO;         // openGL buffer handles
             std::vector<Vertex> vertices;       // self explanatory
@@ -58,6 +63,14 @@ namespace xen {
         glm::vec3 position;
         std::vector<Mesh> meshes;   // all meshes re
         std::string directory;
+        
+        /**
+         * @brief Load a model from a filepath
+         * 
+         * @param m model
+         * @param path path to model file
+         */
+        Model import(const std::string &path);
     
         /**
          * @brief Recursively process aiNodes within an aiScene and store the data in a Model
@@ -76,42 +89,6 @@ namespace xen {
          */
         Model::Mesh process_mesh(aiMesh *mesh, const aiScene *scene);
 
-        // /**
-        //  * @brief Import textures from a file and store them in a vector
-        //  * 
-        //  * @param mat 
-        //  * @param type 
-        //  * @param type_name 
-        //  * @return std::vector<Texture> 
-        //  */
-        // std::vector<Texture> import_textures(aiMaterial *mat, aiTextureType type, std::string type_name);
-
-        /**
-         * @brief Load a model from a filepath
-         * 
-         * @param m model
-         * @param path path to model file
-         */
-        friend Model import_model(const std::string &path) {
-            Model model;
-            Assimp::Importer importer;
-            
-            const aiScene *scene = importer.ReadFile(path,
-                aiProcess_Triangulate |
-                aiProcess_GenSmoothNormals |
-                aiProcess_FlipUVs |
-                aiProcess_CalcTangentSpace);
-            
-            if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-                std::cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << "\n";
-            }
-
-            model.directory = path.substr(0, path.find_last_of('/'));
-            model.process_node(scene->mRootNode, scene);
-
-            return model;
-        }
-
         glm::mat4 model_matrix() {
             return glm::translate(glm::mat4(1.0f), position);
         }
@@ -124,14 +101,6 @@ namespace xen {
      * @return unsigned int ??
      */
     unsigned int load_texture(const char *path);
-
-    /**
-     * @brief Load a model from a filepath
-     * 
-     * @param m model
-     * @param path path to model file
-     */
-    Model import_model(const std::string &path);
 } // namespace xen
 
 #endif

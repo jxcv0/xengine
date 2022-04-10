@@ -28,7 +28,9 @@ int main(int argc, char const *argv[]) {
 
     // renderable objs to be made up of shaders and models?
     auto shader = xen::load_shader("assets/shaders/basic.vert", "assets/shaders/basic.frag");
-    auto model = xen::import_model("assets/models/female_base/test/female_base_texture_test.obj");
+    // auto model = xen::import_model("assets/models/rock/rock.obj");
+    xen::Model model; 
+    model.import("assets/models/female_base/test/female_base_texture_test.obj");
     model.position = glm::vec3(0.0f);
     RENDERMANAGER.buffer_model(model);
 

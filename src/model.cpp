@@ -3,6 +3,33 @@
 namespace xen {
 
     /**
+     * @brief Load a model from a filepath
+     * 
+     * @param m model
+     * @param path path to model file
+     */
+    Model Model::import(const std::string &path) {
+        Model model;
+        Assimp::Importer importer;
+        
+        const aiScene *scene = importer.ReadFile(path,
+            aiProcess_Triangulate |
+            aiProcess_GenSmoothNormals |
+            aiProcess_FlipUVs |
+            aiProcess_CalcTangentSpace);
+
+        if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
+            std::cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << "\n";
+        }
+
+        model.directory = path.substr(0, path.find_last_of('/'));
+        model.process_node(scene->mRootNode, scene);
+
+        std::cout << "model loaded from " << model.directory << "\n";
+        return model;
+    }
+
+    /**
      * @brief Recursively process aiNodes within an aiScene and store the data in a Model
      * 
      * @param node node
@@ -11,7 +38,12 @@ namespace xen {
     void Model::process_node(aiNode *node, const aiScene *scene) {
 
         // process all meshes in this node
-        for (size_t i = 0; i < scene->mNumMeshes; i++) {
+        if (scene->mNumMeshes < 1) {
+            std::cout << "Meshes not found\n";
+            return;
+        }
+
+        for (size_t i = 0; i < node->mNumMeshes; i++) {
             aiMesh *mesh = scene->mMeshes[node->mMeshes[i]]; // this line segfaults
             meshes.push_back(process_mesh(mesh, scene));
         }

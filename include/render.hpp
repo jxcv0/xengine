@@ -44,9 +44,12 @@ namespace xen {
          */
         void shut_down();
 
-        glm::mat4 projection_matrix() {
-            return glm::perspective(glm::radians(50.0f), (float)scr_width/(float)scr_height, 0.1f, 100.0f);
-        }
+        /**
+         * @brief Generate a projection matrix
+         * 
+         * @return glm::mat4 
+         */
+        glm::mat4 projection_matrix();
 
         /**
          * @brief Check if window should close

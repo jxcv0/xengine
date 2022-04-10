@@ -46,6 +46,10 @@ namespace xen {
         glfwTerminate();
     }
 
+    glm::mat4 RenderManager::projection_matrix() {
+        return glm::perspective(glm::radians(50.0f), (float)scr_width/(float)scr_height, 0.1f, 100.0f);
+    }
+
     bool RenderManager::should_close() {
         return glfwWindowShouldClose(window);
     }
