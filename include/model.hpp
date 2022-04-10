@@ -89,9 +89,12 @@ namespace xen {
          */
         Model::Mesh process_mesh(aiMesh *mesh, const aiScene *scene);
 
-        glm::mat4 model_matrix() {
-            return glm::translate(glm::mat4(1.0f), position);
-        }
+        /**
+         * @brief Create a model matrix based on model position
+         * 
+         * @return glm::vec4 model matrix
+         */
+        glm::mat4 model_matrix();
     };
 
     /**

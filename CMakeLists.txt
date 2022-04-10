@@ -37,6 +37,7 @@ set(
 
 set(
   HEADERS
+    include/checkerr.h
     include/alloc.hpp
     include/shaders.hpp
     include/model.hpp

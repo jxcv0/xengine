@@ -184,6 +184,6 @@ void xen::Shader::set_vec3(const char* name, const glm::vec3 &v) {
  * @param name shader name
  * @param val value
  */
-void xen::Shader::set_mat4(const char* name, const glm::mat4 &v) {
-    glUniformMatrix4fv(id, 1, GL_FALSE, glm::value_ptr(v));
+void xen::Shader::set_mat4(const char* name, const glm::mat4 &m) {
+    glUniformMatrix4fv(glGetUniformLocation(id, name), 1, GL_FALSE, &m[0][0]);
 }

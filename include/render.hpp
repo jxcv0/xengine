@@ -100,16 +100,10 @@ namespace xen {
         // TODO - replace model with xen::Renderable?
         void draw_mesh(Model::Mesh &mesh, Shader &shader);
 
-        void render_model(Model &model, Shader &shader) {
-            for (size_t i = 0; i < model.meshes.size(); i++) {
-                draw_mesh(model.meshes[i], shader);
-            }
-        }
+        void render_model(Model &model, Shader &shader);
 
-        void fill_bg(glm::vec4 col = glm::vec4(0.01f, 0.02f, 0.02f, 1.0f)) {
-            glClearColor(col.x, col.y, col.z, col.a);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        }
+        void fill_bg(glm::vec4 col);
+        void fill_bg();
     };
 } // namespace xen
 #endif // _RENDER_HPP_

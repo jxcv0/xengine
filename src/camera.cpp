@@ -12,14 +12,10 @@ namespace xen {
         up = glm::normalize(glm::cross(right, front));
     }
 
-    bool Camera::initialized() {
-        return init;
-    }
-
     void Camera::set_last(float x, float y) {
         last_x = x;
-        last_y = y;
-        init = true;
+        last_y = y; 
+        update();
     }
 
     void Camera::process_input(GLFWwindow *window) {

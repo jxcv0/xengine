@@ -34,6 +34,9 @@ namespace xen {
             std::cout << "Failed to initialize GLAD" << std::endl;
         }
 
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
+
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     }
 
@@ -114,5 +117,21 @@ namespace xen {
         glDrawElements(
             GL_TRIANGLES, static_cast<unsigned int>(mesh.indices.size()), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
+    }
+
+    void RenderManager::render_model(Model &model, Shader &shader) {
+        for (auto m : model.meshes) {
+            draw_mesh(m, shader);
+        }
+    }
+
+    void RenderManager::fill_bg(glm::vec4 col = glm::vec4(0.01f, 0.02f, 0.02f, 1.0f)) {
+        glClearColor(col.x, col.y, col.z, col.a);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+    
+    void RenderManager::fill_bg() {
+        glClearColor(0.01f, 0.01f, 0.01f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 }; 

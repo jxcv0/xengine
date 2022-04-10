@@ -107,4 +107,13 @@ namespace xen {
 
         return x_mesh;
     }
+
+    /**
+     * @brief Create a model matrix based on model position
+     * 
+     * @return glm::vec4 model matrix
+     */
+    glm::mat4 Model::model_matrix() {
+        return glm::translate(glm::mat4(1.0f), position);
+    }
 }

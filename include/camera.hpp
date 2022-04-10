@@ -11,7 +11,6 @@ namespace xen {
     class Camera {
         float last_x;
         float last_y;
-        bool init = false;
 
         float yaw;
         float pitch;
@@ -38,13 +37,11 @@ namespace xen {
         Camera() { /* do nothing */ }
         ~Camera() { /* do nothing */ }
 
-        /**
-         * @brief check if the camera is ready for rendering
-         * 
-         * @return true 
-         * @return false 
-         */
-        bool initialized();
+        void startUp() {
+            pos = glm::vec3(0.0f, 0.0f, 0.0f);
+            yaw = -90.0f;
+            pitch = 0.0f;
+        }
         
         /**
          * @brief Cache a cursor position
