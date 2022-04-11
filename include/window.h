@@ -14,9 +14,6 @@ namespace xen
 		int scrHeight = 600;
 	};
 
-	// global window object
-	extern Window globalWindow;
-
 	// initialize GLFW and GLAD then draw a window
 	void initWindow(Window &window)
 	{
@@ -53,6 +50,13 @@ namespace xen
 		{
 			glfwSetWindowShouldClose(window, true);
 		}
+	}
+
+	// swap buffers and poll events
+	void swapThenPoll(Window &window)
+	{
+		glfwSwapBuffers(window.ptr);
+		glfwPollEvents();
 	}
 }
 
