@@ -50,12 +50,15 @@ int main(int argc, char const *argv[]) {
 	glEnableVertexAttribArray(1);
 
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(3);
-	checkerr();
+	glEnableVertexAttribArray(2);
+
 	while (!xen::windowShouldClose(mainWindow))
 	{
 		xen::processKeyPress(mainWindow.ptr);
 		xen::fill(0.3f, 0.1f, 0.1f, 1.0f);
+		glBindVertexArray(VAO);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glBindVertexArray(0);
 		xen::swapThenPoll(mainWindow);
 	}
 	
