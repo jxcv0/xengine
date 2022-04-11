@@ -58,6 +58,13 @@ namespace xen
 		glfwSwapBuffers(window.ptr);
 		glfwPollEvents();
 	}
-}
+	
+	// fill the window with a single colour
+	void fill(float r, float g, float b, float a)
+	{
+		glClearColor(r, g, b ,a);
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
+} // namespace xen
 
 #endif // WINDOW_H

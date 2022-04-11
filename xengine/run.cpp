@@ -8,6 +8,7 @@
 
 #include "window.h"
 #include "shader.h"
+#include "checkerr.h"
 
 int main(int argc, char const *argv[]) {
 	xen::Window mainWindow;
@@ -50,10 +51,11 @@ int main(int argc, char const *argv[]) {
 
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(3);
-
+	checkerr();
 	while (!xen::windowShouldClose(mainWindow))
 	{
 		xen::processKeyPress(mainWindow.ptr);
+		xen::fill(0.3f, 0.1f, 0.1f, 1.0f);
 		xen::swapThenPoll(mainWindow);
 	}
 	
