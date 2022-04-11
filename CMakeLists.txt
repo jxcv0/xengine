@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.22.1)
+cmake_minimum_required(VERSION 3.18)
 project(xengine VERSION 0.1.0)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -19,24 +19,15 @@ find_package(assimp REQUIRED)
 
 set(
   SOURCES
-    src/alloc.cpp
-    src/shaders.cpp
-    src/model.cpp
-    src/render.cpp
-    src/camera.cpp
 )
 
 set(
   HEADERS
     include/checkerr.h
-    include/alloc.hpp
-    include/shaders.hpp
-    include/model.hpp
-    include/render.hpp
-    include/camera.hpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${HEADERS})
+set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 
 target_include_directories(
   ${PROJECT_NAME}
