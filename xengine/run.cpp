@@ -14,7 +14,8 @@ int main(int argc, char const *argv[]) {
 	xen::initWindow(mainWindow);
 
 	auto shader = xen::loadShaderFromFile("assets/shaders/basic.vert", "assets/shaders/basic.frag");
-
+	auto texture = xen::loadTextureFromFile("assets/textures/stone_blocks.jpg");
+	
 	float vertices[] = {
 		// positions          // colors           // texture coords
 		 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right

@@ -8,6 +8,9 @@
 #include <sstream>
 #include <iostream>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 namespace xen
 {
 	// check the compilation status of a shader program
@@ -88,6 +91,49 @@ namespace xen
 		glDeleteShader(fragId);
 		
 		return prgmId;
+	}
+
+	// load a texture from a file and bind to gl texture buffer
+	unsigned int loadTextureFromFile(const char* path)
+	{
+		unsigned int texId;
+		glGenTextures(1, &texId);
+
+		int width, height, numComp;
+		unsigned char* data = stbi_load(path, &width, &height, &numComp, 0);
+		if (data)
+		{
+			GLenum format;
+			if (numComp == 1)
+			{
+				format = GL_RED;
+			}
+			else if (numComp == 3)
+			{
+				format = GL_RGB;
+			}
+			else if (numComp == 4)
+			{
+				format = GL_RGBA;
+			}
+
+			glBindTexture(GL_TEXTURE_2D, texId);
+			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+			// glGenerateMipmap(GL_TEXTURE_2D);
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+			stbi_image_free(data);
+		}
+		else
+		{
+			std::cout << "ERROR::TEXTURE_LOAD_ERR: Unable to load texture from " << path << "\n";
+			stbi_image_free(data);
+		}
+		return texId;
 	}
 }
 
