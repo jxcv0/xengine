@@ -59,6 +59,7 @@ int main(int argc, char const *argv[])
 		xen::processKeyPress(mainWindow.ptr);
 		xen::fill(0.3f, 0.1f, 0.1f, 1.0f);
 
+		glBindTexture(GL_TEXTURE_2D, texture);
 		glUseProgram(shader);
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
