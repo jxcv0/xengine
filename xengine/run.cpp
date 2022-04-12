@@ -10,8 +10,10 @@
 #include "shader.h"
 #include "checkerr.h"
 
-int main(int argc, char const *argv[]) {
-	xen::Window mainWindow;
+xen::Window mainWindow;
+
+int main(int argc, char const *argv[])
+{
 	xen::initWindow(mainWindow);
 
 	auto shader = xen::loadShaderFromFile("assets/shaders/basic.vert", "assets/shaders/basic.frag");
@@ -56,9 +58,11 @@ int main(int argc, char const *argv[]) {
 	{
 		xen::processKeyPress(mainWindow.ptr);
 		xen::fill(0.3f, 0.1f, 0.1f, 1.0f);
+
+		glUseProgram(shader);
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		glBindVertexArray(0);
+
 		xen::swapThenPoll(mainWindow);
 	}
 	

@@ -1,9 +1,8 @@
 #version 460 core
-out vec4 frag_col;
+out vec4 fragCol;
 
-in vec2 tex_coord;
-// uniform sampler2D texture_diffuse1;
+in vec3 Col;
 
 void main() {
-    frag_col = vec4(0.5f, 0.5f, 0.5f, 1.0f);
+    fragCol = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 }

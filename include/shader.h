@@ -31,6 +31,7 @@ namespace xen
 	{
 		GLint success;
 		GLchar infoLog[1024];
+		glGetProgramiv(prgmId, GL_LINK_STATUS, &success);
 		if (!success)
 		{
 			glGetProgramInfoLog(prgmId, 1024, NULL, infoLog);
@@ -75,7 +76,7 @@ namespace xen
 		checkShaderCompile(vertId);
 
 		// frag
-		fragId = glCreateShader(GL_VERTEX_SHADER);
+		fragId = glCreateShader(GL_FRAGMENT_SHADER);
 		glShaderSource(fragId, 1, &fragCodeCstr, NULL);
 		glCompileShader(fragId);
 		checkShaderCompile(fragId);
