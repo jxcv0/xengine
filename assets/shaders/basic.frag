@@ -7,5 +7,5 @@ in vec2 texCoord;
 uniform sampler2D tex;
 
 void main() {
-    fragCol = texture(tex, texCoord);
+    fragCol = mix(texture(tex, texCoord), vec4(col, 1.0f), 0.5f);
 }

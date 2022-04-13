@@ -136,6 +136,54 @@ namespace xen
 		}
 		return texId;
 	}
+
+	// use a shader program
+	void useShader(unsigned int shader)
+	{
+		glUseProgram(shader);
+	}
+
+	// set shader boolean uniform utility function
+	void setShaderUniform(unsigned int shader, const char *uniformName, bool value)
+	{
+		glUniform1i(glGetUniformLocation(shader, uniformName), static_cast<int>(value));
+	}
+
+	// set shader int uniform utility function
+	void setShaderUniform(unsigned int shader, const char *uniformName, int value)
+	{
+		glUniform1i(glGetUniformLocation(shader, uniformName), value);
+	}
+
+	// set shader float uniform utility function
+	void setShaderUniform(unsigned int shader, const char *uniformName, float value)
+	{
+		glUniform1f(glGetUniformLocation(shader, uniformName), value);
+	}
+
+	// set shader vec2 uniform utility function
+	void setShaderUniform(unsigned int shader, const char *uniformName, glm::vec2 &value)
+	{
+		glUniform2fv(glGetUniformLocation(shader, uniformName), 1, &value[0]);
+	}
+
+	// set shader vec3 uniform utility function
+	void setShaderUniform(unsigned int shader, const char *uniformName, glm::vec3 &value)
+	{
+		glUniform3fv(glGetUniformLocation(shader, uniformName), 1, &value[0]);
+	}
+
+	// set shader vec4 uniform utility function
+	void setShaderUniform(unsigned int shader, const char *uniformName, glm::vec4 &value)
+	{
+		glUniform4fv(glGetUniformLocation(shader, uniformName), 1, &value[0]);
+	}
+
+	// set shader mat4 uniform utility funtion
+	void setShaderUniform(unsigned int shader, const char *uniformName, glm::mat4 &value)
+	{
+		glUniformMatrix4fv(glGetUniformLocation(shader, uniformName), 1, GL_FALSE, &value[0][0]);
+	}
 }
 
 #endif // SHADER_H
