@@ -98,7 +98,7 @@ void mouseCallback(GLFWwindow *window, double xPosIn, double yPosIn)
 	{
 		camera.xLast = xPos;
 		camera.yLast = yPos;
-		return;
+		firstMouseMovement = false;
 	}
 		
 	float xOffset = xPos - camera.xLast;
