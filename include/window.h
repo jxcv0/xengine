@@ -35,6 +35,8 @@ namespace xen
 		{
 			std::cout << "Unable to initialize GLAD\n";
 		}
+
+		glfwSetInputMode(window.ptr, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	}
 
 	// check if glfw has recieved a signal to close
@@ -63,8 +65,26 @@ namespace xen
 	void fill(float r, float g, float b, float a)
 	{
 		glClearColor(r, g, b ,a);
-		glClear(GL_COLOR_BUFFER_BIT);
 	}
+
+	// clear gl buffers
+	void clear()
+	{
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+
+	// calculate projection matrix
+	glm::mat4 projectionMatrix(Window &window)
+	{
+		return glm::perspective(glm::radians(55.0f), (float)window.scrWidth / (float)window.scrHeight, 0.1f, 100.0f);
+	}
+
+	// set cursor position callback function
+	void setCursorPositionCallback(Window &window, GLFWcursorposfun function)
+	{
+		glfwSetCursorPosCallback(window.ptr, function);
+	}
+
 } // namespace xen
 
 #endif // WINDOW_H

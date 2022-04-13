@@ -184,6 +184,6 @@ namespace xen
 	{
 		glUniformMatrix4fv(glGetUniformLocation(shader, uniformName), 1, GL_FALSE, &value[0][0]);
 	}
-}
+} // namespace xen
 
 #endif // SHADER_H

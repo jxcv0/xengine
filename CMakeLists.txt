@@ -19,6 +19,7 @@ find_package(assimp REQUIRED)
 
 set(
   SOURCES 
+    include/camera.h
     include/shader.h
     include/window.h
     include/checkerr.h
