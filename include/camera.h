@@ -37,8 +37,6 @@ namespace xen
 			sin(glm::radians(camera.b)) * cos(glm::radians(camera.a))));
 
 		camera.x = glm::normalize(glm::cross(camera.z, camera.y));
-		std::cout << "a: " << camera.a << "\n";
-		std::cout << "b: " << camera.b << "\n";
 	}
 }
 

@@ -22,7 +22,6 @@ int main(int argc, char const *argv[])
 	xen::initWindow(mainWindow);
 	xen::setCursorPositionCallback(mainWindow, mouseCallback);
 	camera.position = glm::vec3(0.0f, 0.0f, 3.0f);
-	xen::updateCamera(camera, (float)mainWindow.scrWidth/2, (float)mainWindow.scrHeight/2);
 
 	auto shader = xen::loadShaderFromFile("assets/shaders/basic.vert", "assets/shaders/basic.frag");
 	auto texture = xen::loadTextureFromFile("assets/textures/stone_blocks.jpg");
@@ -88,7 +87,6 @@ int main(int argc, char const *argv[])
 	return 0;
 }
 
-
 void mouseCallback(GLFWwindow *window, double xPosIn, double yPosIn)
 {
 	float xPos = static_cast<float>(xPosIn);
@@ -100,7 +98,7 @@ void mouseCallback(GLFWwindow *window, double xPosIn, double yPosIn)
 		camera.yLast = yPos;
 		firstMouseMovement = false;
 	}
-		
+
 	float xOffset = xPos - camera.xLast;
 	float yOffset = camera.yLast - yPos;
 	camera.xLast = xPos;
