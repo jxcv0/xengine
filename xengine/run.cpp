@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
+#include "model.h"
 #include "camera.h"
 #include "window.h"
 #include "shader.h"
