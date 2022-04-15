@@ -10,7 +10,6 @@
 #include "camera.h"
 #include "window.h"
 #include "shader.h"
-#include "checkerr.h"
 
 xen::Window mainWindow;
 xen::Camera camera;
@@ -26,6 +25,9 @@ int main(int argc, char const *argv[])
 
 	auto shader = xen::loadShaderFromFile("assets/shaders/basic.vert", "assets/shaders/basic.frag");
 	auto texture = xen::loadTextureFromFile("assets/textures/stone_blocks.jpg");
+	xen::Model femaleModel;
+	xen::loadModel(femaleModel, "assets/models/female_base/test/female_base_texture_test.obj");
+	xen::genModelBuffers(femaleModel);
 	
 	float vertices[] = {
 		// positions          // colors           // texture coords
@@ -66,9 +68,11 @@ int main(int argc, char const *argv[])
 
 	while (!xen::windowShouldClose(mainWindow))
 	{
-		auto viewMatrix = xen::viewMatrix(camera);
 		xen::useShader(shader);
+
+		auto viewMatrix = xen::viewMatrix(camera);
 		auto projectionMatrix = xen::projectionMatrix(mainWindow);
+
 		xen::setShaderUniform(shader, "model", modelMatrix);
 		xen::setShaderUniform(shader, "view", viewMatrix);
 		xen::setShaderUniform(shader, "projection", projectionMatrix);
@@ -79,6 +83,10 @@ int main(int argc, char const *argv[])
 		glBindTexture(GL_TEXTURE_2D, texture);
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+		auto femaleModelMatrix = xen::modelMatrix(femaleModel);
+		xen::setShaderUniform(shader, "model", femaleModelMatrix);
+		xen::drawModel(femaleModel);
 
 		xen::swapThenPoll(mainWindow);
 	}
