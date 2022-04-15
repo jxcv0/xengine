@@ -1,13 +1,21 @@
 #ifndef MODEL_H
 #define MODEL_H
 
+#include <glad.h>
+
 #include <vector>
 #include <string>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 #include <glm/glm.hpp>
+
+#include "shader.h"
 
 namespace xen
 {
@@ -19,6 +27,7 @@ namespace xen
 
 		int width, height, numComp;
 		unsigned char* data = stbi_load(path, &width, &height, &numComp, 0);
+
 		if (data)
 		{
 			GLenum format;
@@ -51,18 +60,19 @@ namespace xen
 			std::cout << "ERROR::TEXTURE_LOAD_ERR: Unable to load texture from " << path << "\n";
 			stbi_image_free(data);
 		}
+
 		return texId;
 	}
 
-	// a vertex - TODO: AoS vs SoA
+	// an individual vertex
 	struct Vertex
 	{
-		glm::vec3 position;	// position of the vertex
-		glm::vec3 normal;	// normal vector
-		glm::vec2 texCoord;	// coordinates of texures applied to this vertex
+		glm::vec3 position;
+		glm::vec3 normal;
+		glm::vec2 texCoord;
 	};
 
-	// texture id
+	// a texture
 	struct Texture
 	{
 		unsigned int id;
@@ -72,7 +82,161 @@ namespace xen
 	// mesh data
 	struct Mesh
 	{
+		unsigned int VAO, VBO, EBO;		// gl buffer handles
 		std::vector<Vertex> vertices;
+		std::vector<unsigned int> indices;
+		std::vector<Texture> textures;
 	};
+
+	// a model is a collection of meshes and the data required for generating a model matrix
+	struct Model
+	{
+		glm::vec3 position = glm::vec3(0.0f);
+		std::vector<Mesh> meshes;
+		// TODO rotation and scale
+	};
+
+	// process imported mesh data
+	Mesh processMesh(aiMesh *mesh, const aiScene *scene)
+	{
+		Mesh xMesh;
+
+		// vertices
+		for (size_t i = 0; i < mesh->mNumVertices; i++)
+		{
+			// position
+			Vertex vertex;
+			glm::vec3 vector3;
+			vector3.x = mesh->mVertices[i].x;
+			vector3.y = mesh->mVertices[i].y;
+			vector3.z = mesh->mVertices[i].z;
+			vertex.position = vector3;
+
+			// normals
+			if (mesh->HasNormals())
+			{
+				vector3.x = mesh->mNormals[i].x;
+				vector3.y = mesh->mNormals[i].y;
+				vector3.z = mesh->mNormals[i].z;
+				vertex.normal = vector3;
+			}
+
+			// texCoord
+			if (mesh->mTextureCoords[0]) // each vertex may only have one set of texture coordinates for now
+			{
+				glm::vec2 vector2;
+				vector2.x = mesh->mTextureCoords[0][i].x;
+				vector2.y = mesh->mTextureCoords[0][i].y;
+				vertex.texCoord = vector2;
+			}
+			else
+			{
+				vertex.texCoord = glm::vec2(0.0f, 0.0f);
+
+			}
+
+			xMesh.vertices.push_back(vertex);
+		}
+
+		for (size_t i = 0; i < mesh->mNumFaces; i++)
+		{
+			for (size_t j = 0; j < mesh->mFaces[i].mNumIndices; j++)
+			{
+				xMesh.indices.push_back(mesh->mFaces[i].mIndices[j]);
+			}
+		}
+		
+		// aiMaterial material = scene->mMaterials[mesh->mMaterialIndex];
+
+		return xMesh;
+	}
+
+	// recursively process all node in a scene
+	void processNode(Model &model, aiNode *node, const aiScene *scene)
+	{
+		for(size_t i = 0; i < node->mNumMeshes; i++)
+		{
+			model.meshes.push_back(processMesh(scene->mMeshes[node->mMeshes[i]], scene));
+		}
+			
+		for(size_t i = 0; i < node->mNumChildren; i++)
+		{
+			processNode(model, node->mChildren[i], scene);
+		}
+	}
+
+	// load data from a file into a model
+	void loadModel(Model &model, const char* path)
+	{
+		Assimp::Importer imp;
+		const aiScene *scene = imp.ReadFile(path,
+				aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+		
+		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+		{
+			std::cout << "ERROR::ASSIMP:: " << imp.GetErrorString() << "\n";
+			return;
+		}
+		processNode(model, scene->mRootNode, scene);
+	}
+
+	void genModelBuffers(Model &model)
+	{
+		for (auto &mesh : model.meshes)
+		{
+			glGenVertexArrays(1, &mesh.VAO);
+			glGenBuffers(1, &mesh.VBO);
+			glGenBuffers(1, &mesh.EBO);
+
+			glBindVertexArray(mesh.VAO);
+
+			glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
+			glBufferData(GL_ARRAY_BUFFER, mesh.vertices.size() * sizeof(Vertex), &mesh.vertices[0], GL_STATIC_DRAW);
+
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.EBO);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(unsigned int), &mesh.indices[0], GL_STATIC_DRAW); 
+
+			// vertex positions
+			glEnableVertexAttribArray(0);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+
+			// vertex normals
+			glEnableVertexAttribArray(1);
+			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+
+			// texture coords
+			glEnableVertexAttribArray(2);
+			glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoord));
+
+			// unbind
+			glBindVertexArray(0);
+		}
+	}
+
+	// draw a mesh using a shader program
+	void drawMesh(Mesh &mesh)
+	{
+		// TODO textures
+		glBindVertexArray(mesh.VAO);
+		glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(mesh.indices.size()), GL_UNSIGNED_INT, 0);
+		glBindVertexArray(0);
+	}
+
+	// draw all meshes in a model using a single shader program
+	void drawModel(Model& model)
+	{
+
+		for (size_t i = 0; i < model.meshes.size(); i++)
+		{
+			drawMesh(model.meshes[i]);
+		}
+	}
+
+	// generate model matrix based on model position
+	glm::mat4 modelMatrix(Model &model)
+	{
+		return glm::translate(glm::mat4(1.0f), model.position);
+	}
 }
+
 #endif // MODEL_H
