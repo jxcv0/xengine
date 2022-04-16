@@ -19,6 +19,7 @@ find_package(assimp REQUIRED)
 
 set(
   SOURCES 
+    include/loadobj.h
     include/keys.h
     include/model.h
     include/camera.h

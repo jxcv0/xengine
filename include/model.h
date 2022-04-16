@@ -9,6 +9,9 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#include <fstream>
+#include <iostream>
+
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -142,55 +145,24 @@ namespace xen
 		return textures;
 	}
 
-	// process imported mesh data
-	Mesh processMesh(aiMesh *mesh, const aiScene *scene)
+	void loadObj(const char* path)
 	{
-		Mesh xMesh;
-
-		// vertices
-		for (size_t i = 0; i < mesh->mNumVertices; i++)
+		std::ifstream file(path);
+		std::string line;
+		while (std::getline(file, line))
 		{
-			// position
-			Vertex vertex;
-			glm::vec3 vector3;
-			vector3.x = mesh->mVertices[i].x;
-			vector3.y = mesh->mVertices[i].y;
-			vector3.z = mesh->mVertices[i].z;
-			vertex.position = vector3;
+			if (line.starts_with('#')) { break; };	// assuming comments are always alone on a line
 
-			// normals
-			if (mesh->HasNormals())
+			if (line.starts_with("v"))
 			{
-				vector3.x = mesh->mNormals[i].x;
-				vector3.y = mesh->mNormals[i].y;
-				vector3.z = mesh->mNormals[i].z;
-				vertex.normal = vector3;
-			}
-
-			// texCoord
-			if (mesh->mTextureCoords[0]) // each vertex may only have one set of texture coordinates for now
-			{
-				glm::vec2 vector2;
-				vector2.x = mesh->mTextureCoords[0][i].x;
-				vector2.y = mesh->mTextureCoords[0][i].y;
-				vertex.texCoord = vector2;
-			}
-			else
-			{
-				vertex.texCoord = glm::vec2(0.0f, 0.0f);
-
-			}
-
-			xMesh.vertices.push_back(vertex);
-		}
-
-		for (size_t i = 0; i < mesh->mNumFaces; i++)
-		{
-			for (size_t j = 0; j < mesh->mFaces[i].mNumIndices; j++)
-			{
-				xMesh.indices.push_back(mesh->mFaces[i].mIndices[j]);
+				size_t pos = 0;
+				while ((pos = line.find(" ")) != std::string::npos)
+				{
+					// continue from here
+				}
 			}
 		}
+<<<<<<< HEAD
 		
 		aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
 		std::vector<TextureCache> cache;
@@ -234,6 +206,8 @@ namespace xen
 			return;
 		}
 		processNode(model, scene->mRootNode, scene);
+=======
+>>>>>>> ac2e5b5aeed19c3345867a1750dce4918876308b
 	}
 
 	{
