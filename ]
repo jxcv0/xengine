@@ -101,7 +101,112 @@ namespace xen
 		return texId;
 	}
 
-	// buffer model data in gl
+	// temporary storage for tracking what files have already been loaded into GL_TEXTURE_*
+	struct TextureCache
+	{
+		unsigned int id;
+		std::string path;
+	};
+
+	// load a texture file into a mesh only if it has not already been buffered into GL
+	std::vector<Texture> loadMaterialTexture(aiMaterial *material, aiTextureType type, const char* uniformName, std::vector<TextureCache> &cache)
+	{
+		std::vector<Texture> textures;
+		for (size_t i = 0; i < material->GetTextureCount(type); i++)
+		{
+			aiString str;
+			material->GetTexture(type, i, &str);
+			bool skip = false;
+
+			for (auto &c : cache)
+			{
+				if (std::strcmp(c.path.data(), str.C_Str()) == 0)
+				{
+					Texture texture = { c.id };
+					textures.push_back(texture);
+					skip = true;
+					break;
+				}
+			}
+
+			if (!skip)
+			{
+				Texture texture;
+				texture.id = loadTextureFromFile(str.C_Str());
+				texture.uniformName = uniformName;
+				
+				textures.push_back(texture);
+				
+				TextureCache c = { texture.id, str.C_Str() };
+				cache.push_back(c);
+			}
+		}
+
+		return textures;
+	}
+
+	void loadObj(const char* path)
+	{
+		std::ifstream file(path);
+		std::string line;
+		while (std::getline(file, line))
+		{
+			if (line.starts_with('#')) { break; };	// assuming comments are always alone on a line
+
+			if (line.starts_with("v"))
+			{
+				size_t pos = 0;
+				while ((pos = line.find(" ")) != std::string::npos)
+				{
+					// continue from here
+				}
+			}
+		}
+<<<<<<< HEAD
+		
+		aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
+		std::vector<TextureCache> cache;
+
+		std::vector<Texture> diffuseMaps = loadMaterialTexture(material, aiTextureType_DIFFUSE, "texture_diffuse", cache);
+		xMesh.textures.insert(xMesh.textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+		
+		std::vector<Texture> specularMaps = loadMaterialTexture(material, aiTextureType_SPECULAR, "texture_specular", cache);
+		xMesh.textures.insert(xMesh.textures.end(), specularMaps.begin(), diffuseMaps.end());
+
+		std::vector<Texture> normalMaps = loadMaterialTexture(material, aiTextureType_HEIGHT, "texture_normal", cache);
+		xMesh.textures.insert(xMesh.textures.end(), normalMaps.begin(), normalMaps.end());
+
+		return xMesh;
+	}
+
+	// recursively process all node in a scene
+	void processNode(Model &model, aiNode *node, const aiScene *scene)
+	{
+		for(size_t i = 0; i < node->mNumMeshes; i++)
+		{
+			model.meshes.push_back(processMesh(scene->mMeshes[node->mMeshes[i]], scene));
+		}
+			
+		for(size_t i = 0; i < node->mNumChildren; i++)
+		{
+			processNode(model, node->mChildren[i], scene);
+		}
+	}
+
+	// load data from a file into a model
+	void loadModel(Model &model, const char* path)
+	{
+		Assimp::Importer imp;
+		const aiScene *scene = imp.ReadFile(path,
+				aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+		
+		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+		{
+			std::cout << "ERROR::ASSIMP:: " << imp.GetErrorString() << "\n";
+			return;
+		}
+		processNode(model, scene->mRootNode, scene);
+	}
 	void bufferModel(Model &model)
 	{
 		for (auto &mesh : model.meshes)
