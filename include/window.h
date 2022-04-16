@@ -4,6 +4,8 @@
 #include <glad.h>
 #include <GLFW/glfw3.h>
 
+#include "keys.h"
+
 namespace xen
 {
 	// window datatype
@@ -37,6 +39,7 @@ namespace xen
 		}
 
 		glfwSetInputMode(window.ptr, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
 	}
 
 	// check if glfw has recieved a signal to close
@@ -45,8 +48,15 @@ namespace xen
 		return glfwWindowShouldClose(window.ptr);
 	}
 
+	// terminate glfw
+	void terminate()
+	{
+		// other cleanup?
+		glfwTerminate();
+	}
+
 	// process key presses
-	void processKeyPress(GLFWwindow *window)
+	void processEsc(GLFWwindow *window)
 	{
 		if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		{
@@ -84,6 +94,17 @@ namespace xen
 	{
 		glfwSetCursorPosCallback(window.ptr, function);
 	}
+
+	// process keyboard input
+	Direction processKeyInput(Window &window)
+	{
+		if (glfwGetKey(window.ptr, GLFW_KEY_W) == GLFW_PRESS) { return Direction::FORWARD; };
+		if (glfwGetKey(window.ptr, GLFW_KEY_S) == GLFW_PRESS) { return Direction::BACKWARD; };
+		if (glfwGetKey(window.ptr, GLFW_KEY_A) == GLFW_PRESS) { return Direction::LEFT; };
+		if (glfwGetKey(window.ptr, GLFW_KEY_D) == GLFW_PRESS) { return Direction::RIGHT; };
+		return Direction::NONE;
+	}
+		
 
 } // namespace xen
 

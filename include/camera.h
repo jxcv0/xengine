@@ -1,6 +1,8 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#include "keys.h"
+
 namespace xen
 {
 	// camera state
@@ -37,6 +39,30 @@ namespace xen
 			sin(glm::radians(camera.b)) * cos(glm::radians(camera.a))));
 
 		camera.x = glm::normalize(glm::cross(camera.z, camera.y));
+	}
+
+	void processMovement(Camera &camera, Direction direction, float deltaTime)
+	{
+		float velocity = 2.5f * deltaTime;
+		if (direction == Direction::FORWARD)
+		{
+			camera.position += camera.z * velocity;
+		}
+
+		if (direction == Direction::BACKWARD)
+		{
+			camera.position -= camera.z * velocity;
+		}
+
+		if (direction == Direction::LEFT)
+		{
+			camera.position -= camera.x * velocity;
+		}
+
+		if (direction == Direction::RIGHT)
+		{
+			camera.position += camera.x * velocity;
+		}
 	}
 }
 

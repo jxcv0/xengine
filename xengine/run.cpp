@@ -10,8 +10,9 @@
 #include "camera.h"
 #include "window.h"
 #include "shader.h"
+#include "keys.h"
 
-xen::Window mainWindow;
+xen::Window window;
 xen::Camera camera;
 bool firstMouseMovement = true;
 
@@ -19,9 +20,9 @@ void mouseCallback(GLFWwindow *window, double xPosIn, double yPosIn);
 
 int main(int argc, char const *argv[])
 {
-	xen::initWindow(mainWindow);
-	xen::setCursorPositionCallback(mainWindow, mouseCallback);
-	camera.position = glm::vec3(0.0f, 0.0f, 3.0f);
+	xen::initWindow(window);
+	xen::setCursorPositionCallback(window, mouseCallback);
+	camera.position = glm::vec3(0.0f, 1.0f, 3.0f);
 
 	auto shader = xen::loadShaderFromFile("assets/shaders/basic.vert", "assets/shaders/basic.frag");
 	auto texture = xen::loadTextureFromFile("assets/textures/stone_blocks.jpg");
@@ -29,15 +30,27 @@ int main(int argc, char const *argv[])
 	xen::loadModel(femaleModel, "assets/models/female_base/test/female_base_texture_test.obj");
 	xen::genModelBuffers(femaleModel);
 
-	while (!xen::windowShouldClose(mainWindow))
+	float deltaTime = 0.0f;
+	float lastFrame = 0.0f;
+
+	while (!xen::windowShouldClose(window))
 	{
+		// delta time 
+		float currentFrame = static_cast<float>(glfwGetTime());
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;	// should be at end of game loop?
+
+		// input
+		xen::processEsc(window.ptr);
+		xen::processMovement(camera, xen::processKeyInput(window), deltaTime);
+
 		// background
 		xen::fill(0.3f, 0.1f, 0.1f, 1.0f);
 		xen::clear();
 
 		// render matrices
 		auto viewMatrix = xen::viewMatrix(camera);
-		auto projectionMatrix = xen::projectionMatrix(mainWindow);
+		auto projectionMatrix = xen::projectionMatrix(window);
 		auto modelMatrix = xen::modelMatrix(femaleModel);
 
 		// shader and shader uniforms
@@ -46,17 +59,14 @@ int main(int argc, char const *argv[])
 		xen::setShaderUniform(shader, "view", viewMatrix);
 		xen::setShaderUniform(shader, "projection", projectionMatrix);
 
-		// input
-		xen::processKeyPress(mainWindow.ptr);
-
 		// model must be drawn after calling xen::clear
 		xen::setShaderUniform(shader, "model", modelMatrix);
 		xen::drawModel(femaleModel);
 
-		xen::swapThenPoll(mainWindow);
+		xen::swapThenPoll(window);
 	}
 	
-	glfwTerminate();
+	xen::terminate();
 
 	return 0;
 }
@@ -79,5 +89,4 @@ void mouseCallback(GLFWwindow *window, double xPosIn, double yPosIn)
 	camera.yLast = yPos;
 
 	xen::updateCamera(camera, xOffset * 0.1f, yOffset * 0.1f);
-
 }
