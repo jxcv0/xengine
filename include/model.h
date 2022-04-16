@@ -19,6 +19,40 @@
 
 namespace xen
 {
+
+	// an individual vertex
+	struct Vertex
+	{
+		glm::vec3 position;
+		glm::vec3 normal;
+		glm::vec2 texCoord;
+	};
+
+	// a texture
+	struct Texture
+	{
+		unsigned int id;
+		std::string uniformName;
+	};
+
+	// mesh data
+	struct Mesh
+	{
+		unsigned int VAO, VBO, EBO;		// gl buffer handles
+		std::vector<Vertex> vertices;
+		std::vector<unsigned int> indices;
+		std::vector<Texture> textures;
+	};
+
+	// a model is a collection of meshes and the data required for generating a model matrix
+	struct Model
+	{
+		std::string name;			// name of model used to load textures
+		glm::vec3 position = glm::vec3(0.0f);	// position of model in world space
+		std::vector<Mesh> meshes;		// the meshes comprising the model
+		// TODO rotation and scale
+	};
+
 	// load a texture from a file and bind to gl texture buffer
 	unsigned int loadTextureFromFile(const char* path)
 	{
@@ -64,37 +98,49 @@ namespace xen
 		return texId;
 	}
 
-	// an individual vertex
-	struct Vertex
-	{
-		glm::vec3 position;
-		glm::vec3 normal;
-		glm::vec2 texCoord;
-	};
-
-	// a texture
-	struct Texture
+	// temporary storage for tracking what files have already been loaded into GL_TEXTURE_*
+	struct TextureCache
 	{
 		unsigned int id;
-		std::string type;
+		std::string path;
 	};
 
-	// mesh data
-	struct Mesh
+	// load a texture file into a mesh only if it has not already been buffered into GL
+	std::vector<Texture> loadMaterialTexture(aiMaterial *material, aiTextureType type, const char* uniformName, std::vector<TextureCache> &cache)
 	{
-		unsigned int VAO, VBO, EBO;		// gl buffer handles
-		std::vector<Vertex> vertices;
-		std::vector<unsigned int> indices;
 		std::vector<Texture> textures;
-	};
+		for (size_t i = 0; i < material->GetTextureCount(type); i++)
+		{
+			aiString str;
+			material->GetTexture(type, i, &str);
+			bool skip = false;
 
-	// a model is a collection of meshes and the data required for generating a model matrix
-	struct Model
-	{
-		glm::vec3 position = glm::vec3(0.0f);
-		std::vector<Mesh> meshes;
-		// TODO rotation and scale
-	};
+			for (auto &c : cache)
+			{
+				if (std::strcmp(c.path.data(), str.C_Str()) == 0)
+				{
+					Texture texture = { c.id };
+					textures.push_back(texture);
+					skip = true;
+					break;
+				}
+			}
+
+			if (!skip)
+			{
+				Texture texture;
+				texture.id = loadTextureFromFile(str.C_Str());
+				texture.uniformName = uniformName;
+				
+				textures.push_back(texture);
+				
+				TextureCache c = { texture.id, str.C_Str() };
+				cache.push_back(c);
+			}
+		}
+
+		return textures;
+	}
 
 	// process imported mesh data
 	Mesh processMesh(aiMesh *mesh, const aiScene *scene)
@@ -146,7 +192,17 @@ namespace xen
 			}
 		}
 		
-		// aiMaterial material = scene->mMaterials[mesh->mMaterialIndex];
+		aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
+		std::vector<TextureCache> cache;
+
+		std::vector<Texture> diffuseMaps = loadMaterialTexture(material, aiTextureType_DIFFUSE, "texture_diffuse", cache);
+		xMesh.textures.insert(xMesh.textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+		
+		std::vector<Texture> specularMaps = loadMaterialTexture(material, aiTextureType_SPECULAR, "texture_specular", cache);
+		xMesh.textures.insert(xMesh.textures.end(), specularMaps.begin(), diffuseMaps.end());
+
+		std::vector<Texture> normalMaps = loadMaterialTexture(material, aiTextureType_HEIGHT, "texture_normal", cache);
+		xMesh.textures.insert(xMesh.textures.end(), normalMaps.begin(), normalMaps.end());
 
 		return xMesh;
 	}
@@ -180,7 +236,6 @@ namespace xen
 		processNode(model, scene->mRootNode, scene);
 	}
 
-	void genModelBuffers(Model &model)
 	{
 		for (auto &mesh : model.meshes)
 		{
@@ -225,11 +280,7 @@ namespace xen
 	// draw all meshes in a model using a single shader program
 	void drawModel(Model& model)
 	{
-
-		for (size_t i = 0; i < model.meshes.size(); i++)
-		{
-			drawMesh(model.meshes[i]);
-		}
+		for (size_t i = 0; i < model.meshes.size(); i++) { drawMesh(model.meshes[i]); }
 	}
 
 	// generate model matrix based on model position

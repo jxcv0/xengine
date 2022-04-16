@@ -39,7 +39,9 @@ namespace xen
 		}
 
 		glfwSetInputMode(window.ptr, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
+		
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LESS);
 	}
 
 	// check if glfw has recieved a signal to close

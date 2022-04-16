@@ -26,9 +26,9 @@ int main(int argc, char const *argv[])
 
 	auto shader = xen::loadShaderFromFile("assets/shaders/basic.vert", "assets/shaders/basic.frag");
 	auto texture = xen::loadTextureFromFile("assets/textures/stone_blocks.jpg");
-	xen::Model femaleModel;
-	xen::loadModel(femaleModel, "assets/models/female_base/test/female_base_texture_test.obj");
-	xen::genModelBuffers(femaleModel);
+	xen::Model cyborgModel;
+	xen::loadModel(cyborgModel, "assets/models/cyborg/cyborg.obj");
+	xen::genModelBuffers(cyborgModel);
 
 	float deltaTime = 0.0f;
 	float lastFrame = 0.0f;
@@ -51,7 +51,7 @@ int main(int argc, char const *argv[])
 		// render matrices
 		auto viewMatrix = xen::viewMatrix(camera);
 		auto projectionMatrix = xen::projectionMatrix(window);
-		auto modelMatrix = xen::modelMatrix(femaleModel);
+		auto modelMatrix = xen::modelMatrix(cyborgModel);
 
 		// shader and shader uniforms
 		xen::useShader(shader);
@@ -61,7 +61,7 @@ int main(int argc, char const *argv[])
 
 		// model must be drawn after calling xen::clear
 		xen::setShaderUniform(shader, "model", modelMatrix);
-		xen::drawModel(femaleModel);
+		xen::drawModel(cyborgModel);
 
 		xen::swapThenPoll(window);
 	}
