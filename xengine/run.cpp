@@ -25,7 +25,6 @@ int main(int argc, char const *argv[])
 	camera.position = glm::vec3(0.0f, 1.0f, 3.0f);
 
 	auto shader = xen::loadShaderFromFile("assets/shaders/basic.vert", "assets/shaders/basic.frag");
-	auto texture = xen::loadTextureFromFile("assets/textures/stone_blocks.jpg");
 	xen::Model cube;
 	xen::loadModel(cube, "assets/models/cube/cube_triangulated.obj");
 	xen::genModelBuffers(cube);

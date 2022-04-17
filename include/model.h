@@ -22,7 +22,6 @@
 
 namespace xen
 {
-
 	// an individual vertex
 	struct Vertex
 	{
@@ -100,64 +99,61 @@ namespace xen
 		return texId;
 	}
 
-	// process a mesh
-	Mesh processMesh(aiMesh *mesh, const aiScene *scene)
-	{
-		Mesh newMesh;
-		for(size_t i = 0; i < mesh->mNumVertices; i++)
-		{
-			Vertex vertex;
-			glm::vec3 vector;
-
-			// positions
-			vector.x = mesh->mVertices[i].x;
-			vector.y = mesh->mVertices[i].y;
-			vector.z = mesh->mVertices[i].z;
-			vertex.position = vector;
-
-			// normals
-			if (mesh->HasNormals())
-			{
-				vector.x = mesh->mNormals[i].x;
-				vector.y = mesh->mNormals[i].y;
-				vector.z = mesh->mNormals[i].z;
-				vertex.normal = vector;
-			}
-
-			// texture coordinates
-			if(mesh->mTextureCoords[0])
-			{
-				glm::vec2 vec;
-				vec.x = mesh->mTextureCoords[0][i].x; 
-				vec.y = mesh->mTextureCoords[0][i].y;
-				vertex.texCoord = vec;
-			}
-			else
-			{
-				vertex.texCoord = glm::vec2(0.0f, 0.0f);
-			}
-
-			newMesh.vertices.push_back(vertex);
-		}
-
-		for(size_t i = 0; i < mesh->mNumFaces; i++)
-		{
-			aiFace face = mesh->mFaces[i];
-			for(size_t j = 0; j < face.mNumIndices; j++)
-			{
-				newMesh.indices.push_back(face.mIndices[j]);        
-			}
-		}
-
-		return newMesh;
-	}
-
 	// recursively process nodes in a scene
 	void processNode(Model &model, aiNode *node, const aiScene *scene)
 	{
 		for (size_t i = 0; i < node->mNumMeshes; i++)
 		{
-			model.meshes.push_back(processMesh(scene->mMeshes[node->mMeshes[i]], scene));
+			aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
+			Mesh xenMesh;
+			for(size_t i = 0; i < mesh->mNumVertices; i++)
+			{
+				Vertex vertex;
+				glm::vec3 vector;
+
+				// positions
+				vector.x = mesh->mVertices[i].x;
+				vector.y = mesh->mVertices[i].y;
+				vector.z = mesh->mVertices[i].z;
+				vertex.position = vector;
+
+				// normals
+				if (mesh->HasNormals())
+				{
+					vector.x = mesh->mNormals[i].x;
+					vector.y = mesh->mNormals[i].y;
+					vector.z = mesh->mNormals[i].z;
+					vertex.normal = vector;
+				}
+
+				// texture coordinates
+				if(mesh->mTextureCoords[0])
+				{
+					glm::vec2 vec;
+					vec.x = mesh->mTextureCoords[0][i].x; 
+					vec.y = mesh->mTextureCoords[0][i].y;
+					vertex.texCoord = vec;
+				}
+				else
+				{
+					vertex.texCoord = glm::vec2(0.0f, 0.0f);
+				}
+
+				xenMesh.vertices.push_back(vertex);
+			}
+
+			for(size_t i = 0; i < mesh->mNumFaces; i++)
+			{
+				aiFace face = mesh->mFaces[i];
+				for(size_t j = 0; j < face.mNumIndices; j++)
+				{
+					xenMesh.indices.push_back(face.mIndices[j]);        
+				}
+			}
+
+			// TODO - textures
+
+			model.meshes.push_back(xenMesh);
 		}
 
 		for (size_t i = 0; i < node->mNumChildren; i++)
