@@ -12,6 +12,10 @@
 #include <fstream>
 #include <iostream>
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 #include <glm/glm.hpp>
 
 #include "shader.h"
@@ -46,59 +50,10 @@ namespace xen
 	// a model is a collection of meshes and the data required for generating a model matrix
 	struct Model
 	{
-		std::string name;			// name of model used to load textures
 		glm::vec3 position = glm::vec3(0.0f);	// position of model in world space
 		std::vector<Mesh> meshes;		// the meshes comprising the model
 		// TODO rotation and scale
 	};
-
-	// load a .obj file int a Model
-	void loadModel(Model &model, const char* path)
-	{
-		std::ifstream file(path);
-		std::string line;
-		size_t pos = 0;
-
-		while(std::getline(file, line))
-		{
-			if ((pos = line.find("#")) != std::string::npos)
-			{
-				line.erase(pos, line.size());
-			}
-
-			if ((pos = line.find("v")) != std::string::npos)
-			{
-				if ((pos = line.find("t")) != std::string::npos)
-				{
-					// add to texCoord
-					line.erase(0, pos + 2);
-					std::cout << line << "\n";
-					while((pos = line.find(" ")) != std::string::npos)
-					{
-						// do the things 
-					}
-				}
-				else if ((pos = line.find("n")) != std::string::npos) 
-				{
-					// add to normal
-					line.erase(0, pos + 2);
-					std::cout << line << "\n";
-				}
-				else
-				{
-					// add to vertices
-					line.erase(0, pos + 3);
-					std::cout << line << "\n";
-				}
-			}
-			else if ((pos = line.find("f")) != std::string::npos)
-			{
-				// add to faces
-				line.erase(0, pos + 2);
-				std::cout << line << "\n";
-			}
-		}
-	}
 
 	// load a texture from a file and bind to gl texture buffer
 	unsigned int loadTextureFromFile(const char* path)
@@ -145,6 +100,91 @@ namespace xen
 		return texId;
 	}
 
+	// process a mesh
+	Mesh processMesh(aiMesh *mesh, const aiScene *scene)
+	{
+		Mesh newMesh;
+		for(size_t i = 0; i < mesh->mNumVertices; i++)
+		{
+			Vertex vertex;
+			glm::vec3 vector;
+
+			// positions
+			vector.x = mesh->mVertices[i].x;
+			vector.y = mesh->mVertices[i].y;
+			vector.z = mesh->mVertices[i].z;
+			vertex.position = vector;
+
+			// normals
+			if (mesh->HasNormals())
+			{
+				vector.x = mesh->mNormals[i].x;
+				vector.y = mesh->mNormals[i].y;
+				vector.z = mesh->mNormals[i].z;
+				vertex.normal = vector;
+			}
+
+			// texture coordinates
+			if(mesh->mTextureCoords[0])
+			{
+				glm::vec2 vec;
+				vec.x = mesh->mTextureCoords[0][i].x; 
+				vec.y = mesh->mTextureCoords[0][i].y;
+				vertex.texCoord = vec;
+			}
+			else
+			{
+				vertex.texCoord = glm::vec2(0.0f, 0.0f);
+			}
+
+			newMesh.vertices.push_back(vertex);
+		}
+
+		for(size_t i = 0; i < mesh->mNumFaces; i++)
+		{
+			aiFace face = mesh->mFaces[i];
+			for(size_t j = 0; j < face.mNumIndices; j++)
+			{
+				newMesh.indices.push_back(face.mIndices[j]);        
+			}
+		}
+
+		return newMesh;
+	}
+
+	// recursively process nodes in a scene
+	void processNode(Model &model, aiNode *node, const aiScene *scene)
+	{
+		for (size_t i = 0; i < node->mNumMeshes; i++)
+		{
+			model.meshes.push_back(processMesh(scene->mMeshes[node->mMeshes[i]], scene));
+		}
+
+		for (size_t i = 0; i < node->mNumChildren; i++)
+		{
+			processNode(model, node->mChildren[i], scene);
+		}
+	}
+
+	// load a model from a file
+	void loadModel(Model &model, const char* filepath)
+	{
+		Assimp::Importer importer;
+		const aiScene* scene = importer.ReadFile(filepath,
+				aiProcess_Triangulate |
+				aiProcess_GenSmoothNormals |
+				aiProcess_FlipUVs |
+				aiProcess_CalcTangentSpace);
+
+		if(!scene)
+		{
+			std::cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << "\n";
+			return;
+		}
+
+		processNode(model, scene->mRootNode, scene);
+	}
+
 	// buffer model data in gl
 	void genModelBuffers(Model &model)
 	{
@@ -159,6 +199,7 @@ namespace xen
 			glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
 			glBufferData(GL_ARRAY_BUFFER, mesh.vertices.size() * sizeof(Vertex), &mesh.vertices[0], GL_STATIC_DRAW);
 
+			// indices
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.EBO);
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(unsigned int), &mesh.indices[0], GL_STATIC_DRAW); 
 
@@ -166,13 +207,13 @@ namespace xen
 			glEnableVertexAttribArray(0);
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
 
-			// vertex normals
-			glEnableVertexAttribArray(1);
-			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-
 			// texture coords
+			glEnableVertexAttribArray(1);
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoord));
+
+			// vertex normals
 			glEnableVertexAttribArray(2);
-			glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoord));
+			glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 
 			// unbind
 			glBindVertexArray(0);

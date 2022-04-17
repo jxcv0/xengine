@@ -19,7 +19,6 @@ find_package(assimp REQUIRED)
 
 set(
   SOURCES 
-    include/loadobj.h
     include/keys.h
     include/model.h
     include/camera.h
@@ -42,6 +41,7 @@ target_link_libraries(
   ${PROJECT_NAME}
     PUBLIC
       glfw
+      glm::glm
       glad
       OpenGL::GL
       assimp
