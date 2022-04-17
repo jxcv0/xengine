@@ -99,30 +99,46 @@ namespace xen
 		return texId;
 	}
 
+	void loadMaterialTextures(Mesh &mesh, std::string dir, aiMaterial *mat, aiTextureType type, std::string typeName)
+	{
+		for (size_t i = 0; i < mat->GetTextureCount(type); i++)
+		{
+			aiString str;
+			mat->GetTexture(type, i, &str);
+
+			Texture texture;
+			std::string fileName(str.C_Str());
+			// texture.id = loadTextureFromFile((dir + "/" + fileName).c_str());
+			texture.uniformName = str.C_Str();
+			std::cout << texture.uniformName << "\n";
+			mesh.textures.push_back(texture);
+		}
+	};
+
 	// recursively process nodes in a scene
-	void processNode(Model &model, aiNode *node, const aiScene *scene)
+	void processNode(Model &model, aiNode *node, const aiScene *scene, std::string dir)
 	{
 		for (size_t i = 0; i < node->mNumMeshes; i++)
 		{
 			aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
 			Mesh xenMesh;
-			for(size_t i = 0; i < mesh->mNumVertices; i++)
+			for(size_t j = 0; j < mesh->mNumVertices; j++)
 			{
 				Vertex vertex;
 				glm::vec3 vector;
 
 				// positions
-				vector.x = mesh->mVertices[i].x;
-				vector.y = mesh->mVertices[i].y;
-				vector.z = mesh->mVertices[i].z;
+				vector.x = mesh->mVertices[j].x;
+				vector.y = mesh->mVertices[j].y;
+				vector.z = mesh->mVertices[j].z;
 				vertex.position = vector;
 
 				// normals
 				if (mesh->HasNormals())
 				{
-					vector.x = mesh->mNormals[i].x;
-					vector.y = mesh->mNormals[i].y;
-					vector.z = mesh->mNormals[i].z;
+					vector.x = mesh->mNormals[j].x;
+					vector.y = mesh->mNormals[j].y;
+					vector.z = mesh->mNormals[j].z;
 					vertex.normal = vector;
 				}
 
@@ -130,8 +146,8 @@ namespace xen
 				if(mesh->mTextureCoords[0])
 				{
 					glm::vec2 vec;
-					vec.x = mesh->mTextureCoords[0][i].x; 
-					vec.y = mesh->mTextureCoords[0][i].y;
+					vec.x = mesh->mTextureCoords[0][j].x; 
+					vec.y = mesh->mTextureCoords[0][j].y;
 					vertex.texCoord = vec;
 				}
 				else
@@ -139,32 +155,42 @@ namespace xen
 					vertex.texCoord = glm::vec2(0.0f, 0.0f);
 				}
 
+				// textures
+
+				aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
+
+				loadMaterialTextures(xenMesh, dir, material, aiTextureType_DIFFUSE, "texture_diffuse");
+				loadMaterialTextures(xenMesh, dir, material, aiTextureType_SPECULAR, "texture_specular");
+				loadMaterialTextures(xenMesh, dir, material, aiTextureType_HEIGHT, "texture_normal");
+
 				xenMesh.vertices.push_back(vertex);
 			}
 
-			for(size_t i = 0; i < mesh->mNumFaces; i++)
+			// indices
+			for(size_t j = 0; j < mesh->mNumFaces; j++)
 			{
-				aiFace face = mesh->mFaces[i];
-				for(size_t j = 0; j < face.mNumIndices; j++)
+				aiFace face = mesh->mFaces[j];
+				for(size_t k = 0; k < face.mNumIndices; k++)
 				{
-					xenMesh.indices.push_back(face.mIndices[j]);        
+					xenMesh.indices.push_back(face.mIndices[k]);        
 				}
 			}
-
-			// TODO - textures
 
 			model.meshes.push_back(xenMesh);
 		}
 
 		for (size_t i = 0; i < node->mNumChildren; i++)
 		{
-			processNode(model, node->mChildren[i], scene);
+			processNode(model, node->mChildren[i], scene, dir);
 		}
 	}
 
 	// load a model from a file
 	void loadModel(Model &model, const char* filepath)
 	{
+		std::string dir(filepath);
+		dir = dir.substr(0, dir.find_last_of('/'));
+
 		Assimp::Importer importer;
 		const aiScene* scene = importer.ReadFile(filepath,
 				aiProcess_Triangulate |
@@ -178,7 +204,7 @@ namespace xen
 			return;
 		}
 
-		processNode(model, scene->mRootNode, scene);
+		processNode(model, scene->mRootNode, scene, dir);
 	}
 
 	// buffer model data in gl

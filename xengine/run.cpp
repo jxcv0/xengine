@@ -26,7 +26,7 @@ int main(int argc, char const *argv[])
 
 	auto shader = xen::loadShaderFromFile("assets/shaders/basic.vert", "assets/shaders/basic.frag");
 	xen::Model cube;
-	xen::loadModel(cube, "assets/models/cube/cube_triangulated.obj");
+	xen::loadModel(cube, "assets/models/cyborg/cyborg.obj");
 	xen::genModelBuffers(cube);
 
 	float deltaTime = 0.0f;
