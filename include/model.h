@@ -52,6 +52,54 @@ namespace xen
 		// TODO rotation and scale
 	};
 
+	// load a .obj file int a Model
+	void loadModel(Model &model, const char* path)
+	{
+		std::ifstream file(path);
+		std::string line;
+		size_t pos = 0;
+
+		while(std::getline(file, line))
+		{
+			if ((pos = line.find("#")) != std::string::npos)
+			{
+				line.erase(pos, line.size());
+			}
+
+			if ((pos = line.find("v")) != std::string::npos)
+			{
+				if ((pos = line.find("t")) != std::string::npos)
+				{
+					// add to texCoord
+					line.erase(0, pos + 2);
+					std::cout << line << "\n";
+					while((pos = line.find(" ")) != std::string::npos)
+					{
+						// do the things 
+					}
+				}
+				else if ((pos = line.find("n")) != std::string::npos) 
+				{
+					// add to normal
+					line.erase(0, pos + 2);
+					std::cout << line << "\n";
+				}
+				else
+				{
+					// add to vertices
+					line.erase(0, pos + 3);
+					std::cout << line << "\n";
+				}
+			}
+			else if ((pos = line.find("f")) != std::string::npos)
+			{
+				// add to faces
+				line.erase(0, pos + 2);
+				std::cout << line << "\n";
+			}
+		}
+	}
+
 	// load a texture from a file and bind to gl texture buffer
 	unsigned int loadTextureFromFile(const char* path)
 	{
@@ -98,7 +146,7 @@ namespace xen
 	}
 
 	// buffer model data in gl
-	void bufferModel(Model &model)
+	void genModelBuffers(Model &model)
 	{
 		for (auto &mesh : model.meshes)
 		{
