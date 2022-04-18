@@ -25,6 +25,7 @@ namespace xen
 	// an individual vertex
 	struct Vertex
 	{
+		// TODO tangent, bitangent
 		glm::vec3 position;
 		glm::vec3 normal;
 		glm::vec2 texCoord;
