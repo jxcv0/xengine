@@ -99,16 +99,15 @@ namespace xen
 		return texId;
 	}
 
-	void loadMaterialTextures(Mesh &mesh, std::string dir, aiMaterial *mat, aiTextureType type, std::string typeName)
+	void loadMaterial(Mesh &mesh, std::string &dir, aiMaterial *mat, aiTextureType type, std::string typeName)
 	{
 		for (size_t i = 0; i < mat->GetTextureCount(type); i++)
 		{
 			aiString str;
 			mat->GetTexture(type, i, &str);
-
 			Texture texture;
 			std::string fileName(str.C_Str());
-			// texture.id = loadTextureFromFile((dir + "/" + fileName).c_str());
+			texture.id = loadTextureFromFile((dir + "/" + fileName).c_str());
 			texture.uniformName = str.C_Str();
 			std::cout << texture.uniformName << "\n";
 			mesh.textures.push_back(texture);
@@ -154,15 +153,6 @@ namespace xen
 				{
 					vertex.texCoord = glm::vec2(0.0f, 0.0f);
 				}
-
-				// textures
-
-				aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
-
-				loadMaterialTextures(xenMesh, dir, material, aiTextureType_DIFFUSE, "texture_diffuse");
-				loadMaterialTextures(xenMesh, dir, material, aiTextureType_SPECULAR, "texture_specular");
-				loadMaterialTextures(xenMesh, dir, material, aiTextureType_HEIGHT, "texture_normal");
-
 				xenMesh.vertices.push_back(vertex);
 			}
 
@@ -175,6 +165,13 @@ namespace xen
 					xenMesh.indices.push_back(face.mIndices[k]);        
 				}
 			}
+
+			// textures
+			aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
+
+			loadMaterial(xenMesh, dir, material, aiTextureType_DIFFUSE, "texture_diffuse");
+			loadMaterial(xenMesh, dir, material, aiTextureType_SPECULAR, "texture_specular");
+			loadMaterial(xenMesh, dir, material, aiTextureType_HEIGHT, "texture_normal");
 
 			model.meshes.push_back(xenMesh);
 		}
