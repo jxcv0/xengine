@@ -29,6 +29,8 @@ namespace xen
 		glm::vec3 position;
 		glm::vec3 normal;
 		glm::vec2 texCoord;
+		glm::vec3 tangent;
+		glm::vec3 bitangent;
 	};
 
 	// a texture
@@ -150,6 +152,16 @@ namespace xen
 					vec.x = mesh->mTextureCoords[0][j].x; 
 					vec.y = mesh->mTextureCoords[0][j].y;
 					vertex.texCoord = vec;
+
+					vector.x = mesh->mTangents[i].x;
+					vector.y = mesh->mTangents[i].y;
+					vector.z = mesh->mTangents[i].z;
+					vertex.tangent = vector;
+
+					vector.x = mesh->mBitangents[i].x;
+					vector.y = mesh->mBitangents[i].y;
+					vector.z = mesh->mBitangents[i].z;
+					vertex.bitangent = vector;
 				}
 				else
 				{
@@ -235,6 +247,13 @@ namespace xen
 			// vertex normals
 			glEnableVertexAttribArray(2);
 			glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+
+			// tangent
+			glEnableVertexAttribArray(3);
+			glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tangent));
+
+			glEnableVertexAttribArray(4);
+			glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, bitangent));
 
 			// unbind
 			glBindVertexArray(0);
