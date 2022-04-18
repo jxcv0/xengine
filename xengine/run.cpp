@@ -66,6 +66,9 @@ int main(int argc, char const *argv[])
 		xen::setShaderUniform(shader, "shininess", 32.0f);
 		xen::setShaderUniform(shader, "light.position", light.position);
 		xen::setShaderUniform(shader, "light.colour", light.colour);
+		xen::setShaderUniform(shader, "light.constant", light.constant);
+		xen::setShaderUniform(shader, "light.linear", light.linear);
+		xen::setShaderUniform(shader, "light.quadratic", light.quadratic);
 
 		// TODO - texture uniforms are assigned when loading, should all uniforms be in the same place?
 		xen::drawModel(model, shader);
