@@ -31,7 +31,8 @@ int main(int argc, char const *argv[])
 	xen::genModelBuffers(model);	// all buffer gen functions must be sequential
 
 	xen::Light light;
-	light.position = glm::vec3(1.0f);
+	light.position = glm::vec3(0.0f, 3.0f, 1.0f);
+
 	float deltaTime = 0.0f;
 	float lastFrame = 0.0f;
 

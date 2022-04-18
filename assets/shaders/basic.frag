@@ -24,10 +24,12 @@ struct Light
 	float linear;
 	float quadratic;
 };
-uniform Light light;	// array of lights with entry for every light that casts to a visible surface
+uniform Light light;	// TODO array of lights with entry for every light that casts to a visible surface
 
-void main()
+// calculate on omnidirectional light
+vec3 calculateLight(Light light, vec3 normal, vec3 viewDir)
 {
+	
 	float distance = length(light.position - fragPos);
 	float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic + (distance * distance));
 
@@ -44,11 +46,19 @@ void main()
 	vec3 diffuse = diff * light.colour * texture(textureDiffuse, texCoord).rgb;
 
 	// specular
-	vec3 viewDir = normalize(viewPosition - fragPos);
 	vec3 reflectDir = reflect(-lightDir, norm);
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
 	vec3 specular = spec * light.colour * texture(textureSpecular, texCoord).rgb;
 
-	vec3 result = (ambient + diffuse + specular) * attenuation;
+	return (ambient + diffuse + specular) * attenuation;
+}
+
+void main()
+{
+	vec3 viewDir = normalize(viewPosition - fragPos);
+	vec3 normal = texture(textureNormal, texCoord).rgb;
+	normal = normalize(normal * 2.0 - 1.0);
+
+	vec3 result = calculateLight(light, normal, viewDir);
 	fragCol = vec4(result, 1.0);
 }

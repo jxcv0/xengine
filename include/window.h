@@ -40,8 +40,13 @@ namespace xen
 
 		glfwSetInputMode(window.ptr, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		
+		// depth testing
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
+
+		// face culling 
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
 	}
 
 	// check if glfw has recieved a signal to close
