@@ -11,6 +11,7 @@
 #include "window.h"
 #include "shader.h"
 #include "keys.h"
+#include "light.h"
 
 xen::Window window;
 xen::Camera camera;
@@ -25,10 +26,12 @@ int main(int argc, char const *argv[])
 	camera.position = glm::vec3(0.0f, 1.0f, 3.0f);
 
 	auto shader = xen::loadShaderFromFile("assets/shaders/basic.vert", "assets/shaders/basic.frag");
-	xen::Model cube;
-	xen::loadModel(cube, "assets/models/cyborg/cyborg.obj");
-	xen::genModelBuffers(cube);
+	xen::Model model;
+	xen::loadModel(model, "assets/models/cyborg/cyborg.obj");
+	xen::genModelBuffers(model);	// all buffer gen functions must be sequential
 
+	xen::Light light;
+	light.position = glm::vec3(1.0f);
 	float deltaTime = 0.0f;
 	float lastFrame = 0.0f;
 
@@ -50,7 +53,7 @@ int main(int argc, char const *argv[])
 		// render matrices
 		auto viewMatrix = xen::viewMatrix(camera);
 		auto projectionMatrix = xen::projectionMatrix(window);
-		auto modelMatrix = xen::modelMatrix(cube);
+		auto modelMatrix = xen::modelMatrix(model);
 
 		// shader and shader uniforms
 		xen::useShader(shader);
@@ -58,9 +61,11 @@ int main(int argc, char const *argv[])
 		xen::setShaderUniform(shader, "view", viewMatrix);
 		xen::setShaderUniform(shader, "projection", projectionMatrix);
 
-		// model must be drawn after calling xen::clear
-		xen::setShaderUniform(shader, "model", modelMatrix);
-		xen::drawModel(cube);
+		// light
+		xen::setShaderUniform(shader, "light.position", light.position);
+		xen::setShaderUniform(shader, "light.colour", light.colour);
+
+		xen::drawModel(model, shader);
 
 		xen::swapThenPoll(window);
 	}

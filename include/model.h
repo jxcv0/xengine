@@ -99,6 +99,7 @@ namespace xen
 		return texId;
 	}
 
+	// load all textures of a type into a mesh
 	void loadMaterial(Mesh &mesh, std::string &dir, aiMaterial *mat, aiTextureType type, std::string typeName)
 	{
 		for (size_t i = 0; i < mat->GetTextureCount(type); i++)
@@ -108,8 +109,7 @@ namespace xen
 			Texture texture;
 			std::string fileName(str.C_Str());
 			texture.id = loadTextureFromFile((dir + "/" + fileName).c_str());
-			texture.uniformName = str.C_Str();
-			std::cout << texture.uniformName << "\n";
+			texture.uniformName = typeName;
 			mesh.textures.push_back(texture);
 		}
 	};
@@ -169,9 +169,9 @@ namespace xen
 			// textures
 			aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
 
-			loadMaterial(xenMesh, dir, material, aiTextureType_DIFFUSE, "texture_diffuse");
-			loadMaterial(xenMesh, dir, material, aiTextureType_SPECULAR, "texture_specular");
-			loadMaterial(xenMesh, dir, material, aiTextureType_HEIGHT, "texture_normal");
+			loadMaterial(xenMesh, dir, material, aiTextureType_DIFFUSE, "textureDiffuse");
+			loadMaterial(xenMesh, dir, material, aiTextureType_SPECULAR, "textureSpecular");
+			loadMaterial(xenMesh, dir, material, aiTextureType_HEIGHT, "textureNormal");
 
 			model.meshes.push_back(xenMesh);
 		}
@@ -240,18 +240,25 @@ namespace xen
 	}
 
 	// draw a mesh using a shader program
-	void drawMesh(Mesh &mesh)
+	// this function assumes each mesh only has one diffuse, specular and normal map
+	void drawMesh(Mesh &mesh, unsigned int shader)
 	{
-		// TODO textures
+		for (int i = 0; i < mesh.textures.size(); i++)
+		{
+			glActiveTexture(GL_TEXTURE0 + i);
+			setShaderUniform(shader, mesh.textures[i].uniformName.c_str(), i);
+			glBindTexture(GL_TEXTURE_2D, mesh.textures[i].id);
+		}
 		glBindVertexArray(mesh.VAO);
 		glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(mesh.indices.size()), GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
+		glActiveTexture(GL_TEXTURE0);
 	}
 
 	// draw all meshes in a model using a single shader program
-	void drawModel(Model& model)
+	void drawModel(Model& model, unsigned int shader)
 	{
-		for (size_t i = 0; i < model.meshes.size(); i++) { drawMesh(model.meshes[i]); }
+		for (auto &mesh : model.meshes) { drawMesh(mesh, shader); }
 	}
 
 	// generate model matrix based on model position
