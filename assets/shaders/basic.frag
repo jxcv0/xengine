@@ -18,11 +18,19 @@ struct Light
 {
 	vec3 position;
 	vec3 colour;
+
+	// attenuation constants
+	float constant;
+	float linear;
+	float quadratic;
 };
 uniform Light light;	// array of lights with entry for every light that casts to a visible surface
 
 void main()
 {
+	float distance = length(light.position - fragPos);
+	float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic + (distance * distance));
+
 	// ambient
 	float ambientStrength = 0.1;	// get this from where?
 	vec3 ambient = ambientStrength * light.colour;
@@ -41,6 +49,6 @@ void main()
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
 	vec3 specular = spec * light.colour * texture(textureSpecular, texCoord).rgb;
 
-	vec3 result = (ambient + diffuse + specular);
+	vec3 result = (ambient + diffuse + specular) * attenuation;
 	fragCol = vec4(result, 1.0);
 }

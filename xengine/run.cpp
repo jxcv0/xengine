@@ -47,7 +47,7 @@ int main(int argc, char const *argv[])
 		xen::processMovement(camera, xen::processKeyInput(window), deltaTime);
 
 		// background
-		xen::fill(0.3f, 0.1f, 0.1f, 1.0f);
+		xen::fill(0.1f, 0.1f, 0.1f, 1.0f);
 		xen::clear();
 
 		// render matrices
@@ -67,6 +67,7 @@ int main(int argc, char const *argv[])
 		xen::setShaderUniform(shader, "light.position", light.position);
 		xen::setShaderUniform(shader, "light.colour", light.colour);
 
+		// TODO - texture uniforms are assigned when loading, should all uniforms be in the same place?
 		xen::drawModel(model, shader);
 
 		xen::swapThenPoll(window);
