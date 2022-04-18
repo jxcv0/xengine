@@ -11,12 +11,13 @@ uniform sampler2D textureSpecular;
 uniform sampler2D textureNormal;
 uniform float shininess;
 
+uniform vec3 viewPosition;
+
 // could be made into an array of all light positions in "scene"?
 struct Light
 {
 	vec3 position;
 	vec3 colour;
-	vec3 viewPosition;
 };
 uniform Light light;	// array of lights with entry for every light that casts to a visible surface
 
@@ -35,9 +36,9 @@ void main()
 	vec3 diffuse = diff * light.colour * texture(textureDiffuse, texCoord).rgb;
 
 	// specular
-	vec3 viewDir = normalize(light.viewPosition - fragPos);
+	vec3 viewDir = normalize(viewPosition - fragPos);
 	vec3 reflectDir = reflect(-lightDir, norm);
-	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
 	vec3 specular = spec * light.colour * texture(textureSpecular, texCoord).rgb;
 
 	vec3 result = (ambient + diffuse + specular);

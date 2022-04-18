@@ -62,6 +62,8 @@ int main(int argc, char const *argv[])
 		xen::setShaderUniform(shader, "projection", projectionMatrix);
 
 		// light
+		xen::setShaderUniform(shader, "viewPosition", camera.position);
+		xen::setShaderUniform(shader, "shininess", 32.0f);
 		xen::setShaderUniform(shader, "light.position", light.position);
 		xen::setShaderUniform(shader, "light.colour", light.colour);
 
