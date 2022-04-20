@@ -4,7 +4,7 @@
 #include <glad.h>
 #include <GLFW/glfw3.h>
 
-#include "keys.h"
+#include "input.h"
 
 namespace xen
 {
@@ -12,8 +12,8 @@ namespace xen
 	struct Window
 	{
 		GLFWwindow* ptr;
-		int scrWidth = 800;
-		int scrHeight = 600;
+		int scrWidth = 1600;
+		int scrHeight = 900;
 	};
 
 	// initialize GLFW and GLAD then draw a window

@@ -52,7 +52,7 @@ namespace xen
 	// a model is a collection of meshes and the data required for generating a model matrix
 	struct Model
 	{
-		glm::vec3 position = glm::vec3(0.0f);	// position of model in world space
+		glm::vec3 position = glm::vec3(0.0f);	// position of model in world space - default to world 0, 0, 0
 		std::vector<Mesh> meshes;		// the meshes comprising the model
 		// TODO rotation and scale
 	};

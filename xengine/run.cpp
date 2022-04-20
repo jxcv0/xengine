@@ -10,7 +10,7 @@
 #include "camera.h"
 #include "window.h"
 #include "shader.h"
-#include "keys.h"
+#include "input.h"
 #include "light.h"
 
 xen::Window window;
@@ -23,15 +23,20 @@ int main(int argc, char const *argv[])
 {
 	xen::initWindow(window);
 	xen::setCursorPositionCallback(window, mouseCallback);
-	camera.position = glm::vec3(0.0f, 1.0f, 3.0f);
 
-	auto shader = xen::loadShaderFromFile("assets/shaders/basic.vert", "assets/shaders/basic.frag");
+	// model shader and model
+	auto shader = xen::loadShaderFromFile("assets/shaders/model.vert", "assets/shaders/model.frag");
 	xen::Model model;
 	xen::loadModel(model, "assets/models/cyborg/cyborg.obj");
 	xen::genModelBuffers(model);	// all buffer gen functions must be sequential
 
+	// 3rd person camera
+	camera.position = model.position + glm::vec3(-1.0f, 4.0f, -2.0f);
+	xen::updateCamera(camera, 0.0f, 0.0f);
+
+	// temp light
 	xen::Light light;
-	light.position = glm::vec3(0.0f, 3.0f, 1.0f);
+	light.position = glm::vec3(0.0f, 5.0f, 0.0f);
 
 	float deltaTime = 0.0f;
 	float lastFrame = 0.0f;
@@ -42,7 +47,7 @@ int main(int argc, char const *argv[])
 		float currentFrame = static_cast<float>(glfwGetTime());
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;	// should be at end of game loop?
-
+		
 		// input
 		xen::processEsc(window.ptr);
 		xen::processMovement(camera, xen::processKeyInput(window), deltaTime);

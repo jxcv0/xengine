@@ -1,7 +1,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "keys.h"
+#include "input.h"
 
 namespace xen
 {
@@ -13,7 +13,7 @@ namespace xen
 		glm::vec3 y = glm::vec3(0.0f, 1.0f, 0.0f);		// positive y vector (camera up axis)
 		glm::vec3 z = glm::vec3(0.0f, 0.0f, -1.0f);		// camera z vector (the aim vector)
 		float a = 0.0f;						// rotation around local x axis (pitch)
-		float b = -90.0f;					// rotation around local y axis (yaw)
+		float b = 90.0f;					// rotation around local y axis (yaw)
 		float xLast;
 		float yLast;
 	};

@@ -5,6 +5,7 @@
 
 #include <glm/glm.hpp>
 
+// looking a little bit empty at the moment
 namespace xen
 {
 	struct Light
