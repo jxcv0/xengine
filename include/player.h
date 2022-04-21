@@ -3,9 +3,13 @@
 
 namespace xen
 {
+	// playable character state
 	struct Character
 	{
-		Model model;
+		glm::vec3 x;		// local x axis (right)
+		glm::vec3 y;		// local y axis (up)
+		glm::vec3 z;		// local z axis (front)
+		Model model;		// model data TODO multiple for equipables?
 	};
 } // namespace xen
 

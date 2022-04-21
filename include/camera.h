@@ -41,25 +41,25 @@ namespace xen
 		camera.x = glm::normalize(glm::cross(camera.z, camera.y));
 	}
 
-	void processMovement(Camera &camera, Direction direction, float deltaTime)
+	void processMovement(Camera &camera, bool w, bool a, bool s, bool d, float deltaTime)
 	{
 		float velocity = 2.5f * deltaTime;
-		if (direction == Direction::FORWARD)
+		if (w)
 		{
 			camera.position += camera.z * velocity;
 		}
 
-		if (direction == Direction::BACKWARD)
+		if (s)
 		{
 			camera.position -= camera.z * velocity;
 		}
 
-		if (direction == Direction::LEFT)
+		if (a)
 		{
 			camera.position -= camera.x * velocity;
 		}
 
-		if (direction == Direction::RIGHT)
+		if (d)
 		{
 			camera.position += camera.x * velocity;
 		}

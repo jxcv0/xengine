@@ -17,6 +17,12 @@ xen::Window window;
 xen::Camera camera;
 bool firstMouseMovement = true;
 
+// keyboard input flags
+bool w = false;
+bool a = false;
+bool s = false;
+bool d = false;
+
 void mouseCallback(GLFWwindow *window, double xPosIn, double yPosIn);
 
 int main(int argc, char const *argv[])
@@ -50,7 +56,8 @@ int main(int argc, char const *argv[])
 		
 		// input
 		xen::processEsc(window.ptr);
-		xen::processMovement(camera, xen::processKeyInput(window), deltaTime);
+		xen::processKeyInput(window, w, a, s, d);
+		xen::processMovement(camera, w, a, s, d, deltaTime);
 
 		// background
 		xen::fill(0.1f, 0.1f, 0.1f, 1.0f);
@@ -80,6 +87,11 @@ int main(int argc, char const *argv[])
 		xen::drawModel(model, shader);
 
 		xen::swapThenPoll(window);
+
+		w = false;
+		a = false;
+		s = false;
+		d = false;
 	}
 	
 	xen::terminate();

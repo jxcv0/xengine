@@ -4,8 +4,6 @@
 #include <glad.h>
 #include <GLFW/glfw3.h>
 
-#include "input.h"
-
 namespace xen
 {
 	// window datatype
@@ -103,13 +101,12 @@ namespace xen
 	}
 
 	// process keyboard input
-	Direction processKeyInput(Window &window)
+	void processKeyInput(Window &window, bool &w, bool &a, bool &s, bool &d)
 	{
-		if (glfwGetKey(window.ptr, GLFW_KEY_W) == GLFW_PRESS) { return Direction::FORWARD; };
-		if (glfwGetKey(window.ptr, GLFW_KEY_S) == GLFW_PRESS) { return Direction::BACKWARD; };
-		if (glfwGetKey(window.ptr, GLFW_KEY_A) == GLFW_PRESS) { return Direction::LEFT; };
-		if (glfwGetKey(window.ptr, GLFW_KEY_D) == GLFW_PRESS) { return Direction::RIGHT; };
-		return Direction::NONE;
+		if (glfwGetKey(window.ptr, GLFW_KEY_W) == GLFW_PRESS) { w = true; };
+		if (glfwGetKey(window.ptr, GLFW_KEY_S) == GLFW_PRESS) { s = true; };
+		if (glfwGetKey(window.ptr, GLFW_KEY_A) == GLFW_PRESS) { a = true; };
+		if (glfwGetKey(window.ptr, GLFW_KEY_D) == GLFW_PRESS) { d = true; };
 	}
 		
 

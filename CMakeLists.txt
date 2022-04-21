@@ -21,7 +21,6 @@ set(
   SOURCES 
     include/player.h
     include/light.h
-    include/input.h
     include/model.h
     include/camera.h
     include/shader.h
