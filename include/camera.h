@@ -1,17 +1,15 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "input.h"
-
 namespace xen
 {
 	// camera state
 	struct Camera
 	{
 		glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);	// world position
-		glm::vec3 x;						// positive x vector (to right of camera)
-		glm::vec3 y = glm::vec3(0.0f, 1.0f, 0.0f);		// positive y vector (camera up axis)
-		glm::vec3 z = glm::vec3(0.0f, 0.0f, -1.0f);		// camera z vector (the aim vector)
+		glm::vec3 x;						// local x axis (right)
+		glm::vec3 y = glm::vec3(0.0f, 1.0f, 0.0f);		// local y axis (up)
+		glm::vec3 z = glm::vec3(0.0f, 0.0f, -1.0f);		// local z axis (front)
 		float a = 0.0f;						// rotation around local x axis (pitch)
 		float b = 90.0f;					// rotation around local y axis (yaw)
 		float xLast;
@@ -25,7 +23,7 @@ namespace xen
 	}
 
 	// update camera vectors with mouse position
-	void updateCamera(Camera &camera, float x, float y)
+	void updateCameraAim(Camera &camera, float x, float y)
 	{
 		camera.a += y;
 		camera.b += x;
@@ -41,31 +39,21 @@ namespace xen
 		camera.x = glm::normalize(glm::cross(camera.z, camera.y));
 	}
 
-	void processMovement(Camera &camera, bool w, bool a, bool s, bool d, float deltaTime)
+	// update camera position vith a vector
+	void updateCameraPosition(Camera &camera, glm::vec3 pos)
+	{
+		camera.position = pos;
+	}
+
+	// update camera position based on key press / character movement flags
+	void processCameraMovement(Camera &camera, bool w, bool a, bool s, bool d, float deltaTime)
 	{
 		float velocity = 2.5f * deltaTime;
-		if (w)
-		{
-			camera.position += camera.z * velocity;
-		}
-
-		if (s)
-		{
-			camera.position -= camera.z * velocity;
-		}
-
-		if (a)
-		{
-			camera.position -= camera.x * velocity;
-		}
-
-		if (d)
-		{
-			camera.position += camera.x * velocity;
-		}
+		if (w) { camera.position += camera.z * velocity; }
+		if (s) { camera.position -= camera.z * velocity; }
+		if (a) { camera.position -= camera.x * velocity; }
+		if (d) { camera.position += camera.x * velocity; }
 	}
 }
 
 #endif // CAMERA_H
-
-//719148

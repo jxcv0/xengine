@@ -10,7 +10,6 @@
 #include "camera.h"
 #include "window.h"
 #include "shader.h"
-#include "input.h"
 #include "light.h"
 
 xen::Window window;
@@ -35,10 +34,12 @@ int main(int argc, char const *argv[])
 	xen::Model model;
 	xen::loadModel(model, "assets/models/cyborg/cyborg.obj");
 	xen::genModelBuffers(model);	// all buffer gen functions must be sequential
+	xen::Player player;
+	player. model = model;
 
 	// 3rd person camera
-	camera.position = model.position + glm::vec3(-1.0f, 4.0f, -2.0f);
-	xen::updateCamera(camera, 0.0f, 0.0f);
+	xen::updateCameraAim(camera, 0.0f, 0.0f);
+	xen::updateCameraPosition(camera, (model.position + glm::vec3(-1.0f, 4.0f, -3.0f)));
 
 	// temp light
 	xen::Light light;
@@ -57,8 +58,12 @@ int main(int argc, char const *argv[])
 		// input
 		xen::processEsc(window.ptr);
 		xen::processKeyInput(window, w, a, s, d);
-		xen::processMovement(camera, w, a, s, d, deltaTime);
 
+		xen::processModelMovement(player, w, a, s, d, deltaTime);
+		std::cout << player.model.position.x << " " << player.model.position.y << " " << player.model.position.z << "\n";
+
+		// xen::processCameraMovement(camera, w, a, s, d, deltaTime);
+		
 		// background
 		xen::fill(0.1f, 0.1f, 0.1f, 1.0f);
 		xen::clear();
@@ -116,5 +121,5 @@ void mouseCallback(GLFWwindow *window, double xPosIn, double yPosIn)
 	camera.xLast = xPos;
 	camera.yLast = yPos;
 
-	xen::updateCamera(camera, xOffset * 0.1f, yOffset * 0.1f);
+	xen::updateCameraAim(camera, xOffset * 0.1f, yOffset * 0.1f);
 }

@@ -25,7 +25,6 @@ namespace xen
 	// an individual vertex
 	struct Vertex
 	{
-		// TODO tangent, bitangent
 		glm::vec3 position;
 		glm::vec3 normal;
 		glm::vec2 texCoord;
@@ -50,13 +49,23 @@ namespace xen
 	};
 
 	// a model is a collection of meshes and the data required for generating a model matrix
+	// TODO animations
 	struct Model
 	{
-		glm::vec3 position = glm::vec3(0.0f);	// position of model in world space - default to world 0, 0, 0
-		std::vector<Mesh> meshes;		// the meshes comprising the model
-		// TODO rotation and scale
+		glm::vec3 position = glm::vec3(0.0f);		// position of model in world space - default to world 0, 0, 0
+		glm::vec3 x;					// local x axis (right)
+		glm::vec3 y = glm::vec3(0.0f, 1.0f, 0.0);	// local y axix (up)
+		glm::vec3 z = glm::vec3(0.0f, 0.0f, -1.0f);	// local z axis (front)
+		float b = 90.0f					// rotation about local y axis 
+		std::vector<Mesh> meshes;			// the meshes comprising the model
 	};
-
+	
+	// update position based on movement
+	void processModelMovement(Model &model, glm::vec3 &viewFront, bool w, bool a, bool s, bool d, float deltaTime)
+	{
+		// TODO
+	}
+	
 	// load a texture from a file and bind to gl texture buffer
 	unsigned int loadTextureFromFile(const char* path)
 	{
@@ -82,7 +91,7 @@ namespace xen
 				format = GL_RGBA;
 			}
 
-			// TODO multisampling
+			// TODO multisampling for antiailiasing
 			glBindTexture(GL_TEXTURE_2D, texId);
 			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 			// glGenerateMipmap(GL_TEXTURE_2D);

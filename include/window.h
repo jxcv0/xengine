@@ -108,8 +108,6 @@ namespace xen
 		if (glfwGetKey(window.ptr, GLFW_KEY_A) == GLFW_PRESS) { a = true; };
 		if (glfwGetKey(window.ptr, GLFW_KEY_D) == GLFW_PRESS) { d = true; };
 	}
-		
-
 } // namespace xen
 
 #endif // WINDOW_H
