@@ -7,3 +7,19 @@ TODOS:
 - menuing
 	- go to new menu loop within main gameloop
 	- may depend on implimenting a better IO callback system
+
+- Job system:
+	- how to check for job dependancies? within function? or within job?
+
+template<typename Data>
+struct Job
+{
+	void(*jobFunction)(Data)
+	Data data;
+};
+
+template<typename Data>
+void kick(Job<Data> job)
+{
+	jobFunction(job.data);
+}
