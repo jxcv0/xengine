@@ -1,5 +1,9 @@
 TODOS:
 
+- main character movement
+	- movement direction depends on camera position
+	- after animations are implimented, animation will depend also on if "aiming"
+
 - IO
 	- better io system. Current one is too one dimentional
 	- Input should be interpreted based on context i.e, GAME mode moves the character, DEBUG mode moves only the camera, MENU mode operates on the UI.
@@ -9,17 +13,5 @@ TODOS:
 	- may depend on implimenting a better IO callback system
 
 - Job system:
-	- how to check for job dependancies? within function? or within job?
-
-template<typename Data>
-struct Job
-{
-	void(*jobFunction)(Data)
-	Data data;
-};
-
-template<typename Data>
-void kick(Job<Data> job)
-{
-	jobFunction(job.data);
-}
+	- check for job dependancies within job function not within job
+	- if function cannot run to completion because of a dependancy then push the job back onto the queue
