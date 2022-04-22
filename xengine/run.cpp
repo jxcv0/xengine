@@ -34,12 +34,11 @@ int main(int argc, char const *argv[])
 	xen::Model model;
 	xen::loadModel(model, "assets/models/cyborg/cyborg.obj");
 	xen::genModelBuffers(model);	// all buffer gen functions must be sequential
-	xen::Player player;
-	player. model = model;
 
 	// 3rd person camera
 	xen::updateCameraAim(camera, 0.0f, 0.0f);
-	xen::updateCameraPosition(camera, (model.position + glm::vec3(-1.0f, 4.0f, -3.0f)));
+	// TODO this is incorrect - offset should be in model space, this is world space
+	// xen::updateCameraPosition(camera, (model.position + glm::vec3(-1.0f, 4.0f, -3.0f)));
 
 	// temp light
 	xen::Light light;
@@ -58,9 +57,6 @@ int main(int argc, char const *argv[])
 		// input
 		xen::processEsc(window.ptr);
 		xen::processKeyInput(window, w, a, s, d);
-
-		xen::processModelMovement(player, w, a, s, d, deltaTime);
-		std::cout << player.model.position.x << " " << player.model.position.y << " " << player.model.position.z << "\n";
 
 		// xen::processCameraMovement(camera, w, a, s, d, deltaTime);
 		

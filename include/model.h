@@ -31,7 +31,7 @@ namespace xen
 		glm::vec3 tangent;
 		glm::vec3 bitangent;
 	};
-
+	
 	// a texture
 	struct Texture
 	{
@@ -53,17 +53,23 @@ namespace xen
 	struct Model
 	{
 		glm::vec3 position = glm::vec3(0.0f);		// position of model in world space - default to world 0, 0, 0
-		glm::vec3 x;					// local x axis (right)
-		glm::vec3 y = glm::vec3(0.0f, 1.0f, 0.0);	// local y axix (up)
-		glm::vec3 z = glm::vec3(0.0f, 0.0f, -1.0f);	// local z axis (front)
-		float b = 90.0f					// rotation about local y axis 
+		const glm::vec3 y = glm::vec3(0.0f, 1.0f, 0.0f);
+		glm::vec3 z = glm::vec3(0.0f, 0.0f, -1.0f);	// local z axis (front) 
+		float b = 90.0f;				// rotation about global y axis (up)
 		std::vector<Mesh> meshes;			// the meshes comprising the model
 	};
 	
-	// update position based on movement
-	void processModelMovement(Model &model, glm::vec3 &viewFront, bool w, bool a, bool s, bool d, float deltaTime)
+	// update model rotation about local y
+	void updateModelVectors(Model &model)
 	{
-		// TODO
+		model.z = glm::normalize(glm::vec3(cos(glm::radians(model.b)), 0.0f, sin(glm::radians(model.b))));
+	}
+
+	// update model position based on key press
+	// assumes local y == global y
+	void processModelMovement(Model &model, glm::vec3 &viewFront, bool w, bool a, bool s, bool d, float deltaTime)
+	{		
+		
 	}
 	
 	// load a texture from a file and bind to gl texture buffer

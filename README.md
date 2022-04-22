@@ -7,6 +7,7 @@ TODOS:
 - IO
 	- better io system. Current one is too one dimentional
 	- Input should be interpreted based on context i.e, GAME mode moves the character, DEBUG mode moves only the camera, MENU mode operates on the UI.
+	- Bitmask for input instead of loads of bool
 
 - menuing
 	- go to new menu loop within main gameloop
