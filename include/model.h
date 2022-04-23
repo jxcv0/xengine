@@ -70,10 +70,38 @@ namespace xen
 	void processModelMovement(Model &model, glm::vec3 &viewFront, bool w, bool a, bool s, bool d, float deltaTime)
 	{		
 		// TODO these need to be made parallel to viewFront
-		if (w) { model.b = 0.0f; }
+		if (w)
+		{
+			if (a) 
+			{
+				model.b = 45.0f;
+				return;
+			};
+			if (d)
+			{
+				model.b = 315.0f;
+				return;
+			}
+			model.b = 0.0f;
+		}
+		
+		if (s)
+		{
+			if (a) 
+			{
+				model.b = 135.0f;
+				return;
+			};
+			if (d)
+			{
+				model.b = 225.0f;
+				return;
+			}
+			model.b = 180.0f;
+		}
+
 		if (a) { model.b = 90.0f; }
-		if (s) { model.b = 180.0f; }
-		if (d) { model.b = -90.0f; }
+		if (d) { model.b = 270.0f; }
 
 		updateModelVectors(model);
 	}
