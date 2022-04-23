@@ -39,12 +39,6 @@ namespace xen
 		camera.x = glm::normalize(glm::cross(camera.z, camera.y));
 	}
 
-	// update camera position vith a vector
-	void updateCameraPosition(Camera &camera, glm::vec3 pos)
-	{
-		camera.position = pos;
-	}
-
 	// update camera position based on key press / character movement flags
 	void processCameraMovement(Camera &camera, bool w, bool a, bool s, bool d, float deltaTime)
 	{

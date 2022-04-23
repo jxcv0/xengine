@@ -37,12 +37,11 @@ int main(int argc, char const *argv[])
 
 	// 3rd person camera
 	xen::updateCameraAim(camera, 0.0f, 0.0f);
-	// TODO this is incorrect - offset should be in model space, this is world space
-	// xen::updateCameraPosition(camera, (model.position + glm::vec3(-1.0f, 4.0f, -3.0f)));
+	camera.position = model.position;
 
 	// temp light
 	xen::Light light;
-	light.position = glm::vec3(0.0f, 5.0f, 0.0f);
+	light.position = glm::vec3(0.0f, 5.0f, 1.0f);
 
 	float deltaTime = 0.0f;
 	float lastFrame = 0.0f;
@@ -57,7 +56,8 @@ int main(int argc, char const *argv[])
 		// input
 		xen::processEsc(window.ptr);
 		xen::processKeyInput(window, w, a, s, d);
-
+		camera.position = model.position + glm::vec3(-1.0f, 3.5f, -3.0f);
+		xen::processModelMovement(model, camera.z, w, a, s, d, deltaTime);
 		// xen::processCameraMovement(camera, w, a, s, d, deltaTime);
 		
 		// background

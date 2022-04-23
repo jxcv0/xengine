@@ -55,7 +55,7 @@ namespace xen
 		glm::vec3 position = glm::vec3(0.0f);		// position of model in world space - default to world 0, 0, 0
 		const glm::vec3 y = glm::vec3(0.0f, 1.0f, 0.0f);
 		glm::vec3 z = glm::vec3(0.0f, 0.0f, -1.0f);	// local z axis (front) 
-		float b = 90.0f;				// rotation about global y axis (up)
+		float b = 0.0f;				// rotation about global y axis (up)
 		std::vector<Mesh> meshes;			// the meshes comprising the model
 	};
 	
@@ -69,7 +69,13 @@ namespace xen
 	// assumes local y == global y
 	void processModelMovement(Model &model, glm::vec3 &viewFront, bool w, bool a, bool s, bool d, float deltaTime)
 	{		
-		
+		// TODO these need to be made parallel to viewFront
+		if (w) { model.b = 0.0f; }
+		if (a) { model.b = 90.0f; }
+		if (s) { model.b = 180.0f; }
+		if (d) { model.b = -90.0f; }
+
+		updateModelVectors(model);
 	}
 	
 	// load a texture from a file and bind to gl texture buffer
@@ -300,7 +306,8 @@ namespace xen
 	// generate model matrix based on model position
 	glm::mat4 modelMatrix(Model &model)
 	{
-		return glm::translate(glm::mat4(1.0f), model.position);
+		auto mm = glm::translate(glm::mat4(1.0f), model.position);
+		return glm::rotate(mm, glm::radians(model.b), glm::vec3(0.0f, 1.0f, 0.0f));
 	}
 }
 
