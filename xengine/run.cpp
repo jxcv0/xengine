@@ -16,8 +16,8 @@
 xen::Window window;
 xen::Camera camera;
 bool firstMouseMovement = true;
-const float cameraAngle = 45.0f;
-const float cameraDist = 2.0f;
+const float cameraAngle = 10.0f;
+const float cameraDist = 3.0f;
 
 // keyboard input flags
 bool w = false;
@@ -29,7 +29,7 @@ void mouseCallback(GLFWwindow *window, double xPosIn, double yPosIn);
 
 int main(int argc, char const *argv[])
 {
-	xen::initWindow(window, 800, 600);
+	xen::initWindow(window, 1080, 600);
 	xen::setCursorPositionCallback(window, mouseCallback);
 
 	// model shader and model
@@ -41,6 +41,7 @@ int main(int argc, char const *argv[])
 	// 3rd person camera
 	// xen::updateCameraAim(camera, 75.0f, 3.16f, 0.0f, 0.0f, 0.01f);
 	camera.position = model.position;
+	camera.position.y = 3.5f;
 
 	// temp light
 	xen::Light light;

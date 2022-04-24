@@ -48,22 +48,19 @@ namespace xen
 		if (camera.a > 89.0f) { camera.a = 89.0f; };
 		if (camera.a < -89.0f) { camera.a = -89.0f; };
 
-		// assuming ve+ (CW)
-		float theta = glm::radians(camera.b - offsetAnglexz);
-		camera.position.x = offsetDist * cos(theta);
-		camera.position.z = offsetDist * sin(theta);
-		camera.position.y = 2.5f;
-
 		glm::vec3 radius;
 		radius.x = offsetDist * cos(glm::radians(camera.b));
 		radius.z = offsetDist * sin(glm::radians(camera.b));
 		radius.y = camera.position.y;
 
-		camera.z = glm::normalize(glm::cross(radius, camera.y));
-		// camera.z = glm::normalize(glm::vec4(
-			// cos(glm::radians(camera.b)) * cos(glm::radians(camera.a)),
-			// sin(glm::radians(camera.a)),
-			// sin(glm::radians(camera.b)) * cos(glm::radians(camera.a))));
+		float theta = glm::radians(camera.b - offsetAnglexz);
+		camera.position.x = -offsetDist * cos(theta);
+		camera.position.z = -offsetDist * sin(theta);
+
+		camera.z = glm::normalize(glm::vec3(
+			cos(glm::radians(camera.b)) * cos(glm::radians(camera.a)),
+			sin(glm::radians(camera.a)),
+			sin(glm::radians(camera.b)) * cos(glm::radians(camera.a))));
 
 		camera.x = glm::normalize(glm::cross(camera.z, camera.y));
 	}
