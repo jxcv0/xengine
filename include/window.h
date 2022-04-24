@@ -10,18 +10,20 @@ namespace xen
 	struct Window
 	{
 		GLFWwindow* ptr;
-		int scrWidth = 1600;
-		int scrHeight = 900;
+		int scrWidth;
+		int scrHeight;
 	};
 
 	// initialize GLFW and GLAD then draw a window
-	void initWindow(Window &window)
+	void initWindow(Window &window, int width, int height)
 	{
 		glfwInit();
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+		window.scrWidth = width;
+		window.scrHeight = height;
 		window.ptr = glfwCreateWindow(window.scrWidth, window.scrHeight, "xengine", NULL, NULL);
 		if (window.ptr == NULL)
 		{
@@ -89,9 +91,9 @@ namespace xen
 	}
 
 	// calculate projection matrix
-	glm::mat4 projectionMatrix(Window &window)
+	glm::mat4 projectionMatrix(Window &window, float fov)
 	{
-		return glm::perspective(glm::radians(55.0f), (float)window.scrWidth / (float)window.scrHeight, 0.1f, 100.0f);
+		return glm::perspective(glm::radians(fov), (float)window.scrWidth / (float)window.scrHeight, 0.1f, 100.0f);
 	}
 
 	// set cursor position callback function

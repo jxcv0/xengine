@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
+#include "checkerr.h"
 #include "model.h"
 #include "camera.h"
 #include "window.h"
@@ -15,6 +16,8 @@
 xen::Window window;
 xen::Camera camera;
 bool firstMouseMovement = true;
+const float cameraAngle = 45.0f;
+const float cameraDist = 2.0f;
 
 // keyboard input flags
 bool w = false;
@@ -26,7 +29,7 @@ void mouseCallback(GLFWwindow *window, double xPosIn, double yPosIn);
 
 int main(int argc, char const *argv[])
 {
-	xen::initWindow(window);
+	xen::initWindow(window, 800, 600);
 	xen::setCursorPositionCallback(window, mouseCallback);
 
 	// model shader and model
@@ -36,15 +39,19 @@ int main(int argc, char const *argv[])
 	xen::genModelBuffers(model);	// all buffer gen functions must be sequential
 
 	// 3rd person camera
-	xen::updateCameraAim(camera, 0.0f, 0.0f);
+	// xen::updateCameraAim(camera, 75.0f, 3.16f, 0.0f, 0.0f, 0.01f);
 	camera.position = model.position;
 
 	// temp light
 	xen::Light light;
-	light.position = glm::vec3(0.0f, 5.0f, 1.0f);
+	light.position = glm::vec3(0.0f, 3.0f, -1.0f);
 
 	float deltaTime = 0.0f;
 	float lastFrame = 0.0f;
+
+	xen::updateCameraAim(camera, cameraAngle, cameraDist, 0.0f, 0.0f, 0.1f);
+	std::cout << "xyz: " << camera.position.x << " " << camera.position.y << " " << camera.position.z << "\n";
+	std::cout << "ab: " << camera.a << " " << camera.b << "\n";
 
 	while (!xen::windowShouldClose(window))
 	{
@@ -56,9 +63,7 @@ int main(int argc, char const *argv[])
 		// input
 		xen::processEsc(window.ptr);
 		xen::processKeyInput(window, w, a, s, d);
-		camera.position = model.position + glm::vec3(-1.0f, 3.5f, -3.0f);
 		xen::processModelMovement(model, camera.z, w, a, s, d, deltaTime);
-		// xen::processCameraMovement(camera, w, a, s, d, deltaTime);
 		
 		// background
 		xen::fill(0.1f, 0.1f, 0.1f, 1.0f);
@@ -66,7 +71,7 @@ int main(int argc, char const *argv[])
 
 		// render matrices
 		auto viewMatrix = xen::viewMatrix(camera);
-		auto projectionMatrix = xen::projectionMatrix(window);
+		auto projectionMatrix = xen::projectionMatrix(window, 55.0f);
 		auto modelMatrix = xen::modelMatrix(model);
 
 		// shader and shader uniforms
@@ -86,8 +91,9 @@ int main(int argc, char const *argv[])
 
 		// TODO - texture uniforms are assigned when loading, should all uniforms be in the same place?
 		xen::drawModel(model, shader);
-
 		xen::swapThenPoll(window);
+
+		checkerr();
 
 		w = false;
 		a = false;
@@ -117,5 +123,8 @@ void mouseCallback(GLFWwindow *window, double xPosIn, double yPosIn)
 	camera.xLast = xPos;
 	camera.yLast = yPos;
 
-	xen::updateCameraAim(camera, xOffset * 0.1f, yOffset * 0.1f);
+	// xen::updateCameraAim(camera, xOffset * 0.1f, yOffset * 0.1f);
+	xen::updateCameraAim(camera, cameraAngle, cameraDist, xOffset, yOffset, 0.1f);
+	std::cout << "xyz: " << camera.position.x << " " << camera.position.y << " " << camera.position.z << "\n";
+	std::cout << "ab: " << camera.a << " " << camera.b << "\n";
 }
