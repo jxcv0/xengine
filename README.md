@@ -1,9 +1,5 @@
 TODOS:
 
-- main character movement
-	- movement direction depends on camera position
-	- after animations are implimented, animation will depend also on if "aiming"
-
 - IO
 	- better io system. Current one is too one dimentional
 	- Input should be interpreted based on context i.e, GAME mode moves the character, DEBUG mode moves only the camera, MENU mode operates on the UI.

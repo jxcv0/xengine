@@ -45,12 +45,13 @@ namespace xen
 		camera.a += y * sen;
 		camera.b += x * sen;
 
-		if (camera.a > 89.0f) { camera.a = 89.0f; };
-		if (camera.a < -89.0f) { camera.a = -89.0f; };
+		if (camera.a > 50.0f) { camera.a = 50.0f; };
+		if (camera.a < -50.0f) { camera.a = -50.0f; };
 
+		std::cout << camera.a << "\n";
 		camera.position.x = -offsetDist * cos(glm::radians(camera.b));
 		camera.position.y = -offsetDist * sin(glm::radians(camera.a));
-		camera.position.z = (-offsetDist * sin(glm::radians(camera.b)));	// this isnt quite right
+		camera.position.z = -offsetDist * sin(glm::radians(camera.b));	// this isnt quite right
 		camera.position.y += 3.5f;	// TODO - is this ok hard coded?
 
 		camera.z = glm::normalize(glm::vec3(
