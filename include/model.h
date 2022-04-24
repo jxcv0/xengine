@@ -52,11 +52,11 @@ namespace xen
 	// TODO animations
 	struct Model
 	{
-		glm::vec3 position = glm::vec3(0.0f);		// position of model in world space - default to world 0, 0, 0
+		glm::vec3 position = glm::vec3(0.0f);			// position of model in world space - default to world 0, 0, 0
 		const glm::vec3 y = glm::vec3(0.0f, 1.0f, 0.0f);
-		glm::vec3 z = glm::vec3(0.0f, 0.0f, -1.0f);	// local z axis (front) 
-		float b = 0.0f;				// rotation about global y axis (up)
-		std::vector<Mesh> meshes;			// the meshes comprising the model
+		glm::vec3 z;						// local z axis (front)
+		float b = 0.0f;						// rotation about global y axis (up)
+		std::vector<Mesh> meshes;				// the meshes comprising the model
 	};
 	
 	// update model rotation about local y
@@ -67,22 +67,30 @@ namespace xen
 
 	// update model position based on key press
 	// assumes local y == global y
-	void processModelMovement(Model &model, glm::vec3 &viewFront, bool w, bool a, bool s, bool d, float deltaTime)
+	void processModelMovement(Model &model, float forward, bool w, bool a, bool s, bool d, float deltaTime)
 	{		
-		// TODO these need to be made parallel to viewFront
+		forward -= 90.0f;
 		if (w)
 		{
 			if (a) 
 			{
 				model.b = 45.0f;
+				model.b -= forward;
+				updateModelVectors(model);
 				return;
 			};
+
 			if (d)
 			{
 				model.b = 315.0f;
+				model.b -= forward;
+				updateModelVectors(model);
 				return;
 			}
 			model.b = 0.0f;
+			model.b -= forward;
+			updateModelVectors(model);
+			return;
 		}
 		
 		if (s)
@@ -90,20 +98,39 @@ namespace xen
 			if (a) 
 			{
 				model.b = 135.0f;
+				model.b -= forward;
+				updateModelVectors(model);
 				return;
 			};
+
 			if (d)
 			{
 				model.b = 225.0f;
+				model.b -= forward;
+				updateModelVectors(model);
 				return;
 			}
 			model.b = 180.0f;
+			model.b -= forward;
+			updateModelVectors(model);
+			return;
 		}
 
-		if (a) { model.b = 90.0f; }
-		if (d) { model.b = 270.0f; }
+		if (a)
+		{
+			model.b = 90.0f;
+			model.b -= forward;
+			updateModelVectors(model);
+			return;
+		}
 
-		updateModelVectors(model);
+		if (d)
+		{
+			model.b = 270.0f;
+			model.b -= forward;
+			updateModelVectors(model);
+			return;
+		}
 	}
 	
 	// load a texture from a file and bind to gl texture buffer

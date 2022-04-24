@@ -18,6 +18,7 @@ xen::Camera camera;
 bool firstMouseMovement = true;
 const float cameraAngle = 10.0f;
 const float cameraDist = 3.0f;
+const glm::vec3 worldUp(0.0f, 1.0f, 0.0f);
 
 // keyboard input flags
 bool w = false;
@@ -39,7 +40,7 @@ int main(int argc, char const *argv[])
 	xen::genModelBuffers(model);	// all buffer gen functions must be sequential
 
 	// 3rd person camera
-	// xen::updateCameraAim(camera, 75.0f, 3.16f, 0.0f, 0.0f, 0.01f);
+	xen::updateCameraAim(camera, 75.0f, 3.16f, 0.0f, 0.0f, 0.01f);
 	camera.position = model.position;
 	camera.position.y = 3.5f;
 
@@ -51,8 +52,6 @@ int main(int argc, char const *argv[])
 	float lastFrame = 0.0f;
 
 	xen::updateCameraAim(camera, cameraAngle, cameraDist, 0.0f, 0.0f, 0.1f);
-	std::cout << "xyz: " << camera.position.x << " " << camera.position.y << " " << camera.position.z << "\n";
-	std::cout << "ab: " << camera.a << " " << camera.b << "\n";
 
 	while (!xen::windowShouldClose(window))
 	{
@@ -64,7 +63,8 @@ int main(int argc, char const *argv[])
 		// input
 		xen::processEsc(window.ptr);
 		xen::processKeyInput(window, w, a, s, d);
-		xen::processModelMovement(model, camera.z, w, a, s, d, deltaTime);
+		xen::processModelMovement(model, camera.b, w, a, s, d, deltaTime);
+		xen::updateModelVectors(model);
 		
 		// background
 		xen::fill(0.1f, 0.1f, 0.1f, 1.0f);
@@ -124,8 +124,5 @@ void mouseCallback(GLFWwindow *window, double xPosIn, double yPosIn)
 	camera.xLast = xPos;
 	camera.yLast = yPos;
 
-	// xen::updateCameraAim(camera, xOffset * 0.1f, yOffset * 0.1f);
 	xen::updateCameraAim(camera, cameraAngle, cameraDist, xOffset, yOffset, 0.1f);
-	std::cout << "xyz: " << camera.position.x << " " << camera.position.y << " " << camera.position.z << "\n";
-	std::cout << "ab: " << camera.a << " " << camera.b << "\n";
 }

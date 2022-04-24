@@ -4,6 +4,11 @@
 #include <glad.h>
 #include <GLFW/glfw3.h>
 
+#define INPUT_W 	0x0001 // bit 0
+#define INPUT_A 	0x0002 // bit 0
+#define INPUT_S 	0x0004 // bit 0
+#define INPUT_D 	0x0008 // bit 0
+
 namespace xen
 {
 	// window datatype
@@ -101,6 +106,16 @@ namespace xen
 	{
 		glfwSetCursorPosCallback(window.ptr, function);
 	}
+
+	/*
+	void processKeyInput(Window &window, unsigned char &input)
+	{
+		if (glfwGetKey(window.ptr, GLFW_KEY_W) == GLFW_PRESS) { input = input & INPUT_W; };
+		if (glfwGetKey(window.ptr, GLFW_KEY_A) == GLFW_PRESS) { input = input & INPUT_A; };
+		if (glfwGetKey(window.ptr, GLFW_KEY_S) == GLFW_PRESS) { input = input & INPUT_S; };
+		if (glfwGetKey(window.ptr, GLFW_KEY_D) == GLFW_PRESS) { input = input & INPUT_D; };
+	}
+	*/
 
 	// process keyboard input
 	void processKeyInput(Window &window, bool &w, bool &a, bool &s, bool &d)
