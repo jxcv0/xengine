@@ -48,7 +48,6 @@ namespace xen
 		if (camera.a > 50.0f) { camera.a = 50.0f; };
 		if (camera.a < -50.0f) { camera.a = -50.0f; };
 
-		std::cout << camera.a << "\n";
 		camera.position.x = -offsetDist * cos(glm::radians(camera.b));
 		camera.position.y = -offsetDist * sin(glm::radians(camera.a));
 		camera.position.z = -offsetDist * sin(glm::radians(camera.b));	// this isnt quite right

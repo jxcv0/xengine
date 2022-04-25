@@ -2,10 +2,14 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
+#include <vector>
+#include <thread>
+#include <atomic>
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
+#include "jobsys.h"
 #include "checkerr.h"
 #include "model.h"
 #include "camera.h"
@@ -20,6 +24,28 @@ const float cameraAngle = 10.0f;
 const float cameraDist = 3.0f;
 const glm::vec3 worldUp(0.0f, 1.0f, 0.0f);
 
+std::vector<std::thread> threadPool;
+std::list<xen::Job> xen::jobQueue;
+std::mutex xen::m;
+std::condition_variable xen::cv;
+bool xen::run = true;
+
+glm::mat4 viewMatrix;
+bool viewMatrixJobFunc(void* camera)
+{
+	xen::Camera *c = static_cast<xen::Camera*>(camera);
+	if (firstMouseMovement)
+	{
+		std::cout << "returning job\n";
+		return false;
+	}
+
+	std::cout << "kicking job\n";
+	viewMatrix = xen::viewMatrix(*c);
+	return true;
+}
+xen::Job viewMatrixJob = { viewMatrixJobFunc, (void*)&camera };
+
 // keyboard input flags
 bool w = false;
 bool a = false;
@@ -32,13 +58,14 @@ int main(int argc, char const *argv[])
 {
 	xen::initWindow(window, 1080, 600);
 	xen::setCursorPositionCallback(window, mouseCallback);
+	xen::initThreadPool(threadPool, 4, xen::wait);
 
 	// model shader and model
 	auto shader = xen::loadShaderFromFile("assets/shaders/model.vert", "assets/shaders/model.frag");
 	xen::Model model;
 	xen::loadModel(model, "assets/models/cyborg/cyborg.obj");
 	xen::genModelBuffers(model);	// all buffer gen functions must be sequential
-
+	
 	// 3rd person camera
 	xen::updateCameraAim(camera, 75.0f, 3.16f, 0.0f, 0.0f, 0.01f);
 	camera.position = model.position;
@@ -71,7 +98,8 @@ int main(int argc, char const *argv[])
 		xen::clear();
 
 		// render matrices
-		auto viewMatrix = xen::viewMatrix(camera);
+		xen::pushJob(viewMatrixJob);
+		// auto viewMatrix = xen::viewMatrix(camera);
 		auto projectionMatrix = xen::projectionMatrix(window, 55.0f);
 		auto modelMatrix = xen::modelMatrix(model);
 
@@ -101,7 +129,9 @@ int main(int argc, char const *argv[])
 		s = false;
 		d = false;
 	}
-	
+
+	xen::run = false;
+	xen::joinThreadPool(threadPool);	
 	xen::terminate();
 
 	return 0;
