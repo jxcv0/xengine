@@ -2,10 +2,8 @@
 #define JOBSYS_H
 
 #include <list>
-#include <vector>
 #include <thread>
-#include <mutex>
-#include <condition_variable>
+#include <atomic>
 
 namespace xen
 {
@@ -34,41 +32,50 @@ namespace xen
 	// join all threads in a threadpool
 	void joinThreadPool(std::vector<std::thread> &threadPool)
 	{
-		for (auto &thread : threadPool) { thread.join(); };
+		for (auto &thread : threadPool) { thread.join(); }
 	}
-
-	// global variables
-	extern std::mutex m;
-	extern std::condition_variable cv;
-	extern std::list<Job> jobQueue;
 
 	// push a job to the back of a queue
-	void pushJob(Job &job)
+	void pushJob(std::list<Job> &jobQueue, Job &job, std::atomic_flag *lk)
 	{
-		{
-			std::lock_guard lk(m);
-			jobQueue.push_back(job);
-		}
-		cv.notify_one();
+		while (std::atomic_flag_test_and_set(lk));
+		jobQueue.push_back(job);
+		std::atomic_flag_clear(lk);
 	}
 
-	// wait on work from producer thread
-	extern bool run;
+	// global scope
+	extern std::atomic_flag lk;
+	extern std::list<Job> jobQueue;
+	extern std::atomic<bool> run;
+
+	// worker thread loop
 	void wait()
 	{
 		Job job;
-		while (run)
+		while(run)
 		{
-			std::unique_lock lk(m);
-			cv.wait(lk, [&]{ return !jobQueue.empty(); });
-			job = jobQueue.front();
-			jobQueue.pop_front();
+			std::cout << std::this_thread::get_id() << "\n";
+			std::cout << "locking...\n";
+			while (std::atomic_flag_test_and_set_explicit(&lk, std::memory_order_acquire)) { std::this_thread::yield(); }
 
-			lk.unlock();
-			cv.notify_one();
+			if (!jobQueue.empty())
+			{
+				std::cout << "getting job...\n";
+				job = jobQueue.front();
+				jobQueue.pop_front();
 
-			if (!kick(job)) { pushJob(job); };
+				std::cout << "unlocking..\n";
+				std::atomic_flag_clear_explicit(&lk, std::memory_order_release);
+				std::cout << "kicking...\n";
+				if (!kick(job)) { std::cout << "returning job...\n"; pushJob(jobQueue, job, &lk); };
+			}
+			else 
+			{
+				std::cout << "unlocking..\n";
+				std::atomic_flag_clear_explicit(&lk, std::memory_order_release);
+			}
 		}
+		std::cout << "exiting...\n";
 	}
 } // namespace xen
 

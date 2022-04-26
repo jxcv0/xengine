@@ -26,21 +26,15 @@ const glm::vec3 worldUp(0.0f, 1.0f, 0.0f);
 
 std::vector<std::thread> threadPool;
 std::list<xen::Job> xen::jobQueue;
-std::mutex xen::m;
-std::condition_variable xen::cv;
-bool xen::run = true;
+std::atomic_flag xen::lk = ATOMIC_FLAG_INIT;
+std::atomic<bool> xen::run = true;
 
 glm::mat4 viewMatrix;
 bool viewMatrixJobFunc(void* camera)
 {
 	xen::Camera *c = static_cast<xen::Camera*>(camera);
-	if (firstMouseMovement)
-	{
-		std::cout << "returning job\n";
-		return false;
-	}
+	if (firstMouseMovement) { return false; }
 
-	std::cout << "kicking job\n";
 	viewMatrix = xen::viewMatrix(*c);
 	return true;
 }
@@ -86,19 +80,21 @@ int main(int argc, char const *argv[])
 		float currentFrame = static_cast<float>(glfwGetTime());
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;	// should be at end of game loop?
-		
+
 		// input
 		xen::processEsc(window.ptr);
 		xen::processKeyInput(window, w, a, s, d);
 		xen::processModelMovement(model, camera.b, w, a, s, d, deltaTime);
 		xen::updateModelVectors(model);
-		
+
 		// background
 		xen::fill(0.1f, 0.1f, 0.1f, 1.0f);
 		xen::clear();
 
 		// render matrices
-		xen::pushJob(viewMatrixJob);
+		xen::pushJob(xen::jobQueue, viewMatrixJob, &xen::lk);
+		std::cout << "pushing\n";
+		xen::jobQueue.push_back(viewMatrixJob);
 		// auto viewMatrix = xen::viewMatrix(camera);
 		auto projectionMatrix = xen::projectionMatrix(window, 55.0f);
 		auto modelMatrix = xen::modelMatrix(model);
