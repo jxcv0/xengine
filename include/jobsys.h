@@ -37,7 +37,7 @@ namespace xen
 	}
 
 	// push a job to the back of a queue
-	void pushJob(std::list<Job> &jobQueue, Job &job, std::atomic_flag *lk)
+	void pushJob(std::list<Job> &jobQueue, const Job &job, std::atomic_flag *lk)
 	{
 		while (std::atomic_flag_test_and_set(lk));
 		jobQueue.push_back(job);
@@ -75,6 +75,14 @@ namespace xen
 			}
 		}
 	}
+
+	// construct a job from a function and data
+	Job makeJob(bool (*func)(void*), void* data)
+	{
+		Job j = { func, data };
+		return j;
+	}
+
 } // namespace xen
 
 #endif // JOBSYS_H

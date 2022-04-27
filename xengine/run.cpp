@@ -16,7 +16,6 @@
 #include "window.h"
 #include "shader.h"
 #include "light.h"
-#include "render.h"
 
 xen::Window window;
 xen::Camera camera;
@@ -30,6 +29,7 @@ std::list<xen::Job> xen::jobQueue;
 std::atomic_flag xen::lk = ATOMIC_FLAG_INIT;
 std::atomic<bool> xen::run = true;
 
+// mock job TODO rm
 glm::mat4 viewMatrix;
 bool viewMatrixJobFunc(void* camera)
 {
@@ -76,6 +76,16 @@ int main(int argc, char const *argv[])
 	float lastFrame = 0.0f;
 
 	xen::updateCameraAim(camera, cameraAngle, cameraDist, 0.0f, 0.0f, 0.1f);
+
+
+	char* str = "test success\n";
+	
+	xen::pushJob(xen::jobQueue, xen::makeJob([](void* chars){
+		char* str = static_cast<char*>(chars);
+		std::cout << str;
+		return true;
+	}, str), &xen::lk);
+
 
 	while (!xen::windowShouldClose(window))
 	{
