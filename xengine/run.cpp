@@ -34,7 +34,8 @@ bool viewMatrixJobFunc(void* camera)
 {
 	xen::Camera *c = static_cast<xen::Camera*>(camera);
 	if (firstMouseMovement) { return false; }
-	std::cout << "here";
+	// std::cout << "running on " << std::this_thread::get_id() << "\n";
+	// std::cout << glfwGetTime() << "\n";
 
 	viewMatrix = xen::viewMatrix(*c);
 	return true;
