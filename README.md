@@ -12,3 +12,24 @@ TODOS:
 - Job system:
 	- check for job dependancies within job function not within job
 	- if function cannot run to completion because of a dependancy then push the job back onto the queue
+
+
+// ignoring loading jobs for now
+
+IO
+
+update view
+	- update camera position and fov
+	- calculate view matrix
+	- calculate projection matrix
+
+update scene
+	- physics
+	- collision resolution
+	- animations
+
+render scene
+	- meshes
+	- particles
+
+swap buffers

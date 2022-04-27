@@ -4,6 +4,7 @@
 #include <list>
 #include <thread>
 #include <atomic>
+#include <vector>
 
 namespace xen
 {
@@ -54,28 +55,25 @@ namespace xen
 		Job job;
 		while(run)
 		{
-			std::cout << std::this_thread::get_id() << "\n";
-			std::cout << "locking...\n";
-			while (std::atomic_flag_test_and_set_explicit(&lk, std::memory_order_acquire)) { std::this_thread::yield(); }
+			while (std::atomic_flag_test_and_set_explicit(&lk, std::memory_order_acquire))
+			{
+				asm ("pause");
+				std::this_thread::yield();
+			}
 
 			if (!jobQueue.empty())
 			{
-				std::cout << "getting job...\n";
 				job = jobQueue.front();
 				jobQueue.pop_front();
 
-				std::cout << "unlocking..\n";
 				std::atomic_flag_clear_explicit(&lk, std::memory_order_release);
-				std::cout << "kicking...\n";
-				if (!kick(job)) { std::cout << "returning job...\n"; pushJob(jobQueue, job, &lk); };
+				if (!kick(job)) { pushJob(jobQueue, job, &lk); };
 			}
 			else 
 			{
-				std::cout << "unlocking..\n";
 				std::atomic_flag_clear_explicit(&lk, std::memory_order_release);
 			}
 		}
-		std::cout << "exiting...\n";
 	}
 } // namespace xen
 

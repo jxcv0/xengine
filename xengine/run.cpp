@@ -34,6 +34,7 @@ bool viewMatrixJobFunc(void* camera)
 {
 	xen::Camera *c = static_cast<xen::Camera*>(camera);
 	if (firstMouseMovement) { return false; }
+	std::cout << "here";
 
 	viewMatrix = xen::viewMatrix(*c);
 	return true;
@@ -52,7 +53,7 @@ int main(int argc, char const *argv[])
 {
 	xen::initWindow(window, 1080, 600);
 	xen::setCursorPositionCallback(window, mouseCallback);
-	xen::initThreadPool(threadPool, 4, xen::wait);
+	xen::initThreadPool(threadPool, 1, xen::wait);
 
 	// model shader and model
 	auto shader = xen::loadShaderFromFile("assets/shaders/model.vert", "assets/shaders/model.frag");
@@ -93,16 +94,14 @@ int main(int argc, char const *argv[])
 
 		// render matrices
 		xen::pushJob(xen::jobQueue, viewMatrixJob, &xen::lk);
-		std::cout << "pushing\n";
-		xen::jobQueue.push_back(viewMatrixJob);
 		// auto viewMatrix = xen::viewMatrix(camera);
 		auto projectionMatrix = xen::projectionMatrix(window, 55.0f);
 		auto modelMatrix = xen::modelMatrix(model);
 
 		// shader and shader uniforms
 		xen::useShader(shader);
-		xen::setShaderUniform(shader, "model", modelMatrix);
 		xen::setShaderUniform(shader, "view", viewMatrix);
+		xen::setShaderUniform(shader, "model", modelMatrix);
 		xen::setShaderUniform(shader, "projection", projectionMatrix);
 
 		// light
