@@ -293,7 +293,7 @@ namespace xen
 
 		processNode(model, scene->mRootNode, scene, dir);
 	}
-
+	
 	// buffer model data in gl
 	void genModelBuffers(Model &model)
 	{

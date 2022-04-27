@@ -16,6 +16,7 @@
 #include "window.h"
 #include "shader.h"
 #include "light.h"
+#include "render.h"
 
 xen::Window window;
 xen::Camera camera;

@@ -19,6 +19,7 @@ find_package(assimp REQUIRED)
 
 set(
   SOURCES 
+    include/render.h
     include/light.h
     include/model.h
     include/camera.h
