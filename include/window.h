@@ -4,12 +4,14 @@
 #include <glad.h>
 #include <GLFW/glfw3.h>
 
+#include "jobsys.h"
+
 #define INPUT_W 	0x0001 // bit 0
 #define INPUT_A 	0x0002 // bit 0
 #define INPUT_S 	0x0004 // bit 0
 #define INPUT_D 	0x0008 // bit 0
 
-namespace xen
+namespace xen::window
 {
 	// window datatype
 	struct Window
@@ -20,7 +22,7 @@ namespace xen
 	};
 
 	// initialize GLFW and GLAD then draw a window
-	void initWindow(Window &window, int width, int height)
+	void init(Window &window, int width, int height)
 	{
 		glfwInit();
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -55,7 +57,7 @@ namespace xen
 	}
 
 	// check if glfw has recieved a signal to close
-	bool windowShouldClose(Window &window)
+	bool shouldClose(Window &window)
 	{
 		return glfwWindowShouldClose(window.ptr);
 	}
@@ -83,15 +85,10 @@ namespace xen
 		glfwPollEvents();
 	}
 	
-	// fill the window with a single colour
-	void fill(float r, float g, float b, float a)
+	// fill the window with a single colour and clear
+	void bg(float r, float g, float b, float a)
 	{
 		glClearColor(r, g, b ,a);
-	}
-
-	// clear gl buffers
-	void clear()
-	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
@@ -125,6 +122,7 @@ namespace xen
 		if (glfwGetKey(window.ptr, GLFW_KEY_A) == GLFW_PRESS) { a = true; };
 		if (glfwGetKey(window.ptr, GLFW_KEY_D) == GLFW_PRESS) { d = true; };
 	}
-} // namespace xen
+
+} // namespace xen::window
 
 #endif // WINDOW_H

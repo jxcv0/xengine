@@ -1,11 +1,15 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-namespace xen
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
+
+namespace xen::camera
 {
 	// camera state
 	struct Camera
 	{
+		glm::vec3 targetPosition = glm::vec3(0.0f, 0.0f, 0.0f);
 		glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);	// world position
 		glm::vec3 x;						// local x axis (right)
 		glm::vec3 y = glm::vec3(0.0f, 1.0f, 0.0f);		// local y axis (up)
@@ -48,10 +52,9 @@ namespace xen
 		if (camera.a > 50.0f) { camera.a = 50.0f; };
 		if (camera.a < -50.0f) { camera.a = -50.0f; };
 
-		camera.position.x = -offsetDist * cos(glm::radians(camera.b));
-		camera.position.y = -offsetDist * sin(glm::radians(camera.a));
-		camera.position.z = -offsetDist * sin(glm::radians(camera.b));	// this isnt quite right
-		camera.position.y += 3.5f;	// TODO - is this ok hard coded?
+		camera.position.x = camera.targetPosition.x + (-offsetDist * cos(glm::radians(camera.b)));
+		camera.position.y = camera.targetPosition.y + (-offsetDist * sin(glm::radians(camera.a))) + 3.5f;
+		camera.position.z = camera.targetPosition.z + (-offsetDist * sin(glm::radians(camera.b)));	// this isnt quite right
 
 		camera.z = glm::normalize(glm::vec3(
 			cos(glm::radians(camera.b)) * cos(glm::radians(camera.a)),
@@ -59,7 +62,6 @@ namespace xen
 			sin(glm::radians(camera.b)) * cos(glm::radians(camera.a))));
 
 		camera.x = glm::normalize(glm::cross(camera.z, camera.y));
-		camera.position += camera.x;
 	}
 
 	// update camera position based on key press / character movement flags
@@ -71,6 +73,6 @@ namespace xen
 		if (a) { camera.position -= camera.x * velocity; }
 		if (d) { camera.position += camera.x * velocity; }
 	}
-}
+} // namespace xen::camera
 
 #endif // CAMERA_H
