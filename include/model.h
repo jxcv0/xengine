@@ -76,7 +76,6 @@ namespace xen
 			{
 				model.b = 45.0f;
 				model.b -= forward;
-				updateModelVectors(model);
 				return;
 			};
 
@@ -84,12 +83,10 @@ namespace xen
 			{
 				model.b = 315.0f;
 				model.b -= forward;
-				updateModelVectors(model);
 				return;
 			}
 			model.b = 0.0f;
 			model.b -= forward;
-			updateModelVectors(model);
 			return;
 		}
 		
@@ -99,7 +96,6 @@ namespace xen
 			{
 				model.b = 135.0f;
 				model.b -= forward;
-				updateModelVectors(model);
 				return;
 			};
 
@@ -107,12 +103,10 @@ namespace xen
 			{
 				model.b = 225.0f;
 				model.b -= forward;
-				updateModelVectors(model);
 				return;
 			}
 			model.b = 180.0f;
 			model.b -= forward;
-			updateModelVectors(model);
 			return;
 		}
 
@@ -120,7 +114,6 @@ namespace xen
 		{
 			model.b = 90.0f;
 			model.b -= forward;
-			updateModelVectors(model);
 			return;
 		}
 
@@ -128,7 +121,6 @@ namespace xen
 		{
 			model.b = 270.0f;
 			model.b -= forward;
-			updateModelVectors(model);
 			return;
 		}
 	}

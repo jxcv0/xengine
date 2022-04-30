@@ -41,7 +41,7 @@ int main(int argc, char const *argv[])
 {
 	xen::window::init(GLOBAL_WINDOW, 1080, 600);
 	xen::window::setCursorPositionCallback(GLOBAL_WINDOW, mouseCallback);
-	jobSys.start_up(1); // only need a few threads for now
+	jobSys.start_up(2); // only need a few threads for now
 
 	// model shader and model
 	auto shader = xen::loadShaderFromFile("assets/shaders/model.vert", "assets/shaders/model.frag");
@@ -62,7 +62,6 @@ int main(int argc, char const *argv[])
 	// producer loop
 	while (!xen::window::shouldClose(GLOBAL_WINDOW))
 	{
-		camera.targetPosition = model.position;
 
 		// delta time 
 		float currentFrame = static_cast<float>(glfwGetTime());
@@ -80,6 +79,7 @@ int main(int argc, char const *argv[])
 
 		// render matrices
 		jobSys.push_job([&]{ viewMatrix = xen::camera::viewMatrix(camera); });
+		// viewMatrix = xen::camera::viewMatrix(camera);
 
 		// auto viewMatrix = xen::viewMatrix(camera);
 		auto projectionMatrix = xen::window::projectionMatrix(GLOBAL_WINDOW, 55.0f);
