@@ -7,9 +7,9 @@
 #include "jobsys.h"
 
 #define INPUT_W 	0x0001 // bit 0
-#define INPUT_A 	0x0002 // bit 0
-#define INPUT_S 	0x0004 // bit 0
-#define INPUT_D 	0x0008 // bit 0
+#define INPUT_A 	0x0002 // bit 1
+#define INPUT_S 	0x0004 // bit 2
+#define INPUT_D 	0x0008 // bit 3
 
 namespace xen::window
 {
@@ -65,16 +65,16 @@ namespace xen::window
 	// terminate glfw
 	void terminate()
 	{
-		// other cleanup?
+		// TODO - other cleanup?
 		glfwTerminate();
 	}
 
 	// process key presses
-	void processEsc(GLFWwindow *window)
+	void esc(Window &window)
 	{
-		if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		if(glfwGetKey(window.ptr, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		{
-			glfwSetWindowShouldClose(window, true);
+			glfwSetWindowShouldClose(window.ptr, true);
 		}
 	}
 

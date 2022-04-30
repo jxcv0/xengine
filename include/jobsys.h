@@ -7,19 +7,15 @@
 #include <vector>
 #include <iostream>
 
-namespace xen::jobsys
+namespace xen::jobs
 {
-
-	// job exit status
-	enum ExitStatus { SUCCESS, PAUSE };
-	
 	// entry and data for a job
 	struct Job
 	{
-		ExitStatus (*entry)(void*);	// pointer to job function
+		int (*entry)(void*);	// pointer to job function
 		void* params;		// job function parameters
 	};
-	
+
 	// kick a job
 	bool kick(Job &job)
 	{
@@ -27,7 +23,7 @@ namespace xen::jobsys
 	}
 
 	// initialize a threadpool with a thread count and a wait function
-	void initThreadPool(std::vector<std::thread> &threadPool, unsigned int nThreads, void (*spin)(void))
+	void init(std::vector<std::thread> &threadPool, size_t nThreads, void (*spin)(void))
 	{
 		for (size_t i = 0; i < nThreads; i++)
 		{
@@ -36,13 +32,13 @@ namespace xen::jobsys
 	}
 
 	// join all threads in a threadpool
-	void joinThreadPool(std::vector<std::thread> &threadPool)
+	void join(std::vector<std::thread> &threadPool)
 	{
 		for (auto &thread : threadPool) { thread.join(); }
 	}
 
-	// push a job to the back of a queue
-	void pushJob(std::list<Job> &jobQueue, const Job &job, std::atomic_flag *lk)
+	// spin on a lock
+	void acquire(std::atomic_flag *lk)
 	{
 		// test
 		while (lk->test())
@@ -57,57 +53,64 @@ namespace xen::jobsys
 			asm ("pause");
 			std::this_thread::yield();
 		}
+	}
 
-		jobQueue.push_back(job);
+	// release lock
+	void release(std::atomic_flag *lk)
+	{
 		std::atomic_flag_clear_explicit(lk, std::memory_order_release);
 	}
 
-	// global scope
-	extern std::atomic_flag GLOBAL_LK;
-	extern std::list<Job> GLOBAL_JOB_QUEUE;
-	extern std::atomic<bool> GLOBAL_RUN;
-
-	// worker thread loop
-	void spin()
+	// push a job to the back of a queue
+	void push_job(std::list<Job> &jobQueue, const Job &job, std::atomic_flag *lk)
 	{
-		Job job;
-		while(GLOBAL_RUN)
+		acquire(lk);
+		jobQueue.push_back(job);
+		release(lk);
+	}
+
+	// singleton job system manager
+	struct JobSystemMgr
+	{
+
+		// start up
+		void start_up(size_t nThreads = std::thread::hardware_concurrency())
 		{
-			// test
-			while (GLOBAL_LK.test())
+			for (size_t i = 0; i < nThreads; i++)
 			{
-				asm ("pause");	// does this work before a yield()?
-				std::this_thread::yield();
-			}
-
-			// test and set
-			while (std::atomic_flag_test_and_set_explicit(&GLOBAL_LK, std::memory_order_acquire))
-			{
-				asm ("pause");
-				std::this_thread::yield();
-			}
-
-			if (!GLOBAL_JOB_QUEUE.empty())
-			{
-				job = GLOBAL_JOB_QUEUE.front();
-				GLOBAL_JOB_QUEUE.pop_front();
-
-				std::atomic_flag_clear_explicit(&GLOBAL_LK, std::memory_order_release);
-				if (kick(job) == PAUSE) { pushJob(GLOBAL_JOB_QUEUE, job, &GLOBAL_LK); }
-			}
-			else 
-			{
-				std::atomic_flag_clear_explicit(&GLOBAL_LK, std::memory_order_release);
+				_jobs.emplace_back([&](){
+					while (_run)
+					{
+						acquire(&_lk);
+						if (_jobs.empty()) { release(&_lk); continue; }
+						auto job = _jobs.front();
+						_jobs.pop_front();
+						release(&_lk);
+					}
+				});
 			}
 		}
-	}
 
-	// construct a job from a function and data
-	constexpr Job makeJob(ExitStatus (*func)(void*), void* data)
-	{
-		Job j = { func, data };
-		return j;
-	}
-} // namespace xen::jobsys
+		// shut down
+		void shut_down()
+		{
+			_run = false;
+			join(_threads);
+		}
+
+		void push_job(std::function<void(void)> job)
+		{
+			acquire(&_lk);
+			_jobs.push_back(job);
+			release(&_lk);
+		}
+
+	private:
+		std::atomic<bool> _run = true;
+		std::vector<std::thread> _threads;
+		std::list<std::function<void(void)>> _jobs;
+		std::atomic_flag _lk = ATOMIC_FLAG_INIT;
+	};
+} // namespace xen::jobs
 
 #endif // JOBSYS_H

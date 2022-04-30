@@ -5,6 +5,8 @@
 #include <vector>
 #include <thread>
 #include <atomic>
+#include <type_traits>
+#include <functional>
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
@@ -17,7 +19,7 @@
 #include "shader.h"
 #include "light.h"
 
-xen::window::Window window;
+xen::window::Window GLOBAL_WINDOW;
 xen::camera::Camera camera;
 bool firstMouseMovement = true;
 const float cameraAngle = 10.0f;
@@ -25,22 +27,7 @@ const float cameraDist = 3.0f;
 const glm::vec3 worldUp(0.0f, 1.0f, 0.0f);
 
 // job system
-std::vector<std::thread> threadPool;
-std::list<xen::jobsys::Job> xen::jobsys::GLOBAL_JOB_QUEUE;
-std::atomic_flag xen::jobsys::GLOBAL_LK = ATOMIC_FLAG_INIT;
-std::atomic<bool> xen::jobsys::GLOBAL_RUN = true;
-
-// mock job TODO rm
-glm::mat4 viewMatrix;
-xen::jobsys::ExitStatus viewMatrixJobFunc(void* camera)
-{
-	xen::camera::Camera *c = static_cast<xen::camera::Camera*>(camera);
-	if (firstMouseMovement) { return xen::jobsys::PAUSE; }
-
-	viewMatrix = xen::camera::viewMatrix(*c);
-	return xen::jobsys::SUCCESS;
-}
-xen::jobsys::Job viewMatrixJob = { viewMatrixJobFunc, (void*)&camera };
+xen::jobs::JobSystemMgr jobSys;
 
 // keyboard input flags
 bool w = false;
@@ -52,9 +39,9 @@ void mouseCallback(GLFWwindow *window, double xPosIn, double yPosIn);
 
 int main(int argc, char const *argv[])
 {
-	xen::window::init(window, 1080, 600);
-	xen::window::setCursorPositionCallback(window, mouseCallback);
-	xen::jobsys::initThreadPool(threadPool, 1, xen::jobsys::spin);
+	xen::window::init(GLOBAL_WINDOW, 1080, 600);
+	xen::window::setCursorPositionCallback(GLOBAL_WINDOW, mouseCallback);
+	jobSys.start_up(1); // only need a few threads for now
 
 	// model shader and model
 	auto shader = xen::loadShaderFromFile("assets/shaders/model.vert", "assets/shaders/model.frag");
@@ -70,10 +57,10 @@ int main(int argc, char const *argv[])
 	float lastFrame = 0.0f;
 
 	xen::camera::updateCameraAim(camera, cameraAngle, cameraDist, 0.0f, 0.0f, 0.1f);
-	viewMatrix = xen::camera::viewMatrix(camera);
+	auto viewMatrix = xen::camera::viewMatrix(camera);
 
 	// producer loop
-	while (!xen::window::shouldClose(window))
+	while (!xen::window::shouldClose(GLOBAL_WINDOW))
 	{
 		camera.targetPosition = model.position;
 
@@ -83,8 +70,8 @@ int main(int argc, char const *argv[])
 		lastFrame = currentFrame;	// should be at end of game loop?
 
 		// input
-		xen::window::processEsc(window.ptr);
-		xen::window::processKeyInput(window, w, a, s, d);
+		xen::window::esc(GLOBAL_WINDOW);
+		xen::window::processKeyInput(GLOBAL_WINDOW, w, a, s, d);
 		xen::processModelMovement(model, camera.b, w, a, s, d, deltaTime);
 		xen::updateModelVectors(model);
 
@@ -92,10 +79,10 @@ int main(int argc, char const *argv[])
 		xen::window::bg(0.1f, 0.1f, 0.1f, 1.0f);
 
 		// render matrices
-		xen::jobsys::pushJob(xen::jobsys::GLOBAL_JOB_QUEUE, viewMatrixJob, &xen::jobsys::GLOBAL_LK);
+		jobSys.push_job([&]{ viewMatrix = xen::camera::viewMatrix(camera); });
 
 		// auto viewMatrix = xen::viewMatrix(camera);
-		auto projectionMatrix = xen::window::projectionMatrix(window, 55.0f);
+		auto projectionMatrix = xen::window::projectionMatrix(GLOBAL_WINDOW, 55.0f);
 		auto modelMatrix = xen::modelMatrix(model);
 
 		// shader and shader uniforms
@@ -115,7 +102,7 @@ int main(int argc, char const *argv[])
 
 		// TODO - texture uniforms are assigned when loading, should all uniforms be in the same place?
 		xen::drawModel(model, shader);
-		xen::window::swapThenPoll(window);
+		xen::window::swapThenPoll(GLOBAL_WINDOW);
 
 		checkerr();
 
@@ -125,8 +112,7 @@ int main(int argc, char const *argv[])
 		d = false;
 	}
 
-	xen::jobsys::GLOBAL_RUN = false;
-	xen::jobsys::joinThreadPool(threadPool);	
+	jobSys.shut_down();
 	xen::window::terminate();
 
 	return 0;
