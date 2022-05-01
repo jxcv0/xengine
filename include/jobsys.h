@@ -83,18 +83,24 @@ namespace xen::jobs
 					while (_run)
 					{
 						std::unique_lock lk(_m);
-						_cv.wait(lk, [&]{ return !_jobs.empty(); });
+						_cv.wait(lk);
 
-						auto job = _jobs.front();
-						_jobs.pop_front();
-
-						lk.unlock();
-						_cv.notify_one();
-						job();
+						if (!_jobs.empty())
+						{
+							auto job = _jobs.front();
+							_jobs.pop_front();
+							lk.unlock();
+							_cv.notify_one();
+							job();
+						}
+						else
+						{
+							lk.unlock();
+							_cv.notify_one();
+						}
 					}
-					_cv.notify_one();
 				});
-				t.detach();
+				_threads.push_back(std::move(t));
 			}
 		}
 
@@ -102,6 +108,10 @@ namespace xen::jobs
 		void shut_down()
 		{
 			_run = false;
+			for (auto &thread : _threads)
+			{
+				thread.join();
+			}
 		}
 
 		void push_job(std::function<void(void)> job)
@@ -114,12 +124,12 @@ namespace xen::jobs
 		}
 
 	private:
+		std::vector<std::thread> _threads;
 		std::atomic<bool> _run = true;
 		std::list<std::function<void(void)>> _jobs;
 		std::mutex _m;
 		std::condition_variable _cv;
 	};
-
 } // namespace xen::jobs
 
 #endif // JOBSYS_H
