@@ -31,13 +31,13 @@ bool a = false;
 bool s = false;
 bool d = false;
 
-void mouseCallback(GLFWwindow *window, double xPosIn, double yPosIn);
+void on_mouse(GLFWwindow *window, double xPosIn, double yPosIn);
 
 int main(int argc, char const *argv[])
 {
 	xen::window::init(window, 1080, 600);
-	xen::window::set_cursor_position_callback(window, mouseCallback);
-	jobSys.start_up(3); // minus this thread
+	xen::window::set_cursor_position_callback(window, on_mouse);
+	jobSys.start_up(3);
 
 	// model shader and model
 	auto shader = xen::shader::load("assets/shaders/model.vert", "assets/shaders/model.frag");
@@ -62,9 +62,12 @@ int main(int argc, char const *argv[])
 	{
 
 		// delta time 
-		float currentFrame = static_cast<float>(glfwGetTime());
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;	// should be at end of game loop?
+		float currentFrame;
+        jobSys.push_job([&] {
+            currentFrame = static_cast<float>(glfwGetTime());
+            deltaTime = currentFrame - lastFrame;
+            lastFrame = currentFrame;
+        });
 
 		// input
 		xen::window::esc(window);
@@ -73,6 +76,7 @@ int main(int argc, char const *argv[])
 		xen::model::update_vectors(model);
 
 		// background
+        // jobSys.push_job([]{ xen::window::bg(0.1f, 0.1f, 0.1f, 1.0f); });
 		xen::window::bg(0.1f, 0.1f, 0.1f, 1.0f);
 
 		// render matrices
@@ -113,7 +117,7 @@ int main(int argc, char const *argv[])
 	return 0;
 }
 
-void mouseCallback(GLFWwindow *window, double xPosIn, double yPosIn)
+void on_mouse(GLFWwindow *window, double xPosIn, double yPosIn)
 {
 	float xPos = static_cast<float>(xPosIn);
 	float yPos = static_cast<float>(yPosIn);
