@@ -20,7 +20,7 @@
 
 #include "shader.h"
 
-namespace xen
+namespace xen::model
 {
 	// an individual vertex
 	struct Vertex
@@ -60,14 +60,14 @@ namespace xen
 	};
 	
 	// update model rotation about local y
-	void updateModelVectors(Model &model)
+	void update_vectors(Model &model)
 	{
 		model.z = glm::normalize(glm::vec3(cos(glm::radians(model.b)), 0.0f, sin(glm::radians(model.b))));
 	}
 
 	// update model position based on key press
 	// assumes local y == global y
-	void processModelMovement(Model &model, float forward, bool w, bool a, bool s, bool d, float deltaTime)
+	void process_movement(Model &model, float forward, bool w, bool a, bool s, bool d, float deltaTime)
 	{		
 		forward -= 90.0f;
 		if (w)
@@ -126,7 +126,7 @@ namespace xen
 	}
 	
 	// load a texture from a file and bind to gl texture buffer
-	unsigned int loadTextureFromFile(const char* path)
+	unsigned int load_texture(const char* path)
 	{
 		unsigned int texId;
 		glGenTextures(1, &texId);
@@ -172,7 +172,7 @@ namespace xen
 	}
 
 	// load all textures of a type into a mesh
-	void loadMaterial(Mesh &mesh, std::string &dir, aiMaterial *mat, aiTextureType type, std::string typeName)
+	void load_material(Mesh &mesh, std::string &dir, aiMaterial *mat, aiTextureType type, std::string typeName)
 	{
 		for (size_t i = 0; i < mat->GetTextureCount(type); i++)
 		{
@@ -180,14 +180,14 @@ namespace xen
 			mat->GetTexture(type, i, &str);
 			Texture texture;
 			std::string fileName(str.C_Str());
-			texture.id = loadTextureFromFile((dir + "/" + fileName).c_str());
+			texture.id = load_texture((dir + "/" + fileName).c_str());
 			texture.uniformName = typeName;
 			mesh.textures.push_back(texture);
 		}
 	};
 
 	// recursively process nodes in a scene
-	void processNode(Model &model, aiNode *node, const aiScene *scene, std::string dir)
+	void process_node(Model &model, aiNode *node, const aiScene *scene, std::string dir)
 	{
 		for (size_t i = 0; i < node->mNumMeshes; i++)
 		{
@@ -251,21 +251,21 @@ namespace xen
 			// textures
 			aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
 
-			loadMaterial(xenMesh, dir, material, aiTextureType_DIFFUSE, "textureDiffuse");
-			loadMaterial(xenMesh, dir, material, aiTextureType_SPECULAR, "textureSpecular");
-			loadMaterial(xenMesh, dir, material, aiTextureType_HEIGHT, "textureNormal");
+			load_material(xenMesh, dir, material, aiTextureType_DIFFUSE, "textureDiffuse");
+			load_material(xenMesh, dir, material, aiTextureType_SPECULAR, "textureSpecular");
+			load_material(xenMesh, dir, material, aiTextureType_HEIGHT, "textureNormal");
 
 			model.meshes.push_back(xenMesh);
 		}
 
 		for (size_t i = 0; i < node->mNumChildren; i++)
 		{
-			processNode(model, node->mChildren[i], scene, dir);
+			process_node(model, node->mChildren[i], scene, dir);
 		}
 	}
 
 	// load a model from a file
-	void loadModel(Model &model, const char* filepath)
+	void load_model(Model &model, const char* filepath)
 	{
 		std::string dir(filepath);
 		dir = dir.substr(0, dir.find_last_of('/'));
@@ -283,11 +283,11 @@ namespace xen
 			return;
 		}
 
-		processNode(model, scene->mRootNode, scene, dir);
+		process_node(model, scene->mRootNode, scene, dir);
 	}
 	
 	// buffer model data in gl
-	void genModelBuffers(Model &model)
+	void gen_buffers(Model &model)
 	{
 		for (auto &mesh : model.meshes)
 		{
@@ -330,12 +330,12 @@ namespace xen
 
 	// draw a mesh using a shader program
 	// this function assumes each mesh only has one diffuse, specular and normal map
-	void drawMesh(Mesh &mesh, unsigned int shader)
+	void draw(Mesh &mesh, unsigned int shader)
 	{
 		for (int i = 0; i < mesh.textures.size(); i++)
 		{
 			glActiveTexture(GL_TEXTURE0 + i);
-			setShaderUniform(shader, mesh.textures[i].uniformName.c_str(), i);
+			xen::shader::set_uniform(shader, mesh.textures[i].uniformName.c_str(), i);
 			glBindTexture(GL_TEXTURE_2D, mesh.textures[i].id);
 		}
 		glBindVertexArray(mesh.VAO);
@@ -345,17 +345,17 @@ namespace xen
 	}
 
 	// draw all meshes in a model using a single shader program
-	void drawModel(Model& model, unsigned int shader)
+	void draw(Model& model, unsigned int shader)
 	{
-		for (auto &mesh : model.meshes) { drawMesh(mesh, shader); }
+		for (auto &mesh : model.meshes) { draw(mesh, shader); }
 	}
 
 	// generate model matrix based on model position
-	glm::mat4 modelMatrix(Model &model)
+	glm::mat4 model_matrix(Model &model)
 	{
 		auto mm = glm::translate(glm::mat4(1.0f), model.position);
 		return glm::rotate(mm, glm::radians(model.b), glm::vec3(0.0f, 1.0f, 0.0f));
 	}
-}
+} //namespace xen::model
 
 #endif // MODEL_H

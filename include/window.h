@@ -57,7 +57,7 @@ namespace xen::window
 	}
 
 	// check if glfw has recieved a signal to close
-	bool shouldClose(Window &window)
+	bool should_close(Window &window)
 	{
 		return glfwWindowShouldClose(window.ptr);
 	}
@@ -79,7 +79,7 @@ namespace xen::window
 	}
 
 	// swap buffers and poll events
-	void swapThenPoll(Window &window)
+	void swap_and_poll(Window &window)
 	{
 		glfwSwapBuffers(window.ptr);
 		glfwPollEvents();
@@ -93,13 +93,13 @@ namespace xen::window
 	}
 
 	// calculate projection matrix
-	glm::mat4 projectionMatrix(Window &window, float fov)
+	glm::mat4 projection_matrix(Window &window, float fov)
 	{
 		return glm::perspective(glm::radians(fov), (float)window.scrWidth / (float)window.scrHeight, 0.1f, 100.0f);
 	}
 
 	// set cursor position callback function
-	void setCursorPositionCallback(Window &window, GLFWcursorposfun function)
+	void set_cursor_position_callback(Window &window, GLFWcursorposfun function)
 	{
 		glfwSetCursorPosCallback(window.ptr, function);
 	}

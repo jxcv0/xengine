@@ -5,7 +5,7 @@
 #include <thread>
 #include <atomic>
 #include <vector>
-#include <iostream>
+#include <functional>
 
 namespace xen::jobs
 {
@@ -72,13 +72,12 @@ namespace xen::jobs
 	// singleton job system manager
 	struct JobSystemMgr
 	{
-
 		// start up
 		void start_up(size_t nThreads = std::thread::hardware_concurrency())
 		{
 			for (size_t i = 0; i < nThreads; i++)
 			{
-				_jobs.emplace_back([&](){
+				std::thread t([&]{
 					while (_run)
 					{
 						acquire(&_lk);
@@ -86,8 +85,11 @@ namespace xen::jobs
 						auto job = _jobs.front();
 						_jobs.pop_front();
 						release(&_lk);
+						job();
+						std::cout << std::this_thread::get_id() << std::endl;
 					}
 				});
+				t.detach();
 			}
 		}
 
@@ -95,7 +97,6 @@ namespace xen::jobs
 		void shut_down()
 		{
 			_run = false;
-			join(_threads);
 		}
 
 		void push_job(std::function<void(void)> job)
@@ -107,10 +108,10 @@ namespace xen::jobs
 
 	private:
 		std::atomic<bool> _run = true;
-		std::vector<std::thread> _threads;
 		std::list<std::function<void(void)>> _jobs;
 		std::atomic_flag _lk = ATOMIC_FLAG_INIT;
 	};
+
 } // namespace xen::jobs
 
 #endif // JOBSYS_H

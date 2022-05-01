@@ -8,10 +8,10 @@
 #include <sstream>
 #include <iostream>
 
-namespace xen
+namespace xen::shader
 {
 	// check the compilation status of a shader program
-	void checkShaderCompile(GLuint shaderId)
+	void check_compile(GLuint shaderId)
 	{
 		GLint success;
 		GLchar infoLog[1024];
@@ -24,7 +24,7 @@ namespace xen
 	}
 
 	// check the linking status of a shader program
-	void checkPrgmLink(GLuint prgmId)
+	void check_link(GLuint prgmId)
 	{
 		GLint success;
 		GLchar infoLog[1024];
@@ -37,7 +37,7 @@ namespace xen
 	}
 
 	// load a shader from a text file
-	unsigned int loadShaderFromFile(const char *vertPath, const char* fragPath)
+	unsigned int load(const char *vertPath, const char* fragPath)
 	{
 		std::string vertCode;
 		std::string fragCode;
@@ -70,20 +70,20 @@ namespace xen
 		vertId = glCreateShader(GL_VERTEX_SHADER);
 		glShaderSource(vertId, 1, &vertCodeCstr, NULL);
 		glCompileShader(vertId);
-		checkShaderCompile(vertId);
+		check_compile(vertId);
 
 		// frag
 		fragId = glCreateShader(GL_FRAGMENT_SHADER);
 		glShaderSource(fragId, 1, &fragCodeCstr, NULL);
 		glCompileShader(fragId);
-		checkShaderCompile(fragId);
+		check_compile(fragId);
 
 		// prgm
 		auto prgmId = glCreateProgram();
 		glAttachShader(prgmId, vertId);
 		glAttachShader(prgmId, fragId);
 		glLinkProgram(prgmId);
-		checkPrgmLink(prgmId);
+		check_link(prgmId);
 
 		glDeleteShader(vertId);
 		glDeleteShader(fragId);
@@ -92,49 +92,49 @@ namespace xen
 	}
 
 	// use a shader program
-	void useShader(unsigned int shader)
+	void use(unsigned int shader)
 	{
 		glUseProgram(shader);
 	}
 
 	// set shader boolean uniform utility function
-	void setShaderUniform(unsigned int shader, const char *uniformName, bool value)
+	void set_uniform(unsigned int shader, const char *uniformName, bool value)
 	{
 		glUniform1i(glGetUniformLocation(shader, uniformName), static_cast<int>(value));
 	}
 
 	// set shader int uniform utility function
-	void setShaderUniform(unsigned int shader, const char *uniformName, int value)
+	void set_uniform(unsigned int shader, const char *uniformName, int value)
 	{
 		glUniform1i(glGetUniformLocation(shader, uniformName), value);
 	}
 
 	// set shader float uniform utility function
-	void setShaderUniform(unsigned int shader, const char *uniformName, float value)
+	void set_uniform(unsigned int shader, const char *uniformName, float value)
 	{
 		glUniform1f(glGetUniformLocation(shader, uniformName), value);
 	}
 
 	// set shader vec2 uniform utility function
-	void setShaderUniform(unsigned int shader, const char *uniformName, glm::vec2 &value)
+	void set_uniform(unsigned int shader, const char *uniformName, glm::vec2 &value)
 	{
 		glUniform2fv(glGetUniformLocation(shader, uniformName), 1, &value[0]);
 	}
 
 	// set shader vec3 uniform utility function
-	void setShaderUniform(unsigned int shader, const char *uniformName, glm::vec3 &value)
+	void set_uniform(unsigned int shader, const char *uniformName, glm::vec3 &value)
 	{
 		glUniform3fv(glGetUniformLocation(shader, uniformName), 1, &value[0]);
 	}
 
 	// set shader vec4 uniform utility function
-	void setShaderUniform(unsigned int shader, const char *uniformName, glm::vec4 &value)
+	void set_uniform(unsigned int shader, const char *uniformName, glm::vec4 &value)
 	{
 		glUniform4fv(glGetUniformLocation(shader, uniformName), 1, &value[0]);
 	}
 
 	// set shader mat4 uniform utility funtion
-	void setShaderUniform(unsigned int shader, const char *uniformName, glm::mat4 &value)
+	void set_uniform(unsigned int shader, const char *uniformName, glm::mat4 &value)
 	{
 		glUniformMatrix4fv(glGetUniformLocation(shader, uniformName), 1, GL_FALSE, &value[0][0]);
 	}

@@ -3,10 +3,6 @@
 
 #include <iostream>
 #include <vector>
-#include <thread>
-#include <atomic>
-#include <type_traits>
-#include <functional>
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
@@ -19,7 +15,7 @@
 #include "shader.h"
 #include "light.h"
 
-xen::window::Window GLOBAL_WINDOW;
+xen::window::Window window;
 xen::camera::Camera camera;
 bool firstMouseMovement = true;
 const float cameraAngle = 10.0f;
@@ -39,15 +35,15 @@ void mouseCallback(GLFWwindow *window, double xPosIn, double yPosIn);
 
 int main(int argc, char const *argv[])
 {
-	xen::window::init(GLOBAL_WINDOW, 1080, 600);
-	xen::window::setCursorPositionCallback(GLOBAL_WINDOW, mouseCallback);
-	jobSys.start_up(2); // only need a few threads for now
+	xen::window::init(window, 1080, 600);
+	xen::window::set_cursor_position_callback(window, mouseCallback);
+	jobSys.start_up(std::thread::hardware_concurrency() - 1); // minus this thread
 
 	// model shader and model
-	auto shader = xen::loadShaderFromFile("assets/shaders/model.vert", "assets/shaders/model.frag");
-	xen::Model model;
-	xen::loadModel(model, "assets/models/cyborg/cyborg.obj");
-	xen::genModelBuffers(model);	// all buffer gen functions must be sequential
+	auto shader = xen::shader::load("assets/shaders/model.vert", "assets/shaders/model.frag");
+	xen::model::Model model;
+	xen::model::load_model(model, "assets/models/cyborg/cyborg.obj");
+	xen::model::gen_buffers(model);	// all buffer gen functions must be sequential
 	
 	// temp light
 	xen::Light light;
@@ -58,9 +54,11 @@ int main(int argc, char const *argv[])
 
 	xen::camera::updateCameraAim(camera, cameraAngle, cameraDist, 0.0f, 0.0f, 0.1f);
 	auto viewMatrix = xen::camera::viewMatrix(camera);
+	auto projectionMatrix = xen::window::projection_matrix(window, 55.0f);
+	auto modelMatrix = xen::model::model_matrix(model);
 
 	// producer loop
-	while (!xen::window::shouldClose(GLOBAL_WINDOW))
+	while (!xen::window::should_close(window))
 	{
 
 		// delta time 
@@ -69,40 +67,37 @@ int main(int argc, char const *argv[])
 		lastFrame = currentFrame;	// should be at end of game loop?
 
 		// input
-		xen::window::esc(GLOBAL_WINDOW);
-		xen::window::processKeyInput(GLOBAL_WINDOW, w, a, s, d);
-		xen::processModelMovement(model, camera.b, w, a, s, d, deltaTime);
-		xen::updateModelVectors(model);
+		xen::window::esc(window);
+		xen::window::processKeyInput(window, w, a, s, d);
+		xen::model::process_movement(model, camera.b, w, a, s, d, deltaTime);
+		xen::model::update_vectors(model);
 
 		// background
 		xen::window::bg(0.1f, 0.1f, 0.1f, 1.0f);
 
 		// render matrices
 		jobSys.push_job([&]{ viewMatrix = xen::camera::viewMatrix(camera); });
-		// viewMatrix = xen::camera::viewMatrix(camera);
-
-		// auto viewMatrix = xen::viewMatrix(camera);
-		auto projectionMatrix = xen::window::projectionMatrix(GLOBAL_WINDOW, 55.0f);
-		auto modelMatrix = xen::modelMatrix(model);
+		jobSys.push_job([&]{ projectionMatrix = xen::window::projection_matrix(window, 55.0f); });
+		jobSys.push_job([&]{ modelMatrix = xen::model::model_matrix(model); });
 
 		// shader and shader uniforms
-		xen::useShader(shader);
-		xen::setShaderUniform(shader, "view", viewMatrix);
-		xen::setShaderUniform(shader, "model", modelMatrix);
-		xen::setShaderUniform(shader, "projection", projectionMatrix);
+		xen::shader::use(shader);
+		xen::shader::set_uniform(shader, "view", viewMatrix);
+		xen::shader::set_uniform(shader, "model", modelMatrix);
+		xen::shader::set_uniform(shader, "projection", projectionMatrix);
 
 		// light
-		xen::setShaderUniform(shader, "viewPosition", camera.position);
-		xen::setShaderUniform(shader, "shininess", 32.0f);
-		xen::setShaderUniform(shader, "light.position", light.position);
-		xen::setShaderUniform(shader, "light.colour", light.colour);
-		xen::setShaderUniform(shader, "light.constant", light.constant);
-		xen::setShaderUniform(shader, "light.linear", light.linear);
-		xen::setShaderUniform(shader, "light.quadratic", light.quadratic);
+		xen::shader::set_uniform(shader, "viewPosition", camera.position);
+		xen::shader::set_uniform(shader, "shininess", 32.0f);
+		xen::shader::set_uniform(shader, "light.position", light.position);
+		xen::shader::set_uniform(shader, "light.colour", light.colour);
+		xen::shader::set_uniform(shader, "light.constant", light.constant);
+		xen::shader::set_uniform(shader, "light.linear", light.linear);
+		xen::shader::set_uniform(shader, "light.quadratic", light.quadratic);
 
 		// TODO - texture uniforms are assigned when loading, should all uniforms be in the same place?
-		xen::drawModel(model, shader);
-		xen::window::swapThenPoll(GLOBAL_WINDOW);
+		xen::model::draw(model, shader);
+		xen::window::swap_and_poll(window);
 
 		checkerr();
 
