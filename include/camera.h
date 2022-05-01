@@ -21,13 +21,13 @@ namespace xen::camera
 	};
 
 	// get view matrix from camera state
-	glm::mat4 viewMatrix(Camera &camera)
+	glm::mat4 view_matrix(Camera &camera)
 	{
 		return glm::lookAt(camera.position, camera.position + camera.z, camera.y);
 	}
 
 	// update camera vectors with mouse position
-	void updateCameraAim(Camera &camera, float x, float y)
+	void update_aim(Camera &camera, float x, float y)
 	{
 		camera.a += y;
 		camera.b += x;
@@ -44,7 +44,7 @@ namespace xen::camera
 	}
 
 	// update camera vectors and position based on a centre of rotation about an xz position
-	void updateCameraAim(Camera &camera, float offsetAnglexz, float offsetDist, float x, float y, float sen)
+	void update_aim(Camera &camera, float offsetAnglexz, float offsetDist, float x, float y, float sen)
 	{
 		camera.a += y * sen;
 		camera.b += x * sen;
@@ -65,7 +65,7 @@ namespace xen::camera
 	}
 
 	// update camera position based on key press / character movement flags
-	void processCameraMovement(Camera &camera, bool w, bool a, bool s, bool d, float deltaTime)
+	void process_movement(Camera &camera, bool w, bool a, bool s, bool d, float deltaTime)
 	{
 		float velocity = 2.5f * deltaTime;
 		if (w) { camera.position += camera.z * velocity; }

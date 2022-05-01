@@ -52,8 +52,8 @@ int main(int argc, char const *argv[])
 	float deltaTime = 0.0f;
 	float lastFrame = 0.0f;
 
-	xen::camera::updateCameraAim(camera, cameraAngle, cameraDist, 0.0f, 0.0f, 0.1f);
-	auto viewMatrix = xen::camera::viewMatrix(camera);
+	xen::camera::update_aim(camera, cameraAngle, cameraDist, 0.0f, 0.0f, 0.1f);
+	auto viewMatrix = xen::camera::view_matrix(camera);
 	auto projectionMatrix = xen::window::projection_matrix(window, 55.0f);
 	auto modelMatrix = xen::model::model_matrix(model);
 
@@ -76,7 +76,7 @@ int main(int argc, char const *argv[])
 		xen::window::bg(0.1f, 0.1f, 0.1f, 1.0f);
 
 		// render matrices
-		jobSys.push_job([&]{ viewMatrix = xen::camera::viewMatrix(camera); });
+		jobSys.push_job([&]{ viewMatrix = xen::camera::view_matrix(camera); });
 		jobSys.push_job([&]{ projectionMatrix = xen::window::projection_matrix(window, 55.0f); });
 		jobSys.push_job([&]{ modelMatrix = xen::model::model_matrix(model); });
 
@@ -130,5 +130,5 @@ void mouseCallback(GLFWwindow *window, double xPosIn, double yPosIn)
 	camera.xLast = xPos;
 	camera.yLast = yPos;
 
-	xen::camera::updateCameraAim(camera, cameraAngle, cameraDist, xOffset, yOffset, 0.1f);
+	xen::camera::update_aim(camera, cameraAngle, cameraDist, xOffset, yOffset, 0.1f);
 }
