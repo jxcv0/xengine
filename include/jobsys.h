@@ -67,13 +67,16 @@ namespace xen::jobs
 	void push_job(std::list<Job> &jobQueue, const Job &job, std::atomic_flag *lk)
 	{
 		acquire(lk);
-		jobQueue.push_back(job);
-		release(lk);
+		jobQueue.push_back(job); release(lk);
 	}
 
 	// singleton job system manager
+    // TODO - allocator for std::function<> and std::packaged_task<>
 	struct JobSystemMgr
 	{
+        JobSystemMgr() { /* do nothing */ }
+        ~JobSystemMgr() { /* do nothing */ }
+
 		// start up
 		void start_up(size_t nThreads = std::thread::hardware_concurrency())
 		{

@@ -7,6 +7,7 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
+#include "alloc.h"
 #include "jobsys.h"
 #include "checkerr.h"
 #include "model.h"
@@ -37,7 +38,8 @@ int main(int argc, char const *argv[])
 {
 	xen::window::init(window, 1080, 600);
 	xen::window::set_cursor_position_callback(window, on_mouse);
-	jobSys.start_up(3);
+	jobSys.start_up();
+    xen::mem::Allocator allocator<float>(10);
 
 	// model shader and model
 	auto shader = xen::shader::load("assets/shaders/model.vert", "assets/shaders/model.frag");
@@ -60,7 +62,6 @@ int main(int argc, char const *argv[])
 	// producer loop
 	while (!xen::window::should_close(window))
 	{
-
 		// delta time 
 		float currentFrame;
         jobSys.push_job([&] {
