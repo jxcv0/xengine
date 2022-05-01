@@ -39,11 +39,24 @@ namespace xen::mem
             std::unique_lock lk(_m);
             _cv.wait(lk);
 
-            // allocate memory
+            // TODO allocate memory
+
 
             lk.unlock();
             _cv.notify_one();
         }
+
+        void deallocate(T* p, size_t n)
+        {
+            std::unique_lock lk(_m);
+            _cv.wait(lk);
+
+            // TODO deallocate memory
+
+
+            lk.unlock();
+            _cv.notify_one();
+        } 
 
     private: 
         void* _top;
