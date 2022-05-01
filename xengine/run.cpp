@@ -37,7 +37,7 @@ int main(int argc, char const *argv[])
 {
 	xen::window::init(window, 1080, 600);
 	xen::window::set_cursor_position_callback(window, mouseCallback);
-	jobSys.start_up(std::thread::hardware_concurrency() - 1); // minus this thread
+	jobSys.start_up(3); // minus this thread
 
 	// model shader and model
 	auto shader = xen::shader::load("assets/shaders/model.vert", "assets/shaders/model.frag");

@@ -5,6 +5,8 @@
 #include <thread>
 #include <atomic>
 #include <vector>
+#include <mutex>
+#include <condition_variable>
 #include <functional>
 
 namespace xen::jobs
@@ -80,14 +82,17 @@ namespace xen::jobs
 				std::thread t([&]{
 					while (_run)
 					{
-						acquire(&_lk);
-						if (_jobs.empty()) { release(&_lk); continue; }
+						std::unique_lock lk(_m);
+						_cv.wait(lk, [&]{ return !_jobs.empty(); });
+
 						auto job = _jobs.front();
 						_jobs.pop_front();
-						release(&_lk);
+
+						lk.unlock();
+						_cv.notify_one();
 						job();
-						std::cout << std::this_thread::get_id() << std::endl;
 					}
+					_cv.notify_one();
 				});
 				t.detach();
 			}
@@ -101,15 +106,18 @@ namespace xen::jobs
 
 		void push_job(std::function<void(void)> job)
 		{
-			acquire(&_lk);
-			_jobs.push_back(job);
-			release(&_lk);
+			{
+				std::lock_guard lk(_m);
+				_jobs.push_back(job);
+			}
+			_cv.notify_one();
 		}
 
 	private:
 		std::atomic<bool> _run = true;
 		std::list<std::function<void(void)>> _jobs;
-		std::atomic_flag _lk = ATOMIC_FLAG_INIT;
+		std::mutex _m;
+		std::condition_variable _cv;
 	};
 
 } // namespace xen::jobs
