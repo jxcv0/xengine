@@ -9,6 +9,8 @@
 #include <condition_variable>
 #include <functional>
 
+#include "alloc.h"
+
 namespace xen::jobs
 {
 	// entry and data for a job
@@ -92,6 +94,7 @@ namespace xen::jobs
 						{
 							auto job = _jobs.front();
 							_jobs.pop_front();
+
 							lk.unlock();
 							_cv.notify_one();
 							job();
@@ -113,6 +116,7 @@ namespace xen::jobs
 			_run = false;
 			for (auto &thread : _threads)
 			{
+                _cv.notify_all();
 				thread.join();
 			}
 		}
@@ -129,9 +133,9 @@ namespace xen::jobs
         bool empty() { return _jobs.empty(); }
 
 	private:
-		std::vector<std::thread> _threads;
+		std::vector<std::thread, xen::mem::Allocator<std::thread>> _threads;
 		std::atomic<bool> _run = true;
-		std::list<std::function<void(void)>> _jobs;
+		std::list<std::function<void(void)>, xen::mem::Allocator<std::function<void(void)>>> _jobs;
 		std::mutex _m;
 		std::condition_variable _cv;
 	};

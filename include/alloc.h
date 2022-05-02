@@ -2,6 +2,7 @@
 #define ALLOC_H
 
 #include <cstdlib>
+#include <cstring>
 #include <mutex>
 #include <vector>
 
@@ -17,7 +18,6 @@ namespace xen::mem
         std::mutex _m;
     };
 } // namespace xen::mem
-
 extern xen::mem::Memory MEMORY_RESOURCE;
 
 namespace xen::mem
@@ -32,6 +32,7 @@ namespace xen::mem
         Allocator() = default;
 
         // allocate memory from static resource
+        // TODO make aligned to T
         T* allocate(size_t n)
         {
             std::lock_guard lk(MEMORY_RESOURCE._m);
@@ -53,9 +54,28 @@ namespace xen::mem
         }
 
         // deallocate memory and shift addresses
-        void deallocate(T* ptr, size_t n) noexcept
+        // TODO fix!
+        void deallocate(T* p, size_t n) noexcept
         {
-            
+            std::lock_guard lk(MEMORY_RESOURCE._m);
+
+            auto ptr = reinterpret_cast<void*>(p);
+            auto shift = n * sizeof(T);
+
+            for (size_t i = 0; i < MEMORY_RESOURCE._mkrs.size(); i++)
+            {
+                auto mkr = reinterpret_cast<void*>(MEMORY_RESOURCE._mkrs[i]);
+                if (mkr == ptr) { MEMORY_RESOURCE._mkrs.erase(MEMORY_RESOURCE._mkrs.begin() + i); }
+                if (mkr > ptr)
+                {
+                    void* next = reinterpret_cast<void*>(MEMORY_RESOURCE._mkrs[i + 1]);
+                    std::memmove(static_cast<void*>(ptr), mkr, shift);
+                    ptr = mkr;
+#ifdef DEBUG
+                std::cout << "Dellocating " << shift << " bytes from " << ptr << " -> " << next << "\n";
+#endif
+                }
+            }
         }
     };
 }// namespace xen::mem

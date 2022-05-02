@@ -39,7 +39,7 @@ int main(int argc, char const *argv[])
 {
 	xen::window::init(window, 1080, 600);
 	xen::window::set_cursor_position_callback(window, on_mouse);
-	jobSys.start_up();
+	jobSys.start_up(1);
 
     std::vector<int, xen::mem::Allocator<int>> v1;
     std::vector<float, xen::mem::Allocator<float>> v2;
@@ -54,19 +54,6 @@ int main(int argc, char const *argv[])
     jobSys.push_job([&]{ v2.push_back(1.4); });
     jobSys.push_job([&]{ v2.push_back(1.5); });
     jobSys.push_job([&]{ v2.push_back(1.6); });
-
-    while (!jobSys.empty()) {}
-    std::cout << "\nv1: " << v1.size() << "\n";
-    for (auto &x : v1)
-    {
-        std::cout << x << "\n";
-    }
-
-    std::cout << "\nv2: " << v2.size() << "\n";
-    for (auto &x : v2)
-    {
-        std::cout << x << "\n";
-    }
 
 	// model shader and model
 	auto shader = xen::shader::load("assets/shaders/model.vert", "assets/shaders/model.frag");
@@ -91,7 +78,7 @@ int main(int argc, char const *argv[])
 	{
 		// delta time 
 		float currentFrame;
-        jobSys.push_job([&] {
+        jobSys.push_job([&]{
             currentFrame = static_cast<float>(glfwGetTime());
             deltaTime = currentFrame - lastFrame;
             lastFrame = currentFrame;
@@ -138,6 +125,18 @@ int main(int argc, char const *argv[])
 		s = false;
 		d = false;
 	}
+
+    std::cout << "\nv1: " << v1.size() << "\n";
+    for (auto &x : v1)
+    {
+        std::cout << x << "\n";
+    }
+
+    std::cout << "\nv2: " << v2.size() << "\n";
+    for (auto &x : v2)
+    {
+        std::cout << x << "\n";
+    }
 
 	jobSys.shut_down();
 	xen::window::terminate();
