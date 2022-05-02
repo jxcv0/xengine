@@ -16,6 +16,7 @@
 #include "shader.h"
 #include "light.h"
 
+xen::mem::Memory MEMORY_RESOURCE;
 xen::window::Window window;
 xen::camera::Camera camera;
 bool firstMouseMovement = true;
@@ -40,11 +41,28 @@ int main(int argc, char const *argv[])
 	xen::window::set_cursor_position_callback(window, on_mouse);
 	jobSys.start_up();
 
-    std::cout << "here\n";
-    xen::mem::Allocator<int> alloc;
-    auto one = alloc.allocate(10);
-    auto two = alloc.allocate(2);
-    std::cout << one << " " << two << "\n";
+    std::vector<int, xen::mem::Allocator<int>> v1;
+    std::vector<float, xen::mem::Allocator<float>> v2;
+    v1.push_back(10);
+    v1.push_back(10);
+    v1.push_back(10);
+    v1.push_back(10);
+    v1.push_back(10);
+    v1.push_back(10);
+    v1.push_back(10);
+    v1.push_back(10);
+    v1.push_back(10);
+    v2.push_back(10.1);
+    v2.push_back(10.1);
+    v2.push_back(10.1);
+    v2.push_back(10.1);
+    v2.push_back(10.1);
+    v2.push_back(10.1);
+    v2.push_back(10.1);
+    v2.push_back(10.1);
+    v2.push_back(10.1);
+    v2.push_back(10.1);
+    v2.push_back(10.1);
 
 	// model shader and model
 	auto shader = xen::shader::load("assets/shaders/model.vert", "assets/shaders/model.frag");
