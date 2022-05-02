@@ -43,26 +43,30 @@ int main(int argc, char const *argv[])
 
     std::vector<int, xen::mem::Allocator<int>> v1;
     std::vector<float, xen::mem::Allocator<float>> v2;
-    v1.push_back(10);
-    v1.push_back(10);
-    v1.push_back(10);
-    v1.push_back(10);
-    v1.push_back(10);
-    v1.push_back(10);
-    v1.push_back(10);
-    v1.push_back(10);
-    v1.push_back(10);
-    v2.push_back(10.1);
-    v2.push_back(10.1);
-    v2.push_back(10.1);
-    v2.push_back(10.1);
-    v2.push_back(10.1);
-    v2.push_back(10.1);
-    v2.push_back(10.1);
-    v2.push_back(10.1);
-    v2.push_back(10.1);
-    v2.push_back(10.1);
-    v2.push_back(10.1);
+    jobSys.push_job([&]{ v1.push_back(1); });
+    jobSys.push_job([&]{ v1.push_back(2); });
+    jobSys.push_job([&]{ v1.push_back(3); });
+    jobSys.push_job([&]{ v1.push_back(4); });
+    jobSys.push_job([&]{ v1.push_back(5); });
+    jobSys.push_job([&]{ v2.push_back(1.1); });
+    jobSys.push_job([&]{ v2.push_back(1.2); });
+    jobSys.push_job([&]{ v2.push_back(1.3); });
+    jobSys.push_job([&]{ v2.push_back(1.4); });
+    jobSys.push_job([&]{ v2.push_back(1.5); });
+    jobSys.push_job([&]{ v2.push_back(1.6); });
+
+    while (!jobSys.empty()) {}
+    std::cout << "\nv1: " << v1.size() << "\n";
+    for (auto &x : v1)
+    {
+        std::cout << x << "\n";
+    }
+
+    std::cout << "\nv2: " << v2.size() << "\n";
+    for (auto &x : v2)
+    {
+        std::cout << x << "\n";
+    }
 
 	// model shader and model
 	auto shader = xen::shader::load("assets/shaders/model.vert", "assets/shaders/model.frag");
