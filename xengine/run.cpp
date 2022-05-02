@@ -39,7 +39,8 @@ int main(int argc, char const *argv[])
 	xen::window::init(window, 1080, 600);
 	xen::window::set_cursor_position_callback(window, on_mouse);
 	jobSys.start_up();
-    xen::mem::Allocator<float> allocator(10);
+
+    xen::mem::Allocator<int> allocator;
 
 	// model shader and model
 	auto shader = xen::shader::load("assets/shaders/model.vert", "assets/shaders/model.frag");

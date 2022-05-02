@@ -4,67 +4,54 @@
 #include <cstdlib>
 #include <mutex>
 #include <condition_variable>
-#include <limits>
+
+// TODO
 
 namespace xen::mem
 {
+    // allocator with pre-allocated memory chunk
     template<typename T>
     struct Allocator
     {
-        // required by named requirements
+        // reqd by named requirements
         typedef T value_type;
 
-        // construct a stack allocator with a given size
-        Allocator(size_t n)
+        Allocator() = default;
+
+        // allocaate memory from static resource
+        T* allocate(size_t n)
         {
-            if (n > std::numeric_limits<size_t>::max() / sizeof(T))
+            std::unique_lock lk(_m);
+            cv.wait(_cv);
+
+            size_t size = n * sizeof(T);
+            if (auto ptr = static_cast<T*>(_mkr))
             {
-                throw std::bad_array_new_length();
+                auto marker = reinterpret_cast<uintptr_t>(_mkr);
+                marker += size;
+                _mkr = reinterpret_cast<void*>(marker);
+                return ptr;
             }
-
-            _size = n * sizeof(T);
-            _top = std::malloc(_size);
-            std::cout << _size << " bytes\n";
-        }
-
-        // free memory
-        ~Allocator()
-        {
-            std::free(_top);
-        }
-
-        // allocate memory from chunk
-        T* allocate(size_t nBytes)
-        {
-            std::unique_lock lk(_m);
-            _cv.wait(lk);
-
-            // TODO allocate memory
-
-
+            
             lk.unlock();
-            _cv.notify_one();
+            cv.notify_one();
         }
 
-        void deallocate(T* p, size_t n)
+        void deallocate(T* ptr, size_t n)
         {
-            std::unique_lock lk(_m);
-            _cv.wait(lk);
+            // TODO
+        }
 
-            // TODO deallocate memory
-
-
-            lk.unlock();
-            _cv.notify_one();
-        } 
-
-    private: 
-        void* _top;
-        uintptr_t _bot;
-        size_t _size;
+    private:
+        static void* _head;
+        static void* _mkr;
         std::mutex _m;
         std::condition_variable _cv;
     };
+    template<typename T>
+    void* Allocator<T>::_head = std::malloc(1048576);    // 1GB
+    template<typename T>
+    uintptr_t Allocator<T>::_mkr = _head;
 }// namespace xen::mem
 
 #endif // ALLOC_H
