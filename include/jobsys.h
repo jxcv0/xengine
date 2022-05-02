@@ -126,6 +126,8 @@ namespace xen::jobs
 			_cv.notify_one();
 		}
 
+        bool empty() { return _jobs.empty(); }
+
 	private:
 		std::vector<std::thread> _threads;
 		std::atomic<bool> _run = true;

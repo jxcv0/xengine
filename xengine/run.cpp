@@ -40,7 +40,11 @@ int main(int argc, char const *argv[])
 	xen::window::set_cursor_position_callback(window, on_mouse);
 	jobSys.start_up();
 
-    xen::mem::Allocator<int> allocator;
+    std::cout << "here\n";
+    xen::mem::Allocator<int> alloc;
+    auto one = alloc.allocate(10);
+    auto two = alloc.allocate(2);
+    std::cout << one << " " << two << "\n";
 
 	// model shader and model
 	auto shader = xen::shader::load("assets/shaders/model.vert", "assets/shaders/model.frag");
