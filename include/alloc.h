@@ -62,6 +62,10 @@ namespace xen::mem
             auto ptr = reinterpret_cast<void*>(p);
             auto shift = n * sizeof(T);
 
+            // TODO THIS CALL ALL BE DONE WITH ONE CALL TO std::memmove!!!
+
+            // shift tail marker
+
             for (size_t i = 0; i < MEMORY_RESOURCE._mkrs.size(); i++)
             {
                 auto mkr = reinterpret_cast<void*>(MEMORY_RESOURCE._mkrs[i]);
