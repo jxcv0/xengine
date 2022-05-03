@@ -2,15 +2,15 @@
 #define ALLOC_H
 
 #include <cstdlib>
-#include <cstring>
-#include <atomic>
 #include <mutex>
 #include <vector>
 
 #define DEBUG
 
+// TODO stop trying to use this pool allocater as a fix all
 namespace xen::mem
 {
+    static std::mutex mpMutex;
     template<typename T>
     struct MemoryPool
     {
@@ -21,46 +21,66 @@ namespace xen::mem
         };
 
         // get the singleton MemoryPool instance static auto& get_instance()
+        static auto& get_instance()
         {
             static MemoryPool<T> mp;
             if (!mp._alloc)
             {
-                // TODO - use ^2 allocs
-                size_t allocSize = 100 * sizeof(T);
-                Node *alloc = static_cast<Node*>(std::malloc(allocSize));
-                Node *n = alloc;
-            
-                for(size_t i = 0; i < 100; i++)
-                {
-                    n->next = reinterpret_cast<Node*>(reinterpret_cast<uintptr_t>(n) + sizeof(T));
-                    n = n->next;
-                }
-
-                n->next = nullptr;
-                mp._alloc = alloc;
+                mp.prealloc();
             }
             return mp;
         }
 
         // get next available allocation and shift _alloc
-        T* get_alloc()
+        T* alloc(size_t n)
         {
+            std::lock_guard lk(mpMutex);
+            if (!_alloc->next)
+            {
+                this->prealloc();
+            }
+
             auto a = _alloc;
             _alloc = _alloc->next;
             return reinterpret_cast<T*>(a);
         }
 
         // return an allocation to the memory pool
-        void return_alloc(T* ptr, size_t size)
+        void free(T* ptr, size_t size)
         {
-            // instert ptr back into list
-            reinterpret_cast<Node*>(ptr)->next = _alloc;
-            _alloc = reinterpret_cast<Node*>(ptr);
+            for (size_t i = 0; i < size; i++)
+            {
+                std::lock_guard lk(mpMutex);
+                // instert ptr back into list
+                reinterpret_cast<Node*>(ptr)->next = _alloc;
+                _alloc = reinterpret_cast<Node*>(ptr);
+            }
         }
 
     private:
+
+        // malloc more memory for the pool
+        void prealloc()
+        {
+            size_t allocSize = _size * sizeof(T);
+
+            Node *alloc = static_cast<Node*>(std::malloc(allocSize));
+
+            Node *n = alloc;
+            for(size_t i = 0; i < _size; i++)
+            {
+                n->next = reinterpret_cast<Node*>(reinterpret_cast<uintptr_t>(n) + sizeof(T));
+                n = n->next;
+            }
+
+            n->next = nullptr;
+            _alloc = alloc;
+            _size *= 2;
+        }
+
         MemoryPool() {}
         Node *_alloc = nullptr;
+        size_t _size = 1;
     };
 
     // allocator with pre-allocated memory chunk
@@ -74,13 +94,13 @@ namespace xen::mem
         // allocate memory from static resource
         T* allocate(size_t n)
         {
-            return _mp.get_alloc();
+            return _mp.alloc(n);
         }
 
         // deallocate memory and shift addresses
         void deallocate(T* p, size_t n) noexcept
         {
-            _mp.return_alloc(p, n);
+            _mp.free(p, n);
         }
 
     private:
