@@ -16,7 +16,6 @@
 #include "shader.h"
 #include "light.h"
 
-xen::mem::Memory MEMORY_RESOURCE;
 xen::window::Window window;
 xen::camera::Camera camera;
 bool firstMouseMovement = true;

@@ -3,6 +3,7 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <atomic>
 #include <mutex>
 #include <vector>
 
@@ -10,77 +11,80 @@
 
 namespace xen::mem
 {
-    struct Memory
+    template<typename T>
+    struct MemoryPool
     {
-        void* _head = std::malloc(1048576);
-        void* _tail = _head;
-        std::vector<uintptr_t> _mkrs;
-        std::mutex _m;
-    };
-} // namespace xen::mem
-extern xen::mem::Memory MEMORY_RESOURCE;
+        // singly linked list of free allocations
+        struct Node
+        {
+            Node* next;
+        };
 
-namespace xen::mem
-{
+        // get the singleton MemoryPool instance static auto& get_instance()
+        {
+            static MemoryPool<T> mp;
+            if (!mp._alloc)
+            {
+                // TODO - use ^2 allocs
+                size_t allocSize = 100 * sizeof(T);
+                Node *alloc = static_cast<Node*>(std::malloc(allocSize));
+                Node *n = alloc;
+            
+                for(size_t i = 0; i < 100; i++)
+                {
+                    n->next = reinterpret_cast<Node*>(reinterpret_cast<uintptr_t>(n) + sizeof(T));
+                    n = n->next;
+                }
+
+                n->next = nullptr;
+                mp._alloc = alloc;
+            }
+            return mp;
+        }
+
+        // get next available allocation and shift _alloc
+        T* get_alloc()
+        {
+            auto a = _alloc;
+            _alloc = _alloc->next;
+            return reinterpret_cast<T*>(a);
+        }
+
+        // return an allocation to the memory pool
+        void return_alloc(T* ptr, size_t size)
+        {
+            // instert ptr back into list
+            reinterpret_cast<Node*>(ptr)->next = _alloc;
+            _alloc = reinterpret_cast<Node*>(ptr);
+        }
+
+    private:
+        MemoryPool() {}
+        Node *_alloc = nullptr;
+    };
+
     // allocator with pre-allocated memory chunk
     template<typename T>
     struct Allocator
     {
-        // reqd by named requirements
         typedef T value_type;
 
         Allocator() = default;
 
         // allocate memory from static resource
-        // TODO make aligned to T
         T* allocate(size_t n)
         {
-            std::lock_guard lk(MEMORY_RESOURCE._m);
-
-            size_t size = n * sizeof(T);
-            if (auto ptr = static_cast<T*>(MEMORY_RESOURCE._tail))
-            {
-                auto marker = reinterpret_cast<uintptr_t>(MEMORY_RESOURCE._tail);
-                marker += size;
-                MEMORY_RESOURCE._mkrs.push_back(marker);
-                MEMORY_RESOURCE._tail = reinterpret_cast<void*>(marker);
-#ifdef DEBUG
-                std::cout << "Allocating " << size << " bytes -> " << ptr << "\n";
-#endif
-                return ptr;
-            }
-
-            throw std::bad_alloc();
+            return _mp.get_alloc();
         }
 
         // deallocate memory and shift addresses
-        // TODO fix!
         void deallocate(T* p, size_t n) noexcept
         {
-            std::lock_guard lk(MEMORY_RESOURCE._m);
-
-            auto ptr = reinterpret_cast<void*>(p);
-            auto shift = n * sizeof(T);
-
-            // TODO THIS CALL ALL BE DONE WITH ONE CALL TO std::memmove!!!
-
-            // shift tail marker
-
-            for (size_t i = 0; i < MEMORY_RESOURCE._mkrs.size(); i++)
-            {
-                auto mkr = reinterpret_cast<void*>(MEMORY_RESOURCE._mkrs[i]);
-                if (mkr == ptr) { MEMORY_RESOURCE._mkrs.erase(MEMORY_RESOURCE._mkrs.begin() + i); }
-                if (mkr > ptr)
-                {
-                    void* next = reinterpret_cast<void*>(MEMORY_RESOURCE._mkrs[i + 1]);
-                    std::memmove(static_cast<void*>(ptr), mkr, shift);
-                    ptr = mkr;
-#ifdef DEBUG
-                std::cout << "Dellocating " << shift << " bytes from " << ptr << " -> " << next << "\n";
-#endif
-                }
-            }
+            _mp.return_alloc(p, n);
         }
+
+    private:
+        MemoryPool<T> _mp = MemoryPool<T>::get_instance();
     };
 }// namespace xen::mem
 
