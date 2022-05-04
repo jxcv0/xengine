@@ -9,8 +9,6 @@
 #include <condition_variable>
 #include <functional>
 
-#include "alloc.h"
-
 namespace xen::jobs
 {
 	// entry and data for a job

@@ -7,7 +7,6 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
-#include "alloc.h"
 #include "jobsys.h"
 #include "checkerr.h"
 #include "model.h"
@@ -39,20 +38,6 @@ int main(int argc, char const *argv[])
 	xen::window::init(window, 1080, 600);
 	xen::window::set_cursor_position_callback(window, on_mouse);
 	jobSys.start_up(1);
-
-    std::vector<int, xen::mem::Allocator<int>> v1;
-    std::vector<float, xen::mem::Allocator<float>> v2;
-    jobSys.push_job([&]{ v1.push_back(1); });
-    jobSys.push_job([&]{ v1.push_back(2); });
-    jobSys.push_job([&]{ v1.push_back(3); });
-    jobSys.push_job([&]{ v1.push_back(4); });
-    jobSys.push_job([&]{ v1.push_back(5); });
-    jobSys.push_job([&]{ v2.push_back(1.1); });
-    jobSys.push_job([&]{ v2.push_back(1.2); });
-    jobSys.push_job([&]{ v2.push_back(1.3); });
-    jobSys.push_job([&]{ v2.push_back(1.4); });
-    jobSys.push_job([&]{ v2.push_back(1.5); });
-    jobSys.push_job([&]{ v2.push_back(1.6); });
 
 	// model shader and model
 	auto shader = xen::shader::load("assets/shaders/model.vert", "assets/shaders/model.frag");
@@ -124,18 +109,6 @@ int main(int argc, char const *argv[])
 		s = false;
 		d = false;
 	}
-
-    std::cout << "\nv1: " << v1.size() << "\n";
-    for (auto &x : v1)
-    {
-        std::cout << x << "\n";
-    }
-
-    std::cout << "\nv2: " << v2.size() << "\n";
-    for (auto &x : v2)
-    {
-        std::cout << x << "\n";
-    }
 
 	jobSys.shut_down();
 	xen::window::terminate();
