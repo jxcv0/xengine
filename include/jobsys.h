@@ -9,73 +9,61 @@
 #include <condition_variable>
 #include <functional>
 
-namespace xen::jobs
+#include "alloc.h"
+
+namespace xen
 {
-	// entry and data for a job
-	struct Job
-	{
-		int (*entry)(void*);	// pointer to job function
-		void* params;		// job function parameters
-	};
+    // some experimenting
+    template<typename T>
+    concept SyncType = requires(T t)
+    {
+        { t.lock() };
+        { t.release() };
+    }; 
 
-	// kick a job
-	bool kick(Job &job)
-	{
-		return job.entry(job.params);
-	}
+    // spinlock based synchronization policy
+    struct Spinlock
+    {
+        void lock()
+        {
+            while (_lk.test()) { __builtin_ia32_pause(); }
+            while (std::atomic_flag_test_and_set_explicit(&_lk, std::memory_order_acquire)) { __builtin_ia32_pause(); }
+        }
 
-	// initialize a threadpool with a thread count and a wait function
-	void init(std::vector<std::thread> &threadPool, size_t nThreads, void (*spin)(void))
-	{
-		for (size_t i = 0; i < nThreads; i++)
-		{
-			threadPool.emplace_back(spin);
-		}
-	}
+        void release()
+        {
+            std::atomic_flag_clear_explicit(&_lk, std::memory_order_release);
+        }
 
-	// join all threads in a threadpool
-	void join(std::vector<std::thread> &threadPool)
-	{
-		for (auto &thread : threadPool) { thread.join(); }
-	}
+    private:
+        std::atomic_flag _lk = ATOMIC_FLAG_INIT;
+    };
 
-	// spin on a lock
-	void acquire(std::atomic_flag *lk)
-	{
-		// test
-		while (lk->test())
-		{
-			asm ("pause");
-			std::this_thread::yield();
-		}
+    struct MutexLock
+    {
+        void lock()
+        {
+            _lk.lock();
+            _cv.wait(_lk);
+        }
 
-		// test and set
-		while (std::atomic_flag_test_and_set_explicit(lk, std::memory_order_acquire))
-		{
-			asm ("pause");
-			std::this_thread::yield();
-		}
-	}
+        void release()
+        {
+            _lk.unlock();
+            _cv.notify_one();
+        }
 
-	// release lock
-	void release(std::atomic_flag *lk)
-	{
-		std::atomic_flag_clear_explicit(lk, std::memory_order_release);
-	}
-
-	// push a job to the back of a queue
-	void push_job(std::list<Job> &jobQueue, const Job &job, std::atomic_flag *lk)
-	{
-		acquire(lk);
-		jobQueue.push_back(job); release(lk);
-	}
+    protected:
+        std::mutex _m;
+        std::unique_lock<std::mutex> _lk = std::unique_lock(_m);
+        std::condition_variable _cv;
+    };
 
 	// singleton job system manager
-    // TODO - allocator for std::function<> and std::packaged_task<>
-	struct JobSystemMgr
+    template<SyncType S = Spinlock>
+	struct JobSystemMgr : public S
 	{
-        JobSystemMgr() { /* do nothing */ }
-        ~JobSystemMgr() { /* do nothing */ }
+        JobSystemMgr() = default;
 
 		// start up
 		void start_up(size_t nThreads = std::thread::hardware_concurrency())
@@ -85,22 +73,19 @@ namespace xen::jobs
 				std::thread t([&]{
 					while (_run)
 					{
-						std::unique_lock lk(_m);
-						_cv.wait(lk);
+                        this->lock();
 
 						if (!_jobs.empty())
 						{
 							auto job = _jobs.front();
 							_jobs.pop_front();
 
-							lk.unlock();
-							_cv.notify_one();
+                            this->release();
 							job();
 						}
 						else
 						{
-							lk.unlock();
-							_cv.notify_one();
+                            this->release();
 						}
 					}
 				});
@@ -114,18 +99,16 @@ namespace xen::jobs
 			_run = false;
 			for (auto &thread : _threads)
 			{
-                _cv.notify_all();
 				thread.join();
 			}
 		}
 
+        // push a job to the back of the jobsystem
 		void push_job(std::function<void(void)> job)
 		{
-			{
-				std::lock_guard lk(_m);
-				_jobs.push_back(job);
-			}
-			_cv.notify_one();
+            this->lock();
+            _jobs.push_back(job);
+            this->release();
 		}
 
         bool empty() { return _jobs.empty(); }
@@ -134,9 +117,30 @@ namespace xen::jobs
 		std::vector<std::thread> _threads;
 		std::atomic<bool> _run = true;
 		std::list<std::function<void(void)>> _jobs;
-		std::mutex _m;
-		std::condition_variable _cv;
 	};
-} // namespace xen::jobs
+
+    // template specialization to avoid deadlock in the case of JobSystemMgr<MutexLock>
+    template<>
+    void JobSystemMgr<MutexLock>::shut_down()
+    {
+        _run = false;
+        for (auto &thread : _threads)
+        {
+            this->_cv.notify_one();
+            thread.join();
+        }
+    }
+
+    // template specialization to avoid deadlock in the case of JobSystemMgr<MutexLock>
+    template<>
+    void JobSystemMgr<MutexLock>::push_job(std::function<void(void)> job)
+    {
+        {
+            std::lock_guard(this->_lk);
+            _jobs.push_back(job);
+        }
+        this->_cv.notify_one();
+    }
+} // namespace xen
 
 #endif // JOBSYS_H

@@ -17,13 +17,14 @@
 
 xen::window::Window window;
 xen::camera::Camera camera;
+xen::JobSystemMgr jobSys;
+
 bool firstMouseMovement = true;
 const float cameraAngle = 10.0f;
 const float cameraDist = 3.0f;
 const glm::vec3 worldUp(0.0f, 1.0f, 0.0f);
 
 // job system
-xen::jobs::JobSystemMgr jobSys;
 
 // keyboard input flags
 bool w = false;
@@ -71,7 +72,9 @@ int main(int argc, char const *argv[])
 		// input
 		xen::window::esc(window);
 		xen::window::processKeyInput(window, w, a, s, d);
-		xen::model::process_movement(model, camera.b, w, a, s, d, deltaTime);
+
+        // TODO - this is causing jitters look into only changing input bools on press and release insted of every frame
+		// xen::model::process_movement(model, camera.b, w, a, s, d, deltaTime);
 		xen::model::update_vectors(model);
 
 		// background
@@ -79,7 +82,7 @@ int main(int argc, char const *argv[])
 		xen::window::bg(0.1f, 0.1f, 0.1f, 1.0f);
 
 		// render matrices
-		jobSys.push_job([&]{ viewMatrix = xen::camera::view_matrix(camera); });
+	    jobSys.push_job([&]{ viewMatrix = xen::camera::view_matrix(camera); });
 		jobSys.push_job([&]{ projectionMatrix = xen::window::projection_matrix(window, 55.0f); });
 		jobSys.push_job([&]{ modelMatrix = xen::model::model_matrix(model); });
 
