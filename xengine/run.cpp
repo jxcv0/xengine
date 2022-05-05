@@ -17,14 +17,11 @@
 
 xen::window::Window window;
 xen::camera::Camera camera;
-xen::JobSystemMgr jobSys;
 
 bool firstMouseMovement = true;
 const float cameraAngle = 10.0f;
 const float cameraDist = 3.0f;
 const glm::vec3 worldUp(0.0f, 1.0f, 0.0f);
-
-// job system
 
 // keyboard input flags
 bool w = false;
@@ -38,7 +35,7 @@ int main(int argc, char const *argv[])
 {
 	xen::window::init(window, 1080, 600);
 	xen::window::set_cursor_position_callback(window, on_mouse);
-	jobSys.start_up(1);
+    xen::ThreadPool threadPool(2);
 
 	// model shader and model
 	auto shader = xen::shader::load("assets/shaders/model.vert", "assets/shaders/model.frag");
@@ -63,11 +60,14 @@ int main(int argc, char const *argv[])
 	{
 		// delta time 
 		float currentFrame;
-        jobSys.push_job([&]{
+        threadPool([&]{
             currentFrame = static_cast<float>(glfwGetTime());
             deltaTime = currentFrame - lastFrame;
             lastFrame = currentFrame;
         });
+        currentFrame = static_cast<float>(glfwGetTime());
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
 
 		// input
 		xen::window::esc(window);
@@ -78,13 +78,13 @@ int main(int argc, char const *argv[])
 		xen::model::update_vectors(model);
 
 		// background
-        // jobSys.push_job([]{ xen::window::bg(0.1f, 0.1f, 0.1f, 1.0f); });
+        // threadPool.push_job([]{ xen::window::bg(0.1f, 0.1f, 0.1f, 1.0f); });
 		xen::window::bg(0.1f, 0.1f, 0.1f, 1.0f);
 
 		// render matrices
-	    jobSys.push_job([&]{ viewMatrix = xen::camera::view_matrix(camera); });
-		jobSys.push_job([&]{ projectionMatrix = xen::window::projection_matrix(window, 55.0f); });
-		jobSys.push_job([&]{ modelMatrix = xen::model::model_matrix(model); });
+	    threadPool([&]{ viewMatrix = xen::camera::view_matrix(camera); });
+		threadPool([&]{ projectionMatrix = xen::window::projection_matrix(window, 55.0f); });
+		threadPool([&]{ modelMatrix = xen::model::model_matrix(model); });
 
 		// shader and shader uniforms
 		xen::shader::use(shader);
@@ -113,7 +113,6 @@ int main(int argc, char const *argv[])
 		d = false;
 	}
 
-	jobSys.shut_down();
 	xen::window::terminate();
 
 	return 0;
