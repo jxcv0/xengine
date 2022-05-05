@@ -44,7 +44,7 @@ namespace xen
 			}
 		}
 
-		void terminate()
+		~ThreadPool()
 		{
             _run = false;
 			for (auto &thread : _threads)

@@ -120,7 +120,6 @@ int main(int argc, char const *argv[])
 		d = false;
 	}
     
-    threadPool.terminate();
 	xen::window::terminate();
 
 	return 0;
