@@ -35,12 +35,12 @@ int main(int argc, char const *argv[])
 {
 	xen::window::init(window, 1080, 600);
 	xen::window::set_cursor_position_callback(window, on_mouse);
-    xen::ThreadPool threadPool(2);
+    xen::ThreadPool threadPool;
 
 	// model shader and model
 	auto shader = xen::shader::load("assets/shaders/model.vert", "assets/shaders/model.frag");
 	xen::model::Model model;
-	xen::model::load_model(model, "assets/models/cyborg/cyborg.obj");
+	xen::model::load(model, "assets/models/cyborg/cyborg.obj");
 	xen::model::gen_buffers(model);	// all buffer gen functions must be sequential
 	
 	// temp light
@@ -55,36 +55,43 @@ int main(int argc, char const *argv[])
 	auto projectionMatrix = xen::window::projection_matrix(window, 55.0f);
 	auto modelMatrix = xen::model::model_matrix(model);
 
+	float currentFrame = 0.0f;
+
+    // TODO - why are jobs not happening?!?!
+
 	// producer loop
 	while (!xen::window::should_close(window))
 	{
 		// delta time 
-		float currentFrame;
-        threadPool([&]{
+        threadPool.push([&]{
             currentFrame = static_cast<float>(glfwGetTime());
             deltaTime = currentFrame - lastFrame;
             lastFrame = currentFrame;
         });
-        currentFrame = static_cast<float>(glfwGetTime());
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
+        
+		xen::window::esc(window);
+		xen::window::processKeyInput(window, w, a, s, d);
+
+        threadPool.push([&]{ xen::camera::update_aim(camera, cameraAngle, cameraDist, 0.0f, 0.0f, 0.1f); });
 
 		// input
 		xen::window::esc(window);
 		xen::window::processKeyInput(window, w, a, s, d);
 
         // TODO - this is causing jitters look into only changing input bools on press and release insted of every frame
-		// xen::model::process_movement(model, camera.b, w, a, s, d, deltaTime);
+		// threadPool.push([&]{ xen::model::process_movement(model, camera.b, w, a, s, d, deltaTime); });
+		// threadPool.push([&]{ xen::model::update_vectors(model); });
+		xen::model::process_movement(model, camera.b, w, a, s, d, deltaTime);
 		xen::model::update_vectors(model);
 
 		// background
-        // threadPool.push_job([]{ xen::window::bg(0.1f, 0.1f, 0.1f, 1.0f); });
-		xen::window::bg(0.1f, 0.1f, 0.1f, 1.0f);
+        // TODO - why does this not work with threadpool();
+        xen::window::bg(0.1f, 0.1f, 0.1f, 1.0f);
 
 		// render matrices
-	    threadPool([&]{ viewMatrix = xen::camera::view_matrix(camera); });
-		threadPool([&]{ projectionMatrix = xen::window::projection_matrix(window, 55.0f); });
-		threadPool([&]{ modelMatrix = xen::model::model_matrix(model); });
+	    threadPool.push([&]{ viewMatrix = xen::camera::view_matrix(camera); });
+		threadPool.push([&]{ projectionMatrix = xen::window::projection_matrix(window, 55.0f); });
+		threadPool.push([&]{ modelMatrix = xen::model::model_matrix(model); });
 
 		// shader and shader uniforms
 		xen::shader::use(shader);
@@ -112,7 +119,8 @@ int main(int argc, char const *argv[])
 		s = false;
 		d = false;
 	}
-
+    
+    threadPool.terminate();
 	xen::window::terminate();
 
 	return 0;

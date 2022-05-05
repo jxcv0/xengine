@@ -1,7 +1,6 @@
 #ifndef JOBSYS_H
 #define JOBSYS_H
 
-#include <queue>
 #include <thread>
 #include <atomic>
 #include <vector>
@@ -18,18 +17,22 @@ namespace xen
 		{
 			for (size_t i = 0; i < nThreads; i++)
 			{
-                std::thread t([this](){
+                std::thread t([this]{
                     std::function<void(void)> job = nullptr;
-                    for(;;)
+                    while(_run)
                     {
                         std::unique_lock lk(_m);
-                        _cv.wait(lk, [this, &job]{ return !_jobs.empty() || _run; });
-                        if (!_run) { return; }
-                        if (_jobs.empty()) { return; }
-                        job = _jobs.front();
-                        _jobs.pop();
+                        _cv.wait(lk);
+
+                        if (!_jobs.empty())
+                        {
+                            job = _jobs.front();
+                            _jobs.erase(_jobs.begin());
+                        }
+
                         lk.unlock();
                         _cv.notify_one();
+
                         if (job)
                         {
                             job();
@@ -41,29 +44,31 @@ namespace xen
 			}
 		}
 
-		~ThreadPool()
+		void terminate()
 		{
-			_run = false;
+            _run = false;
 			for (auto &thread : _threads)
 			{
+                _cv.notify_all();
 				thread.join();
 			}
+            _threads.clear();
 		}
 
-        // push a job to the back of the jobsystem
-		void operator() (const std::function<void(void)> job)
+        // TODO - return value would be nice
+		void push(const std::function<void(void)> job)
 		{
             {
                 std::lock_guard lk(_m);
-                _jobs.push(job);
+                _jobs.push_back(job);
             }
             _cv.notify_one();
 		}
 
 	private:
+        std::atomic<bool> _run = true;
 		std::vector<std::thread> _threads;
-		std::atomic<bool> _run = true;
-		std::queue<std::function<void(void)>> _jobs;
+		std::vector<std::function<void(void)>> _jobs;
         std::mutex _m;
         std::condition_variable _cv;
 	};

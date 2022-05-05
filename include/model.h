@@ -265,7 +265,7 @@ namespace xen::model
 	}
 
 	// load a model from a file
-	void load_model(Model &model, const char* filepath)
+	void load(Model &model, const char* filepath)
 	{
 		std::string dir(filepath);
 		dir = dir.substr(0, dir.find_last_of('/'));
