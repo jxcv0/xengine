@@ -7,10 +7,10 @@
 #include <mutex>
 #include <condition_variable>
 #include <functional>
+#include <type_traits>
 
 namespace xen
 {
-	// singleton job system manager
 	struct ThreadPool
 	{
         ThreadPool(size_t nThreads = std::thread::hardware_concurrency())
@@ -56,7 +56,9 @@ namespace xen
 		}
 
         // TODO - return value would be nice
-		void push(const std::function<void(void)> job)
+        // job struct with ptr to return addr?
+        template<typename Callable>
+		void push(Callable job)
 		{
             {
                 std::lock_guard lk(_m);
