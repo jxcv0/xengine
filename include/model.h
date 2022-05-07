@@ -328,26 +328,22 @@ namespace xen::model
 		}
 	}
 
-	// draw a mesh using a shader program
-	// this function assumes each mesh only has one diffuse, specular and normal map
-	void draw(Mesh &mesh, unsigned int shader)
-	{
-		for (int i = 0; i < mesh.textures.size(); i++)
-		{
-			glActiveTexture(GL_TEXTURE0 + i);
-			xen::shader::set_uniform(shader, mesh.textures[i].uniformName.c_str(), i);
-			glBindTexture(GL_TEXTURE_2D, mesh.textures[i].id);
-		}
-		glBindVertexArray(mesh.VAO);
-		glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(mesh.indices.size()), GL_UNSIGNED_INT, 0);
-		glBindVertexArray(0);
-		glActiveTexture(GL_TEXTURE0);
-	}
-
 	// draw all meshes in a model using a single shader program
 	void draw(Model& model, unsigned int shader)
 	{
-		for (auto &mesh : model.meshes) { draw(mesh, shader); }
+		for (auto &mesh : model.meshes)
+        {
+            for (int i = 0; i < mesh.textures.size(); i++)
+            {
+                glActiveTexture(GL_TEXTURE0 + i);
+                xen::shader::set_uniform(shader, mesh.textures[i].uniformName.c_str(), i);
+                glBindTexture(GL_TEXTURE_2D, mesh.textures[i].id);
+            }
+            glBindVertexArray(mesh.VAO);
+            glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(mesh.indices.size()), GL_UNSIGNED_INT, 0);
+            glBindVertexArray(0);
+            glActiveTexture(GL_TEXTURE0);
+        }
 	}
 
 	// generate model matrix based on model position

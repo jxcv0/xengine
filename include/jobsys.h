@@ -49,16 +49,13 @@ namespace xen
             _run = false;
 			for (auto &thread : _threads)
 			{
-                _cv.notify_all();
+                _cv.notify_one();
 				thread.join();
 			}
             _threads.clear();
 		}
 
-        // TODO - return value would be nice
-        // job struct with ptr to return addr?
-        template<typename Callable>
-		void push(Callable job)
+		void push(std::function<void(void)>job)
 		{
             {
                 std::lock_guard lk(_m);

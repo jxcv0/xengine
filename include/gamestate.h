@@ -3,6 +3,10 @@
 
 namespace xen::state
 {
+    struct Input
+    {
+    };
+
     struct GameState
     {
         float currentTime;

@@ -15,7 +15,6 @@
 #include "shader.h"
 #include "light.h"
 
-xen::window::Window window;
 xen::camera::Camera camera;
 
 bool firstMouseMovement = true;
@@ -33,8 +32,8 @@ void on_mouse(GLFWwindow *window, double xPosIn, double yPosIn);
 
 int main(int argc, char const *argv[])
 {
-	xen::window::init(window, 1080, 600);
-	xen::window::set_cursor_position_callback(window, on_mouse);
+    xen::Window window(1080, 600);
+	window.set_cursor_position_callback(on_mouse);
     xen::ThreadPool threadPool;
 
 	// model shader and model
@@ -52,7 +51,7 @@ int main(int argc, char const *argv[])
 
 	xen::camera::update_aim(camera, cameraAngle, cameraDist, 0.0f, 0.0f, 0.1f);
 	auto viewMatrix = xen::camera::view_matrix(camera);
-	auto projectionMatrix = xen::window::projection_matrix(window, 55.0f);
+	auto projectionMatrix = window.projection_matrix(55.0f);
 	auto modelMatrix = xen::model::model_matrix(model);
 
 	float currentFrame = 0.0f;
@@ -60,8 +59,10 @@ int main(int argc, char const *argv[])
     // TODO - why are jobs not happening?!?!
 
 	// producer loop
-	while (!xen::window::should_close(window))
+	while (!window.should_close())
 	{
+        window.clear();
+
 		// delta time 
         threadPool.push([&]{
             currentFrame = static_cast<float>(glfwGetTime());
@@ -69,28 +70,18 @@ int main(int argc, char const *argv[])
             lastFrame = currentFrame;
         });
         
-		xen::window::esc(window);
-		xen::window::processKeyInput(window, w, a, s, d);
-
+        // TODO - this depends on input!!
         threadPool.push([&]{ xen::camera::update_aim(camera, cameraAngle, cameraDist, 0.0f, 0.0f, 0.1f); });
 
 		// input
-		xen::window::esc(window);
-		xen::window::processKeyInput(window, w, a, s, d);
+		threadPool.push([&]{ window.processKeyInput(w, a, s, d); });
 
-        // TODO - this is causing jitters look into only changing input bools on press and release insted of every frame
-		// threadPool.push([&]{ xen::model::process_movement(model, camera.b, w, a, s, d, deltaTime); });
-		// threadPool.push([&]{ xen::model::update_vectors(model); });
-		xen::model::process_movement(model, camera.b, w, a, s, d, deltaTime);
-		xen::model::update_vectors(model);
-
-		// background
-        // TODO - why does this not work with threadpool();
-        xen::window::bg(0.1f, 0.1f, 0.1f, 1.0f);
+		threadPool.push([&]{ xen::model::process_movement(model, camera.b, w, a, s, d, deltaTime); });
+		threadPool.push([&]{ xen::model::update_vectors(model); });
 
 		// render matrices
 	    threadPool.push([&]{ viewMatrix = xen::camera::view_matrix(camera); });
-		threadPool.push([&]{ projectionMatrix = xen::window::projection_matrix(window, 55.0f); });
+		threadPool.push([&]{ projectionMatrix = window.projection_matrix(55.0f); });
 		threadPool.push([&]{ modelMatrix = xen::model::model_matrix(model); });
 
 		// shader and shader uniforms
@@ -110,18 +101,11 @@ int main(int argc, char const *argv[])
 
 		// TODO - texture uniforms are assigned when loading, should all uniforms be in the same place?
 		xen::model::draw(model, shader);
-		xen::window::swap_and_poll(window);
+		window.swap_and_poll();
 
 		checkerr();
-
-		w = false;
-		a = false;
-		s = false;
-		d = false;
 	}
     
-	xen::window::terminate();
-
 	return 0;
 }
 
