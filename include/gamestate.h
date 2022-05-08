@@ -3,6 +3,7 @@
 
 namespace xen
 {
+    // interprets input bits
     struct Input
     {
         // set the input bits

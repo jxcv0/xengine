@@ -30,7 +30,7 @@ int main(int argc, char const *argv[])
     xen::Window window(1080, 600);
     xen::Input input;
 	window.set_cursor_position_callback(on_mouse);
-    xen::ThreadPool threadPool;
+    xen::ThreadPool threadPool(6);
 
 
 	// model shader and model
@@ -52,8 +52,6 @@ int main(int argc, char const *argv[])
 	auto modelMatrix = xen::model::model_matrix(model);
 
 	float currentFrame = 0.0f;
-
-    // TODO - why are jobs not happening?!?!
 
 	// producer loop
 	while (!window.should_close())

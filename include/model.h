@@ -67,6 +67,7 @@ namespace xen::model
 
 	// update model position based on key press
 	// assumes local y == global y
+    // templated so that "gamestate.h" or "window.h" do not need to be #included
     template<typename Input>
 	void process_movement(Model &model, float forward, Input &in, float deltaTime)
 	{
@@ -86,6 +87,7 @@ namespace xen::model
 				model.b -= forward;
 				return;
 			}
+
 			model.b = 0.0f;
 			model.b -= forward;
 			return;
@@ -106,6 +108,7 @@ namespace xen::model
 				model.b -= forward;
 				return;
 			}
+
 			model.b = 180.0f;
 			model.b -= forward;
 			return;

@@ -8,6 +8,7 @@
 #define INPUT_A 	0x0002 // bit 1
 #define INPUT_S 	0x0004 // bit 2
 #define INPUT_D 	0x0008 // bit 3
+
 #define INPUT_SPC   0x0010 // bit 4
 #define INPUT_SHFT  0x0020 // bit 5
 #define INPUT_CTRL  0x0040 // bit 6
