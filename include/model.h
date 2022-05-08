@@ -52,11 +52,11 @@ namespace xen::model
 	// TODO animations
 	struct Model
 	{
-		glm::vec3 position = glm::vec3(0.0f);			// position of model in world space - default to world 0, 0, 0
+		glm::vec3 position = glm::vec3(0.0f);			    // position of model in world space - default to world 0, 0, 0
 		const glm::vec3 y = glm::vec3(0.0f, 1.0f, 0.0f);
-		glm::vec3 z;						// local z axis (front)
-		float b = 0.0f;						// rotation about global y axis (up)
-		std::vector<Mesh> meshes;				// the meshes comprising the model
+		glm::vec3 z;						                // local z axis (front)
+		float b = 0.0f;						                // rotation about global y axis (up)
+		std::vector<Mesh> meshes;				            // the meshes comprising the model
 	};
 	
 	// update model rotation about local y
@@ -67,19 +67,20 @@ namespace xen::model
 
 	// update model position based on key press
 	// assumes local y == global y
-	void process_movement(Model &model, float forward, bool w, bool a, bool s, bool d, float deltaTime)
-	{		
+    template<typename Input>
+	void process_movement(Model &model, float forward, Input &in, float deltaTime)
+	{
 		forward -= 90.0f;
-		if (w)
+		if (in.forward())
 		{
-			if (a) 
+			if (in.left()) 
 			{
 				model.b = 45.0f;
 				model.b -= forward;
 				return;
 			};
 
-			if (d)
+			if (in.right())
 			{
 				model.b = 315.0f;
 				model.b -= forward;
@@ -90,16 +91,16 @@ namespace xen::model
 			return;
 		}
 		
-		if (s)
+		if (in.backward())
 		{
-			if (a) 
+			if (in.left()) 
 			{
 				model.b = 135.0f;
 				model.b -= forward;
 				return;
 			};
 
-			if (d)
+			if (in.right())
 			{
 				model.b = 225.0f;
 				model.b -= forward;
@@ -110,14 +111,14 @@ namespace xen::model
 			return;
 		}
 
-		if (a)
+		if (in.left())
 		{
 			model.b = 90.0f;
 			model.b -= forward;
 			return;
 		}
 
-		if (d)
+		if (in.right())
 		{
 			model.b = 270.0f;
 			model.b -= forward;

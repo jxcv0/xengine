@@ -7,6 +7,7 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
+#include "gamestate.h"
 #include "jobsys.h"
 #include "checkerr.h"
 #include "model.h"
@@ -22,19 +23,15 @@ const float cameraAngle = 10.0f;
 const float cameraDist = 3.0f;
 const glm::vec3 worldUp(0.0f, 1.0f, 0.0f);
 
-// keyboard input flags
-bool w = false;
-bool a = false;
-bool s = false;
-bool d = false;
-
 void on_mouse(GLFWwindow *window, double xPosIn, double yPosIn);
 
 int main(int argc, char const *argv[])
 {
     xen::Window window(1080, 600);
+    xen::Input input;
 	window.set_cursor_position_callback(on_mouse);
     xen::ThreadPool threadPool;
+
 
 	// model shader and model
 	auto shader = xen::shader::load("assets/shaders/model.vert", "assets/shaders/model.frag");
@@ -74,10 +71,11 @@ int main(int argc, char const *argv[])
         threadPool.push([&]{ xen::camera::update_aim(camera, cameraAngle, cameraDist, 0.0f, 0.0f, 0.1f); });
 
 		// input
-		threadPool.push([&]{ window.processKeyInput(w, a, s, d); });
-
-		threadPool.push([&]{ xen::model::process_movement(model, camera.b, w, a, s, d, deltaTime); });
-		threadPool.push([&]{ xen::model::update_vectors(model); });
+		threadPool.push([&]{
+            auto inputBits = window.get_input();
+            input.set(inputBits); xen::model::process_movement(model, camera.b, input, deltaTime);
+            xen::model::update_vectors(model);
+        });
 
 		// render matrices
 	    threadPool.push([&]{ viewMatrix = xen::camera::view_matrix(camera); });
@@ -104,6 +102,7 @@ int main(int argc, char const *argv[])
 		window.swap_and_poll();
 
 		checkerr();
+        input.clear();
 	}
     
 	return 0;

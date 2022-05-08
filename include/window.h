@@ -4,8 +4,6 @@
 #include <glad.h>
 #include <GLFW/glfw3.h>
 
-#include "jobsys.h"
-
 #define INPUT_W 	0x0001 // bit 0
 #define INPUT_A 	0x0002 // bit 1
 #define INPUT_S 	0x0004 // bit 2
@@ -54,6 +52,11 @@ namespace xen
             glCullFace(GL_BACK);
         }
 
+        ~Window()
+        {
+            this->terminate();
+        }
+
         // check if glfw has recieved a signal to close
         bool should_close()
         {
@@ -72,6 +75,24 @@ namespace xen
         {
             glfwSwapBuffers(_ptr);
             glfwPollEvents();
+        }
+
+        // get the input from the window
+        short get_input()
+        {
+            short inputBits = 0x0;
+
+            if(glfwGetKey(_ptr, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+            {
+                glfwSetWindowShouldClose(_ptr, true);
+            }
+
+            if(glfwGetKey(_ptr, GLFW_KEY_W) == GLFW_PRESS) { inputBits = inputBits | INPUT_W; }
+            if(glfwGetKey(_ptr, GLFW_KEY_A) == GLFW_PRESS) { inputBits = inputBits | INPUT_A; }
+            if(glfwGetKey(_ptr, GLFW_KEY_S) == GLFW_PRESS) { inputBits = inputBits | INPUT_S; }
+            if(glfwGetKey(_ptr, GLFW_KEY_D) == GLFW_PRESS) { inputBits = inputBits | INPUT_D; }
+
+            return inputBits;
         }
 
         // process keyboard input

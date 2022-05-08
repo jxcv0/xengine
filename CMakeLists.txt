@@ -19,6 +19,7 @@ find_package(assimp REQUIRED)
 
 set(
   SOURCES 
+    include/gamestate.h
     include/alloc.h
     include/light.h
     include/model.h
