@@ -27,10 +27,10 @@ namespace xen::camera
 	}
 
 	// update camera vectors with mouse position
-	void update_aim(Camera &camera, float x, float y)
+	void update_aim(Camera &camera, float x, float y, float sensetivity)
 	{
-		camera.a += y;
-		camera.b += x;
+		camera.a += y * sensetivity;
+		camera.b += x * sensetivity;
 
 		if (camera.a > 89.0f) { camera.a = 89.0f; };
 		if (camera.a < -89.0f) { camera.a = -89.0f; };

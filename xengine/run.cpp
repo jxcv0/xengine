@@ -23,6 +23,13 @@ const float cameraAngle = 10.0f;
 const float cameraDist = 3.0f;
 const glm::vec3 worldUp(0.0f, 1.0f, 0.0f);
 
+void test_job(void* data)
+{
+    xen::model::Model *model = static_cast<xen::model::Model*>(data);
+    xen::model::update_vectors(*model);
+    model->matrix = xen::model::model_matrix(*model);
+}
+
 void on_mouse(GLFWwindow *window, double xPosIn, double yPosIn);
 
 int main(int argc, char const *argv[])
@@ -31,13 +38,13 @@ int main(int argc, char const *argv[])
     xen::Input input;
 	window.set_cursor_position_callback(on_mouse);
     // xen::ThreadPool<std::function<void(void)>> threadPool(1);
-    xen::ThreadPool<std::function<void(void)>> threadPool(1);
+    xen::ThreadPool threadPool(1);
 
     // models
 	auto shader = xen::shader::load("assets/shaders/model.vert", "assets/shaders/model.frag");
 
     std::vector<xen::model::Model> models;
-    for(size_t i = 0; i < 20; i++)
+    for (size_t i = 0; i < 5; i++)
     {
         xen::model::Model model;
         model.position.x = i * 4;
@@ -98,12 +105,10 @@ int main(int argc, char const *argv[])
 		// TODO - texture uniforms are assigned when loading, should all uniforms be in the same place?
 		// xen::model::draw(model, shader);
 
-        for (auto &m : models)
+        for (size_t i = 0; i < models.size(); i++)
         {
-            threadPool.push([&]{
-                xen::model::update_vectors(m);
-                m.matrix = xen::model::model_matrix(m);
-            });
+            // threadPool.push(xen::Job{test_job, (void*)&models[i]});
+            threadPool.push(test_job, (void*)&models[i]);
         }
 
         // TODO - this is the kind of thing that should be set to the render thread
@@ -138,6 +143,6 @@ void on_mouse(GLFWwindow *window, double xPosIn, double yPosIn)
 	camera.xLast = xPos;
 	camera.yLast = yPos;
 
-    xen::camera::update_aim(camera, xOffset, yOffset);
+    xen::camera::update_aim(camera, xOffset, yOffset, 0.1f);
 	// xen::camera::update_aim(camera, cameraAngle, cameraDist, xOffset, yOffset, 0.1f);
 }

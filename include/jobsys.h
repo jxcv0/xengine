@@ -6,17 +6,21 @@
 #include <vector>
 #include <mutex>
 #include <condition_variable>
-#include <functional>
-#include <type_traits>
+#include <future>
 
 namespace xen
 {
-    // TODO
-    // get rid of std::function<>
+    struct Job
+    {
+        void operator()(){ func(data); }
+        void (*func)(void*);
+        void* data;
+    };
 
-    template<typename FuncType>
 	struct ThreadPool
 	{
+
+        // constructor
         ThreadPool(size_t nThreads = std::thread::hardware_concurrency())
 		{
 			for (size_t i = 0; i < nThreads; i++)
@@ -24,7 +28,7 @@ namespace xen
                 std::thread t([this]{
                     while(_run)
                     {
-                        FuncType job;
+                        Job job;
                         std::unique_lock lk(_m);
                         _cv.wait(lk);
 
@@ -43,6 +47,7 @@ namespace xen
 			}
 		}
 
+        // destructor
 		~ThreadPool()
 		{
             _run = false;
@@ -54,7 +59,8 @@ namespace xen
             _threads.clear();
 		}
 
-		void push(FuncType job)
+        // kick a job
+		void push(Job job)
 		{
             {
                 std::lock_guard lk(_m);
@@ -63,10 +69,16 @@ namespace xen
             _cv.notify_one();
 		}
 
+        // kick a job
+		void push(void(*func)(void*), void* data)
+		{
+            push(Job{func, data});
+		}
+
 	private:
         std::atomic<bool> _run = true;
 		std::vector<std::thread> _threads;
-		std::vector<FuncType> _jobs;
+		std::vector<Job> _jobs;
         std::mutex _m;
         std::condition_variable _cv;
 	};
