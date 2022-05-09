@@ -30,14 +30,20 @@ int main(int argc, char const *argv[])
     xen::Window window(1080, 600);
     xen::Input input;
 	window.set_cursor_position_callback(on_mouse);
-    xen::ThreadPool threadPool(6);
+    xen::ThreadPool threadPool(1);
 
-
-	// model shader and model
+    // models
 	auto shader = xen::shader::load("assets/shaders/model.vert", "assets/shaders/model.frag");
-	xen::model::Model model;
-	xen::model::load(model, "assets/models/cyborg/cyborg.obj");
-	xen::model::gen_buffers(model);	// all buffer gen functions must be sequential
+
+    std::vector<xen::model::Model> models;
+    for(size_t i = 0; i < 20; i++)
+    {
+        xen::model::Model model;
+        model.position.x = i * 2;
+        xen::model::load(model, "assets/models/cyborg/cyborg.obj");
+        xen::model::gen_buffers(model);	// all buffer gen functions must be sequential
+        models.push_back(model);
+    }
 	
 	// temp light
 	xen::Light light;
@@ -49,46 +55,47 @@ int main(int argc, char const *argv[])
 	xen::camera::update_aim(camera, cameraAngle, cameraDist, 0.0f, 0.0f, 0.1f);
 	auto viewMatrix = xen::camera::view_matrix(camera);
 	auto projectionMatrix = window.projection_matrix(55.0f);
-	auto modelMatrix = xen::model::model_matrix(model);
 
 	float currentFrame = 0.0f;
 
-	// producer loop
+    // TODO - threadpool needs to synchronize dependant tasks:
+    // for (auto &model : scene.models)
+    // {
+    //      threadPool.push([&]{ xen::render(model); });
+    // }
+    // renderThread.notify();
+
+    // TODO
+    // producer thread synchronizes pushed work and synchronizes dependant tasks
 	while (!window.should_close())
 	{
         window.clear();
 
-		// delta time 
-        threadPool.push([&]{
-            currentFrame = static_cast<float>(glfwGetTime());
-            deltaTime = currentFrame - lastFrame;
-            lastFrame = currentFrame;
-        });
+        currentFrame = static_cast<float>(glfwGetTime());
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
         
-        // TODO - this depends on input!!
-        threadPool.push([&]{ xen::camera::update_aim(camera, cameraAngle, cameraDist, 0.0f, 0.0f, 0.1f); });
+       // xen::camera::update_aim(camera, cameraAngle, cameraDist, 0.0f, 0.0f, 0.1f);
 
-		// input
-		threadPool.push([&]{
-            auto inputBits = window.get_input();
-            input.set(inputBits); xen::model::process_movement(model, camera.b, input, deltaTime);
-            xen::model::update_vectors(model);
-        });
+       // input
+        auto inputBits = window.get_input();
+        input.set(inputBits);
+        // xen::model::process_movement(model, camera.b, input, deltaTime);
+        // xen::model::update_vectors(model);
 
 		// render matrices
-	    threadPool.push([&]{ viewMatrix = xen::camera::view_matrix(camera); });
-		threadPool.push([&]{ projectionMatrix = window.projection_matrix(55.0f); });
-		threadPool.push([&]{ modelMatrix = xen::model::model_matrix(model); });
+        xen::camera::process_movement(camera, input, deltaTime);
+        viewMatrix = xen::camera::view_matrix(camera);
+        projectionMatrix = window.projection_matrix(55.0f);
 
 		// shader and shader uniforms
 		xen::shader::use(shader);
 		xen::shader::set_uniform(shader, "view", viewMatrix);
-		xen::shader::set_uniform(shader, "model", modelMatrix);
 		xen::shader::set_uniform(shader, "projection", projectionMatrix);
 
 		// light
 		xen::shader::set_uniform(shader, "viewPosition", camera.position);
-		xen::shader::set_uniform(shader, "shininess", 32.0f);
+		xen::shader::set_uniform(shader, "shininess", 16.0f);
 		xen::shader::set_uniform(shader, "light.position", light.position);
 		xen::shader::set_uniform(shader, "light.colour", light.colour);
 		xen::shader::set_uniform(shader, "light.constant", light.constant);
@@ -96,13 +103,22 @@ int main(int argc, char const *argv[])
 		xen::shader::set_uniform(shader, "light.quadratic", light.quadratic);
 
 		// TODO - texture uniforms are assigned when loading, should all uniforms be in the same place?
-		xen::model::draw(model, shader);
-		window.swap_and_poll();
+		// xen::model::draw(model, shader);
+        // does this segfault because opengl does not like multithreading?
+        for (auto &m : models)
+        {
+            threadPool.push([&]{
+                xen::model::update_vectors(m);
+                auto modelMatrix = xen::model::model_matrix(m);
+                xen::shader::set_uniform(shader, "model", modelMatrix);
+                xen::model::draw(m, shader);
+            });
+        }
 
+		window.swap_and_poll();
 		checkerr();
         input.clear();
 	}
-    
 	return 0;
 }
 
@@ -123,5 +139,6 @@ void on_mouse(GLFWwindow *window, double xPosIn, double yPosIn)
 	camera.xLast = xPos;
 	camera.yLast = yPos;
 
-	xen::camera::update_aim(camera, cameraAngle, cameraDist, xOffset, yOffset, 0.1f);
+    xen::camera::update_aim(camera, xOffset, yOffset);
+	// xen::camera::update_aim(camera, cameraAngle, cameraDist, xOffset, yOffset, 0.1f);
 }

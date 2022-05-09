@@ -65,13 +65,14 @@ namespace xen::camera
 	}
 
 	// update camera position based on key press / character movement flags
-	void process_movement(Camera &camera, bool w, bool a, bool s, bool d, float deltaTime)
+    template<typename Input>
+	void process_movement(Camera &camera, Input in, float deltaTime)
 	{
 		float velocity = 2.5f * deltaTime;
-		if (w) { camera.position += camera.z * velocity; }
-		if (s) { camera.position -= camera.z * velocity; }
-		if (a) { camera.position -= camera.x * velocity; }
-		if (d) { camera.position += camera.x * velocity; }
+		if (in.forward()) { camera.position += camera.z * velocity; }
+		if (in.backward()) { camera.position -= camera.z * velocity; }
+		if (in.left()) { camera.position -= camera.x * velocity; }
+		if (in.right()) { camera.position += camera.x * velocity; }
 	}
 } // namespace xen::camera
 
