@@ -11,6 +11,10 @@
 
 namespace xen
 {
+    // TODO
+    // get rid of std::function<>
+
+    template<typename FuncType>
 	struct ThreadPool
 	{
         ThreadPool(size_t nThreads = std::thread::hardware_concurrency())
@@ -18,9 +22,9 @@ namespace xen
 			for (size_t i = 0; i < nThreads; i++)
 			{
                 std::thread t([this]{
-                    std::function<void(void)> job = nullptr;
                     while(_run)
                     {
+                        FuncType job;
                         std::unique_lock lk(_m);
                         _cv.wait(lk);
 
@@ -32,12 +36,7 @@ namespace xen
 
                         lk.unlock();
                         _cv.notify_one();
-
-                        if (job)
-                        {
-                            job();
-                            job = nullptr;
-                        }
+                        job();
                     }
                 });
                 _threads.push_back(std::move(t));
@@ -55,7 +54,7 @@ namespace xen
             _threads.clear();
 		}
 
-		void push(std::function<void(void)>job)
+		void push(FuncType job)
 		{
             {
                 std::lock_guard lk(_m);
@@ -67,10 +66,11 @@ namespace xen
 	private:
         std::atomic<bool> _run = true;
 		std::vector<std::thread> _threads;
-		std::vector<std::function<void(void)>> _jobs;
+		std::vector<FuncType> _jobs;
         std::mutex _m;
         std::condition_variable _cv;
 	};
+    
 } // namespace xen
 
 #endif // JOBSYS_H

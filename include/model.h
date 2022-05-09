@@ -57,6 +57,7 @@ namespace xen::model
 		glm::vec3 z;						                // local z axis (front)
 		float b = 0.0f;						                // rotation about global y axis (up)
 		std::vector<Mesh> meshes;				            // the meshes comprising the model
+        glm::mat4 matrix;
 	};
 	
 	// update model rotation about local y

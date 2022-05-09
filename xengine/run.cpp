@@ -30,7 +30,8 @@ int main(int argc, char const *argv[])
     xen::Window window(1080, 600);
     xen::Input input;
 	window.set_cursor_position_callback(on_mouse);
-    xen::ThreadPool threadPool(1);
+    // xen::ThreadPool<std::function<void(void)>> threadPool(1);
+    xen::ThreadPool<std::function<void(void)>> threadPool(1);
 
     // models
 	auto shader = xen::shader::load("assets/shaders/model.vert", "assets/shaders/model.frag");
@@ -39,7 +40,7 @@ int main(int argc, char const *argv[])
     for(size_t i = 0; i < 20; i++)
     {
         xen::model::Model model;
-        model.position.x = i * 2;
+        model.position.x = i * 4;
         xen::model::load(model, "assets/models/cyborg/cyborg.obj");
         xen::model::gen_buffers(model);	// all buffer gen functions must be sequential
         models.push_back(model);
@@ -58,15 +59,7 @@ int main(int argc, char const *argv[])
 
 	float currentFrame = 0.0f;
 
-    // TODO - threadpool needs to synchronize dependant tasks:
-    // for (auto &model : scene.models)
-    // {
-    //      threadPool.push([&]{ xen::render(model); });
-    // }
-    // renderThread.notify();
-
-    // TODO
-    // producer thread synchronizes pushed work and synchronizes dependant tasks
+    // TODO producer thread synchronizes pushed work and synchronizes dependant tasks
 	while (!window.should_close())
 	{
         window.clear();
@@ -104,15 +97,21 @@ int main(int argc, char const *argv[])
 
 		// TODO - texture uniforms are assigned when loading, should all uniforms be in the same place?
 		// xen::model::draw(model, shader);
-        // does this segfault because opengl does not like multithreading?
+
         for (auto &m : models)
         {
             threadPool.push([&]{
                 xen::model::update_vectors(m);
-                auto modelMatrix = xen::model::model_matrix(m);
-                xen::shader::set_uniform(shader, "model", modelMatrix);
-                xen::model::draw(m, shader);
+                m.matrix = xen::model::model_matrix(m);
             });
+        }
+
+        // TODO - this is the kind of thing that should be set to the render thread
+        // OpenGL calls must be single threaded
+        for (auto &m : models)
+        {
+            xen::shader::set_uniform(shader, "model", m.matrix);
+            xen::model::draw(m, shader);
         }
 
 		window.swap_and_poll();
