@@ -359,11 +359,12 @@ namespace xen::model
 	}
 
     // jobbed update model
-    void update_model_job(void* data)
+    void* update_model_job(void* data)
     {
         xen::model::Model *model = static_cast<xen::model::Model*>(data);
         xen::model::update_vectors(*model);
         model->matrix = xen::model::model_matrix(*model);
+        return nullptr;
     }
 } //namespace xen::model
 

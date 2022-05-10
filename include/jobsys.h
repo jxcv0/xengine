@@ -1,27 +1,25 @@
 #ifndef JOBSYS_H
 #define JOBSYS_H
 
-#include <thread>
-#include <atomic>
-#include <vector>
-#include <mutex>
-#include <condition_variable>
+#include <pthread.h>
 
 #define JOBSYS_DEBUG
-#define CIRCULAR_BUFFER_SIZE 256
+#define JOBSYS_CIRCULAR_BUFFER_SIZE 256
+#define JOBSYS_NTHREADS 4
 
 // singleton job system
 namespace xen::jobsys
 {
-    std::atomic<bool> _run = true;
-    std::vector<std::thread> _threads;
-    std::mutex _m;
-    std::condition_variable _cv;
+    bool _run = true; // does not need to be atomic for single producer
+    pthread_t _threads[JOBSYS_NTHREADS];
+    int _threadRet[JOBSYS_NTHREADS];
+    pthread_mutex_t _m;
+    pthread_cond_t _cv;
 
     // struct for storing job function and data
     struct Job
     {
-        void (*func)(void*);
+        void* (*func)(void*);
         void* data;
     };
 
@@ -31,62 +29,59 @@ namespace xen::jobsys
         inline void write(Job job)
         {
             _buffer[_write] = job;
-            _write = (_write + 1) % CIRCULAR_BUFFER_SIZE;
+            _write = (_write + 1) % JOBSYS_CIRCULAR_BUFFER_SIZE;
             size++;
-
-#ifdef JOBSYS_DEBUG
-            std::cout << "xen::jobsys::CircularWorkBuffer::write: " << _write << " on " << std::this_thread::get_id() << "\n";
-#endif
-
         }
 
         inline Job* read()
         {
             auto temp = _read;
-            _read = (_read + 1) % CIRCULAR_BUFFER_SIZE;
-
-#ifdef JOBSYS_DEBUG
-            std::cout << "xen::jobsys::CircularWorkBuffer::read: " << _read << " on " << std::this_thread::get_id() << "\n"; 
-#endif
+            _read = (_read + 1) % JOBSYS_CIRCULAR_BUFFER_SIZE;
 
             size--;
             return &_buffer[temp];
         }
 
-        unsigned int size = 0;
+        // seemed odd to allow access to size
+        auto job_count() { return size; }
+
     private:
         unsigned int _read, _write = 0;
-        Job _buffer[CIRCULAR_BUFFER_SIZE];
+        Job _buffer[JOBSYS_CIRCULAR_BUFFER_SIZE];
+        unsigned int size = 0;
     };
 
     CircularWorkBuffer _workQueue;
 
     // wait loop for each worker thread
-    void spin()
+    void* spin(void*)
     {
         while(_run)
         {
             Job *job = nullptr;
 
-            std::unique_lock lk(_m);
-            _cv.wait(lk);
+            pthread_mutex_lock(&_m);
+            pthread_cond_wait(&_cv, &_m);
 
-            if (_workQueue.size > 0) { job = _workQueue.read(); }
+            if (_workQueue.job_count() > 0) { job = _workQueue.read(); }
 
-            lk.unlock();
-            _cv.notify_one();
+            pthread_mutex_unlock(&_m);
+            pthread_cond_signal(&_cv);
 
             if (job) { job->func(job->data); }
         }
+        return nullptr;
     }
 
     // init job system
-    void init(size_t nThreads = std::thread::hardware_concurrency())
+    void init()
     {
-        for (size_t i = 0; i < nThreads; i++)
+        for (size_t i = 0; i < JOBSYS_NTHREADS; i++)
         {
-            std::thread t(spin);
-            _threads.push_back(std::move(t));
+            pthread_create(&_threads[i], NULL, spin, (void*)0);
+#ifdef JOBSYS_DEBUG
+            std::cout << "Created thread: " << _threads[i] << "\n";
+#endif
         }
     }
 
@@ -94,26 +89,24 @@ namespace xen::jobsys
     void terminate()
     {
         _run = false;
-        for (auto &thread : _threads)
+        for (size_t i = 0; i < JOBSYS_NTHREADS; i++)
         {
-            _cv.notify_one();
-            thread.join();
+            pthread_cond_signal(&_cv);
+            pthread_join(_threads[i], NULL);
         }
-        _threads.clear();
     }
 
     // push a job to the back of the work queue
     void push(Job job)
     {
-        {
-            std::lock_guard lk(_m);
-            _workQueue.write(job);
-        }
-        _cv.notify_one();
+        pthread_mutex_lock(&_m);
+        _workQueue.write(job);
+        pthread_mutex_unlock(&_m);
+        pthread_cond_signal(&_cv);
     }
 
     // push a job to the back of the work queue
-    void push(void(*func)(void*), void* data)
+    void push(void* (*func)(void*), void* data)
     {
         push(Job{func, data});
     }
