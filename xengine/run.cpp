@@ -23,13 +23,6 @@ const float cameraAngle = 10.0f;
 const float cameraDist = 3.0f;
 const glm::vec3 worldUp(0.0f, 1.0f, 0.0f);
 
-void test_job(void* data)
-{
-    xen::model::Model *model = static_cast<xen::model::Model*>(data);
-    xen::model::update_vectors(*model);
-    model->matrix = xen::model::model_matrix(*model);
-}
-
 void on_mouse(GLFWwindow *window, double xPosIn, double yPosIn);
 
 int main(int argc, char const *argv[])
@@ -37,20 +30,18 @@ int main(int argc, char const *argv[])
     xen::Window window(1080, 600);
     xen::Input input;
 	window.set_cursor_position_callback(on_mouse);
-    // xen::ThreadPool<std::function<void(void)>> threadPool(1);
-    xen::ThreadPool threadPool(1);
+    xen::jobsys::init();
 
     // models
 	auto shader = xen::shader::load("assets/shaders/model.vert", "assets/shaders/model.frag");
 
-    std::vector<xen::model::Model> models;
+    xen::model::Model models[5];
     for (size_t i = 0; i < 5; i++)
     {
-        xen::model::Model model;
-        model.position.x = i * 4;
-        xen::model::load(model, "assets/models/cyborg/cyborg.obj");
-        xen::model::gen_buffers(model);	// all buffer gen functions must be sequential
-        models.push_back(model);
+        models[i].position.x = i * 4;
+        xen::model::load(models[i], "assets/models/cyborg/cyborg.obj");
+        xen::model::gen_buffers(models[i]);	// all buffer gen functions must be sequential
+        models[i].b =+ 180.0f; 
     }
 	
 	// temp light
@@ -102,13 +93,9 @@ int main(int argc, char const *argv[])
 		xen::shader::set_uniform(shader, "light.linear", light.linear);
 		xen::shader::set_uniform(shader, "light.quadratic", light.quadratic);
 
-		// TODO - texture uniforms are assigned when loading, should all uniforms be in the same place?
-		// xen::model::draw(model, shader);
-
-        for (size_t i = 0; i < models.size(); i++)
+        for (size_t i = 0; i < 5; i++)
         {
-            // threadPool.push(xen::Job{test_job, (void*)&models[i]});
-            threadPool.push(test_job, (void*)&models[i]);
+            xen::jobsys::push(xen::model::update_model_job, (void*)&models[i]);
         }
 
         // TODO - this is the kind of thing that should be set to the render thread
@@ -123,6 +110,8 @@ int main(int argc, char const *argv[])
 		checkerr();
         input.clear();
 	}
+
+    xen::jobsys::terminate();
 	return 0;
 }
 

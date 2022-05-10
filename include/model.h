@@ -357,6 +357,14 @@ namespace xen::model
 		auto mm = glm::translate(glm::mat4(1.0f), model.position);
 		return glm::rotate(mm, glm::radians(model.b), glm::vec3(0.0f, 1.0f, 0.0f));
 	}
+
+    // jobbed update model
+    void update_model_job(void* data)
+    {
+        xen::model::Model *model = static_cast<xen::model::Model*>(data);
+        xen::model::update_vectors(*model);
+        model->matrix = xen::model::model_matrix(*model);
+    }
 } //namespace xen::model
 
 #endif // MODEL_H
