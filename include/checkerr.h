@@ -19,8 +19,7 @@ GLenum checkerror_(const char *file, int line) {
             case GL_OUT_OF_MEMORY: error = "OUT_OF_MEMORY"; break;
             case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
         }
-            std::cout << error << " | " << file << " (" << line << ")" <<
-            "\n";
+            std::cout << error << " | " << file << " (" << line << ")" << "\n";
         }
         return errorCode;
     }
@@ -79,4 +78,14 @@ void APIENTRY gl_debug_output(
         } std::cout << "\n";
     std::cout << "\n";
 }
+
+namespace xen
+{
+    void log(const char *msg, const char *file, int line)
+    {
+        std::cout << "LOG: " << msg << " | " << file << " (" << line << ")" << "\n";
+    }
+    #define logmsg(msg) log(msg, __FILE__, __LINE__);
+} // namespace xen
+
 #endif // _CHECKERR_H_

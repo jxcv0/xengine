@@ -1,6 +1,7 @@
 #ifndef JOBSYS_H
 #define JOBSYS_H
 
+#include "checkerr.h"
 #include <pthread.h>
 
 #define JOBSYS_DEBUG
@@ -80,7 +81,8 @@ namespace xen::jobsys
         {
             pthread_create(&_threads[i], NULL, spin, (void*)0);
 #ifdef JOBSYS_DEBUG
-            std::cout << "Created thread: " << _threads[i] << "\n";
+            std::string msg("Created thread: " + std::to_string(_threads[i]));
+            logmsg(msg.c_str());
 #endif
         }
     }
