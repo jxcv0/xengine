@@ -36,14 +36,9 @@ int main(int argc, char const *argv[])
     // models
 	auto shader = xen::shader::load("assets/shaders/model.vert", "assets/shaders/model.frag");
 
-    xen::model::Model models[5];
-    for (size_t i = 0; i < 5; i++)
-    {
-        models[i].position.x = i * 4;
-        xen::model::load(models[i], "assets/models/cyborg/cyborg.obj");
-        xen::model::gen_buffers(models[i]);	// all buffer gen functions must be sequential
-        models[i].b =+ 180.0f; 
-    }
+    xen::model::Model model;
+    xen::model::load(model, "assets/models/cyborg/cyborg.obj");
+    xen::model::gen_buffers(model);	// all buffer gen functions must be sequential
 	
 	// temp light
 	xen::Light light;
@@ -59,7 +54,7 @@ int main(int argc, char const *argv[])
 	float currentFrame = 0.0f;
 
     // TODO producer thread synchronizes pushed work and synchronizes dependant tasks
-    xen::mem::StackAllocator<glm::mat4> matrixAllocator(3);
+    xen::mem::StackAllocator<glm::mat4> matrixAllocator(2);
 
 	while (!window.should_close())
 	{
@@ -69,13 +64,13 @@ int main(int argc, char const *argv[])
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         
-       // xen::camera::update_aim(camera, cameraAngle, cameraDist, 0.0f, 0.0f, 0.1f);
+       xen::camera::update_aim(camera, cameraAngle, cameraDist, 0.0f, 0.0f, 0.1f);
 
        // input
         auto inputBits = window.get_input();
         input.set(inputBits);
-        // xen::model::process_movement(model, camera.b, input, deltaTime);
-        // xen::model::update_vectors(model);
+        xen::model::process_movement(model, camera.b, input, deltaTime);
+        xen::model::update_vectors(model);
 
         xen::camera::process_movement(camera, input, deltaTime);
 
@@ -99,18 +94,15 @@ int main(int argc, char const *argv[])
 		xen::shader::set_uniform(shader, "light.linear", light.linear);
 		xen::shader::set_uniform(shader, "light.quadratic", light.quadratic);
 
-        for (size_t i = 0; i < 5; i++)
-        {
-            xen::jobsys::push(xen::model::update_model_job, (void*)&models[i]);
-        }
+        xen::jobsys::push(xen::model::update_model_job, (void*)&model);
 
         // TODO - this is the kind of thing that should be set to the render thread
         // OpenGL calls must be single threaded
-        for (auto &m : models)
-        {
-            xen::shader::set_uniform(shader, "model", m.matrix);
-            xen::model::draw(m, shader);
-        }
+        while (!viewMatrix || !projectionMatrix) { std::cout << "waiting\n"; asm("pause"); }
+
+        // render
+        xen::shader::set_uniform(shader, "model", model.matrix);
+        xen::model::draw(model, shader);
 
 		window.swap_and_poll();
 		checkerr();

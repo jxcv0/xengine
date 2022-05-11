@@ -1,5 +1,5 @@
-#ifndef _CHECKERR_H_
-#define _CHECKERR_H_
+#ifndef CHECKERR_H
+#define CHECKERR_H
 
 #include <glad.h>
 #include <GLFW/glfw3.h>
@@ -88,4 +88,4 @@ namespace xen
     #define logmsg(msg) log(msg, __FILE__, __LINE__);
 } // namespace xen
 
-#endif // _CHECKERR_H_
+#endif // CHECKERR_H
