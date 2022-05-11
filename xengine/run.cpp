@@ -64,9 +64,9 @@ int main(int argc, char const *argv[])
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         
-       xen::camera::update_aim(camera, cameraAngle, cameraDist, 0.0f, 0.0f, 0.1f);
+        xen::camera::update_aim(camera, cameraAngle, cameraDist, 0.0f, 0.0f, 0.1f);
 
-       // input
+        // input
         auto inputBits = window.get_input();
         input.set(inputBits);
         xen::model::process_movement(model, camera.b, input, deltaTime);
@@ -75,15 +75,19 @@ int main(int argc, char const *argv[])
         xen::camera::process_movement(camera, input, deltaTime);
 
 		// render matrices
-        glm::mat4 *viewMatrix = matrixAllocator.allocate(1);
-        glm::mat4 *projectionMatrix = matrixAllocator.allocate(1);
-        *viewMatrix = xen::camera::view_matrix(camera);
-        *projectionMatrix = window.projection_matrix(55.0f);
+        auto viewMatrix = xen::camera::view_matrix(camera);
+        auto projectionMatrix = window.projection_matrix(55.0f);
+
+        // this works!
+        // xen::jobsys::push([](void* c) -> void* {
+        //     auto *camera = static_cast<xen::camera::Camera*>(c);
+        //     // do things ...
+        // }, (void*)0);
 
 		// shader and shader uniforms
 		xen::shader::use(shader);
-		xen::shader::set_uniform(shader, "view", *viewMatrix);
-		xen::shader::set_uniform(shader, "projection", *projectionMatrix);
+		xen::shader::set_uniform(shader, "view", viewMatrix);
+		xen::shader::set_uniform(shader, "projection", projectionMatrix);
 
 		// light
 		xen::shader::set_uniform(shader, "viewPosition", camera.position);
@@ -98,9 +102,6 @@ int main(int argc, char const *argv[])
 
         // TODO - this is the kind of thing that should be set to the render thread
         // OpenGL calls must be single threaded
-        while (!viewMatrix || !projectionMatrix) { std::cout << "waiting\n"; asm("pause"); }
-
-        // render
         xen::shader::set_uniform(shader, "model", model.matrix);
         xen::model::draw(model, shader);
 

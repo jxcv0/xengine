@@ -2,7 +2,6 @@
 #define ALLOC_H
 
 #include "checkerr.h"
-#include <cstdlib>
 
 // #define MEM_DEBUG
 

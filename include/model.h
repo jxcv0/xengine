@@ -46,6 +46,11 @@ namespace xen::model
 		std::vector<Vertex> vertices;
 		std::vector<unsigned int> indices;
 		std::vector<Texture> textures;
+        
+        // ptrs to arrays
+        // Vertex* vertices;
+        // unsigned int* indices;
+        // Texture* textures;
 	};
 
 	// a model is a collection of meshes and the data required for generating a model matrix
@@ -58,6 +63,7 @@ namespace xen::model
 		float b = 0.0f;						                // rotation about global y axis (up)
 		std::vector<Mesh> meshes;				            // the meshes comprising the model
         glm::mat4 matrix;
+        // Mesh* meshes;
 	};
 	
 	// update model rotation about local y
@@ -158,7 +164,7 @@ namespace xen::model
 			// TODO multisampling for antiailiasing
 			glBindTexture(GL_TEXTURE_2D, texId);
 			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-			// glGenerateMipmap(GL_TEXTURE_2D);
+			glGenerateMipmap(GL_TEXTURE_2D);
 
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
