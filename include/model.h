@@ -354,8 +354,8 @@ namespace xen::model
 	// generate model matrix based on model position
 	glm::mat4 model_matrix(Model &model)
 	{
-		auto mm = glm::translate(glm::mat4(1.0f), model.position);
-		return glm::rotate(mm, glm::radians(model.b), glm::vec3(0.0f, 1.0f, 0.0f));
+		auto mat = glm::translate(glm::mat4(1.0f), model.position);
+		return glm::rotate(mat, glm::radians(model.b), glm::vec3(0.0f, 1.0f, 0.0f));
 	}
 
     // jobbed update model

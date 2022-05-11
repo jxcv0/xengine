@@ -1,110 +1,81 @@
 #ifndef ALLOC_H
 #define ALLOC_H
 
+#include "checkerr.h"
 #include <cstdlib>
-#include <mutex>
-#include <vector>
 
-#define DEBUG
+// #define MEM_DEBUG
 
-// TODO stop trying to use this pool allocater as a fix all
+#ifdef MEM_DEBUG
+#include <string>
+#endif
+
+// TODO general heap allocator
+// TODO block (SLAB/SLOB?) allocator 
+
 namespace xen::mem
 {
-    static std::mutex mpMutex;
     template<typename T>
-    struct MemoryPool
+    struct StackAllocator
     {
-        // singly linked list of free allocations
-        struct Node
+        StackAllocator(size_t n)
         {
-            Node* next;
-        };
-
-        // get the singleton MemoryPool instance static auto& get_instance()
-        static auto& get_instance()
-        {
-            static MemoryPool<T> mp;
-            if (!mp._alloc)
-            {
-                mp.prealloc();
-            }
-            return mp;
+            auto bytes = (n * sizeof(T)) + alignof(T);
+            _start = reinterpret_cast<uintptr_t>(malloc(bytes));
+            
+            // align
+            size_t mask = alignof(T) - 1;
+            assert((alignof(T) & mask) == 0); // pwr of 2
+            _start = (_start + mask) & ~mask;
+            _mkr = _start;
+            _end = _start + bytes;
         }
 
-        // get next available allocation and shift _alloc
-        T* alloc(size_t n)
+        ~StackAllocator()
         {
-            std::lock_guard lk(mpMutex);
-            if (!_alloc->next)
-            {
-                this->prealloc();
-            }
-
-            auto a = _alloc;
-            _alloc = _alloc->next;
-            return reinterpret_cast<T*>(a);
+            clear();
+            free(reinterpret_cast<void*>(_start));
         }
-
-        // return an allocation to the memory pool
-        void free(T* ptr, size_t size)
-        {
-            for (size_t i = 0; i < size; i++)
-            {
-                std::lock_guard lk(mpMutex);
-                // instert ptr back into list
-                reinterpret_cast<Node*>(ptr)->next = _alloc;
-                _alloc = reinterpret_cast<Node*>(ptr);
-            }
-        }
-
-    private:
-
-        // malloc more memory for the pool
-        void prealloc()
-        {
-            size_t allocSize = _size * sizeof(T);
-
-            Node *alloc = static_cast<Node*>(std::malloc(allocSize));
-
-            Node *n = alloc;
-            for(size_t i = 0; i < _size; i++)
-            {
-                n->next = reinterpret_cast<Node*>(reinterpret_cast<uintptr_t>(n) + sizeof(T));
-                n = n->next;
-            }
-
-            n->next = nullptr;
-            _alloc = alloc;
-            _size *= 2;
-        }
-
-        MemoryPool() {}
-        Node *_alloc = nullptr;
-        size_t _size = 1;
-    };
-
-    // allocator with pre-allocated memory chunk
-    template<typename T>
-    struct Allocator
-    {
-        typedef T value_type;
-
-        Allocator() = default;
-
-        // allocate memory from static resource
+        
         T* allocate(size_t n)
         {
-            return _mp.alloc(n);
+            auto bytes = n * sizeof(T);
+            auto temp = reinterpret_cast<void*>(_mkr);
+            _mkr += bytes;
+
+#ifdef MEM_DEBUG
+            std::string msg("alloc: " + std::to_string(_mkr));
+            logmsg(msg.c_str());
+#endif
+
+            return static_cast<T*>(temp);
         }
 
-        // deallocate memory and shift addresses
-        void deallocate(T* p, size_t n) noexcept
+        void deallocate(T* ptr)
         {
-            _mp.free(p, n);
+            _mkr = reinterpret_cast<uintptr_t>(ptr);
+
+#ifdef MEM_DEBUG
+            std::string msg("free:  " + std::to_string(_mkr));
+            logmsg(msg.c_str());
+#endif
+
+        }
+
+        void clear()
+        {
+            _mkr = _start;
+
+#ifdef MEM_DEBUG
+            std::string msg("clear: " + std::to_string(_mkr));
+            logmsg(msg.c_str());
+#endif
         }
 
     private:
-        MemoryPool<T> _mp = MemoryPool<T>::get_instance();
+        uintptr_t _start;
+        uintptr_t _end;
+        uintptr_t _mkr;
     };
 }// namespace xen::mem
 

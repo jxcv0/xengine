@@ -7,6 +7,7 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
+#include "alloc.h"
 #include "gamestate.h"
 #include "jobsys.h"
 #include "checkerr.h"
@@ -58,6 +59,8 @@ int main(int argc, char const *argv[])
 	float currentFrame = 0.0f;
 
     // TODO producer thread synchronizes pushed work and synchronizes dependant tasks
+    xen::mem::StackAllocator<glm::mat4> matrixAllocator(3);
+
 	while (!window.should_close())
 	{
         window.clear();
@@ -74,15 +77,18 @@ int main(int argc, char const *argv[])
         // xen::model::process_movement(model, camera.b, input, deltaTime);
         // xen::model::update_vectors(model);
 
-		// render matrices
         xen::camera::process_movement(camera, input, deltaTime);
-        viewMatrix = xen::camera::view_matrix(camera);
-        projectionMatrix = window.projection_matrix(55.0f);
+
+		// render matrices
+        glm::mat4 *viewMatrix = matrixAllocator.allocate(1);
+        glm::mat4 *projectionMatrix = matrixAllocator.allocate(1);
+        *viewMatrix = xen::camera::view_matrix(camera);
+        *projectionMatrix = window.projection_matrix(55.0f);
 
 		// shader and shader uniforms
 		xen::shader::use(shader);
-		xen::shader::set_uniform(shader, "view", viewMatrix);
-		xen::shader::set_uniform(shader, "projection", projectionMatrix);
+		xen::shader::set_uniform(shader, "view", *viewMatrix);
+		xen::shader::set_uniform(shader, "projection", *projectionMatrix);
 
 		// light
 		xen::shader::set_uniform(shader, "viewPosition", camera.position);
@@ -109,6 +115,7 @@ int main(int argc, char const *argv[])
 		window.swap_and_poll();
 		checkerr();
         input.clear();
+        matrixAllocator.clear();
 	}
 
     xen::jobsys::terminate();
