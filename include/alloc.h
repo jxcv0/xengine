@@ -13,68 +13,67 @@
 // TODO general heap allocator
 // TODO block (SLAB/SLOB?) allocator 
 
-inline uintptr_t align_addr(uintptr_t addr, size_t align)
-{
-    const size_t mask = align - 1;
-    assert((align & mask) == 0); // pwr of 2
-    return 
-}
-
-// Aligned allocation function. IMPORTANT: 'align'
-// must be a power of 2 (typically 4, 8 or 16).
-template<typename T>
-T* alloc_aligned(size_t n)
-{
-    auto align = alignof(T);
-    size_t nBytes = ((n * sizeof(T)) + align;
-    uintptr_t rawPtr = reinterpret_cast<uintptr_t>(nBytes);
-
-    auto mask = align - 1;
-    assert((align & mask) == 0);
-    auto alignedPtr = (rawPtr + mask) & ~mask;
-
-    // shift addr if already aligned
-    if (ptr == rawPtr) { alignedPtr += align; }
-
-    // store shift
-    ptrdiff_t shift = alignedPtr - rawPtr;
-    assert(shift > 0 && shift <= 256);
-
-    alignedPtr[-1] = static_cast<uintptr_t>(shift & 0xFF);
-    return alignedPtr;
-}
-
-void freealigned(void* pmem)
-{
-    if (pmem)
-    {
-        // convert to u8 pointer.
-        u8* palignedmem = reinterpret_cast<u8*>(pmem);
-        // extract the shift.
-        ptrdiff_t shift = palignedmem[-1];
-        if (shift == 0)
-        shift = 256;
-        // back up to the actual allocated address,
-        // and array-delete it.
-        u8* prawmem = palignedmem - shift;
-        delete[] prawmem;
-    }
-}
 
 namespace xen::mem
 {
+    using uint8 = char;
+
+    // aligned allocation
+    // stored alignment shift in unused memory for freeing later
+    template<typename T>
+    T* alloc_aligned(size_t n)
+    {
+        // alloc
+        auto align = alignof(T);
+        size_t nBytes = (n * sizeof(T)) + align;
+        uint8 *rawMem = new uint8[nBytes];
+
+        // align
+        const auto addr = reinterpret_cast<uintptr_t>(rawMem);
+
+        auto mask = align - 1;
+        assert((align & mask) == 0);
+        auto aligned = (addr + mask) & ~mask;
+
+        auto alignedMem = reinterpret_cast<uint8*>(aligned);
+
+        // shift addr if already aligned
+        if (alignedMem == rawMem) { alignedMem += align; }
+
+        // store shift
+        ptrdiff_t shift = alignedMem - rawMem;
+        assert(shift > 0 && shift <= 256);
+
+        alignedMem[-1] = static_cast<uint8>(shift & 0xFF);
+        return reinterpret_cast<T*>(alignedMem);
+    }
+
+    // fre memory using alignment shift
+    void free_aligned(void* ptr)
+    {
+        if (ptr)
+        {
+            auto p = reinterpret_cast<uint8*>(ptr);
+
+            // extract shift.
+            ptrdiff_t shift = p[-1];
+            if (shift == 0)
+            shift = 256;
+
+            // back up to the actual allocated address,
+            // and array-delete it.
+            auto rawMem = p - shift;
+            delete[] rawMem;
+        }
+    }
+
     template<typename T>
     struct StackAllocator
     {
         StackAllocator(size_t n)
         {
-            auto bytes = (n * sizeof(T)) + alignof(T);
-            _start = reinterpret_cast<uintptr_t>(malloc(bytes));
-            
-            // align
-            size_t mask = alignof(T) - 1;
-            assert((alignof(T) & mask) == 0); // pwr of 2
-            _start = (_start + mask) & ~mask;
+            size_t bytes = (n * sizeof(T)) + alignof(T);
+            _start = reinterpret_cast<uintptr_t>(alloc_aligned<T>(bytes));
             _mkr = _start;
             _end = _start + bytes;
         }
@@ -82,7 +81,7 @@ namespace xen::mem
         ~StackAllocator()
         {
             clear();
-            free(reinterpret_cast<void*>(_start));
+            free_aligned(reinterpret_cast<void*>(_start));
         }
         
         // allocate memory
