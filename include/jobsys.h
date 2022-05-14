@@ -4,19 +4,20 @@
 #include "checkerr.h"
 #include <pthread.h>
 
-#define JOBSYS_DEBUG
 #define JOBSYS_CIRCULAR_BUFFER_SIZE 256
 #define JOBSYS_NTHREADS 4
 
-// singleton job system
-namespace xen::jobsys
+namespace
 {
     bool _run = true; // does not need to be atomic for single producer
     pthread_t _threads[JOBSYS_NTHREADS];
     int _threadRet[JOBSYS_NTHREADS];
     pthread_mutex_t _m;
     pthread_cond_t _cv;
+} // namespace
 
+namespace xen::jobsys
+{
     // struct for storing job function and data
     struct Job
     {
@@ -80,7 +81,7 @@ namespace xen::jobsys
         for (size_t i = 0; i < JOBSYS_NTHREADS; i++)
         {
             pthread_create(&_threads[i], NULL, spin, (void*)0);
-#ifdef JOBSYS_DEBUG
+#ifdef XEN_DEBUG
             std::string msg("Created thread: " + std::to_string(_threads[i]));
             logmsg(msg.c_str());
 #endif

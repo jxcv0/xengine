@@ -1,3 +1,5 @@
+#define XEN_DEBUG
+
 #include <glad.h>
 #include <GLFW/glfw3.h>
 
@@ -54,7 +56,8 @@ int main(int argc, char const *argv[])
 	float currentFrame = 0.0f;
 
     // TODO producer thread synchronizes pushed work and synchronizes dependant tasks
-    xen::mem::StackAllocator<glm::mat4> matrixAllocator(2);
+    
+    // xen::mem::StackAllocator<glm::mat4> matrixAllocator(2);
 
 	while (!xen::window::should_close())
 	{
@@ -70,7 +73,6 @@ int main(int argc, char const *argv[])
         auto inputBits = xen::window::get_input();
         input.set(inputBits);
         xen::model::process_movement(model, camera.b, input, deltaTime);
-        xen::model::update_vectors(model);
 
         xen::camera::process_movement(camera, input, deltaTime);
 
@@ -97,9 +99,11 @@ int main(int argc, char const *argv[])
 		xen::shader::set_uniform(shader, "light.linear", light.linear);
 		xen::shader::set_uniform(shader, "light.quadratic", light.quadratic);
 
-        xen::jobsys::push(xen::model::update_model_job, (void*)&model);
+        // stuttering caused by this job failing to complete before calling xen::model::draw()
+        // xen::jobsys::push(xen::model::update_model_job, (void*)&model);
+        model.matrix = xen::model::model_matrix(model);
 
-        // TODO - this is the kind of thing that should be set to the render thread
+        // TODO - this is the kind of thing that should be sent to the render thread
         // OpenGL calls must be single threaded
         xen::shader::set_uniform(shader, "model", model.matrix);
         xen::model::draw(model, shader);
@@ -109,7 +113,7 @@ int main(int argc, char const *argv[])
 
 		checkerr();
         input.clear();
-        matrixAllocator.clear();
+        // matrixAllocator.clear();
 	}
 
     xen::jobsys::terminate();

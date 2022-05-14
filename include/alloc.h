@@ -3,19 +3,17 @@
 
 #include "checkerr.h"
 
-// #define MEM_DEBUG
-
-#ifdef MEM_DEBUG
+#ifdef XEN_DEBUG
 #include <string>
 #endif
 
 // TODO general heap allocator
-// TODO block (SLAB/SLOB?) allocator 
+// TODO block/pool (SLAB/SLOB?) allocator 
 
 
 namespace xen::mem
 {
-    using uint8 = char;
+    using uint8 = unsigned char;
 
     // aligned allocation
     // stored alignment shift in unused memory for freeing later
@@ -69,6 +67,7 @@ namespace xen::mem
     template<typename T>
     struct StackAllocator
     {
+        // allocate aligned memory up front
         StackAllocator(size_t n)
         {
             size_t bytes = (n * sizeof(T)) + alignof(T);
@@ -77,13 +76,14 @@ namespace xen::mem
             _end = _start + bytes;
         }
 
+        // free aligned memory
         ~StackAllocator()
         {
             clear();
             free_aligned(reinterpret_cast<void*>(_start));
         }
         
-        // allocate memory
+        // allocate from preallocated memory
         T* allocate(size_t n)
         {
             auto bytes = n * sizeof(T);
@@ -96,7 +96,7 @@ namespace xen::mem
                 exit(1);
             }
 
-#ifdef MEM_DEBUG
+#ifdef XEN_DEBUG
             std::string msg("alloc: " + std::to_string(_mkr));
             logmsg(msg.c_str());
 #endif
@@ -105,11 +105,12 @@ namespace xen::mem
         }
 
         // deallocate up to a ptr
+        // TODO pass in size_t n instead and free that many of T?
         void deallocate(T* ptr)
         {
             _mkr = reinterpret_cast<uintptr_t>(ptr);
 
-#ifdef MEM_DEBUG
+#ifdef XEN_DEBUG
             std::string msg("free:  " + std::to_string(_mkr));
             logmsg(msg.c_str());
 #endif
@@ -120,7 +121,7 @@ namespace xen::mem
         {
             _mkr = _start;
 
-#ifdef MEM_DEBUG
+#ifdef XEN_DEBUG
             std::string msg("clear: " + std::to_string(_mkr));
             logmsg(msg.c_str());
 #endif

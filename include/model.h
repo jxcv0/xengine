@@ -66,12 +66,6 @@ namespace xen::model
         // Mesh* meshes;
 	};
 	
-	// update model rotation about local y
-	void update_vectors(Model &model)
-	{
-		model.z = glm::normalize(glm::vec3(cos(glm::radians(model.b)), 0.0f, sin(glm::radians(model.b))));
-	}
-
 	// update model position based on key press
 	// assumes local y == global y
     // templated so that "gamestate.h" or "window.h" do not need to be #included
@@ -368,7 +362,6 @@ namespace xen::model
     void* update_model_job(void* data)
     {
         xen::model::Model *model = static_cast<xen::model::Model*>(data);
-        xen::model::update_vectors(*model);
         model->matrix = xen::model::model_matrix(*model);
         return nullptr;
     }
