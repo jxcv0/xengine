@@ -28,9 +28,9 @@ void on_mouse(GLFWwindow *window, double xPosIn, double yPosIn);
 
 int main(int argc, char const *argv[])
 {
-    xen::Window window(1080, 600);
+    xen::window::init(1080, 600);
     xen::Input input;
-	window.set_cursor_position_callback(on_mouse);
+    xen::window::set_cursor_position_callback(on_mouse);
     xen::jobsys::init();
 
     // models
@@ -49,16 +49,16 @@ int main(int argc, char const *argv[])
 
 	xen::camera::update_aim(camera, cameraAngle, cameraDist, 0.0f, 0.0f, 0.1f);
 	auto viewMatrix = xen::camera::view_matrix(camera);
-	auto projectionMatrix = window.projection_matrix(55.0f);
+	auto projectionMatrix = xen::window::projection_matrix(55.0f);
 
 	float currentFrame = 0.0f;
 
     // TODO producer thread synchronizes pushed work and synchronizes dependant tasks
     xen::mem::StackAllocator<glm::mat4> matrixAllocator(2);
 
-	while (!window.should_close())
+	while (!xen::window::should_close())
 	{
-        window.clear();
+        xen::window::clear();
 
         currentFrame = static_cast<float>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
@@ -67,7 +67,7 @@ int main(int argc, char const *argv[])
         xen::camera::update_aim(camera, cameraAngle, cameraDist, 0.0f, 0.0f, 0.1f);
 
         // input
-        auto inputBits = window.get_input();
+        auto inputBits = xen::window::get_input();
         input.set(inputBits);
         xen::model::process_movement(model, camera.b, input, deltaTime);
         xen::model::update_vectors(model);
@@ -76,7 +76,6 @@ int main(int argc, char const *argv[])
 
 		// render matrices
         auto viewMatrix = xen::camera::view_matrix(camera);
-        auto projectionMatrix = window.projection_matrix(55.0f);
 
         // this works!
         // xen::jobsys::push([](void* c) -> void* {
@@ -105,7 +104,9 @@ int main(int argc, char const *argv[])
         xen::shader::set_uniform(shader, "model", model.matrix);
         xen::model::draw(model, shader);
 
-		window.swap_and_poll();
+        xen::window::swap_buffers();
+        xen::window::poll_events();
+
 		checkerr();
         input.clear();
         matrixAllocator.clear();
