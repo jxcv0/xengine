@@ -38,24 +38,21 @@ int main(int argc, char const *argv[])
     // models
 	auto shader = xen::shader::load("assets/shaders/model.vert", "assets/shaders/model.frag");
 
-    auto modelHandle = xen::model::load("assets/models/cyborg/cyborg.obj");
-    xen::model::gen_buffers(modelHandle);	// all buffer gen functions must be sequential
+    auto model = xen::model::load("assets/models/cyborg/cyborg.obj");
+    xen::model::gen_buffers(model);
 	
 	// temp light
 	xen::Light light;
 	light.position = glm::vec3(0.0f, 3.0f, -1.0f);
-
-	float deltaTime = 0.0f;
-	float lastFrame = 0.0f;
 
 	xen::camera::update_aim(camera, cameraAngle, cameraDist, 0.0f, 0.0f, 0.1f);
 	auto viewMatrix = xen::camera::view_matrix(camera);
 	auto projectionMatrix = xen::window::projection_matrix(55.0f);
 
 	float currentFrame = 0.0f;
+	float deltaTime = 0.0f;
+	float lastFrame = 0.0f;
 
-    // TODO producer thread synchronizes pushed work and synchronizes dependant tasks
-    
 	while (!xen::window::should_close())
 	{
         xen::window::clear();
@@ -95,17 +92,15 @@ int main(int argc, char const *argv[])
 
         // TODO - this is the kind of thing that should be sent to the render thread
         // OpenGL calls must be single threaded
-        xen::model::update_model_matrix(modelHandle);
-        auto modelMatrix = xen::model::model_matrix(modelHandle);
-        xen::shader::set_uniform(shader, "model", modelMatrix);
-        xen::model::draw(modelHandle, shader);
+        xen::model::update_model_matrix(model);
+        xen::shader::set_uniform(shader, "model", xen::model::model_matrix(model));
+        xen::model::draw(model, shader);
 
         xen::window::swap_buffers();
         xen::window::poll_events();
 
 		checkerr();
         input.clear();
-        // matrixAllocator.clear();
 	}
 
     xen::jobsys::terminate();

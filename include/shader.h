@@ -134,7 +134,7 @@ namespace xen::shader
 	}
 
 	// set shader mat4 uniform utility funtion
-	void set_uniform(unsigned int shader, const char *uniformName, glm::mat4 &value)
+	void set_uniform(unsigned int shader, const char *uniformName, const glm::mat4 &value)
 	{
 		glUniformMatrix4fv(glGetUniformLocation(shader, uniformName), 1, GL_FALSE, &value[0][0]);
 	}

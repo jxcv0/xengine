@@ -3,14 +3,10 @@
 
 #include <glad.h>
 
-#include <vector>
 #include <string>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-
-#include <fstream>
-#include <iostream>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -42,7 +38,6 @@ namespace
 		std::string uniformName;
 	};
 
-	// a model is a collection of meshes and the data required for generating a model matrix
 	// TODO animations
 	struct Model
 	{
@@ -70,7 +65,6 @@ namespace
     // stack allocators
     xen::mem::StackAllocator<Vertex> _vertexAllocator(20000);
     xen::mem::StackAllocator<unsigned int> _indexAllocator(20000);
-
 } // namespace
 
 namespace xen::model
@@ -220,8 +214,7 @@ namespace xen::model
 		}
 	}
 
-	// load a model from a file
-    // return a handle to the model in the scene
+	// load a model from a file and return a handle to the model in the scene
 	int load(const char* filepath)
 	{
         if (_mkr == XEN_MAX_MODELS) { return -1; }
@@ -248,20 +241,20 @@ namespace xen::model
 	
 	// buffer model data in gl
     // TODO move to render.h
-	void gen_buffers(unsigned int handle)
+	void gen_buffers(unsigned int model)
 	{
-        glGenVertexArrays(1, &_models[handle].VAO);
-        glGenBuffers(1, &_models[handle].VBO);
-        glGenBuffers(1, &_models[handle].EBO);
+        glGenVertexArrays(1, &_models[model].VAO);
+        glGenBuffers(1, &_models[model].VBO);
+        glGenBuffers(1, &_models[model].EBO);
 
-        glBindVertexArray(_models[handle].VAO);
+        glBindVertexArray(_models[model].VAO);
 
-        glBindBuffer(GL_ARRAY_BUFFER, _models[handle].VBO);
-        glBufferData(GL_ARRAY_BUFFER, _models[handle].numVertices * sizeof(Vertex), &_models[handle].vertices[0], GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, _models[model].VBO);
+        glBufferData(GL_ARRAY_BUFFER, _models[model].numVertices * sizeof(Vertex), &_models[model].vertices[0], GL_STATIC_DRAW);
 
         // indices
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _models[handle].EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, _models[handle].numIndices * sizeof(unsigned int), &_models[handle].indices[0], GL_STATIC_DRAW); 
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _models[model].EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, _models[model].numIndices * sizeof(unsigned int), &_models[model].indices[0], GL_STATIC_DRAW); 
 
         // vertex positions
         glEnableVertexAttribArray(0);
@@ -288,10 +281,10 @@ namespace xen::model
 	}
 
 	// generate model matrix based on model position
-	void update_model_matrix(unsigned int handle)
+	void update_model_matrix(unsigned int model)
 	{
-		auto mat = glm::translate(glm::mat4(1.0f), _models[handle].position);
-		_models[handle].matrix = glm::rotate(mat, glm::radians(_models[handle].b), glm::vec3(0.0f, 1.0f, 0.0f));
+		auto mat = glm::translate(glm::mat4(1.0f), _models[model].position);
+		_models[model].matrix = glm::rotate(mat, glm::radians(_models[model].b), glm::vec3(0.0f, 1.0f, 0.0f));
 	}
 
     glm::mat4 model_matrix(unsigned int model)
@@ -301,16 +294,16 @@ namespace xen::model
     }
 
 	// draw all meshes in a model using a single shader program
-	void draw(unsigned int handle, unsigned int shader)
+	void draw(unsigned int model, unsigned int shader)
 	{
         for (int i = 0; i < 3; i++)
         {
             glActiveTexture(GL_TEXTURE0 + i);
-            xen::shader::set_uniform(shader, _models[handle].textures[i].uniformName.c_str(), i);
-            glBindTexture(GL_TEXTURE_2D, _models[handle].textures[i].id);
+            xen::shader::set_uniform(shader, _models[model].textures[i].uniformName.c_str(), i);
+            glBindTexture(GL_TEXTURE_2D, _models[model].textures[i].id);
         }
-        glBindVertexArray(_models[handle].VAO);
-        glDrawElements(GL_TRIANGLES, _models[handle].numIndices, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(_models[model].VAO);
+        glDrawElements(GL_TRIANGLES, _models[model].numIndices, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
         glActiveTexture(GL_TEXTURE0);
 	}

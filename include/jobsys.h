@@ -16,6 +16,7 @@ namespace
     pthread_cond_t _cv;
 } // namespace
 
+// all jobs sent to the jobsystem are to be completed in that frame
 namespace xen::jobsys
 {
     // struct for storing job function and data
