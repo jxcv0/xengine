@@ -56,8 +56,6 @@ int main(int argc, char const *argv[])
 
     // TODO producer thread synchronizes pushed work and synchronizes dependant tasks
     
-    // xen::mem::StackAllocator<glm::mat4> matrixAllocator(2);
-
 	while (!xen::window::should_close())
 	{
         xen::window::clear();

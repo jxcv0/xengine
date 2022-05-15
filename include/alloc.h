@@ -78,6 +78,12 @@ namespace xen::mem
         // free aligned memory
         ~StackAllocator()
         {
+
+#ifdef XEN_DEBUG
+            std::string msg("free: " + std::to_string(_mkr));
+            logmsg(msg.c_str());
+#endif
+
             free_aligned(reinterpret_cast<void*>(_start));
         }
         
@@ -109,7 +115,7 @@ namespace xen::mem
             _mkr = reinterpret_cast<uintptr_t>(ptr);
 
 #ifdef XEN_DEBUG
-            std::string msg("free:  " + std::to_string(_mkr));
+            std::string msg("dealloc:  " + std::to_string(_mkr));
             logmsg(msg.c_str());
 #endif
         }

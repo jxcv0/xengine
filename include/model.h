@@ -51,25 +51,25 @@ namespace
 		float b = 0.0f;						                // rotation about global y axis (up)
         glm::mat4 matrix;
 
-        // mesh
+        // mesh data
 		unsigned int VAO, VBO, EBO;
 
-        size_t numVertices;
+        size_t numVertices = 0;
         Vertex* vertices;
 
-		std::vector<unsigned int> indices;
-		std::vector<Texture> textures;
-        // Mesh* meshes;
+        size_t numIndices = 0;
+		unsigned int* indices;
+
+        size_t numTextures = 0;
+		Texture textures[3]; // diffuse, specular, normal
 	};
 	
-    // up to 256 models per scene
+    size_t _mkr = 0;
     Model _models[XEN_MAX_MODELS];
-    size_t _mkr;
 
     // stack allocators
-    xen::mem::StackAllocator<Vertex> _vertexAllocator(20000); // this is only enough for one model!!
-    xen::mem::StackAllocator<Texture> _textureAllocator(XEN_MAX_MODELS * 3); // diffuse, normal, specular
-    xen::mem::StackAllocator<unsigned int> _indexAllocator(XEN_MAX_MODELS);
+    xen::mem::StackAllocator<Vertex> _vertexAllocator(20000);
+    xen::mem::StackAllocator<unsigned int> _indexAllocator(20000);
 
 } // namespace
 
@@ -133,7 +133,7 @@ namespace xen::model
 			std::string fileName(str.C_Str());
 			texture.id = load_texture((dir + "/" + fileName).c_str());
 			texture.uniformName = typeName;
-			model->textures.push_back(texture);
+            model->textures[model->numTextures++] = texture;
 		}
 	};
 
@@ -146,6 +146,8 @@ namespace xen::model
 
             model->numVertices = mesh->mNumVertices;
             model->vertices = _vertexAllocator.allocate(model->numVertices);
+            model->numIndices = mesh->mNumFaces * 3; // all faces are triangulated
+            model->indices = _indexAllocator.allocate(model->numIndices);
 
 			for(size_t j = 0; j < mesh->mNumVertices; j++)
 			{
@@ -192,13 +194,15 @@ namespace xen::model
                 model->vertices[j] = vertex;
 			}
 
+            size_t temp = 0;
 			// indices
 			for(size_t j = 0; j < mesh->mNumFaces; j++)
 			{
 				aiFace face = mesh->mFaces[j];
+
 				for(size_t k = 0; k < face.mNumIndices; k++)
 				{
-				    model->indices.push_back(face.mIndices[k]);        
+                    model->indices[temp++] = face.mIndices[k];
 				}
 			}
             
@@ -257,7 +261,7 @@ namespace xen::model
 
         // indices
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _models[handle].EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, _models[handle].indices.size() * sizeof(unsigned int), &_models[handle].indices[0], GL_STATIC_DRAW); 
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, _models[handle].numIndices * sizeof(unsigned int), &_models[handle].indices[0], GL_STATIC_DRAW); 
 
         // vertex positions
         glEnableVertexAttribArray(0);
@@ -299,14 +303,14 @@ namespace xen::model
 	// draw all meshes in a model using a single shader program
 	void draw(unsigned int handle, unsigned int shader)
 	{
-        for (int i = 0; i < _models[handle].textures.size(); i++)
+        for (int i = 0; i < 3; i++)
         {
             glActiveTexture(GL_TEXTURE0 + i);
             xen::shader::set_uniform(shader, _models[handle].textures[i].uniformName.c_str(), i);
             glBindTexture(GL_TEXTURE_2D, _models[handle].textures[i].id);
         }
         glBindVertexArray(_models[handle].VAO);
-        glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(_models[handle].indices.size()), GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, _models[handle].numIndices, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
         glActiveTexture(GL_TEXTURE0);
 	}
