@@ -4,75 +4,78 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
+namespace
+{
+    glm::vec3 _targetPosition = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 _position = glm::vec3(0.0f, 0.0f, 0.0f);	// world position
+    glm::vec3 _x = glm::vec3(0.0f, 1.0f, 0.0f);						// local x axis (right)
+    glm::vec3 _y = glm::vec3(0.0f, 1.0f, 0.0f);		// local y axis (up)
+    glm::vec3 _z = glm::vec3(0.0f, 0.0f, -1.0f);		// local z axis (front)
+    float _a = 0.0f;						// rotation around local x axis (pitch)
+    float _b = 90.0f;					// rotation around local y axis (yaw)
+    float _xLast = 0;
+    float _yLast = 0;
+    bool firstMouseMovement = true;
+} // namespace
+
 namespace xen::camera
 {
-	// camera state
-	struct Camera
+	// calculate view matrix
+	glm::mat4 view_matrix()
 	{
-		glm::vec3 targetPosition = glm::vec3(0.0f, 0.0f, 0.0f);
-		glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);	// world position
-		glm::vec3 x;						// local x axis (right)
-		glm::vec3 y = glm::vec3(0.0f, 1.0f, 0.0f);		// local y axis (up)
-		glm::vec3 z = glm::vec3(0.0f, 0.0f, -1.0f);		// local z axis (front)
-		float a = 0.0f;						// rotation around local x axis (pitch)
-		float b = 90.0f;					// rotation around local y axis (yaw)
-		float xLast;
-		float yLast;
-	};
-
-	// get view matrix from camera state
-	glm::mat4 view_matrix(Camera &camera)
-	{
-		return glm::lookAt(camera.position, camera.position + camera.z, camera.y);
+		return glm::lookAt(_position, _position + _z, _y);
 	}
 
-	// update camera vectors with mouse position
-	void update_aim(Camera &camera, float x, float y, float sensetivity)
+    // get camera position
+    glm::vec3 camera_position()
+    {
+        return _position;
+    }
+
+    // TODO - fix!!
+	// update _vectors and position based on a centre of rotation about an xz position
+	void update_aim(float x, float y, float sen)
 	{
-		camera.a += y * sensetivity;
-		camera.b += x * sensetivity;
+        if (firstMouseMovement)
+        {
+            _xLast = x;
+            _yLast = y;
+            firstMouseMovement = false;
+        }
 
-		if (camera.a > 89.0f) { camera.a = 89.0f; };
-		if (camera.a < -89.0f) { camera.a = -89.0f; };
+        float xOffset = x - _xLast;
+        float yOffset = _yLast - y;
 
-		camera.z = glm::normalize(glm::vec3(
-			cos(glm::radians(camera.b)) * cos(glm::radians(camera.a)),
-			sin(glm::radians(camera.a)),
-			sin(glm::radians(camera.b)) * cos(glm::radians(camera.a))));
+        _xLast = xOffset;
+        _yLast = yOffset;
 
-		camera.x = glm::normalize(glm::cross(camera.z, camera.y));
+		_a += xOffset * sen;
+		_b += yOffset * sen;
+
+		if (_a > 50.0f) { _a = 50.0f; };
+		if (_a < -50.0f) { _a = -50.0f; };
+
+		_position.x = _targetPosition.x + cos(glm::radians(_b));
+		_position.y = _targetPosition.y + sin(glm::radians(_a)) + 3.5f;
+		_position.z = _targetPosition.z + sin(glm::radians(_b));	// this isnt quite right
+
+		_z = glm::normalize(glm::vec3(
+			cos(glm::radians(_b)) * cos(glm::radians(_a)),
+			sin(glm::radians(_a)),
+			sin(glm::radians(_b)) * cos(glm::radians(_a))));
+
+		_x = glm::normalize(glm::cross(_z, _y));
 	}
 
-	// update camera vectors and position based on a centre of rotation about an xz position
-	void update_aim(Camera &camera, float offsetAnglexz, float offsetDist, float x, float y, float sen)
-	{
-		camera.a += y * sen;
-		camera.b += x * sen;
-
-		if (camera.a > 50.0f) { camera.a = 50.0f; };
-		if (camera.a < -50.0f) { camera.a = -50.0f; };
-
-		camera.position.x = camera.targetPosition.x + (-offsetDist * cos(glm::radians(camera.b)));
-		camera.position.y = camera.targetPosition.y + (-offsetDist * sin(glm::radians(camera.a))) + 3.5f;
-		camera.position.z = camera.targetPosition.z + (-offsetDist * sin(glm::radians(camera.b)));	// this isnt quite right
-
-		camera.z = glm::normalize(glm::vec3(
-			cos(glm::radians(camera.b)) * cos(glm::radians(camera.a)),
-			sin(glm::radians(camera.a)),
-			sin(glm::radians(camera.b)) * cos(glm::radians(camera.a))));
-
-		camera.x = glm::normalize(glm::cross(camera.z, camera.y));
-	}
-
-	// update camera position based on key press / character movement flags
+	// update _position based on key press / character movement flags
     template<typename Input>
-	void process_movement(Camera &camera, Input in, float deltaTime)
+	void process_movement(Input in, float deltaTime)
 	{
 		float velocity = 2.5f * deltaTime;
-		if (in.forward()) { camera.position += camera.z * velocity; }
-		if (in.backward()) { camera.position -= camera.z * velocity; }
-		if (in.left()) { camera.position -= camera.x * velocity; }
-		if (in.right()) { camera.position += camera.x * velocity; }
+		if (in.forward()) { _position += _z * velocity; }
+		if (in.backward()) { _position -= _z * velocity; }
+		if (in.left()) { _position -= _x * velocity; }
+		if (in.right()) { _position += _x * velocity; }
 	}
 } // namespace xen::camera
 

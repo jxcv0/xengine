@@ -19,11 +19,6 @@
 #include "shader.h"
 #include "light.h"
 
-xen::camera::Camera camera;
-
-bool firstMouseMovement = true;
-const float cameraAngle = 10.0f;
-const float cameraDist = 3.0f;
 const glm::vec3 worldUp(0.0f, 1.0f, 0.0f);
 
 void on_mouse(GLFWwindow *window, double xPosIn, double yPosIn);
@@ -45,8 +40,8 @@ int main(int argc, char const *argv[])
 	xen::Light light;
 	light.position = glm::vec3(0.0f, 3.0f, -1.0f);
 
-	xen::camera::update_aim(camera, cameraAngle, cameraDist, 0.0f, 0.0f, 0.1f);
-	auto viewMatrix = xen::camera::view_matrix(camera);
+	xen::camera::update_aim(0.0f, 0.0f, 0.1f);
+	auto viewMatrix = xen::camera::view_matrix();
 	auto projectionMatrix = xen::window::projection_matrix(55.0f);
 
 	float currentFrame = 0.0f;
@@ -61,14 +56,14 @@ int main(int argc, char const *argv[])
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         
-        xen::camera::update_aim(camera, cameraAngle, cameraDist, 0.0f, 0.0f, 0.1f);
+        xen::camera::update_aim(0.0f, 0.0f, 0.1f);
 
         // input
         auto inputBits = xen::window::get_input();
         // input.set(inputBits);
         
 		// render matrices
-        auto viewMatrix = xen::camera::view_matrix(camera);
+        auto viewMatrix = xen::camera::view_matrix();
 
         // this works!
         // xen::jobsys::push([](void* c) -> void* {
@@ -82,7 +77,7 @@ int main(int argc, char const *argv[])
 		xen::shader::set_uniform(shader, "projection", projectionMatrix);
 
 		// light
-		xen::shader::set_uniform(shader, "viewPosition", camera.position);
+		xen::shader::set_uniform(shader, "viewPosition", xen::camera::camera_position());
 		xen::shader::set_uniform(shader, "shininess", 16.0f);
 		xen::shader::set_uniform(shader, "light.position", light.position);
 		xen::shader::set_uniform(shader, "light.colour", light.colour);
@@ -112,18 +107,5 @@ void on_mouse(GLFWwindow *window, double xPosIn, double yPosIn)
 	float xPos = static_cast<float>(xPosIn);
 	float yPos = static_cast<float>(yPosIn);
 
-	if (firstMouseMovement)
-	{
-		camera.xLast = xPos;
-		camera.yLast = yPos;
-		firstMouseMovement = false;
-	}
-
-	float xOffset = xPos - camera.xLast;
-	float yOffset = camera.yLast - yPos;
-	camera.xLast = xPos;
-	camera.yLast = yPos;
-
-    xen::camera::update_aim(camera, xOffset, yOffset, 0.1f);
-	// xen::camera::update_aim(camera, cameraAngle, cameraDist, xOffset, yOffset, 0.1f);
+	xen::camera::update_aim(xPos, yPos, 0.1f);
 }
