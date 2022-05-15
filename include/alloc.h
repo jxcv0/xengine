@@ -10,7 +10,6 @@
 // TODO general heap allocator
 // TODO block/pool (SLAB/SLOB?) allocator 
 
-
 namespace xen::mem
 {
     using uint8 = unsigned char;
@@ -79,7 +78,6 @@ namespace xen::mem
         // free aligned memory
         ~StackAllocator()
         {
-            clear();
             free_aligned(reinterpret_cast<void*>(_start));
         }
         

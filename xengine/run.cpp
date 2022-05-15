@@ -38,9 +38,8 @@ int main(int argc, char const *argv[])
     // models
 	auto shader = xen::shader::load("assets/shaders/model.vert", "assets/shaders/model.frag");
 
-    xen::model::Model model;
-    xen::model::load(model, "assets/models/cyborg/cyborg.obj");
-    xen::model::gen_buffers(model);	// all buffer gen functions must be sequential
+    auto modelHandle = xen::model::load("assets/models/cyborg/cyborg.obj");
+    xen::model::gen_buffers(modelHandle);	// all buffer gen functions must be sequential
 	
 	// temp light
 	xen::Light light;
@@ -71,11 +70,8 @@ int main(int argc, char const *argv[])
 
         // input
         auto inputBits = xen::window::get_input();
-        input.set(inputBits);
-        xen::model::process_movement(model, camera.b, input, deltaTime);
-
-        xen::camera::process_movement(camera, input, deltaTime);
-
+        // input.set(inputBits);
+        
 		// render matrices
         auto viewMatrix = xen::camera::view_matrix(camera);
 
@@ -86,7 +82,7 @@ int main(int argc, char const *argv[])
         // }, (void*)0);
 
 		// shader and shader uniforms
-		xen::shader::use(shader);
+        xen::shader::use(shader);
 		xen::shader::set_uniform(shader, "view", viewMatrix);
 		xen::shader::set_uniform(shader, "projection", projectionMatrix);
 
@@ -99,14 +95,12 @@ int main(int argc, char const *argv[])
 		xen::shader::set_uniform(shader, "light.linear", light.linear);
 		xen::shader::set_uniform(shader, "light.quadratic", light.quadratic);
 
-        // stuttering caused by this job failing to complete before calling xen::model::draw()
-        // xen::jobsys::push(xen::model::update_model_job, (void*)&model);
-        model.matrix = xen::model::model_matrix(model);
-
         // TODO - this is the kind of thing that should be sent to the render thread
         // OpenGL calls must be single threaded
-        xen::shader::set_uniform(shader, "model", model.matrix);
-        xen::model::draw(model, shader);
+        xen::model::update_model_matrix(modelHandle);
+        auto modelMatrix = xen::model::model_matrix(modelHandle);
+        xen::shader::set_uniform(shader, "model", modelMatrix);
+        xen::model::draw(modelHandle, shader);
 
         xen::window::swap_buffers();
         xen::window::poll_events();

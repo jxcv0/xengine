@@ -1,22 +1,19 @@
 #ifndef RENDER_H
 #define RENDER_H
 
-#include <mutex>
-#include <condition_variable>
+#include <glad.h>
 
-namespace xen
+#include <pthread.h>
+
+namespace
 {
-    struct RenderThread
-    {
-        template<template Renderable>
-        void operator() (Renderable r)
-        {
-            r.render();
-        }
+    int _thread;
+    pthread_mutex_t _m;
+    pthread_cond_t _cv;
+} // namespace
 
-    private:
-        std::mutex _m;
-        std::condition_variable _cv;
-    };
-} // namespace xen
+namespace xen::render
+{
+} // namespace xen::render
+
 #endif // RENDER_H

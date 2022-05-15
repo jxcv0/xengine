@@ -19,8 +19,11 @@
 #include <glm/glm.hpp>
 
 #include "shader.h"
+#include "alloc.h"
 
-namespace xen::model
+#define XEN_MAX_MODELS 256
+
+namespace
 {
 	// an individual vertex
 	struct Vertex
@@ -39,97 +42,39 @@ namespace xen::model
 		std::string uniformName;
 	};
 
-	// mesh data
-	struct Mesh
-	{
-		unsigned int VAO, VBO, EBO;		// gl buffer handles
-		std::vector<Vertex> vertices;
-		std::vector<unsigned int> indices;
-		std::vector<Texture> textures;
-        
-        // ptrs to arrays
-        // Vertex* vertices;
-        // unsigned int* indices;
-        // Texture* textures;
-	};
-
 	// a model is a collection of meshes and the data required for generating a model matrix
 	// TODO animations
 	struct Model
 	{
 		glm::vec3 position = glm::vec3(0.0f);			    // position of model in world space - default to world 0, 0, 0
 		const glm::vec3 y = glm::vec3(0.0f, 1.0f, 0.0f);
-		glm::vec3 z;						                // local z axis (front)
 		float b = 0.0f;						                // rotation about global y axis (up)
-		std::vector<Mesh> meshes;				            // the meshes comprising the model
         glm::mat4 matrix;
+
+        // mesh
+		unsigned int VAO, VBO, EBO;
+
+        size_t numVertices;
+        Vertex* vertices;
+
+		std::vector<unsigned int> indices;
+		std::vector<Texture> textures;
         // Mesh* meshes;
 	};
 	
-	// update model position based on key press
-	// assumes local y == global y
-    // templated so that "gamestate.h" or "window.h" do not need to be #included
-    template<typename Input>
-	void process_movement(Model &model, float forward, Input &in, float deltaTime)
-	{
-		forward -= 90.0f;
-		if (in.forward())
-		{
-			if (in.left()) 
-			{
-				model.b = 45.0f;
-				model.b -= forward;
-				return;
-			};
+    // up to 256 models per scene
+    Model _models[XEN_MAX_MODELS];
+    size_t _mkr;
 
-			if (in.right())
-			{
-				model.b = 315.0f;
-				model.b -= forward;
-				return;
-			}
+    // stack allocators
+    xen::mem::StackAllocator<Vertex> _vertexAllocator(20000); // this is only enough for one model!!
+    xen::mem::StackAllocator<Texture> _textureAllocator(XEN_MAX_MODELS * 3); // diffuse, normal, specular
+    xen::mem::StackAllocator<unsigned int> _indexAllocator(XEN_MAX_MODELS);
 
-			model.b = 0.0f;
-			model.b -= forward;
-			return;
-		}
-		
-		if (in.backward())
-		{
-			if (in.left()) 
-			{
-				model.b = 135.0f;
-				model.b -= forward;
-				return;
-			};
+} // namespace
 
-			if (in.right())
-			{
-				model.b = 225.0f;
-				model.b -= forward;
-				return;
-			}
-
-			model.b = 180.0f;
-			model.b -= forward;
-			return;
-		}
-
-		if (in.left())
-		{
-			model.b = 90.0f;
-			model.b -= forward;
-			return;
-		}
-
-		if (in.right())
-		{
-			model.b = 270.0f;
-			model.b -= forward;
-			return;
-		}
-	}
-	
+namespace xen::model
+{
 	// load a texture from a file and bind to gl texture buffer
 	unsigned int load_texture(const char* path)
 	{
@@ -156,6 +101,7 @@ namespace xen::model
 			}
 
 			// TODO multisampling for antiailiasing
+            // and futher reading on adding and removing data from GL_TEXTURE_2D
 			glBindTexture(GL_TEXTURE_2D, texId);
 			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 			glGenerateMipmap(GL_TEXTURE_2D);
@@ -177,7 +123,7 @@ namespace xen::model
 	}
 
 	// load all textures of a type into a mesh
-	void load_material(Mesh &mesh, std::string &dir, aiMaterial *mat, aiTextureType type, std::string typeName)
+	void load_material(Model* model, std::string &dir, aiMaterial *mat, aiTextureType type, std::string typeName)
 	{
 		for (size_t i = 0; i < mat->GetTextureCount(type); i++)
 		{
@@ -187,17 +133,20 @@ namespace xen::model
 			std::string fileName(str.C_Str());
 			texture.id = load_texture((dir + "/" + fileName).c_str());
 			texture.uniformName = typeName;
-			mesh.textures.push_back(texture);
+			model->textures.push_back(texture);
 		}
 	};
 
 	// recursively process nodes in a scene
-	void process_node(Model &model, aiNode *node, const aiScene *scene, std::string dir)
+	void process_node(Model* model, aiNode *node, const aiScene *scene, std::string dir)
 	{
 		for (size_t i = 0; i < node->mNumMeshes; i++)
 		{
-			aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-			Mesh xenMesh;
+			aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+
+            model->numVertices = mesh->mNumVertices;
+            model->vertices = _vertexAllocator.allocate(model->numVertices);
+
 			for(size_t j = 0; j < mesh->mNumVertices; j++)
 			{
 				Vertex vertex;
@@ -240,7 +189,7 @@ namespace xen::model
 				{
 					vertex.texCoord = glm::vec2(0.0f, 0.0f);
 				}
-				xenMesh.vertices.push_back(vertex);
+                model->vertices[j] = vertex;
 			}
 
 			// indices
@@ -249,18 +198,16 @@ namespace xen::model
 				aiFace face = mesh->mFaces[j];
 				for(size_t k = 0; k < face.mNumIndices; k++)
 				{
-					xenMesh.indices.push_back(face.mIndices[k]);        
+				    model->indices.push_back(face.mIndices[k]);        
 				}
 			}
-
+            
 			// textures
 			aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
 
-			load_material(xenMesh, dir, material, aiTextureType_DIFFUSE, "textureDiffuse");
-			load_material(xenMesh, dir, material, aiTextureType_SPECULAR, "textureSpecular");
-			load_material(xenMesh, dir, material, aiTextureType_HEIGHT, "textureNormal");
-
-			model.meshes.push_back(xenMesh);
+			load_material(model, dir, material, aiTextureType_DIFFUSE, "textureDiffuse");
+			load_material(model, dir, material, aiTextureType_SPECULAR, "textureSpecular");
+			load_material(model, dir, material, aiTextureType_HEIGHT, "textureNormal");
 		}
 
 		for (size_t i = 0; i < node->mNumChildren; i++)
@@ -270,8 +217,11 @@ namespace xen::model
 	}
 
 	// load a model from a file
-	void load(Model &model, const char* filepath)
+    // return a handle to the model in the scene
+	int load(const char* filepath)
 	{
+        if (_mkr == XEN_MAX_MODELS) { return -1; }
+
 		std::string dir(filepath);
 		dir = dir.substr(0, dir.find_last_of('/'));
 
@@ -285,86 +235,81 @@ namespace xen::model
 		if(!scene)
 		{
 			std::cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << "\n";
-			return;
+			return -1;
 		}
 
-		process_node(model, scene->mRootNode, scene, dir);
+		process_node(&_models[_mkr], scene->mRootNode, scene, dir);
+        return _mkr++;
 	}
 	
 	// buffer model data in gl
-	void gen_buffers(Model &model)
+    // TODO move to render.h
+	void gen_buffers(unsigned int handle)
 	{
-		for (auto &mesh : model.meshes)
-		{
-			glGenVertexArrays(1, &mesh.VAO);
-			glGenBuffers(1, &mesh.VBO);
-			glGenBuffers(1, &mesh.EBO);
+        glGenVertexArrays(1, &_models[handle].VAO);
+        glGenBuffers(1, &_models[handle].VBO);
+        glGenBuffers(1, &_models[handle].EBO);
 
-			glBindVertexArray(mesh.VAO);
+        glBindVertexArray(_models[handle].VAO);
 
-			glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
-			glBufferData(GL_ARRAY_BUFFER, mesh.vertices.size() * sizeof(Vertex), &mesh.vertices[0], GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, _models[handle].VBO);
+        glBufferData(GL_ARRAY_BUFFER, _models[handle].numVertices * sizeof(Vertex), &_models[handle].vertices[0], GL_STATIC_DRAW);
 
-			// indices
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.EBO);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(unsigned int), &mesh.indices[0], GL_STATIC_DRAW); 
+        // indices
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _models[handle].EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, _models[handle].indices.size() * sizeof(unsigned int), &_models[handle].indices[0], GL_STATIC_DRAW); 
 
-			// vertex positions
-			glEnableVertexAttribArray(0);
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+        // vertex positions
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
 
-			// texture coords
-			glEnableVertexAttribArray(1);
-			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoord));
+        // texture coords
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoord));
 
-			// vertex normals
-			glEnableVertexAttribArray(2);
-			glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+        // vertex normals
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 
-			// tangent
-			glEnableVertexAttribArray(3);
-			glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tangent));
+        // tangent
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tangent));
 
-			glEnableVertexAttribArray(4);
-			glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, bitangent));
+        // bitangent
+        glEnableVertexAttribArray(4);
+        glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, bitangent));
 
-			// unbind
-			glBindVertexArray(0);
-		}
-	}
-
-	// draw all meshes in a model using a single shader program
-	void draw(Model& model, unsigned int shader)
-	{
-		for (auto &mesh : model.meshes)
-        {
-            for (int i = 0; i < mesh.textures.size(); i++)
-            {
-                glActiveTexture(GL_TEXTURE0 + i);
-                xen::shader::set_uniform(shader, mesh.textures[i].uniformName.c_str(), i);
-                glBindTexture(GL_TEXTURE_2D, mesh.textures[i].id);
-            }
-            glBindVertexArray(mesh.VAO);
-            glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(mesh.indices.size()), GL_UNSIGNED_INT, 0);
-            glBindVertexArray(0);
-            glActiveTexture(GL_TEXTURE0);
-        }
+        // unbind
+        glBindVertexArray(0);
 	}
 
 	// generate model matrix based on model position
-	glm::mat4 model_matrix(Model &model)
+	void update_model_matrix(unsigned int handle)
 	{
-		auto mat = glm::translate(glm::mat4(1.0f), model.position);
-		return glm::rotate(mat, glm::radians(model.b), glm::vec3(0.0f, 1.0f, 0.0f));
+		auto mat = glm::translate(glm::mat4(1.0f), _models[handle].position);
+		_models[handle].matrix = glm::rotate(mat, glm::radians(_models[handle].b), glm::vec3(0.0f, 1.0f, 0.0f));
 	}
 
-    // jobbed update model
-    void* update_model_job(void* data)
+    glm::mat4 model_matrix(unsigned int model)
     {
-        xen::model::Model *model = static_cast<xen::model::Model*>(data);
-        model->matrix = xen::model::model_matrix(*model);
-        return nullptr;
+        update_model_matrix(model);
+        return _models[model].matrix;
     }
+
+	// draw all meshes in a model using a single shader program
+	void draw(unsigned int handle, unsigned int shader)
+	{
+        for (int i = 0; i < _models[handle].textures.size(); i++)
+        {
+            glActiveTexture(GL_TEXTURE0 + i);
+            xen::shader::set_uniform(shader, _models[handle].textures[i].uniformName.c_str(), i);
+            glBindTexture(GL_TEXTURE_2D, _models[handle].textures[i].id);
+        }
+        glBindVertexArray(_models[handle].VAO);
+        glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(_models[handle].indices.size()), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+        glActiveTexture(GL_TEXTURE0);
+	}
 } //namespace xen::model
 
 #endif // MODEL_H
