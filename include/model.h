@@ -67,7 +67,7 @@ namespace
     xen::mem::StackAllocator<unsigned int> _indexAllocator(20000);
 } // namespace
 
-namespace xen::model
+namespace xen::scene
 {
 	// load a texture from a file and bind to gl texture buffer
 	unsigned int load_texture(const char* path)
@@ -215,7 +215,7 @@ namespace xen::model
 	}
 
 	// load a model from a file and return a handle to the model in the scene
-	int load(const char* filepath)
+	int load_model(const char* filepath)
 	{
         if (_mkr == XEN_MAX_MODELS) { return -1; }
 
@@ -294,7 +294,7 @@ namespace xen::model
     }
 
 	// draw all meshes in a model using a single shader program
-	void draw(unsigned int model, unsigned int shader)
+	void draw_model(unsigned int model, unsigned int shader)
 	{
         for (int i = 0; i < 3; i++)
         {
@@ -307,6 +307,6 @@ namespace xen::model
         glBindVertexArray(0);
         glActiveTexture(GL_TEXTURE0);
 	}
-} //namespace xen::model
+} //namespace xen::scene
 
 #endif // MODEL_H

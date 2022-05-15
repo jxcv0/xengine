@@ -36,10 +36,10 @@ int main(int argc, char const *argv[])
     xen::jobsys::init();
 
     // models
-	auto shader = xen::shader::load("assets/shaders/model.vert", "assets/shaders/model.frag");
+	auto shader = xen::shader::load_shader("assets/shaders/model.vert", "assets/shaders/model.frag");
 
-    auto model = xen::model::load("assets/models/cyborg/cyborg.obj");
-    xen::model::gen_buffers(model);
+    auto model = xen::scene::load_model("assets/models/cyborg/cyborg.obj");
+    xen::scene::gen_buffers(model);
 	
 	// temp light
 	xen::Light light;
@@ -77,7 +77,7 @@ int main(int argc, char const *argv[])
         // }, (void*)0);
 
 		// shader and shader uniforms
-        xen::shader::use(shader);
+        xen::shader::use_shader(shader);
 		xen::shader::set_uniform(shader, "view", viewMatrix);
 		xen::shader::set_uniform(shader, "projection", projectionMatrix);
 
@@ -92,9 +92,9 @@ int main(int argc, char const *argv[])
 
         // TODO - this is the kind of thing that should be sent to the render thread
         // OpenGL calls must be single threaded
-        xen::model::update_model_matrix(model);
-        xen::shader::set_uniform(shader, "model", xen::model::model_matrix(model));
-        xen::model::draw(model, shader);
+        xen::scene::update_model_matrix(model);
+        xen::shader::set_uniform(shader, "model", xen::scene::model_matrix(model));
+        xen::scene::draw_model(model, shader);
 
         xen::window::swap_buffers();
         xen::window::poll_events();

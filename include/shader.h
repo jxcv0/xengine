@@ -37,7 +37,7 @@ namespace xen::shader
 	}
 
 	// load a shader from a text file
-	unsigned int load(const char *vertPath, const char* fragPath)
+	unsigned int load_shader(const char *vertPath, const char* fragPath)
 	{
 		std::string vertCode;
 		std::string fragCode;
@@ -92,7 +92,7 @@ namespace xen::shader
 	}
 
 	// use a shader program
-	void use(unsigned int shader)
+	void use_shader(unsigned int shader)
 	{
 		glUseProgram(shader);
 	}
@@ -104,31 +104,31 @@ namespace xen::shader
 	}
 
 	// set shader int uniform utility function
-	void set_uniform(unsigned int shader, const char *uniformName, int value)
+	void set_uniform(unsigned int shader, const char *uniformName, const int value)
 	{
 		glUniform1i(glGetUniformLocation(shader, uniformName), value);
 	}
 
 	// set shader float uniform utility function
-	void set_uniform(unsigned int shader, const char *uniformName, float value)
+	void set_uniform(unsigned int shader, const char *uniformName, const float value)
 	{
 		glUniform1f(glGetUniformLocation(shader, uniformName), value);
 	}
 
 	// set shader vec2 uniform utility function
-	void set_uniform(unsigned int shader, const char *uniformName, glm::vec2 &value)
+	void set_uniform(unsigned int shader, const char *uniformName, const glm::vec2 &value)
 	{
 		glUniform2fv(glGetUniformLocation(shader, uniformName), 1, &value[0]);
 	}
 
 	// set shader vec3 uniform utility function
-	void set_uniform(unsigned int shader, const char *uniformName, glm::vec3 &value)
+	void set_uniform(unsigned int shader, const char *uniformName, const glm::vec3 &value)
 	{
 		glUniform3fv(glGetUniformLocation(shader, uniformName), 1, &value[0]);
 	}
 
 	// set shader vec4 uniform utility function
-	void set_uniform(unsigned int shader, const char *uniformName, glm::vec4 &value)
+	void set_uniform(unsigned int shader, const char *uniformName, const glm::vec4 &value)
 	{
 		glUniform4fv(glGetUniformLocation(shader, uniformName), 1, &value[0]);
 	}
