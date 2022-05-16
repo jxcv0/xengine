@@ -6,7 +6,7 @@
 
 namespace
 {
-    glm::vec3 _targetPosition = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3* _target;
     glm::vec3 _position = glm::vec3(0.0f, 0.0f, 0.0f);	// world position
     glm::vec3 _x = glm::vec3(0.0f, 1.0f, 0.0f);						// local x axis (right)
     glm::vec3 _y = glm::vec3(0.0f, 1.0f, 0.0f);		// local y axis (up)
@@ -15,7 +15,7 @@ namespace
     float _b = 90.0f;					// rotation around local y axis (yaw)
     float _xLast = 0;
     float _yLast = 0;
-    bool firstMouseMovement = true;
+    bool _firstMouseMovement = true;
 } // namespace
 
 namespace xen::camera
@@ -32,15 +32,20 @@ namespace xen::camera
         return _position;
     }
 
-    // TODO - fix!!
+    // set the target position of the camera
+    void set_target(glm::vec3* target)
+    {
+        _target = target;
+    }
+
 	// update _vectors and position based on a centre of rotation about an xz position
 	void update_aim(float x, float y, float sen)
 	{
-        if (firstMouseMovement)
+        if (_firstMouseMovement)
         {
             _xLast = x;
             _yLast = y;
-            firstMouseMovement = false;
+            _firstMouseMovement = false;
         }
 
         float xOffset = x - _xLast;
@@ -55,9 +60,12 @@ namespace xen::camera
 		if (_a > 50.0f) { _a = 50.0f; };
 		if (_a < -50.0f) { _a = -50.0f; };
 
-		_position.x = _targetPosition.x + cos(glm::radians(_b));
-		_position.y = _targetPosition.y + sin(glm::radians(_a)) + 3.5f;
-		_position.z = _targetPosition.z + sin(glm::radians(_b));	// this isnt quite right
+        if (_target)
+        {
+            _position.x = _target->x * cos(glm::radians(_b));
+            _position.y = _target->y * sin(glm::radians(_a)) + 3.5f;
+            _position.z = _target->z * sin(glm::radians(_b));	// this isnt quite right
+        }
 
 		_z = glm::normalize(glm::vec3(
 			cos(glm::radians(_b)) * cos(glm::radians(_a)),

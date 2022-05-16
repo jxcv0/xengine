@@ -41,6 +41,7 @@ int main(int argc, char const *argv[])
 	light.position = glm::vec3(0.0f, 3.0f, -1.0f);
 
 	xen::camera::update_aim(0.0f, 0.0f, 0.1f);
+    xen::camera::set_target(xen::scene::model_position(model));
 	auto viewMatrix = xen::camera::view_matrix();
 	auto projectionMatrix = xen::window::projection_matrix(55.0f);
 
@@ -104,8 +105,5 @@ int main(int argc, char const *argv[])
 
 void on_mouse(GLFWwindow *window, double xPosIn, double yPosIn)
 {
-	float xPos = static_cast<float>(xPosIn);
-	float yPos = static_cast<float>(yPosIn);
-
-	xen::camera::update_aim(xPos, yPos, 0.1f);
+	xen::camera::update_aim(static_cast<float>(xPosIn), static_cast<float>(yPosIn), 0.1f);
 }

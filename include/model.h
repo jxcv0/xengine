@@ -279,6 +279,13 @@ namespace xen::scene
         // unbind
         glBindVertexArray(0);
 	}
+    
+    // get a ptr to a model position
+    // used for if a game entity needs a reference to another model for calculations
+    glm::vec3* model_position(unsigned int model)
+    {
+        return &_models[model].position;
+    }
 
 	// generate model matrix based on model position
 	void update_model_matrix(unsigned int model)
