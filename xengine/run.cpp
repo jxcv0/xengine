@@ -40,7 +40,7 @@ int main(int argc, char const *argv[])
 	xen::Light light;
 	light.position = glm::vec3(0.0f, 3.0f, -1.0f);
 
-    // xen::camera::set_target(xen::scene::model_position(model));
+    xen::camera::update_aim(0.0f, 0.0f, 0.0f);
 
 	auto viewMatrix = xen::camera::view_matrix();
 	auto projectionMatrix = xen::window::projection_matrix(55.0f);
