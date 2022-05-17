@@ -12,9 +12,9 @@ namespace
     glm::vec3 _y = glm::vec3(0.0f, 1.0f, 0.0f);		// local y axis (up)
     glm::vec3 _z = glm::vec3(0.0f, 0.0f, -1.0f);		// local z axis (front)
     float _a = 0.0f;						// rotation around local x axis (pitch)
-    float _b = 90.0f;					// rotation around local y axis (yaw)
-    float _xLast = 0;
-    float _yLast = 0;
+    float _b = 0.0f;					// rotation around local y axis (yaw)
+    float _prevX = 0;
+    float _prevY = 0;
     bool _firstMouseMovement = true;
 } // namespace
 
@@ -39,32 +39,33 @@ namespace xen::camera
     }
 
 	// update _vectors and position based on a centre of rotation about an xz position
-	void update_aim(float x, float y, float sen)
+	void update_aim(float mouseX, float mouseY, float sen)
 	{
         if (_firstMouseMovement)
         {
-            _xLast = x;
-            _yLast = y;
+            _prevX = mouseX;
+            _prevY = mouseY;
             _firstMouseMovement = false;
         }
 
-        float xOffset = x - _xLast;
-        float yOffset = _yLast - y;
+        auto changeX = mouseX - _prevX;
+        auto changeY = _prevY - mouseY;
 
-        _xLast = xOffset;
-        _yLast = yOffset;
+        _prevX = mouseX;
+        _prevY = mouseY;
 
-		_a += xOffset * sen;
-		_b += yOffset * sen;
+		_b += changeX * sen;
+		_a += changeY * sen;
 
 		if (_a > 50.0f) { _a = 50.0f; };
 		if (_a < -50.0f) { _a = -50.0f; };
 
+        // TODO 3rd person
         if (_target)
         {
             _position.x = _target->x * cos(glm::radians(_b));
             _position.y = _target->y * sin(glm::radians(_a)) + 3.5f;
-            _position.z = _target->z * sin(glm::radians(_b));	// this isnt quite right
+            _position.z = _target->z * sin(glm::radians(_b));
         }
 
 		_z = glm::normalize(glm::vec3(

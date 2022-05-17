@@ -40,8 +40,8 @@ int main(int argc, char const *argv[])
 	xen::Light light;
 	light.position = glm::vec3(0.0f, 3.0f, -1.0f);
 
-	xen::camera::update_aim(0.0f, 0.0f, 0.1f);
-    xen::camera::set_target(xen::scene::model_position(model));
+    // xen::camera::set_target(xen::scene::model_position(model));
+
 	auto viewMatrix = xen::camera::view_matrix();
 	auto projectionMatrix = xen::window::projection_matrix(55.0f);
 
@@ -57,8 +57,6 @@ int main(int argc, char const *argv[])
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         
-        xen::camera::update_aim(0.0f, 0.0f, 0.1f);
-
         // input
         auto inputBits = xen::window::get_input();
         // input.set(inputBits);
@@ -103,7 +101,7 @@ int main(int argc, char const *argv[])
 	return 0;
 }
 
-void on_mouse(GLFWwindow *window, double xPosIn, double yPosIn)
+void on_mouse(GLFWwindow *window, double x, double y)
 {
-	xen::camera::update_aim(static_cast<float>(xPosIn), static_cast<float>(yPosIn), 0.1f);
+	xen::camera::update_aim(static_cast<float>(x), static_cast<float>(y), 0.1f);
 }
