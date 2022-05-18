@@ -32,6 +32,24 @@ namespace xen::camera
         return _position;
     }
 
+    void init()
+    {
+        _position = glm::vec3(
+            (offsetRad * (cos(glm::radians(_b)) * cos(glm::radians(_a)))),
+            (offsetRad * (sin(glm::radians(_a)))),
+            (offsetRad * (sin(glm::radians(_b)) * cos(glm::radians(_a)))
+        ));
+
+        _position.y += 3.5f;
+
+		_z = glm::normalize(glm::vec3(
+			cos(glm::radians(_b)) * cos(glm::radians(_a)),
+			sin(glm::radians(_a)),
+			sin(glm::radians(_b)) * cos(glm::radians(_a))));
+
+		_x = glm::normalize(glm::cross(_z, _y));
+    }
+
 	// update _vectors and position based on a centre of rotation about an xz position
 	void update_aim(float mouseX, float mouseY, float sen)
 	{
@@ -61,8 +79,6 @@ namespace xen::camera
         ));
 
         _position.y += 3.5f;
-
-        std::cout << _position.x << " " << _position.y << " " << _position.z << "\n";
 
 		_z = glm::normalize(glm::vec3(
 			cos(glm::radians(_b)) * cos(glm::radians(_a)),

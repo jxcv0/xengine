@@ -4,13 +4,12 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
-#include <vector>
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
 #include "alloc.h"
-#include "gamestate.h"
+#include "input.h"
 #include "jobsys.h"
 #include "checkerr.h"
 #include "model.h"
@@ -18,8 +17,6 @@
 #include "window.h"
 #include "shader.h"
 #include "light.h"
-
-const glm::vec3 worldUp(0.0f, 1.0f, 0.0f);
 
 void on_mouse(GLFWwindow *window, double xPosIn, double yPosIn);
 
@@ -40,7 +37,7 @@ int main(int argc, char const *argv[])
 	xen::Light light;
 	light.position = glm::vec3(0.0f, 3.0f, -1.0f);
 
-    xen::camera::update_aim(0.0f, 0.0f, 0.0f);
+    xen::camera::init();
 
 	auto viewMatrix = xen::camera::view_matrix();
 	auto projectionMatrix = xen::window::projection_matrix(55.0f);
@@ -58,8 +55,7 @@ int main(int argc, char const *argv[])
         lastFrame = currentFrame;
         
         // input
-        auto inputBits = xen::window::get_input();
-        // input.set(inputBits);
+        input.set(xen::window::get_input());
         
 		// render matrices
         auto viewMatrix = xen::camera::view_matrix();

@@ -294,6 +294,7 @@ namespace xen::scene
 		_models[model].matrix = glm::rotate(mat, glm::radians(_models[model].b), glm::vec3(0.0f, 1.0f, 0.0f));
 	}
 
+    // update and get a model matrix
     glm::mat4 model_matrix(unsigned int model)
     {
         update_model_matrix(model);
@@ -303,7 +304,7 @@ namespace xen::scene
 	// draw all meshes in a model using a single shader program
 	void draw_model(unsigned int model, unsigned int shader)
 	{
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < _models[model].numTextures; i++)
         {
             glActiveTexture(GL_TEXTURE0 + i);
             xen::shader::set_uniform(shader, _models[model].textures[i].uniformName.c_str(), i);
