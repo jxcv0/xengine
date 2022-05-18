@@ -20,10 +20,11 @@ find_package(assimp REQUIRED)
 
 set(
   SOURCES 
-    include/gamestate.h
+    include/player.h
+    include/input.h
     include/alloc.h
     include/light.h
-    include/model.h
+    include/scene.h
     include/camera.h
     include/shader.h
     include/window.h

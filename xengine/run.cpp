@@ -12,7 +12,8 @@
 #include "input.h"
 #include "jobsys.h"
 #include "checkerr.h"
-#include "model.h"
+#include "scene.h"
+#include "player.h"
 #include "camera.h"
 #include "window.h"
 #include "shader.h"
@@ -23,7 +24,6 @@ void on_mouse(GLFWwindow *window, double xPosIn, double yPosIn);
 int main(int argc, char const *argv[])
 {
     xen::window::init(1080, 600);
-    xen::Input input;
     xen::window::set_cursor_position_callback(on_mouse);
     xen::jobsys::init();
 
@@ -55,7 +55,9 @@ int main(int argc, char const *argv[])
         lastFrame = currentFrame;
         
         // input
-        input.set(xen::window::get_input());
+        xen::input::set(xen::window::get_input());
+
+        xen::player::process_input();
         
 		// render matrices
         auto viewMatrix = xen::camera::view_matrix();
@@ -90,7 +92,7 @@ int main(int argc, char const *argv[])
         xen::window::poll_events();
 
 		checkerr();
-        input.clear();
+        xen::input::clear();
 	}
 
     xen::jobsys::terminate();

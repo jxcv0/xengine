@@ -31,7 +31,8 @@ namespace xen::camera
     {
         return _position;
     }
-
+    
+    // init camera to starting values
     void init()
     {
         _position = glm::vec3(

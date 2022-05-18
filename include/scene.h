@@ -1,5 +1,5 @@
-#ifndef MODEL_H
-#define MODEL_H
+#ifndef SCENE_H
+#define SCENE_H
 
 #include <glad.h>
 
@@ -315,6 +315,12 @@ namespace xen::scene
         glBindVertexArray(0);
         glActiveTexture(GL_TEXTURE0);
 	}
+
+    // set the rotation of the model about the global y axis
+    void set_model_rotation_y(unsigned int model, float r)
+    {
+        _models[model].b = r;
+    }
 } //namespace xen::scene
 
-#endif // MODEL_H
+#endif // SCENE_H
