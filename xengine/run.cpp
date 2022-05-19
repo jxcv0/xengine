@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
+#include "filesys.h"
 #include "alloc.h"
 #include "input.h"
 #include "jobsys.h"
@@ -26,6 +27,7 @@ int main(int argc, char const *argv[])
     xen::window::init(1080, 600);
     xen::window::set_cursor_position_callback(on_mouse);
     xen::jobsys::init();
+    xen::filesys::init();
 
     // models
 	auto shader = xen::shader::load_shader("assets/shaders/model.vert", "assets/shaders/model.frag");

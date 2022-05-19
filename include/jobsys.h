@@ -8,14 +8,13 @@
 
 namespace
 {
-    const size_t BUFFER_SIZE = 256;
     const size_t NTHREADS = 4;
 
-    bool _run = true; // does not need to be atomic for single producer
-    pthread_t _threads[NTHREADS];
-    int _threadRet[NTHREADS];
-    pthread_mutex_t _m;
-    pthread_cond_t _cv;
+    bool _jobsysRun = true; // does not need to be atomic for single producer
+    pthread_t _jobsysThreads[NTHREADS];
+    int _jobsysThreadRet[NTHREADS];
+    pthread_mutex_t _jobsysMutex;
+    pthread_cond_t _jobsysCond;
 
     // Job type
     struct Job
@@ -24,22 +23,22 @@ namespace
         void* data;
     };
 
-    xen::CircularBuffer<Job> _workQueue(BUFFER_SIZE);
+    xen::CircularBuffer<Job> _workQueue(256);
 
     // wait loop for each worker thread
-    void* spin(void*)
+    void* jobsys_main(void*)
     {
-        while(_run)
+        while(_jobsysRun)
         {
             Job *job = nullptr;
 
-            pthread_mutex_lock(&_m);
-            pthread_cond_wait(&_cv, &_m);
+            pthread_mutex_lock(&_jobsysMutex);
+            pthread_cond_wait(&_jobsysCond, &_jobsysMutex);
 
             if (_workQueue.size() > 0) { job = _workQueue.readptr(); }
 
-            pthread_mutex_unlock(&_m);
-            pthread_cond_signal(&_cv);
+            pthread_mutex_unlock(&_jobsysMutex);
+            pthread_cond_signal(&_jobsysCond);
 
             if (job) { job->func(job->data); }
         }
@@ -55,9 +54,9 @@ namespace xen::jobsys
     {
         for (size_t i = 0; i < NTHREADS; i++)
         {
-            pthread_create(&_threads[i], NULL, spin, (void*)0);
+            pthread_create(&_jobsysThreads[i], NULL, jobsys_main, (void*)0);
 #ifdef XEN_DEBUG
-            std::string msg("Created thread: " + std::to_string(_threads[i]));
+            std::string msg("Created thread: " + std::to_string(_jobsysThreads[i]));
             logmsg(msg.c_str());
 #endif
         }
@@ -66,21 +65,21 @@ namespace xen::jobsys
     // notify and join all threads
     void terminate()
     {
-        _run = false;
+        _jobsysRun = false;
         for (size_t i = 0; i < NTHREADS; i++)
         {
-            pthread_cond_signal(&_cv);
-            pthread_join(_threads[i], NULL);
+            pthread_cond_signal(&_jobsysCond);
+            pthread_join(_jobsysThreads[i], NULL);
         }
     }
 
     // push a job to the back of the work queue
     void push(Job job)
     {
-        pthread_mutex_lock(&_m);
+        pthread_mutex_lock(&_jobsysMutex);
         _workQueue.write(job);
-        pthread_mutex_unlock(&_m);
-        pthread_cond_signal(&_cv);
+        pthread_mutex_unlock(&_jobsysMutex);
+        pthread_cond_signal(&_jobsysCond);
     }
 
     // push a job to the back of the work queue

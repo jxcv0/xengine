@@ -1,6 +1,8 @@
 #ifndef BUFFER_H
 #define BUFFER_H
 
+#include "alloc.h"
+
 namespace xen
 {
     // circular fifo queue
@@ -10,12 +12,12 @@ namespace xen
         CircularBuffer(size_t n)
         {
             _maxSize = n;
-            _buffer = new T[_maxSize];
+            _buffer = mem::alloc_aligned<T>(_maxSize);
         }
 
         ~CircularBuffer()
         {
-            delete[] _buffer;
+            mem::free_aligned(_buffer);
         }
 
         inline void write(T item)
