@@ -62,10 +62,25 @@ int main(int argc, char const *argv[])
 		// render matrices
         auto viewMatrix = xen::camera::view_matrix();
 
-        // this works!
-        // xen::jobsys::push([](void* c) -> void* {
-        //     auto *camera = static_cast<xen::camera::Camera*>(c);
-        //     // do things ...
+        // test
+        // xen::jobsys::push([](void*) -> void* {
+            // std::cout << "job1\n";
+            // return nullptr;
+        // }, (void*)0);
+
+        // xen::jobsys::push([](void*) -> void* {
+            // std::cout << "job2\n";
+            // return nullptr;
+        // }, (void*)0);
+
+        // xen::jobsys::push([](void*) -> void* {
+            // std::cout << "job3\n";
+            // return nullptr;
+        // }, (void*)0);
+
+        // xen::jobsys::push([](void*) -> void* {
+            // std::cout << "job4\n";
+            // return nullptr;
         // }, (void*)0);
 
 		// shader and shader uniforms
