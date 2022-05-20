@@ -20,6 +20,7 @@ find_package(assimp REQUIRED)
 
 set(
   SOURCES 
+    include/math.h
     include/buffer.h
     include/player.h
     include/input.h

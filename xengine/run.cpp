@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
+#include "math.h"
 #include "filesys.h"
 #include "alloc.h"
 #include "input.h"

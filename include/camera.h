@@ -4,6 +4,8 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
+#include "math.h"
+
 namespace
 {
     float offsetRad = -3.0f;
@@ -33,20 +35,21 @@ namespace xen::camera
     }
     
     // init camera to starting values
+    // TODO condense calls to radians()
     void init()
     {
         _position = glm::vec3(
-            (offsetRad * (cos(glm::radians(_b)) * cos(glm::radians(_a)))),
-            (offsetRad * (sin(glm::radians(_a)))),
-            (offsetRad * (sin(glm::radians(_b)) * cos(glm::radians(_a)))
+            (offsetRad * (cos(xen::radians(_b)) * cos(xen::radians(_a)))),
+            (offsetRad * (sin(xen::radians(_a)))),
+            (offsetRad * (sin(xen::radians(_b)) * cos(xen::radians(_a)))
         ));
 
         _position.y += 3.5f;
 
 		_z = glm::normalize(glm::vec3(
-			cos(glm::radians(_b)) * cos(glm::radians(_a)),
-			sin(glm::radians(_a)),
-			sin(glm::radians(_b)) * cos(glm::radians(_a))));
+			cos(xen::radians(_b)) * cos(xen::radians(_a)),
+			sin(xen::radians(_a)),
+			sin(xen::radians(_b)) * cos(xen::radians(_a))));
 
 		_x = glm::normalize(glm::cross(_z, _y));
     }
@@ -74,17 +77,17 @@ namespace xen::camera
 		if (_a < -50.0f) { _a = -50.0f; };
 
         _position = glm::vec3(
-            (offsetRad * (cos(glm::radians(_b)) * cos(glm::radians(_a)))),
-            (offsetRad * (sin(glm::radians(_a)))),
-            (offsetRad * (sin(glm::radians(_b)) * cos(glm::radians(_a)))
+            (offsetRad * (cos(xen::radians(_b)) * cos(xen::radians(_a)))),
+            (offsetRad * (sin(xen::radians(_a)))),
+            (offsetRad * (sin(xen::radians(_b)) * cos(xen::radians(_a)))
         ));
 
         _position.y += 3.5f;
 
 		_z = glm::normalize(glm::vec3(
-			cos(glm::radians(_b)) * cos(glm::radians(_a)),
-			sin(glm::radians(_a)),
-			sin(glm::radians(_b)) * cos(glm::radians(_a))));
+			cos(xen::radians(_b)) * cos(xen::radians(_a)),
+			sin(xen::radians(_a)),
+			sin(xen::radians(_b)) * cos(xen::radians(_a))));
 
 		_x = glm::normalize(glm::cross(_z, _y));
 	}
