@@ -8,6 +8,8 @@
 #include <sstream>
 #include <iostream>
 
+#include "math.h"
+
 namespace xen::shader
 {
 	// check the compilation status of a shader program
@@ -138,6 +140,27 @@ namespace xen::shader
 	{
 		glUniformMatrix4fv(glGetUniformLocation(shader, uniformName), 1, GL_FALSE, &value[0][0]);
 	}
+
+    // own math lib
+
+
+    // set shader Vec<2> uniform utility function
+    void set_uniform(unsigned int shader, const char* uniformName, Vec<2> &value)
+    {
+		glUniform2fv(glGetUniformLocation(shader, uniformName), 1, &value[0]);
+    }
+    //
+    // set shader Vec<2> uniform utility function
+    void set_uniform(unsigned int shader, const char* uniformName, Vec<3> &value)
+    {
+		glUniform3fv(glGetUniformLocation(shader, uniformName), 1, &value[0]);
+    }
+
+    // set shader Mat<4, 4> uniform utility function
+    void set_uniform(unsigned int shader, const char* uniformName, Mat<4, 4> &value)
+    {
+		glUniformMatrix4fv(glGetUniformLocation(shader, uniformName), 1, GL_FALSE, &value[0][0]);
+    }
 } // namespace xen
 
 #endif // SHADER_H

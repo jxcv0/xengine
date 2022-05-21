@@ -297,7 +297,7 @@ namespace xen::scene
     // update and get a model matrix
     glm::mat4 model_matrix(unsigned int model)
     {
-        update_model_matrix(model);
+        update_model_matrix(model); // keep this?
         return _models[model].matrix;
     }
 
