@@ -12,7 +12,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#include <glm/glm.hpp>
+// #include <glm/glm.hpp>
 
 #include "shader.h"
 #include "alloc.h"
@@ -41,8 +41,8 @@ namespace
 	// TODO animations
 	struct Model
 	{
-		glm::vec3 position = glm::vec3(0.0f);			    // position of model in world space - default to world 0, 0, 0
-		const glm::vec3 y = glm::vec3(0.0f, 1.0f, 0.0f);
+		glm::vec3 position{0.0f, 0.0f, 0.0f};
+		const glm::vec3 y{0.0f, 0.0f, 0.0f};
 		float b = 0.0f;						                // rotation about global y axis (up)
         glm::mat4 matrix;
 
@@ -149,17 +149,17 @@ namespace xen::scene
 				glm::vec3 vector;
 
 				// positions
-				vector.x = mesh->mVertices[j].x;
-				vector.y = mesh->mVertices[j].y;
-				vector.z = mesh->mVertices[j].z;
+				vector[0] = mesh->mVertices[j].x;
+				vector[1] = mesh->mVertices[j].y;
+				vector[2] = mesh->mVertices[j].z;
 				vertex.position = vector;
 
 				// normals
 				if (mesh->HasNormals())
 				{
-					vector.x = mesh->mNormals[j].x;
-					vector.y = mesh->mNormals[j].y;
-					vector.z = mesh->mNormals[j].z;
+					vector[0] = mesh->mNormals[j].x;
+					vector[1] = mesh->mNormals[j].y;
+					vector[2] = mesh->mNormals[j].z;
 					vertex.normal = vector;
 				}
 
@@ -167,23 +167,23 @@ namespace xen::scene
 				if(mesh->mTextureCoords[0])
 				{
 					glm::vec2 vec;
-					vec.x = mesh->mTextureCoords[0][j].x; 
-					vec.y = mesh->mTextureCoords[0][j].y;
+					vec[0] = mesh->mTextureCoords[0][j].x; 
+					vec[1] = mesh->mTextureCoords[0][j].y;
 					vertex.texCoord = vec;
 
-					vector.x = mesh->mTangents[i].x;
-					vector.y = mesh->mTangents[i].y;
-					vector.z = mesh->mTangents[i].z;
+					vector[0] = mesh->mTangents[i].x;
+					vector[1] = mesh->mTangents[i].y;
+					vector[2] = mesh->mTangents[i].z;
 					vertex.tangent = vector;
 
-					vector.x = mesh->mBitangents[i].x;
-					vector.y = mesh->mBitangents[i].y;
-					vector.z = mesh->mBitangents[i].z;
+					vector[0] = mesh->mBitangents[i].x;
+					vector[1] = mesh->mBitangents[i].y;
+					vector[2] = mesh->mBitangents[i].z;
 					vertex.bitangent = vector;
 				}
 				else
 				{
-					vertex.texCoord = glm::vec2(0.0f, 0.0f);
+					vertex.texCoord = {0.0f, 0.0f};
 				}
                 model->vertices[j] = vertex;
 			}
@@ -282,9 +282,9 @@ namespace xen::scene
     
     // get a ptr to a model position
     // used for if a game entity needs a reference to another model for calculations
-    glm::vec3* model_position(unsigned int model)
+    Model* get_model(unsigned int model)
     {
-        return &_models[model].position;
+        return &_models[model];
     }
 
 	// generate model matrix based on model position
@@ -317,7 +317,7 @@ namespace xen::scene
 	}
 
     // set the rotation of the model about the global y axis
-    void set_model_rotation_y(unsigned int model, float r)
+    inline void set_model_rotation_y(unsigned int model, float r)
     {
         _models[model].b = r;
     }

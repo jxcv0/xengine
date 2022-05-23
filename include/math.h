@@ -2,29 +2,31 @@
 #define MATH_H
 
 #include <iostream>
-#include <cassert>
+#include <cmath>
 
 // TODO SIMD
 
 namespace xen
 {
     // take a wild guess
-    float radians(float dg)
+    inline float radians(float dg)
     {
         return dg * 0.0174533;
     }
 
+    // Vector of length n
+    // values initialized to 0
     template<int n>
     struct Vec
     {
-        auto& operator[](size_t index){ return vals[index]; }
+        inline auto& operator[](size_t index){ return vals[index]; }
 
-        float operator*(float f) 
+        inline float operator*(float f) 
         {
             return (vals[0] * f) + (vals[1] * f) + (vals[2] * f);
         }
 
-        Vec<n> operator+(Vec<n>&& v)
+        inline Vec<n> operator+(Vec<n>&& v)
         {
             Vec<n> res;
             for (size_t i = 0; i < n; i++)
@@ -33,14 +35,14 @@ namespace xen
             }
         }
 
-        float vals[n];
+        float vals[n] = {0.0f};
     };
 
     template<int m, int n>
     struct Mat
     {
-        auto& operator[](size_t index) { return vals[index]; }
-        float vals[m][n];
+        inline auto& operator[](size_t index) { return vals[index]; }
+        float vals[m][n] = {0.0f};
     };
 
     // get the dot product of 2 Vec<3>s
@@ -82,13 +84,39 @@ namespace xen
         return res;
     }
 
+    template<int m, int n>
+    void dbg_mat(Mat<m, n>& mat)
+    {
+        std::cout << "Mat<" << m << ", " << n << ">:\n";
+        for (size_t i = 0; i < m; i++)
+        {
+            for (size_t j = 0; j < n; j++)
+            {
+                std::cout << mat[i][j] << " ";
+            }
+            std::cout << "\n";
+        }
+        std::cout << "\n";
+    }
+
+    template<int n>
+    void dbg_vec(Vec<n>& v)
+    {
+        std::cout << "Vec<" << n << ">:\n";
+        for (size_t i = 0; i < n; i++)
+        {
+            std::cout << v[i] << " ";
+        }
+        std::cout << "\n\n";
+    }
+
     // add translation values to a 4x4 matrix
     inline Mat<4, 4> translate(Mat<4, 4>& mat, Vec<3>& v)
     {
         Mat<4, 4> res;
         res[3][0] = v[0];
-        res[3][1] = v[0];
-        res[3][2] = v[0];
+        res[3][1] = v[1];
+        res[3][2] = v[2];
         res[3][3] = 1.0f;
         return res;
     }
@@ -108,10 +136,11 @@ namespace xen
     inline Mat<4, 4> rotate(Mat<4, 4>& mat, float theta, Vec<3>& axis)
     {
         // radians?
-        auto angle = radians(theta);
-        auto c = cos(angle);
-        auto s = sin(angle);
+        float angle = radians(theta);
+        auto c = std::cos(angle);
+        auto s = std::sin(angle);
         auto t = axis * (1 - c);
+        std::cout << "theta:" << theta << " angle: " << angle << " c: " << c << " t: " << t << "\n";
 
         Vec<3> temp;
         temp[0] = t;
