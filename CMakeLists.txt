@@ -25,7 +25,6 @@ set(
     include/player.h
     include/input.h
     include/alloc.h
-    include/light.h
     include/scene.h
     include/camera.h
     include/shader.h

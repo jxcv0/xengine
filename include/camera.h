@@ -8,7 +8,7 @@
 
 namespace
 {
-    float offsetRad = -3.0f;
+    float offsetRad = -5.0f;
     glm::vec3 _position = glm::vec3(0.0f, 0.0f, 0.0f);
     glm::vec3 _x = glm::vec3(0.0f, 1.0f, 0.0f);
     glm::vec3 _y = glm::vec3(0.0f, 1.0f, 0.0f);

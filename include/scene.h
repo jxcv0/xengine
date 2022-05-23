@@ -18,6 +18,7 @@
 #include "alloc.h"
 
 #define XEN_MAX_MODELS 256
+#define XEN_MAX_LIGHTS 32
 
 namespace
 {
@@ -58,9 +59,23 @@ namespace
         size_t numTextures = 0;
 		Texture textures[3]; // diffuse, specular, normal
 	};
+
+	struct Light
+	{
+		glm::vec3 colour = glm::vec3(1.0f);
+		glm::vec3 position;
+
+		// attenuation
+		float constant = 1.0f;
+		float linear = 0.09f;
+		float quadratic = 0.032f;
+	};
 	
-    size_t _mkr = 0;
+    size_t _modelMkr = 0;
     Model _models[XEN_MAX_MODELS];
+
+    size_t _lightMkr = 0;
+    Light _lights[XEN_MAX_LIGHTS];
 
     // stack allocators
     xen::mem::StackAllocator<Vertex> _vertexAllocator(20000);
@@ -217,7 +232,7 @@ namespace xen::scene
 	// load a model from a file and return a handle to the model in the scene
 	int load_model(const char* filepath)
 	{
-        if (_mkr == XEN_MAX_MODELS) { return -1; }
+        if (_modelMkr == XEN_MAX_MODELS) { return -1; }
 
 		std::string dir(filepath);
 		dir = dir.substr(0, dir.find_last_of('/'));
@@ -235,8 +250,8 @@ namespace xen::scene
 			return -1;
 		}
 
-		process_node(&_models[_mkr], scene->mRootNode, scene, dir);
-        return _mkr++;
+		process_node(&_models[_modelMkr], scene->mRootNode, scene, dir);
+        return _modelMkr++;
 	}
 	
 	// buffer model data in gl
@@ -320,6 +335,23 @@ namespace xen::scene
     inline void set_model_rotation_y(unsigned int model, float r)
     {
         _models[model].b = r;
+    }
+
+    inline int add_light(glm::vec3 pos)
+    {
+        _lights[_lightMkr].position = pos;
+        return _lightMkr++;
+    }
+
+    // temp function just to move this here
+    // TODO delete this and set up better system of setting light uniforms
+    void set_light_uniforms(unsigned int shader, unsigned int light)
+    {
+		xen::shader::set_uniform(shader, "light.position", _lights[light].position);
+		xen::shader::set_uniform(shader, "light.colour", _lights[light].colour);
+		xen::shader::set_uniform(shader, "light.constant", _lights[light].constant);
+		xen::shader::set_uniform(shader, "light.linear", _lights[light].linear);
+		xen::shader::set_uniform(shader, "light.quadratic", _lights[light].quadratic);
     }
 } //namespace xen::scene
 

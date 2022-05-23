@@ -19,7 +19,6 @@
 #include "camera.h"
 #include "window.h"
 #include "shader.h"
-#include "light.h"
 
 void on_mouse(GLFWwindow *window, double xPosIn, double yPosIn);
 
@@ -33,12 +32,12 @@ int main(int argc, char const *argv[])
     // models
 	auto shader = xen::shader::load_shader("assets/shaders/model.vert", "assets/shaders/model.frag");
 
-    auto model = xen::scene::load_model("assets/models/cyborg/cyborg.obj");
+    auto model = xen::scene::load_model("assets/models/rect/rect.obj");
+    // auto model = xen::scene::load_model("assets/models/cyborg/cyborg.obj");
     xen::scene::gen_buffers(model);
 	
 	// temp light
-	xen::Light light;
-	light.position = glm::vec3(0.0f, 3.0f, -1.0f);
+	auto light = xen::scene::add_light(glm::vec3(1.0f, 3.0f, 1.0f));
 
     xen::camera::init();
 
@@ -90,15 +89,11 @@ int main(int argc, char const *argv[])
         xen::shader::use_shader(shader);
 		xen::shader::set_uniform(shader, "view", viewMatrix);
 		xen::shader::set_uniform(shader, "projection", projectionMatrix);
+        xen::scene::set_light_uniforms(shader, light);
 
 		// light
 		xen::shader::set_uniform(shader, "viewPosition", xen::camera::camera_position());
 		xen::shader::set_uniform(shader, "shininess", 16.0f);
-		xen::shader::set_uniform(shader, "light.position", light.position);
-		xen::shader::set_uniform(shader, "light.colour", light.colour);
-		xen::shader::set_uniform(shader, "light.constant", light.constant);
-		xen::shader::set_uniform(shader, "light.linear", light.linear);
-		xen::shader::set_uniform(shader, "light.quadratic", light.quadratic);
 
         // TODO - this is the kind of thing that should be sent to the render thread
         // OpenGL calls must be single threaded
