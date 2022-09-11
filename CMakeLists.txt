@@ -1,11 +1,10 @@
 cmake_minimum_required(VERSION 3.18)
 project(xengine VERSION 0.1.0)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_BUILD_TYPE debug)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a")
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a -O3")
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 enable_testing()
 
@@ -20,19 +19,16 @@ find_package(assimp REQUIRED)
 
 set(
   SOURCES 
-    include/math.h
-    include/buffer.h
-    include/player.h
-    include/input.h
-    include/alloc.h
-    include/scene.h
-    include/camera.h
-    include/shader.h
-    include/window.h
-    include/checkerr.h
+    include/keys.h
+    include/mainwindow.h
 )
 
-add_library(${PROJECT_NAME} STATIC ${SOURCES}) 
+set(
+  HEADERS 
+    src/main.cpp
+)
+
+add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS}) 
 set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 
 target_include_directories(
@@ -53,8 +49,8 @@ target_link_libraries(
 )
 
 add_subdirectory(lib/glad)
-add_subdirectory(xengine)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
+
