@@ -25,17 +25,6 @@ GLenum checkerror_(const char *file, int line) {
     }
 #define checkerr() checkerror_(__FILE__, __LINE__)
 
-/**
- * @brief Debug callback for opengl
- * 
- * @param source 
- * @param type 
- * @param id 
- * @param severity 
- * @param length 
- * @param message 
- * @param userParam 
- */
 void APIENTRY gl_debug_output(
     GLenum source,
     GLenum type,
