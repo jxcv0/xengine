@@ -1,7 +1,7 @@
 #ifndef SHADEREXCEPTIONS_H_
 #define SHADEREXCEPTIONS_H_
 
-#include <exception>
+#include <stdexcept>
 
 /* \brief Runtime exception to be thrown when shader fails to compile.
  */
