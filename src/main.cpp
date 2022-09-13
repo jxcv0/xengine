@@ -20,7 +20,8 @@ int main(int argc, char const *argv[])
 
   Shader basic_shader = ShaderUtils::load("assets/shaders/model.vert",
                                           "assets/shaders/model.frag");
-  Mesh mesh;
+
+  Mesh mesh("assets/models/cyborg/cyborg.obj");
 
   while (!main_window.should_close()) {
     main_window.update_input();

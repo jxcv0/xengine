@@ -33,13 +33,30 @@ class Mesh {
 		std::string uniform_name;
 	};
 
-  std::string filepath;
+  std::string m_filepath;
   uint32_t m_VAO;
   uint32_t m_VBO;
   uint32_t m_EBO;
   std::vector<Vertex> m_vertices;
   std::vector<uint32_t> m_indices;
   std::vector<Texture> m_textures;
+
+public:
+
+  Mesh() = delete;
+
+  /*! \brief          Construct a mesh with a filepath.
+   *                  The mesh is not loaded from file here.
+   *  \param filepath The filepath to the 3D mesh file.
+   */
+  Mesh(const char *filepath) : m_filepath(filepath) {};
+
+  ~Mesh() {
+  }
+
+  /*! \brief Load the mesh data from the file.
+   */
+  void load_from_file();
 
   /*! \brief Generate OpenGL buffer objects for this mesh.
    */
