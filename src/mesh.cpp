@@ -4,6 +4,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+/*------------------------------------------------------------------------------
+ */
 void
 Mesh::gen_buffers() {
   glGenVertexArrays(1, &m_VAO);
@@ -50,42 +52,39 @@ Mesh::gen_buffers() {
   glBindVertexArray(0);
 }
 
-namespace MeshUtils {
-  /*! \brief      Load an image texture from a path and add it to GL texture buffer.
-   *  \param path The filepath to the image file.
-   *  \return     A handle to the texture object.
-   */
-	uint32_t load_texture(const char* path) {
-		uint32_t texture_id;
-		glGenTextures(1, &texture_id);
+/*------------------------------------------------------------------------------
+ */
+uint32_t MeshUtils::load_texture(const char* path) {
+  uint32_t texture_id;
+  glGenTextures(1, &texture_id);
 
-		int width, height, num_comp;
-		unsigned char* data = stbi_load(path, &width, &height, &num_comp, 0);
+  int width, height, num_comp;
+  unsigned char* data = stbi_load(path, &width, &height, &num_comp, 0);
 
-		if (data) {
-			GLenum format;
-			if (num_comp == 1) {
-				format = GL_RED;
-			} else if (num_comp == 3) {
-				format = GL_RGB;
-			} else if (num_comp == 4) {
-				format = GL_RGBA;
-			}
+  if (data) {
+    GLenum format;
+    if (num_comp == 1) {
+      format = GL_RED;
+    } else if (num_comp == 3) {
+      format = GL_RGB;
+    } else if (num_comp == 4) {
+      format = GL_RGBA;
+    }
 
-			glBindTexture(GL_TEXTURE_2D, texture_id);
-			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-			glGenerateMipmap(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
 
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-		} else {
-			std::cout << "Unable to load texture from " << path << "\n";
-		}
-
-    stbi_image_free(data);
-		return texture_id;
+  } else {
+    std::cout << "Unable to load texture from " << path << "\n";
   }
-} // namespace MeshUtils
+
+  stbi_image_free(data);
+  return texture_id;
+}
+
