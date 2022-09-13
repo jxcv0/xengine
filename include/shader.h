@@ -10,7 +10,7 @@
 
 #ifndef OPENGL_LIBS
 #define OPENGL_LIBS
-#include "glad.h"
+#include <glad.h>
 #endif
 
 #include <glm/glm.hpp>

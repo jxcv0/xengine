@@ -7,6 +7,7 @@ in vec3 normal;
 in mat3 TBN;
 
 // each renderable object only has one material
+
 uniform sampler2D textureDiffuse;
 uniform sampler2D textureSpecular;
 uniform sampler2D textureNormal;
@@ -14,8 +15,7 @@ uniform float shininess;
 
 uniform vec3 viewPosition;
 
-struct Light
-{
+struct Light {
 	vec3 position;
 	vec3 colour;
 
@@ -27,8 +27,7 @@ struct Light
 uniform Light light;
 
 // calculate on omnidirectional light
-vec3 calculateLight(Light light, vec3 normal, vec3 viewDir)
-{
+vec3 calculateLight(Light light, vec3 normal, vec3 viewDir) {
 	
 	float distance = length(light.position - fragPos);
 	float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic + (distance * distance));
@@ -53,8 +52,7 @@ vec3 calculateLight(Light light, vec3 normal, vec3 viewDir)
 	return (ambient + diffuse + specular) * attenuation;
 }
 
-void main()
-{
+void main() {
 	vec3 viewDir = normalize(viewPosition - fragPos);
 	vec3 normal = texture(textureNormal, texCoord).rgb;
 	normal = (normal * 2.0 - 1.0);
@@ -63,3 +61,4 @@ void main()
 	vec3 result = calculateLight(light, normal, viewDir);
 	fragCol = vec4(result, 1.0);
 }
+

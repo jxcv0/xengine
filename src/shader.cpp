@@ -33,16 +33,22 @@ namespace ShaderUtils {
 
 		try {
       vert_file.open(vert_path);
-			frag_file.open(frag_path);
-			std::stringstream vertStream, fragStream;
+			std::stringstream vertStream;
 			vertStream << vert_file.rdbuf();
-			fragStream << frag_file.rdbuf();
 			vert_file.close();
-			frag_file.close();
 			vert_code = vertStream.str();
+		} catch (std::ifstream::failure &e) {
+      std::cout << "Unable to load vertex shader: " << e.what() << "\n";
+		}
+
+		try {
+			frag_file.open(frag_path);
+			std::stringstream fragStream;
+			fragStream << frag_file.rdbuf();
+			frag_file.close();
 			frag_code = fragStream.str();
 		} catch (std::ifstream::failure &e) {
-			std::cout << "Unable to load shader: " << e.what() << "\n";
+      std::cout << "Unable to load fragment shader: " << e.what() << "\n";
 		}
 		
 		const char *vert_code_cstr = vert_code.c_str();

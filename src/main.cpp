@@ -18,7 +18,7 @@ int main(int argc, char const *argv[])
   main_window.show();
 
   Shader basic_shader = ShaderUtils::load("assets/shaders/model.vert",
-                                          "assert/shaders/model.frag");
+                                          "assets/shaders/model.frag");
 
   while (!main_window.should_close()) {
     main_window.update_input();

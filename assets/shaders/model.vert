@@ -25,3 +25,4 @@ void main() {
 	texCoord = aTexCoord;
 	normal = aNormal;
 }
+
