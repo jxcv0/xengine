@@ -38,7 +38,8 @@ namespace ShaderUtils {
 			vert_file.close();
 			vert_code = vertStream.str();
 		} catch (std::ifstream::failure &e) {
-      std::cout << "Unable to load vertex shader: " << e.what() << "\n";
+      std::cout << "Unable to load vertex shader "
+                << vert_path << " " << e.what() << "\n";
 		}
 
 		try {
@@ -48,7 +49,8 @@ namespace ShaderUtils {
 			frag_file.close();
 			frag_code = fragStream.str();
 		} catch (std::ifstream::failure &e) {
-      std::cout << "Unable to load fragment shader: " << e.what() << "\n";
+      std::cout << "Unable to load fragment shader "
+                << frag_path << " " << e.what() << "\n";
 		}
 		
 		const char *vert_code_cstr = vert_code.c_str();
