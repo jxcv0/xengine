@@ -22,12 +22,16 @@ set(
     include/keys.h
     include/mainwindow.h
     include/shader.h
+    include/mesh.h
+
+    lib/stb/stb_image.h
 )
 
 set(
   HEADERS 
     src/main.cpp
     src/shader.cpp
+    src/mesh.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS}) 

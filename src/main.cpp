@@ -5,6 +5,7 @@
 
 #include "mainwindow.h"
 #include "shader.h"
+#include "mesh.h"
 
 // void on_mouse(GLFWwindow *window, double xPosIn, double yPosIn);
 
@@ -19,6 +20,7 @@ int main(int argc, char const *argv[])
 
   Shader basic_shader = ShaderUtils::load("assets/shaders/model.vert",
                                           "assets/shaders/model.frag");
+  Mesh mesh;
 
   while (!main_window.should_close()) {
     main_window.update_input();
