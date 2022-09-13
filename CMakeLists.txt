@@ -22,12 +22,12 @@ set(
     include/keys.h
     include/mainwindow.h
     include/shader.h
-    include/shaderexceptions.h
 )
 
 set(
   HEADERS 
     src/main.cpp
+    src/shader.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS}) 
