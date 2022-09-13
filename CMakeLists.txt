@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.16)
 project(xengine VERSION 0.1.0)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -15,12 +15,14 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 find_package(OpenGL REQUIRED)
 find_package(glfw3 3.3 REQUIRED)
 find_package(glm REQUIRED)
-find_package(assimp REQUIRED)
+# find_package(assimp REQUIRED)
 
 set(
   SOURCES 
     include/keys.h
     include/mainwindow.h
+    include/shader.h
+    include/shaderexceptions.h
 )
 
 set(
@@ -45,7 +47,8 @@ target_link_libraries(
       glm::glm
       glad
       OpenGL::GL
-      assimp
+      dl
+      # assimp
 )
 
 add_subdirectory(lib/glad)
