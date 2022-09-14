@@ -15,14 +15,14 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 find_package(OpenGL REQUIRED)
 find_package(glfw3 3.3 REQUIRED)
 find_package(glm REQUIRED)
-# find_package(assimp REQUIRED)
+find_package(assimp REQUIRED)
 
 set(
   SOURCES 
     include/keys.h
     include/mainwindow.h
     include/shader.h
-    include/mesh.h
+    include/model.h
 
     lib/stb/stb_image.h
 )
@@ -31,7 +31,7 @@ set(
   HEADERS 
     src/main.cpp
     src/shader.cpp
-    src/mesh.cpp
+    src/model.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS}) 

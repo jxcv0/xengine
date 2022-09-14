@@ -5,7 +5,7 @@
 
 #include "mainwindow.h"
 #include "shader.h"
-#include "mesh.h"
+#include "model.h"
 
 // void on_mouse(GLFWwindow *window, double xPosIn, double yPosIn);
 
@@ -21,7 +21,8 @@ int main(int argc, char const *argv[])
   Shader basic_shader = ShaderUtils::load("assets/shaders/model.vert",
                                           "assets/shaders/model.frag");
 
-  Mesh mesh("assets/models/cyborg/cyborg.obj");
+  Mesh mesh;
+  mesh.gen_buffers();
 
   while (!main_window.should_close()) {
     main_window.update_input();

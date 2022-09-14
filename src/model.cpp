@@ -1,4 +1,4 @@
-#include "mesh.h"
+#include "model.h"
 #include <cstdint>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -31,22 +31,22 @@ Mesh::gen_buffers() {
   // texture coords
   glEnableVertexAttribArray(1);
   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-      (void*)offsetof(Vertex, tex_coord));
+      (void*)offsetof(Vertex, m_tex_coord));
 
   // vertex normals
   glEnableVertexAttribArray(2);
   glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-      (void*)offsetof(Vertex, normal));
+      (void*)offsetof(Vertex, m_normal));
 
   // tangent
   glEnableVertexAttribArray(3);
   glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-      (void*)offsetof(Vertex, tangent));
+      (void*)offsetof(Vertex, m_tangent));
 
   // bitangent
   glEnableVertexAttribArray(4);
   glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-      (void*)offsetof(Vertex, bitangent));
+      (void*)offsetof(Vertex, m_bitangent));
 
   // unbind
   glBindVertexArray(0);

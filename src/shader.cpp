@@ -24,6 +24,8 @@ void ShaderUtils::check_link(int id) {
   }
 }
 
+/*------------------------------------------------------------------------------
+ */
 Shader ShaderUtils::load(const char *vert_path, const char *frag_path) {
   std::string vert_code;
   std::string frag_code;
