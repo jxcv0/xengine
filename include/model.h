@@ -1,6 +1,7 @@
 #ifndef MESH_H_
 #define MESH_H_
 
+#include <assimp/material.h>
 #include <string>
 #include <vector>
 #include <cstdint>
@@ -102,6 +103,13 @@ class Model {
    *  \param scene The aiScene.
    */
   void process_mesh(const char *dir, aiMesh *mesh, const aiScene *scene);
+
+  /*! \brief Load all the textures of a material type from a 3D model file.
+   *  \param mat The material.
+   *  \param type The texture type.
+   *  \param name The name of the type.
+   */
+  void load_material(aiMaterial *mat, aiTextureType type, const char *name);
 
 public:
   /*! \brief Default constructor so that loading from file can be deferred.

@@ -1,9 +1,14 @@
 #include "model.h"
 
-#include <assimp/texture.h>
-#include <cstdint>
 #include <stdexcept>
 #include <vector>
+#include <map>
+
+#include <assimp/material.h>
+#include <assimp/texture.h>
+#include <cstdint>
+#include <cstring>
+#include <glm/fwd.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -81,7 +86,13 @@ MeshUtils::load_texture(const char* path) {
     }
 
     glBindTexture(GL_TEXTURE_2D, texture_id);
-    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(
+        GL_TEXTURE_2D,
+        0, format,
+        width, height,
+        0, format,
+        GL_UNSIGNED_BYTE,
+        data);
     glGenerateMipmap(GL_TEXTURE_2D);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -102,7 +113,9 @@ MeshUtils::load_texture(const char* path) {
 void
 Model::load(const char *filepath) {
   Assimp::Importer importer;
-  auto flags = (aiProcess_Triangulate | aiProcess_FlipUVs);
+  auto flags = (aiProcess_Triangulate |
+                aiProcess_FlipUVs | 
+                aiProcess_GenNormals);
   const aiScene *scene = importer.ReadFile(filepath, flags);
 
   if (nullptr == scene ||
@@ -137,19 +150,60 @@ Model::process_mesh(const char *dir, aiMesh *mesh, const aiScene *scene) {
   std::vector<uint32_t> indices(mesh->mNumFaces * 3); // triangulated
   std::vector<Texture> textures(3); // TODO how to find number of textures?
 
+  // vertices
   for (auto i = 0; i < mesh->mNumVertices; ++i) {
     Vertex vertex;
-    // TODO process
+    vertex.m_position = glm::vec3(mesh->mVertices[i].x,
+                                  mesh->mVertices[i].y,
+                                  mesh->mVertices[i].z);
+
+    vertex.m_normal = glm::vec3(mesh->mNormals[i].x,
+                                mesh->mNormals[i].y,
+                                mesh->mNormals[i].z);
+
+    // assuming vertices only have one texture coordinate per vertex
+    vertex.m_tex_coord = glm::vec2(mesh->mTextureCoords[0][i].x,
+                                   mesh->mTextureCoords[0][i].y);
+
+    vertex.m_tangent = glm::vec3(mesh->mTangents[i].x,
+                                 mesh->mTangents[i].y,
+                                 mesh->mTangents[i].z);
+
+    vertex.m_bitangent = glm::vec3(mesh->mBitangents[i].x,
+                                   mesh->mBitangents[i].y,
+                                   mesh->mBitangents[i].z);
+
     vertices.push_back(vertex);
   }
 
-  // TODO process indices
-  
-  if (mesh->mMaterialIndex >= 0) {
-    // TODO process materials
+  // indices
+  for (auto i = 0; i < mesh->mNumFaces; ++i) {
+    aiFace face = mesh->mFaces[i];
+    for (auto j = 0; j < face.mNumIndices; ++j) {
+      indices.push_back(face.mIndices[j]);
+    }
   }
+
+  // materials
+  aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
+  load_material(material, aiTextureType_DIFFUSE, "texture_diffuse");
+  load_material(material, aiTextureType_SPECULAR, "texture_specular");
+  load_material(material, aiTextureType_AMBIENT, "texture_height");
 
   Mesh m(vertices, indices, textures);
   m_meshes.push_back(m);
+}
+
+void
+Model::load_material(aiMaterial *mat, aiTextureType type, const char *name) {
+  // this is here so it is not pulled into the cache along with other things.
+  // (supposedly)
+  for (auto i = 0; i < mat->GetTextureCount(type); ++i) {
+    aiString aistr;
+    mat->GetTexture(type, i, &aistr);
+    std::string str = aistr.C_Str();
+    // no caching for now
+    // TODO
+  }
 }
 
