@@ -1,8 +1,16 @@
 #include "model.h"
+
+#include <assimp/texture.h>
 #include <cstdint>
+#include <stdexcept>
+#include <vector>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 /*------------------------------------------------------------------------------
  */
@@ -54,7 +62,8 @@ Mesh::gen_buffers() {
 
 /*------------------------------------------------------------------------------
  */
-uint32_t MeshUtils::load_texture(const char* path) {
+uint32_t
+MeshUtils::load_texture(const char* path) {
   uint32_t texture_id;
   glGenTextures(1, &texture_id);
 
@@ -86,5 +95,61 @@ uint32_t MeshUtils::load_texture(const char* path) {
 
   stbi_image_free(data);
   return texture_id;
+}
+
+/*------------------------------------------------------------------------------
+ */
+void
+Model::load(const char *filepath) {
+  Assimp::Importer importer;
+  auto flags = (aiProcess_Triangulate | aiProcess_FlipUVs);
+  const aiScene *scene = importer.ReadFile(filepath, flags);
+
+  if (nullptr == scene ||
+      scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE ||
+      nullptr == scene->mRootNode) {
+    throw std::runtime_error(importer.GetErrorString());
+  }
+  std::string path = filepath;
+  const auto dir = path.substr(0, path.find_last_of('/'));
+  process_node(dir.c_str(), scene->mRootNode, scene);
+}
+
+/*------------------------------------------------------------------------------
+ */
+void
+Model::process_node(const char *dir, aiNode *node, const aiScene *scene) {
+  for (auto i = 0; i < node->mNumMeshes; ++i) {
+    aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
+    process_mesh(dir, mesh, scene);
+  }
+
+  for (auto i = 0; i < node->mNumChildren; ++i) {
+    process_node(dir, node->mChildren[i], scene);
+  }
+}
+
+/*------------------------------------------------------------------------------
+ */
+void
+Model::process_mesh(const char *dir, aiMesh *mesh, const aiScene *scene) {
+  std::vector<Vertex> vertices(mesh->mNumVertices);
+  std::vector<uint32_t> indices(mesh->mNumFaces * 3); // triangulated
+  std::vector<Texture> textures(3); // TODO how to find number of textures?
+
+  for (auto i = 0; i < mesh->mNumVertices; ++i) {
+    Vertex vertex;
+    // TODO process
+    vertices.push_back(vertex);
+  }
+
+  // TODO process indices
+  
+  if (mesh->mMaterialIndex >= 0) {
+    // TODO process materials
+  }
+
+  Mesh m(vertices, indices, textures);
+  m_meshes.push_back(m);
 }
 
