@@ -27,7 +27,7 @@ struct Vertex {
 /*! \brief An image texture
  */
 struct Texture {
-  unsigned int id;
+  uint32_t m_id;
   std::string m_uniform_name;
 };
 
@@ -108,8 +108,9 @@ class Model {
    *  \param mat The material.
    *  \param type The texture type.
    *  \param name The name of the type.
+   *  \return A vector of The loaded textures.
    */
-  void load_material(aiMaterial *mat, aiTextureType type, const char *name);
+  std::vector<Texture> load_material(aiMaterial *mat, aiTextureType type, const char *name);
 
 public:
   /*! \brief Default constructor so that loading from file can be deferred.

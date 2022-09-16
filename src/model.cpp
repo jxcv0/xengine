@@ -186,24 +186,30 @@ Model::process_mesh(const char *dir, aiMesh *mesh, const aiScene *scene) {
 
   // materials
   aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
-  load_material(material, aiTextureType_DIFFUSE, "texture_diffuse");
-  load_material(material, aiTextureType_SPECULAR, "texture_specular");
-  load_material(material, aiTextureType_AMBIENT, "texture_height");
+  auto diffuse = load_material(material, aiTextureType_DIFFUSE, "texture_diffuse");
+  auto specular = load_material(material, aiTextureType_SPECULAR, "texture_specular");
+  auto height = load_material(material, aiTextureType_AMBIENT, "texture_height");
+  textures.insert(textures.end(), diffuse.begin(), diffuse.end());
 
   Mesh m(vertices, indices, textures);
   m_meshes.push_back(m);
 }
 
-void
+/*------------------------------------------------------------------------------
+ */
+std::vector<Texture>
 Model::load_material(aiMaterial *mat, aiTextureType type, const char *name) {
-  // this is here so it is not pulled into the cache along with other things.
-  // (supposedly)
+  // this is just terrible design
+  // this needs to be handled by a resource manager
+  // also materials should be a separate component
+  std::vector<Texture> textures;
   for (auto i = 0; i < mat->GetTextureCount(type); ++i) {
     aiString aistr;
     mat->GetTexture(type, i, &aistr);
-    std::string str = aistr.C_Str();
-    // no caching for now
-    // TODO
+    Texture texture;
+    texture.m_id = MeshUtils::load_texture(aistr.C_Str());
+    textures.push_back(texture);
   }
+  return textures;
 }
 
