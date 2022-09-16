@@ -10,16 +10,19 @@ Can load all types of game resources:
 	- Animations
 	- Textures/Images
 	- Sound
+  - Shaders
 
 ## Types
 
 ### Model
 3D model data
+
 ### eid_t
 Entity handle
 ```c++
 using eid_t = uint32_t;
 ```
+
 ### cid_t
 ```c++
 using cid_t = uint32_t;
