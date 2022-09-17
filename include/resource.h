@@ -5,17 +5,18 @@
 #include <memory>
 
 /*! \brief A game resource.
- *         Manages the memory of the underying resource.
+ *         Manages the memory of the underying resource via a shared pointer.
  */
 template<typename ResourceType>
 class Resource {
-  std::unique_ptr<ResourceType> mp_resource;
+  std::shared_ptr<ResourceType> mp_resource;
   std::filesystem::path m_filepath;
 
-  // Resource(Resource&&) = delete;
-  // Resource& operator=(const Resource&) = delete;
-  // Resource& operator=(Resource&&) = delete;
+  Resource& operator=(const Resource&) = delete;
+  Resource& operator=(Resource&&) = delete;
+
 public:
+
   /*! \brief Construct a Resource. We assume the memory has not already been
    *         allocated.
    */
@@ -23,9 +24,10 @@ public:
     : mp_resource(resource)
     , m_filepath(filepath) {}
 
-  Resource(const Resource<ResourceType>&) {
-    // TODO HOW
-  }
+  /*! \brief Copy constructor
+   */
+  Resource(const Resource<ResourceType>& r) = default;
+
 
   ~Resource() = default;
 
