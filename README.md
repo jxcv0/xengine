@@ -6,24 +6,13 @@ WIP Game Engine
 ### ResourceSubsystem
 Loads resources from file into memory.
 Can load all types of game resources:
-	- 3D models
-	- Animations
-	- Textures/Images
-	- Sound
-  - Shaders
+- 3D models
+- Animations
+- Textures/Images
+- Sound
+- Shaders
 
-## Types
+### Others ...
 
-### Model
-3D model data
-
-### eid_t
-Entity handle
-```c++
-using eid_t = uint32_t;
-```
-
-### cid_t
-```c++
-using cid_t = uint32_t;
-```
+## TODO's
+- Async Resource loading functions return (std::future?)
