@@ -5,7 +5,7 @@
 
 #ifndef OPENGL_LIBS
 #define OPENGL_LIBS
-#include "glad.h"
+#include <glad.h>
 #include <GLFW/glfw3.h>
 #endif
 

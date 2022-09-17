@@ -19,20 +19,21 @@ find_package(glm REQUIRED)
 find_package(assimp REQUIRED)
 
 set(
-  SOURCES 
+  HEADERS 
+    include/types.h
     include/keys.h
     include/mainwindow.h
     include/shader.h
-    include/model.h
-
+    include/resourcesubsystem.h
+    include/resource.h
     lib/stb/stb_image.h
 )
 
 set(
-  HEADERS 
+  SOURCES 
     src/main.cpp
     src/shader.cpp
-    src/model.cpp
+    src/resourcesubsystem.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS}) 

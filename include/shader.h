@@ -100,6 +100,8 @@ namespace ShaderUtils {
    *  \param vert_path Path to the vertex shader.
    *  \param frag_path Path to the fragment shader.
    *  \return          A new Shader object.
+   *
+   *  TODO shaders can all be loaded and compiled at once before game start.
    */
 	Shader load(const char *vert_path, const char *frag_path);
 } // namespace Shader

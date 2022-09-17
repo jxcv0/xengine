@@ -4,13 +4,16 @@
 #include <glm/ext.hpp>
 
 #include "mainwindow.h"
+#include "resourcesubsystem.h"
 #include "shader.h"
-#include "model.h"
+#include "types.h"
 
 // void on_mouse(GLFWwindow *window, double xPosIn, double yPosIn);
 
 int main(int argc, char const *argv[])
 {
+  // ResourceSubsystem resource_subsys;
+
   MainWindow main_window(1080, 600, std::string("main-window"));
   main_window.set_hint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   main_window.set_hint(GLFW_CONTEXT_VERSION_MINOR, 6);
@@ -18,11 +21,8 @@ int main(int argc, char const *argv[])
   // main_window.set_cursor_position_callback(on_mouse);
   main_window.show();
 
-  Shader basic_shader = ShaderUtils::load("assets/shaders/model.vert",
-                                          "assets/shaders/model.frag");
-
-  Mesh mesh;
-  mesh.gen_buffers();
+  Shader shader = ShaderUtils::load("assets/shaders/model.vert",
+                                    "assets/shaders/model.frag");
 
   while (!main_window.should_close()) {
     main_window.update_input();
