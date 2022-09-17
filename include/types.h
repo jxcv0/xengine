@@ -10,7 +10,7 @@
 using eid_t = uint32_t;
 using cid_t = uint32_t;
 
-/*! \brief A single vertex.
+/** @brief A single vertex.
  */
 struct Vertex { glm::vec3 m_position;
   glm::vec3 m_normal;
@@ -19,13 +19,13 @@ struct Vertex { glm::vec3 m_position;
   glm::vec3 m_bitangent;
 };
 
-/*! \brief An image texture
+/** @brief An image texture
  */
 struct Texture {
   uint8_t *m_image;
 };
 
-/*! \brief A material component consisting of 3 texure types.
+/** @brief A material component consisting of 3 texure types.
  */
 struct Material {
   Texture *mp_diffuse;
@@ -34,7 +34,7 @@ struct Material {
 };
 
 
-/*! \brief A Mesh component.
+/** @brief A Mesh component.
  */
 struct Mesh {
   // uint32_t m_VAO; TODO Move to render component/system?
@@ -44,7 +44,7 @@ struct Mesh {
   std::vector<uint32_t> m_indices;
 };
 
-/*! \brief A basic light source.
+/** @brief A basic light source.
  *         TODO all of it.
  */
 struct Light {

@@ -11,7 +11,7 @@
 template<typename T>
 using ResourceList = std::vector<Resource<T>>;
 
-/*! \brief Resource managment subsystem. Loads files from disk into memory.
+/** @brief Resource managment subsystem. Loads files from disk into memory.
  *         TODO async loading
  *         TODO need to know how much memory this needs
  */
@@ -34,30 +34,42 @@ class ResourceSubsystem {
   ResourceSubsystem& operator=(ResourceSubsystem&&) = delete;
 public:
   
-  /*! \brief Get the static instance of the resource subsystem.
-   *  \return A reference to the subsystem.
+  /** @brief Get the static instance of the resource subsystem.
+   *  @return A reference to the subsystem.
    */
   static ResourceSubsystem& instance() {
     static ResourceSubsystem r;
     return r;
   }
 
-  /*! \brief Default dtor
+  /** @brief Default destructor.
    */
   ~ResourceSubsystem() = default;
 
+  /** @brief Load mesh from file.
+   *  @param filepath The filepath of the resource.
+   */
   void load_mesh(const char *filepath);
 
   void load_material(aiMaterial *mat,
                      aiTextureType type,
                      const char *name);
 
-  /*! \brief Load an image from a path.
-   *  \param path The filepath to the image file.
+  /**
+   * @brief Load an image file from a filepath.
+   * 
+   * @param filepath The path to the image resource.
    */
-	void load_image(const char* path);
+	void load_image(const char* filepath);
 
-  bool path_is_loaded(const char* path);
+  /**
+   * @brief Check if a resource has been loaded from a path.
+   * 
+   * @param filepath The filepath to the resource.
+   * @return true The filepath is loaded and contained int the resource subsystem.
+   * @return false The resource has not been loaded from the filepath.
+   */
+  bool is_loaded(const char* filepath);
 };
 
 #endif // RESOURCESUBSYSTEM_H_

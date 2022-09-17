@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_BUILD_TYPE debug)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
-set (CMAKE_C_FLAGS "-Wno-dev")
+set(CMAKE_C_FLAGS "-Wno-dev")
 
 enable_testing()
 
