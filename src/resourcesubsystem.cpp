@@ -48,7 +48,6 @@ ResourceSubsystem::load_model(const char *filepath) {
  */
 Resource<Texture>
 ResourceSubsystem::load_image(const char* path) {
-
   int width, height, num_comp;
   std::byte *data = stbi_load(path, &width, &height, &num_comp, 0);
 
@@ -82,7 +81,7 @@ ResourceSubsystem::process_node(const char *filepath,
 /*------------------------------------------------------------------------------
  */
 Mesh
-ResourceSubsystem::process_mesh(const char *dir,
+ResourceSubsystem::process_mesh(const char *filepath,
                                 aiMesh *mesh,
                                 const aiScene *scene)
 {
@@ -125,9 +124,7 @@ ResourceSubsystem::process_mesh(const char *dir,
 
   // materials
   aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
-  load_material(material, aiTextureType_DIFFUSE, "texture_diffuse");
-  load_material(material, aiTextureType_SPECULAR, "texture_specular");
-  load_material(material, aiTextureType_AMBIENT, "texture_height");
+  load_materials(material, filepath);
 
   return Mesh{vertices, indices};
 }
@@ -135,7 +132,22 @@ ResourceSubsystem::process_mesh(const char *dir,
 /*------------------------------------------------------------------------------
  */
 Resource<Material>
-ResourceSubsystem::load_material(aiMaterial *mat,
+ResourceSubsystem::load_materials(aiMaterial *mat, const char *filepath) {
+  auto it = material_loaded(filepath);
+  if(m_loaded_materials.end() != it) {
+    return *it;
+  }
+  auto diff = load_texture(mat, aiTextureType_DIFFUSE, "texture_diffuse");
+  auto spec = load_texture(mat, aiTextureType_SPECULAR, "texture_specular");
+  auto height = load_texture(mat, aiTextureType_AMBIENT, "texture_height");
+  Resource<Material> material(new Material{diff, spec, height}, filepath);
+  return material;
+}
+
+/*------------------------------------------------------------------------------
+ */
+Texture
+ResourceSubsystem::load_texture(aiMaterial *mat,
                                  aiTextureType type,
                                  const char *name)
 {

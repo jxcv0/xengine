@@ -61,32 +61,54 @@ public:
         [=](auto &r){ r.filepath() == filepath; });
   }
 
+  auto material_loaded(const char *filepath) const {
+    return std::find_if(m_loaded_materials.begin(), m_loaded_models.end(),
+        [=](auto &r){ r.filepath() == filepath; });
+  }
+
 private:
   ResourceList<Model> m_loaded_models;
   ResourceList<Material> m_loaded_materials;
-  ResourceList<Texture> m_loaded_textures;
+  ResourceList<Texture> m_loaded_textures; 
 
   std::vector<Mesh> process_node(const char *filepath,
                                   aiNode *node,
                                   const aiScene *scene);
 
+  /**
+   * @brief Process mesh data.
+   * 
+   * @param filepath The path to the asset.
+   * @param mesh The aiMesh to process.
+   * @param scene The aiScene.
+   * @return Mesh data.
+   */
   Mesh process_mesh(const char *filepath,
-                              aiMesh *mesh,
-                              const aiScene *scene);
+                    aiMesh *mesh,
+                    const aiScene *scene);
 
   /**
-   * @brief Load a material from file. This is done when the filepath
+   * @brief Load materials from file. This is done when the filepath
    *        points to a 3D model with the materials and images in the
    *        same directory.
    * 
    * @param mat The material (assimp).
-   * @param type The aiTextureType.
-   * @param name The na
-   * @return Resource<Material> 
+   * @return The material resource.
    */
-  Resource<Material> load_material(aiMaterial *mat,
-                     aiTextureType type,
-                     const char *name);
+  Resource<Material> load_materials(aiMaterial *mat, const char *filepath);
+
+  /**
+   * @brief Load an image texture of a particular type from an aiMaterial.
+   *
+   * @param
+   * @param
+   * @param
+   * @return
+   */
+  Texture load_texture(aiMaterial *mat,
+                       aiTextureType type,
+                       const char *name);
+  
 
   // singleton
   ResourceSubsystem(const ResourceSubsystem&) = delete;

@@ -13,7 +13,8 @@
 using eid_t = uint32_t;
 using cid_t = uint32_t;
 
-/** @brief A single vertex.
+/**
+ * @brief A single vertex.
  */
 struct Vertex { glm::vec3 m_position;
   glm::vec3 m_normal;
@@ -22,7 +23,8 @@ struct Vertex { glm::vec3 m_position;
   glm::vec3 m_bitangent;
 };
 
-/** @brief An image texture
+/**
+ * @brief An image texture
  */
 struct Texture {
   std::byte *mp_data;
@@ -32,24 +34,28 @@ struct Texture {
   }
 };
 
-/** @brief A material component consisting of 3 texure types.
+/**
+ * @brief A material component consisting of 3 texure types.
+ *        We assume these images will never be used outside of a material.
  */
 struct Material {
-  Texture *mp_diffuse;
-  Texture *mp_specular;
-  Texture *mp_ambient;
+  Texture mp_diffuse;
+  Texture mp_specular;
+  Texture mp_ambient;
 };
 
 
-/** @brief A Mesh component. This may in fact be a collection of different
- *         Meshes from the same directory.
+/**
+ * @brief A Mesh component. This may in fact be a collection of different
+ *        Meshes from the same directory.
  */
 struct Mesh {
   std::vector<Vertex> m_vertices;
   std::vector<uint32_t> m_indices;
 };
 
-/** @brief A Model is a collection of meshes.
+/**
+ * @brief A Model is a collection of meshes.
  */
 struct Model {
   std::vector<Mesh> m_meshes;
