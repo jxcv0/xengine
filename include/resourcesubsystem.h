@@ -17,8 +17,6 @@ class ResourceSubsystem {
   template<typename T>
   using ResourceList = std::vector<Resource<T>>;
 public:
-  
-  ResourceSubsystem() = default;
 
   /**
    * @brief Get the static instance of the subsystem.
@@ -30,8 +28,6 @@ public:
     return r;
   }
 
-  /** @brief Default destructor.
-   */
   ~ResourceSubsystem() = default;
 
   /**
@@ -61,12 +57,24 @@ public:
         [=](auto &r){ r.filepath() == filepath; });
   }
 
+  /**
+   * @brief Check if a material resource has been loaded from a path.
+   * 
+   * @param filepath The filepath to the resource.
+   * @return An iterator to the resource.  */
   auto material_loaded(const char *filepath) const {
     return std::find_if(m_loaded_materials.begin(), m_loaded_models.end(),
         [=](auto &r){ r.filepath() == filepath; });
   }
 
 private:
+  // singleton
+  ResourceSubsystem() = default;
+  ResourceSubsystem(const ResourceSubsystem&) = delete;
+  ResourceSubsystem(ResourceSubsystem&&) = delete;
+  ResourceSubsystem& operator=(const ResourceSubsystem&) = delete;
+  ResourceSubsystem& operator=(ResourceSubsystem&&) = delete;
+
   ResourceList<Model> m_loaded_models;
   ResourceList<Material> m_loaded_materials;
   ResourceList<Texture> m_loaded_textures; 
@@ -108,13 +116,6 @@ private:
   Texture load_texture(aiMaterial *mat,
                        aiTextureType type,
                        const char *name);
-  
-
-  // singleton
-  ResourceSubsystem(const ResourceSubsystem&) = delete;
-  ResourceSubsystem(ResourceSubsystem&&) = delete;
-  ResourceSubsystem& operator=(const ResourceSubsystem&) = delete;
-  ResourceSubsystem& operator=(ResourceSubsystem&&) = delete;
 };
 
 #endif // RESOURCESUBSYSTEM_H_
