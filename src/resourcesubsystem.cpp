@@ -1,6 +1,7 @@
 #include "resourcesubsystem.h"
 #include "resource.h"
 
+#include <glm/fwd.hpp>
 #include <string>
 #include <sstream>
 
@@ -17,8 +18,13 @@
 
 /*------------------------------------------------------------------------------
  */
-void
-ResourceSubsystem::load_mesh(const char *filepath) {
+Resource<Model>
+ResourceSubsystem::load_model(const char *filepath) {
+  auto it = mesh_loaded(filepath);
+  if(m_loaded_models.end() != it) {
+    return *it;
+  }
+
   Assimp::Importer importer;
   auto flags = (aiProcess_Triangulate |
                 aiProcess_FlipUVs | 
@@ -30,31 +36,52 @@ ResourceSubsystem::load_mesh(const char *filepath) {
       nullptr == scene->mRootNode) {
     throw std::runtime_error(importer.GetErrorString());
   }
-  std::string path = filepath;
-  const auto dir = path.substr(0, path.find_last_of('/'));
-  process_node(dir.c_str(), scene->mRootNode, scene);
+  // std::string path = filepath;
+  // const auto dir = path.substr(0, path.find_last_of('/'));
+  auto meshes = process_node(filepath, scene->mRootNode, scene);
+  Resource<Model> new_resource(new Model{meshes}, filepath);
+  m_loaded_models.push_back(new_resource);
+  return new_resource;
 }
 
 /*------------------------------------------------------------------------------
  */
-void
-ResourceSubsystem::process_node(const char *dir,
+Resource<Texture>
+ResourceSubsystem::load_image(const char* path) {
+
+  int width, height, num_comp;
+  uint8_t *data = stbi_load(path, &width, &height, &num_comp, 0);
+
+  if (nullptr == data) {
+    // TODO better error handling
+    std::cout << "Unable to load image from " << path << "\n";
+  }
+}
+
+/*------------------------------------------------------------------------------
+ */
+std::vector<Mesh>
+ResourceSubsystem::process_node(const char *filepath,
                                 aiNode *node,
                                 const aiScene *scene)
 {
+  std::vector<Mesh> meshes;
   for (auto i = 0; i < node->mNumMeshes; ++i) {
     aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-    process_mesh(dir, mesh, scene);
+    meshes.push_back(process_mesh(filepath, mesh, scene));
   }
 
   for (auto i = 0; i < node->mNumChildren; ++i) {
-    process_node(dir, node->mChildren[i], scene);
+    auto m = process_node(filepath, node->mChildren[i], scene);
+    meshes.insert(meshes.end(), m.begin(), m.end());
   }
+
+  return meshes;
 }
 
 /*------------------------------------------------------------------------------
  */
-void
+Mesh
 ResourceSubsystem::process_mesh(const char *dir,
                                 aiMesh *mesh,
                                 const aiScene *scene)
@@ -96,20 +123,18 @@ ResourceSubsystem::process_mesh(const char *dir,
     }
   }
 
-  Resource<Mesh> mesh_resource(new Mesh{vertices, indices},
-                               "how_do_i_get_the_path??");
-  m_loaded_meshes.push_back(mesh_resource);
-
   // materials
   aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
   load_material(material, aiTextureType_DIFFUSE, "texture_diffuse");
   load_material(material, aiTextureType_SPECULAR, "texture_specular");
   load_material(material, aiTextureType_AMBIENT, "texture_height");
+
+  return Mesh{vertices, indices};
 }
 
 /*------------------------------------------------------------------------------
  */
-void
+Resource<Material>
 ResourceSubsystem::load_material(aiMaterial *mat,
                                  aiTextureType type,
                                  const char *name)
@@ -174,15 +199,4 @@ Mesh::gen_buffers() {
 
 /*------------------------------------------------------------------------------
  */
-void
-ResourceSubsystem::load_image(const char* path) {
-
-  int width, height, num_comp;
-  uint8_t *data = stbi_load(path, &width, &height, &num_comp, 0);
-
-  if (nullptr == data) {
-    // TODO better error handling
-    std::cout << "Unable to load image from " << path << "\n";
-  }
-}
 

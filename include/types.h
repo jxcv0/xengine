@@ -22,7 +22,7 @@ struct Vertex { glm::vec3 m_position;
 /** @brief An image texture
  */
 struct Texture {
-  uint8_t *m_image;
+  uint8_t *mp_data;
 };
 
 /** @brief A material component consisting of 3 texure types.
@@ -34,14 +34,18 @@ struct Material {
 };
 
 
-/** @brief A Mesh component.
+/** @brief A Mesh component. This may in fact be a collection of different
+ *         Meshes from the same directory.
  */
 struct Mesh {
-  // uint32_t m_VAO; TODO Move to render component/system?
-  // uint32_t m_VBO;
-  // uint32_t m_EBO;
   std::vector<Vertex> m_vertices;
   std::vector<uint32_t> m_indices;
+};
+
+/** @brief A Model is a collection of meshes.
+ */
+struct Model {
+  std::vector<Mesh> m_meshes;
 };
 
 /** @brief A basic light source.
