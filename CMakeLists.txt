@@ -34,6 +34,7 @@ set(
     src/main.cpp
     src/shader.cpp
     src/resourcesubsystem.cpp
+    src/types.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS}) 

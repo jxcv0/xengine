@@ -1,9 +1,9 @@
 #include "resourcesubsystem.h"
-#include "resource.h"
 
-#include <glm/fwd.hpp>
+#include <stdexcept>
 #include <string>
 #include <sstream>
+#include <vector>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -15,6 +15,7 @@
 #include "stb_image.h"
 
 #include "types.h"
+#include "resource.h"
 
 /*------------------------------------------------------------------------------
  */
@@ -42,19 +43,6 @@ ResourceSubsystem::load_model(const char *filepath) {
   Resource<Model> new_resource(new Model{meshes}, filepath);
   m_loaded_models.push_back(new_resource);
   return new_resource;
-}
-
-/*------------------------------------------------------------------------------
- */
-Resource<Texture>
-ResourceSubsystem::load_image(const char* path) {
-  int width, height, num_comp;
-  std::byte *data = stbi_load(path, &width, &height, &num_comp, 0);
-
-  if (nullptr == data) {
-    // TODO better error handling
-    std::cout << "Unable to load image from " << path << "\n";
-  }
 }
 
 /*------------------------------------------------------------------------------
@@ -137,9 +125,9 @@ ResourceSubsystem::load_materials(aiMaterial *mat, const char *filepath) {
   if(m_loaded_materials.end() != it) {
     return *it;
   }
-  auto diff = load_texture(mat, aiTextureType_DIFFUSE, "texture_diffuse");
-  auto spec = load_texture(mat, aiTextureType_SPECULAR, "texture_specular");
-  auto height = load_texture(mat, aiTextureType_AMBIENT, "texture_height");
+  auto diff = load_texture(mat, aiTextureType_DIFFUSE);
+  auto spec = load_texture(mat, aiTextureType_SPECULAR);
+  auto height = load_texture(mat, aiTextureType_AMBIENT);
   Resource<Material> material(new Material{diff, spec, height}, filepath);
   return material;
 }
@@ -147,17 +135,19 @@ ResourceSubsystem::load_materials(aiMaterial *mat, const char *filepath) {
 /*------------------------------------------------------------------------------
  */
 Texture
-ResourceSubsystem::load_texture(aiMaterial *mat,
-                                 aiTextureType type,
-                                 const char *name)
+ResourceSubsystem::load_texture(aiMaterial *mat, aiTextureType type)
 {
-  for (auto i = 0; i < mat->GetTextureCount(type); ++i) {
-    aiString aistr;
-    mat->GetTexture(type, i, &aistr);
-    /*
-     *  TODO
-     */
+  stbi_set_flip_vertically_on_load(true);
+  assert(1 == mat->GetTextureCount(type));
+  aiString aistr;
+  mat->GetTexture(type, 0, &aistr);
+  Texture tex;
+  tex.mp_data = stbi_load(
+      aistr.C_Str(), &tex.m_width, &tex.m_height, &tex.m_num_channels, 0);
+  if (nullptr == tex.mp_data) {
+    // TODO load default.
   }
+  return tex;
 }
 
 /*------------------------------------------------------------------------------

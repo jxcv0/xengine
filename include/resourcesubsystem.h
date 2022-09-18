@@ -24,8 +24,8 @@ public:
    * @return A const reference to the instance.
    */
   static ResourceSubsystem& instance() {
-    static ResourceSubsystem r;
-    return r;
+    static ResourceSubsystem *r = new ResourceSubsystem();
+    return *r;
   }
 
   ~ResourceSubsystem() = default;
@@ -39,14 +39,6 @@ public:
   Resource<Model> load_model(const char *filepath);
 
   /**
-   * @brief Load an texture image file.
-   * 
-   * @param filepath The filepath to the resource.
-   * @return The image resource.
-   */
-  Resource<Texture> load_image(const char* filepath);
-
-  /**
    * @brief Check if a mesh resource has been loaded from a path.
    * 
    * @param filepath The filepath to the resource.
@@ -54,7 +46,7 @@ public:
    */
   auto mesh_loaded(const char* filepath) const {
     return std::find_if(m_loaded_models.begin(), m_loaded_models.end(),
-        [=](auto &r){ r.filepath() == filepath; });
+        [=](const auto &r){ return r.filepath() == filepath; });
   }
 
   /**
@@ -63,8 +55,8 @@ public:
    * @param filepath The filepath to the resource.
    * @return An iterator to the resource.  */
   auto material_loaded(const char *filepath) const {
-    return std::find_if(m_loaded_materials.begin(), m_loaded_models.end(),
-        [=](auto &r){ r.filepath() == filepath; });
+    return std::find_if(m_loaded_materials.begin(), m_loaded_materials.end(),
+        [=](const auto &r){ return r.filepath() == filepath; });
   }
 
 private:
@@ -77,7 +69,7 @@ private:
 
   ResourceList<Model> m_loaded_models;
   ResourceList<Material> m_loaded_materials;
-  ResourceList<Texture> m_loaded_textures; 
+  // ResourceList<Texture> m_loaded_textures; 
 
   std::vector<Mesh> process_node(const char *filepath,
                                   aiNode *node,
@@ -106,16 +98,14 @@ private:
   Resource<Material> load_materials(aiMaterial *mat, const char *filepath);
 
   /**
-   * @brief Load an image texture of a particular type from an aiMaterial.
+   * @brief Load image texture of a particular type from an aiMaterial. It is
+   *        assumed that there is only one texture of each type.
    *
-   * @param
-   * @param
-   * @param
-   * @return
+   * @param mat The aiMaterial to get the filepath from.
+   * @param type The type of the image to load.
+   * @return The image texture.
    */
-  Texture load_texture(aiMaterial *mat,
-                       aiTextureType type,
-                       const char *name);
+  Texture load_texture(aiMaterial *mat, aiTextureType type);
 };
 
 #endif // RESOURCESUBSYSTEM_H_

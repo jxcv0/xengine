@@ -49,7 +49,7 @@ public:
   /** @brief Get the filepath of the resource as a string.
    *  @return The filepath string.
    */
-  std::string filepath() {
+  std::string filepath() const {
     return m_filepath.string();
   }
 };

@@ -1,18 +1,15 @@
 #include <iostream>
 
-#include <glm/glm.hpp>
-#include <glm/ext.hpp>
-
 #include "mainwindow.h"
 #include "resourcesubsystem.h"
 #include "shader.h"
-#include "types.h"
 
 // void on_mouse(GLFWwindow *window, double xPosIn, double yPosIn);
 
 int main(int argc, char const *argv[])
 {
-  // ResourceSubsystem resource_subsys;
+  auto model = ResourceSubsystem::instance()
+    .load_model("assets/models/cyborg/cyborg.obj");
 
   MainWindow main_window(1080, 600, std::string("main-window"));
   main_window.set_hint(GLFW_CONTEXT_VERSION_MAJOR, 4);
