@@ -15,4 +15,5 @@ Can load all types of game resources:
 ### Others ...
 
 ## TODO's
-- Async Resource loading functions return (std::future?)
+- Async Resource loading functions return (std::future?).
+- Default asset to load in the case of failure.

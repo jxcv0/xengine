@@ -50,7 +50,7 @@ Resource<Texture>
 ResourceSubsystem::load_image(const char* path) {
 
   int width, height, num_comp;
-  uint8_t *data = stbi_load(path, &width, &height, &num_comp, 0);
+  std::byte *data = stbi_load(path, &width, &height, &num_comp, 0);
 
   if (nullptr == data) {
     // TODO better error handling

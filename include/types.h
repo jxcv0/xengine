@@ -7,6 +7,9 @@
 
 #include <glm/glm.hpp>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 using eid_t = uint32_t;
 using cid_t = uint32_t;
 
@@ -22,7 +25,11 @@ struct Vertex { glm::vec3 m_position;
 /** @brief An image texture
  */
 struct Texture {
-  uint8_t *mp_data;
+  std::byte *mp_data;
+
+  ~Texture() {
+    stbi_image_free(mp_data);
+  }
 };
 
 /** @brief A material component consisting of 3 texure types.
