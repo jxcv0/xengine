@@ -20,6 +20,7 @@ find_package(assimp REQUIRED)
 
 set(
   HEADERS 
+    include/logger.h
     include/types.h
     include/keys.h
     include/mainwindow.h

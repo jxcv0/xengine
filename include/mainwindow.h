@@ -8,10 +8,10 @@
 
 #ifndef OPENGL_LIBS
 #define OPENGL_LIBS
-#include <GLFW/glfw3.h>
-
-#include "glad.h"
+#include <glad.h>
 #endif
+
+#include <GLFW/glfw3.h>
 
 #include <glm/ext.hpp>
 #include <glm/glm.hpp>

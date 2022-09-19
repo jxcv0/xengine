@@ -10,7 +10,6 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
-
 #define STB_IMAGE_IMPLEMENTATION
 #include "resource.h"
 #include "stb_image.h"
@@ -157,9 +156,10 @@ std::vector<Texture> ResourceSubsystem::load_textures(aiMaterial *mat,
     Texture texture;
     texture.mp_data = stbi_load(aistr.C_Str(), &texture.m_width,
                                 &texture.m_height, &texture.m_num_channels, 0);
-    if (nullptr == texture.mp_data) {
-      // TODO load default.
-    }
+    // if (nullptr == texture.mp_data) {
+    //   TODO load default.
+    // }
+    assert(nullptr != texture.mp_data);
 
     switch (type) {
       case aiTextureType_DIFFUSE:

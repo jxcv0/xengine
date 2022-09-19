@@ -18,8 +18,6 @@
 /*! @brief A GLSL Shader.
  */
 class Shader {
-  uint32_t m_id;  // Handle to the program object
-
  public:
   Shader() = delete;
 
@@ -29,95 +27,91 @@ class Shader {
   Shader(uint32_t id) : m_id(id){};
 
   /**
-   * @brief Installs the program object as part of current rendering state. 
+   * @brief Installs the program object as part of current rendering state.
    */
   inline void use() { glUseProgram(m_id); }
 
   /**
    * @brief Uniform boolean utility function.
-   * 
+   *
    * @param uniform_name The name of the uniform.
    * @param value The value to set the uniform to.
    */
-  inline void set_uniform(const char *uniform_name,
-                          bool value) {
+  inline void set_uniform(const char *uniform_name, bool value) {
     glUniform1i(glGetUniformLocation(m_id, uniform_name),
                 static_cast<int>(value));
   }
 
   /**
    * @brief Uniform integer utility function.
-   * 
+   *
    * @param uniform_name The name of the uniform.
    * @param value The value to set the uniform to.
    */
-  inline void set_uniform(const char *uniformName,
-                          const int value) {
+  inline void set_uniform(const char *uniformName, const int value) {
     glUniform1i(glGetUniformLocation(m_id, uniformName), value);
   }
 
   /**
    * @brief Uniform float utility function.
-   * 
+   *
    * @param uniform_name The name of the uniform.
    * @param value The value to set the uniform to.
    */
-  inline void set_uniform(const char *uniformName,
-                          const float value) {
+  inline void set_uniform(const char *uniformName, const float value) {
     glUniform1f(glGetUniformLocation(m_id, uniformName), value);
   }
 
   /**
    * @brief Uniform glm::vec2 float utility function.
-   * 
+   *
    * @param uniform_name The name of the uniform.
    * @param value The value to set the uniform to.
    */
-  void set_uniform(const char *uniformName,
-                   const glm::vec2 &value) {
+  void set_uniform(const char *uniformName, const glm::vec2 &value) {
     glUniform2fv(glGetUniformLocation(m_id, uniformName), 1, &value[0]);
   }
 
   /**
    * @brief Uniform glm::vec3 float utility function.
-   * 
+   *
    * @param uniform_name The name of the uniform.
    * @param value The value to set the uniform to.
    */
-  void set_uniform(const char *uniformName,
-                   const glm::vec3 &value) {
+  void set_uniform(const char *uniformName, const glm::vec3 &value) {
     glUniform3fv(glGetUniformLocation(m_id, uniformName), 1, &value[0]);
   }
 
   /**
    * @brief Uniform glm::vec4 float utility function.
-   * 
+   *
    * @param uniform_name The name of the uniform.
    * @param value The value to set the uniform to.
    */
-  void set_uniform(const char *uniformName,
-                   const glm::vec4 &value) {
+  void set_uniform(const char *uniformName, const glm::vec4 &value) {
     glUniform4fv(glGetUniformLocation(m_id, uniformName), 1, &value[0]);
   }
 
   /**
    * @brief Uniform glm::mat4 float utility function.
-   * 
+   *
    * @param uniform_name The name of the uniform.
    * @param value The value to set the uniform to.
    */
-  void set_uniform(const char *uniformName,
-                   const glm::mat4 &value) {
+  void set_uniform(const char *uniformName, const glm::mat4 &value) {
     auto loc = glGetUniformLocation(m_id, uniformName);
     glUniformMatrix4fv(loc, 1, GL_FALSE, &value[0][0]);
   }
+
+ private:
+  uint32_t m_id;  // Handle to the program object
 };
 
 namespace ShaderUtils {
 
 /**
  * @brief Check the compilation status of a shader.
- * 
+ *
  * @param id The id of the shader.
  */
 void check_compile(int id);
