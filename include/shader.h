@@ -15,7 +15,7 @@
 
 #include <glm/glm.hpp>
 
-/*! \brief A GLSL Shader.
+/*! @brief A GLSL Shader.
  */
 class Shader {
   uint32_t m_id;  // Handle to the program object
@@ -23,75 +23,114 @@ class Shader {
  public:
   Shader() = delete;
 
-  /*! \brief No default generated constructor.
+  /**
+   * @brief Construct a shader from a program id.
    */
   Shader(uint32_t id) : m_id(id){};
 
-  /*! \brief Installs the program object as part of current rendering state.
+  /**
+   * @brief Installs the program object as part of current rendering state. 
    */
   inline void use() { glUseProgram(m_id); }
 
-  // set shader boolean uniform utility function
-  inline void set_uniform(unsigned int shader, const char *uniformName,
+  /**
+   * @brief Uniform boolean utility function.
+   * 
+   * @param uniform_name The name of the uniform.
+   * @param value The value to set the uniform to.
+   */
+  inline void set_uniform(const char *uniform_name,
                           bool value) {
-    glUniform1i(glGetUniformLocation(shader, uniformName),
+    glUniform1i(glGetUniformLocation(m_id, uniform_name),
                 static_cast<int>(value));
   }
 
-  // set shader int uniform utility function
-  inline void set_uniform(unsigned int shader, const char *uniformName,
+  /**
+   * @brief Uniform integer utility function.
+   * 
+   * @param uniform_name The name of the uniform.
+   * @param value The value to set the uniform to.
+   */
+  inline void set_uniform(const char *uniformName,
                           const int value) {
-    glUniform1i(glGetUniformLocation(shader, uniformName), value);
+    glUniform1i(glGetUniformLocation(m_id, uniformName), value);
   }
 
-  // set shader float uniform utility function
-  inline void set_uniform(unsigned int shader, const char *uniformName,
+  /**
+   * @brief Uniform float utility function.
+   * 
+   * @param uniform_name The name of the uniform.
+   * @param value The value to set the uniform to.
+   */
+  inline void set_uniform(const char *uniformName,
                           const float value) {
-    glUniform1f(glGetUniformLocation(shader, uniformName), value);
+    glUniform1f(glGetUniformLocation(m_id, uniformName), value);
   }
 
-  // set shader vec2 uniform utility function
-  void set_uniform(unsigned int shader, const char *uniformName,
+  /**
+   * @brief Uniform glm::vec2 float utility function.
+   * 
+   * @param uniform_name The name of the uniform.
+   * @param value The value to set the uniform to.
+   */
+  void set_uniform(const char *uniformName,
                    const glm::vec2 &value) {
-    glUniform2fv(glGetUniformLocation(shader, uniformName), 1, &value[0]);
+    glUniform2fv(glGetUniformLocation(m_id, uniformName), 1, &value[0]);
   }
 
-  // set shader vec3 uniform utility function
-  void set_uniform(unsigned int shader, const char *uniformName,
+  /**
+   * @brief Uniform glm::vec3 float utility function.
+   * 
+   * @param uniform_name The name of the uniform.
+   * @param value The value to set the uniform to.
+   */
+  void set_uniform(const char *uniformName,
                    const glm::vec3 &value) {
-    glUniform3fv(glGetUniformLocation(shader, uniformName), 1, &value[0]);
+    glUniform3fv(glGetUniformLocation(m_id, uniformName), 1, &value[0]);
   }
 
-  // set shader vec4 uniform utility function
-  void set_uniform(unsigned int shader, const char *uniformName,
+  /**
+   * @brief Uniform glm::vec4 float utility function.
+   * 
+   * @param uniform_name The name of the uniform.
+   * @param value The value to set the uniform to.
+   */
+  void set_uniform(const char *uniformName,
                    const glm::vec4 &value) {
-    glUniform4fv(glGetUniformLocation(shader, uniformName), 1, &value[0]);
+    glUniform4fv(glGetUniformLocation(m_id, uniformName), 1, &value[0]);
   }
 
-  // set shader mat4 uniform utility funtion
-  void set_uniform(unsigned int shader, const char *uniformName,
+  /**
+   * @brief Uniform glm::mat4 float utility function.
+   * 
+   * @param uniform_name The name of the uniform.
+   * @param value The value to set the uniform to.
+   */
+  void set_uniform(const char *uniformName,
                    const glm::mat4 &value) {
-    auto loc = glGetUniformLocation(shader, uniformName);
+    auto loc = glGetUniformLocation(m_id, uniformName);
     glUniformMatrix4fv(loc, 1, GL_FALSE, &value[0][0]);
   }
 };
 
 namespace ShaderUtils {
 
-/*! \brief Check the compilation status of the shader program.
- *  \throw ShaderCompilerError
+/**
+ * @brief Check the compilation status of a shader.
+ * 
+ * @param id The id of the shader.
  */
 void check_compile(int id);
 
-/*! \brief Check the link status of the shader program.
- *  \throw ShaderLinkError
+/*! @brief Check the link status of the shader program.
+ *  @throw ShaderLinkError
  */
 void check_link(int id);
 
-/*! \brief           Load a shader from a file.
- *  \param vert_path Path to the vertex shader.
- *  \param frag_path Path to the fragment shader.
- *  \return          A new Shader object.
+/*! @brief Load a shader from a file.
+ *  @param vert_path Path to the vertex shader.
+ *  @param frag_path Path to the fragment shader.
+ *  @return A new Shader object.
  *
  *  TODO shaders can all be loaded and compiled at once before game start.
  */
