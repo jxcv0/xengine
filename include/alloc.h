@@ -15,7 +15,8 @@ using uint8 = unsigned char;
 
 // aligned allocation
 // stored alignment shift in unused memory for freeing later
-template <typename T> T *alloc_aligned(size_t n) {
+template <typename T>
+T *alloc_aligned(size_t n) {
   // alloc
   auto align = alignof(T);
   size_t nBytes = (n * sizeof(T)) + align;
@@ -50,8 +51,7 @@ void free_aligned(void *ptr) {
 
     // extract shift.
     ptrdiff_t shift = p[-1];
-    if (shift == 0)
-      shift = 256;
+    if (shift == 0) shift = 256;
 
     // back up to the actual allocated address,
     // and array-delete it.
@@ -60,7 +60,8 @@ void free_aligned(void *ptr) {
   }
 }
 
-template <typename T> struct StackAllocator {
+template <typename T>
+struct StackAllocator {
   // allocate aligned memory up front
   StackAllocator(size_t n) {
     size_t bytes = (n * sizeof(T)) + alignof(T);
@@ -71,7 +72,6 @@ template <typename T> struct StackAllocator {
 
   // free aligned memory
   ~StackAllocator() {
-
 #ifdef XEN_DEBUG
     std::string msg("free: " + std::to_string(_mkr));
     logmsg(msg.c_str());
@@ -120,11 +120,11 @@ template <typename T> struct StackAllocator {
 #endif
   }
 
-private:
+ private:
   uintptr_t _start;
   uintptr_t _end;
   uintptr_t _mkr;
 };
-} // namespace xen::mem
+}  // namespace xen::mem
 
-#endif // ALLOC_H
+#endif  // ALLOC_H

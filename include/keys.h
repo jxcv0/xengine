@@ -133,4 +133,4 @@ const std::vector<int> KEYS = {GLFW_KEY_UNKNOWN,
                                GLFW_KEY_LAST,
                                GLFW_KEY_MENU};
 
-#endif // KEYS_H_
+#endif  // KEYS_H_

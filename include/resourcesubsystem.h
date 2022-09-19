@@ -1,10 +1,10 @@
 #ifndef RESOURCESUBSYSTEM_H_
 #define RESOURCESUBSYSTEM_H_
 
+#include <assimp/scene.h>
+
 #include <algorithm>
 #include <vector>
-
-#include <assimp/scene.h>
 
 #include "resource.h"
 #include "types.h"
@@ -14,15 +14,16 @@
  *        memory.
  */
 class ResourceSubsystem {
-  template <typename T> using ResourceList = std::vector<Resource<T>>;
+  template <typename T>
+  using ResourceList = std::vector<Resource<T>>;
 
-public:
+ public:
   /**
    * @brief Get the static instance of the subsystem.
    *
    * @return A const reference to the instance.
    */
-  static ResourceSubsystem& instance() {
+  static ResourceSubsystem &instance() {
     static ResourceSubsystem *r = new ResourceSubsystem();
     return *r;
   }
@@ -37,7 +38,7 @@ public:
    */
   Resource<Model> load_model(const char *filepath);
 
-private:
+ private:
   // singleton
   ResourceSubsystem() = default;
   ResourceSubsystem(const ResourceSubsystem &) = delete;
@@ -99,4 +100,4 @@ private:
   auto material_loaded(const char *filepath) const;
 };
 
-#endif // RESOURCESUBSYSTEM_H_
+#endif  // RESOURCESUBSYSTEM_H_

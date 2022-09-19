@@ -7,14 +7,15 @@
 /** @brief A game resource.
  *         Manages the memory of the underying resource via a shared pointer.
  */
-template <typename ResourceType> class Resource {
+template <typename ResourceType>
+class Resource {
   std::shared_ptr<ResourceType> mp_resource;
   std::filesystem::path m_filepath;
 
   Resource &operator=(const Resource &) = delete;
   Resource &operator=(Resource &&) = delete;
 
-public:
+ public:
   /** @brief Construct a Resource. We assume the memory has not already been
    *         allocated.
    */
@@ -32,7 +33,8 @@ public:
    *  @param r The other Resource of any templated type.
    *  @return true if the paths to the resource are the same, otherwise false.
    */
-  template <typename T> bool operator==(const Resource<T> &r) {
+  template <typename T>
+  bool operator==(const Resource<T> &r) {
     return m_filepath.string() == r.string();
   }
 
@@ -46,4 +48,4 @@ public:
    */
   std::string filepath() const { return m_filepath.string(); }
 };
-#endif // RESOURCE_H_
+#endif  // RESOURCE_H_

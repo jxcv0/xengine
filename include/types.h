@@ -2,10 +2,9 @@
 #define TYPES_H_
 
 #include <cstdint>
+#include <glm/glm.hpp>
 #include <string>
 #include <vector>
-
-#include <glm/glm.hpp>
 
 using eid_t = uint32_t;
 using cid_t = uint32_t;
@@ -76,4 +75,4 @@ struct Light {
   float quadratic = 0.032f;
 };
 
-#endif // TYPES_H_
+#endif  // TYPES_H_

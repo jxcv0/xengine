@@ -18,9 +18,9 @@
 /*! \brief A GLSL Shader.
  */
 class Shader {
-  uint32_t m_id; // Handle to the program object
+  uint32_t m_id;  // Handle to the program object
 
-public:
+ public:
   Shader() = delete;
 
   /*! \brief No default generated constructor.
@@ -96,6 +96,6 @@ void check_link(int id);
  *  TODO shaders can all be loaded and compiled at once before game start.
  */
 Shader load(const char *vert_path, const char *frag_path);
-} // namespace ShaderUtils
+}  // namespace ShaderUtils
 
-#endif // SHADER_H
+#endif  // SHADER_H

@@ -1,20 +1,19 @@
 #include "resourcesubsystem.h"
 
-#include <sstream>
-#include <stdexcept>
-#include <string>
-#include <vector>
-
-#include <assimp/Importer.hpp>
 #include <assimp/material.h>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 #include <assimp/texture.h>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include <assimp/Importer.hpp>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <vector>
 
+#define STB_IMAGE_IMPLEMENTATION
 #include "resource.h"
+#include "stb_image.h"
 #include "types.h"
 
 /*------------------------------------------------------------------------------
@@ -81,7 +80,7 @@ std::vector<Mesh> ResourceSubsystem::process_node(const char *filepath,
 Mesh ResourceSubsystem::process_mesh(const char *filepath, aiMesh *mesh,
                                      const aiScene *scene) {
   std::vector<Vertex> vertices(mesh->mNumVertices);
-  std::vector<uint32_t> indices(mesh->mNumFaces * 3); // triangulated
+  std::vector<uint32_t> indices(mesh->mNumFaces * 3);  // triangulated
 
   // vertices
   for (auto i = 0; i < mesh->mNumVertices; ++i) {
@@ -163,21 +162,21 @@ std::vector<Texture> ResourceSubsystem::load_textures(aiMaterial *mat,
     }
 
     switch (type) {
-    case aiTextureType_DIFFUSE:
-      texture.m_type = TextureType::diffuse;
-      break;
-    case aiTextureType_SPECULAR:
-      texture.m_type = TextureType::specular;
-      break;
-    case aiTextureType_HEIGHT:
-      texture.m_type = TextureType::normal;
-      break;
-    case aiTextureType_AMBIENT:
-      texture.m_type = TextureType::height;
-      break;
-    default:
-      texture.m_type = TextureType::diffuse;
-      break;
+      case aiTextureType_DIFFUSE:
+        texture.m_type = TextureType::diffuse;
+        break;
+      case aiTextureType_SPECULAR:
+        texture.m_type = TextureType::specular;
+        break;
+      case aiTextureType_HEIGHT:
+        texture.m_type = TextureType::normal;
+        break;
+      case aiTextureType_AMBIENT:
+        texture.m_type = TextureType::height;
+        break;
+      default:
+        texture.m_type = TextureType::diffuse;
+        break;
     }
 
     textures.push_back(texture);

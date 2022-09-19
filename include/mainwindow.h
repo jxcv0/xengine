@@ -8,8 +8,9 @@
 
 #ifndef OPENGL_LIBS
 #define OPENGL_LIBS
-#include "glad.h"
 #include <GLFW/glfw3.h>
+
+#include "glad.h"
 #endif
 
 #include <glm/ext.hpp>
@@ -18,7 +19,7 @@
 #include "keys.h"
 
 class MainWindow {
-public:
+ public:
   /*! \brief        Construct window with initial width and height.
    *  \param width  Initial witdth of the window.
    *  \param height Initial witdth of the window.
@@ -145,8 +146,8 @@ public:
     return m_perspective_matrix;
   }
 
-private:
-  GLFWwindow *m_window; // not std::unique_ptr as it is managed by glfw
+ private:
+  GLFWwindow *m_window;  // not std::unique_ptr as it is managed by glfw
   float m_width;
   float m_height;
   std::string m_name;
@@ -155,4 +156,4 @@ private:
   glm::mat4 m_perspective_matrix;
 };
 
-#endif // MAINWINDOW_H_
+#endif  // MAINWINDOW_H_

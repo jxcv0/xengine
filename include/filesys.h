@@ -1,9 +1,11 @@
 #ifndef FILESYS_H
 #define FILESYS_H
 
-#include "buffer.h"
 #include <pthread.h>
+
 #include <string>
+
+#include "buffer.h"
 
 namespace {
 struct Request {
@@ -39,13 +41,13 @@ void *filesys_main(void *) {
   }
   return nullptr;
 }
-} // namespace
+}  // namespace
 
 namespace xen::filesys {
 // init file system
 void init() { pthread_create(&_filesysThread, NULL, filesys_main, (void *)0); }
 
 // async
-} // namespace xen::filesys
+}  // namespace xen::filesys
 
-#endif // FILESYS_H
+#endif  // FILESYS_H

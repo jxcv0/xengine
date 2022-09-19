@@ -17,7 +17,7 @@ float _b = 90.0f;
 float _prevX = 0;
 float _prevY = 0;
 bool _firstMouseMovement = true;
-} // namespace
+}  // namespace
 
 namespace xen::camera {
 // calculate view matrix
@@ -83,7 +83,8 @@ void update_aim(float mouseX, float mouseY, float sen) {
 }
 
 // update _position based on key press / character movement flags
-template <typename Input> void process_movement(Input in, float deltaTime) {
+template <typename Input>
+void process_movement(Input in, float deltaTime) {
   float velocity = 2.5f * deltaTime;
   if (in.forward()) {
     _position += _z * velocity;
@@ -98,6 +99,6 @@ template <typename Input> void process_movement(Input in, float deltaTime) {
     _position += _x * velocity;
   }
 }
-} // namespace xen::camera
+}  // namespace xen::camera
 
-#endif // CAMERA_H
+#endif  // CAMERA_H

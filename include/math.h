@@ -12,7 +12,8 @@ inline float radians(float dg) { return dg * 0.0174533; }
 
 // Vector of length n
 // values initialized to 0
-template <int n> struct Vec {
+template <int n>
+struct Vec {
   inline auto &operator[](size_t index) { return vals[index]; }
 
   inline float operator*(float f) {
@@ -29,7 +30,8 @@ template <int n> struct Vec {
   float vals[n] = {0.0f};
 };
 
-template <int m, int n> struct Mat {
+template <int m, int n>
+struct Mat {
   inline auto &operator[](size_t index) { return vals[index]; }
   float vals[m][n] = {0.0f};
 };
@@ -70,7 +72,8 @@ inline Mat<4, 4> cross(Mat<4, 4> &a, Mat<4, 4> &b) {
   return res;
 }
 
-template <int m, int n> void dbg_mat(Mat<m, n> &mat) {
+template <int m, int n>
+void dbg_mat(Mat<m, n> &mat) {
   std::cout << "Mat<" << m << ", " << n << ">:\n";
   for (size_t i = 0; i < m; i++) {
     for (size_t j = 0; j < n; j++) {
@@ -81,7 +84,8 @@ template <int m, int n> void dbg_mat(Mat<m, n> &mat) {
   std::cout << "\n";
 }
 
-template <int n> void dbg_vec(Vec<n> &v) {
+template <int n>
+void dbg_vec(Vec<n> &v) {
   std::cout << "Vec<" << n << ">:\n";
   for (size_t i = 0; i < n; i++) {
     std::cout << v[i] << " ";
@@ -141,6 +145,6 @@ inline Mat<4, 4> rotate(Mat<4, 4> &mat, float theta, Vec<3> &axis) {
 
   return cross(res, q);
 }
-} // namespace xen
+}  // namespace xen
 
-#endif // MATH_H
+#endif  // MATH_H

@@ -1,14 +1,15 @@
 #ifndef JOBSYS_H
 #define JOBSYS_H
 
+#include <pthread.h>
+
 #include "buffer.h"
 #include "checkerr.h"
-#include <pthread.h>
 
 namespace {
 const size_t NTHREADS = 4;
 
-bool _jobsysRun = true; // does not need to be atomic for single producer
+bool _jobsysRun = true;  // does not need to be atomic for single producer
 pthread_t _jobsysThreads[NTHREADS];
 int _jobsysThreadRet[NTHREADS];
 pthread_mutex_t _jobsysMutex;
@@ -43,7 +44,7 @@ void *jobsys_main(void *) {
   }
   return nullptr;
 }
-} // namespace
+}  // namespace
 
 // all jobs sent to the jobsystem are to be completed in that frame
 namespace xen::jobsys {
@@ -77,6 +78,6 @@ void push(Job job) {
 
 // push a job to the back of the work queue
 void push(void *(*func)(void *), void *data) { push(Job{func, data}); }
-} // namespace xen::jobsys
+}  // namespace xen::jobsys
 
-#endif // JOBSYS_H
+#endif  // JOBSYS_H

@@ -6,7 +6,7 @@
 
 namespace {
 unsigned int _model;
-} // namespace
+}  // namespace
 
 namespace xen::player {
 // set the player model
@@ -31,6 +31,6 @@ void process_input() {
     return;
   }
 }
-} // namespace xen::player
+}  // namespace xen::player
 
-#endif // PLAYER_H
+#endif  // PLAYER_H
