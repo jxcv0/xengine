@@ -36,6 +36,7 @@ void EntitySubsystem::destroy_entity(eid_t entity) {
   assert(entity < MAX_ENTITIES);
   m_signatures[entity].reset();
   m_available_eids.push(entity);
+  --m_num_entities;
 }
 
 /*------------------------------------------------------------------------------
