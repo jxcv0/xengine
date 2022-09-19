@@ -42,8 +42,8 @@ Shader ShaderUtils::load(const char *vert_path, const char *frag_path) {
     vert_file.close();
     vert_code = vertStream.str();
   } catch (std::ifstream::failure &e) {
-    std::cout << "Unable to load vertex shader "
-              << vert_path << " " << e.what() << "\n";
+    std::cout << "Unable to load vertex shader " << vert_path << " " << e.what()
+              << "\n";
   }
 
   try {
@@ -53,10 +53,10 @@ Shader ShaderUtils::load(const char *vert_path, const char *frag_path) {
     frag_file.close();
     frag_code = fragStream.str();
   } catch (std::ifstream::failure &e) {
-    std::cout << "Unable to load fragment shader "
-              << frag_path << " " << e.what() << "\n";
+    std::cout << "Unable to load fragment shader " << frag_path << " "
+              << e.what() << "\n";
   }
-  
+
   const char *vert_code_cstr = vert_code.c_str();
   const char *frag_code_cstr = frag_code.c_str();
   unsigned int vert_id, frag_id;
@@ -66,17 +66,16 @@ Shader ShaderUtils::load(const char *vert_path, const char *frag_path) {
   glCompileShader(vert_id);
   try {
     check_compile(vert_id);
-  } catch (const std::runtime_error& e) {
+  } catch (const std::runtime_error &e) {
     std::cout << e.what();
   }
-
 
   frag_id = glCreateShader(GL_FRAGMENT_SHADER);
   glShaderSource(frag_id, 1, &frag_code_cstr, NULL);
   glCompileShader(frag_id);
   try {
     check_compile(frag_id);
-  } catch (const std::runtime_error& e) {
+  } catch (const std::runtime_error &e) {
     std::cout << e.what();
   }
 
@@ -86,7 +85,7 @@ Shader ShaderUtils::load(const char *vert_path, const char *frag_path) {
   glLinkProgram(program_id);
   try {
     check_link(program_id);
-  } catch (const std::runtime_error& e) {
+  } catch (const std::runtime_error &e) {
     std::cout << e.what();
   }
 
@@ -96,4 +95,3 @@ Shader ShaderUtils::load(const char *vert_path, const char *frag_path) {
   Shader shader(program_id);
   return shader;
 }
-

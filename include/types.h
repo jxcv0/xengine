@@ -1,9 +1,9 @@
 #ifndef TYPES_H_
 #define TYPES_H_
 
-#include <vector>
-#include <string>
 #include <cstdint>
+#include <string>
+#include <vector>
 
 #include <glm/glm.hpp>
 
@@ -13,19 +13,15 @@ using cid_t = uint32_t;
 /**
  * @brief A single vertex.
  */
-struct Vertex { glm::vec3 m_position;
+struct Vertex {
+  glm::vec3 m_position;
   glm::vec3 m_normal;
   glm::vec2 m_tex_coord;
   glm::vec3 m_tangent;
   glm::vec3 m_bitangent;
 };
 
-enum class TextureType {
-  diffuse,
-  specular,
-  normal,
-  height
-};
+enum class TextureType { diffuse, specular, normal, height };
 
 /**
  * @brief An image texture
@@ -50,7 +46,6 @@ struct Texture {
 struct Material {
   std::vector<Texture> m_textures;
 };
-
 
 /**
  * @brief A Mesh component. This may in fact be a collection of different

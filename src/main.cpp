@@ -6,10 +6,9 @@
 
 // void on_mouse(GLFWwindow *window, double xPosIn, double yPosIn);
 
-int main(int argc, char const *argv[])
-{
-  auto model = ResourceSubsystem::instance()
-    .load_model("assets/models/cyborg/cyborg.obj");
+int main(int argc, char const *argv[]) {
+  auto model = ResourceSubsystem::instance().load_model(
+      "assets/models/cyborg/cyborg.obj");
 
   MainWindow main_window(1080, 600, std::string("main-window"));
   main_window.set_hint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -35,9 +34,9 @@ int main(int argc, char const *argv[])
     main_window.swap_buffers();
   }
 
-	return 0;
+  return 0;
 }
 
 // void on_mouse(GLFWwindow *window, double x, double y) {
-	// xen::camera::update_aim(static_cast<float>(x), static_cast<float>(y), 0.1f);
+// xen::camera::update_aim(static_cast<float>(x), static_cast<float>(y), 0.1f);
 // }

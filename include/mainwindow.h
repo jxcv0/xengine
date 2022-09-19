@@ -1,10 +1,10 @@
 #ifndef MAINWINDOW_H_
 #define MAINWINDOW_H_
 
+#include <algorithm>
+#include <cstdint>
 #include <string>
 #include <vector>
-#include <cstdint>
-#include <algorithm>
 
 #ifndef OPENGL_LIBS
 #define OPENGL_LIBS
@@ -12,25 +12,20 @@
 #include <GLFW/glfw3.h>
 #endif
 
-#include <glm/glm.hpp>
 #include <glm/ext.hpp>
+#include <glm/glm.hpp>
 
 #include "keys.h"
 
 class MainWindow {
 public:
-
   /*! \brief        Construct window with initial width and height.
    *  \param width  Initial witdth of the window.
    *  \param height Initial witdth of the window.
    *  \param name   The name of the window.
    */
   inline MainWindow(float width, float height, std::string name)
-    : m_width(width)
-    , m_height(height)
-    , m_name(name)
-    , m_window(nullptr)
-  {
+      : m_width(width), m_height(height), m_name(name), m_window(nullptr) {
     glfwInit();
   }
 
@@ -56,11 +51,8 @@ public:
       return;
     }
 
-    m_window = glfwCreateWindow(m_width,
-                                m_height,
-                                m_name.data(),
-                                nullptr,
-                                nullptr);
+    m_window =
+        glfwCreateWindow(m_width, m_height, m_name.data(), nullptr, nullptr);
     if (nullptr == m_window) {
       perror("unable to create glfwwindow");
       glfwTerminate();
@@ -68,11 +60,10 @@ public:
     }
 
     glfwMakeContextCurrent(m_window);
-    glfwSetFramebufferSizeCallback(m_window,
-      [](GLFWwindow* window, int width, int height){
-        glViewport(0, 0, width, height);
-      }
-    );
+    glfwSetFramebufferSizeCallback(
+        m_window, [](GLFWwindow *window, int width, int height) {
+          glViewport(0, 0, width, height);
+        });
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
       perror("Unable to initialize GLAD");
@@ -81,12 +72,12 @@ public:
     }
 
     glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    
+
     // depth testing
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
-    // face culling 
+    // face culling
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
   }
@@ -94,9 +85,7 @@ public:
   /*! \brief  Check if the window should close.
    *  \return true if window should close, otherwise returns false.
    */
-  inline bool should_close() {
-    return glfwWindowShouldClose(m_window);
-  }
+  inline bool should_close() { return glfwWindowShouldClose(m_window); }
 
   /*! \brief Swap front and back buffer of the window.
    */
@@ -109,7 +98,7 @@ public:
   /*! \brief Set the background color of the window.
    */
   inline void set_bg(float r, float g, float b, float a) {
-    glClearColor(r, g, b ,a);
+    glClearColor(r, g, b, a);
   }
 
   /*! \brief Clear bit buffers.
@@ -120,7 +109,7 @@ public:
 
   /*! \brief Set cursor position callback function.
    */
-  template<typename Function>
+  template <typename Function>
   inline void set_cursor_position_callback(Function function) {
     glfwSetCursorPosCallback(m_window, function);
   }
@@ -140,9 +129,7 @@ public:
    *  \param key The key to check for.
    *  \return    true if key is pressed, otherwise returns false;
    */
-  bool key_pressed(int key) {
-    return (m_input_buffer & key) != 0;
-  }
+  bool key_pressed(int key) { return (m_input_buffer & key) != 0; }
 
   /*! \brief     Get a projection matrix for this window.
    *  \param fov The field of view.
@@ -151,17 +138,15 @@ public:
   glm::mat4 projection_matrix(float fov) {
     if (fov == m_fov) {
       m_fov = fov;
-      m_perspective_matrix = glm::perspective(
-          glm::radians(m_fov),
-          ((float)m_width / (float)m_height),
-          0.1f,
-          100.0f);
+      m_perspective_matrix =
+          glm::perspective(glm::radians(m_fov),
+                           ((float)m_width / (float)m_height), 0.1f, 100.0f);
     }
     return m_perspective_matrix;
   }
 
 private:
-  GLFWwindow* m_window; // not std::unique_ptr as it is managed by glfw
+  GLFWwindow *m_window; // not std::unique_ptr as it is managed by glfw
   float m_width;
   float m_height;
   std::string m_name;

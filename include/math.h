@@ -1,169 +1,146 @@
 #ifndef MATH_H
 #define MATH_H
 
-#include <iostream>
 #include <cmath>
+#include <iostream>
 
 // TODO SIMD
 
-namespace xen
-{
-    // take a wild guess
-    inline float radians(float dg)
-    {
-        return dg * 0.0174533;
+namespace xen {
+// take a wild guess
+inline float radians(float dg) { return dg * 0.0174533; }
+
+// Vector of length n
+// values initialized to 0
+template <int n> struct Vec {
+  inline auto &operator[](size_t index) { return vals[index]; }
+
+  inline float operator*(float f) {
+    return (vals[0] * f) + (vals[1] * f) + (vals[2] * f);
+  }
+
+  inline Vec<n> operator+(Vec<n> &&v) {
+    Vec<n> res;
+    for (size_t i = 0; i < n; i++) {
+      res[i] = (this->vals[i] + v[i]);
     }
+  }
 
-    // Vector of length n
-    // values initialized to 0
-    template<int n>
-    struct Vec
-    {
-        inline auto& operator[](size_t index){ return vals[index]; }
+  float vals[n] = {0.0f};
+};
 
-        inline float operator*(float f) 
-        {
-            return (vals[0] * f) + (vals[1] * f) + (vals[2] * f);
-        }
+template <int m, int n> struct Mat {
+  inline auto &operator[](size_t index) { return vals[index]; }
+  float vals[m][n] = {0.0f};
+};
 
-        inline Vec<n> operator+(Vec<n>&& v)
-        {
-            Vec<n> res;
-            for (size_t i = 0; i < n; i++)
-            {
-                res[i] = (this->vals[i] + v[i]);
-            }
-        }
+// get the dot product of 2 Vec<3>s
+inline float dot(Vec<3> &a, Vec<3> &b) {
+  return (a[0] * b[0]) + (a[1] * b[1]) + (a[2] * b[2]);
+}
 
-        float vals[n] = {0.0f};
-    };
+// get the cross product of 2 Vec<3>s
+inline Vec<3> cross(Vec<3> &a, Vec<3> &b) {
+  Vec<3> res;
+  res[0] = (a[1] * b[2]) - (a[2] * b[1]);
+  res[1] = (a[2] * b[0]) - (a[0] * b[2]);
+  res[2] = (a[0] * b[1]) - (a[1] * b[0]);
+  return res;
+}
 
-    template<int m, int n>
-    struct Mat
-    {
-        inline auto& operator[](size_t index) { return vals[index]; }
-        float vals[m][n] = {0.0f};
-    };
+inline Vec<3> cross(Vec<3> &v, Mat<3, 3> &m) {
+  Vec<3> res;
+  res[0] =
+      (v[0] * m.vals[0][0]) + (v[1] * m.vals[0][1]) + (v[2] * m.vals[0][2]);
+  res[1] =
+      (v[0] * m.vals[1][0]) + (v[1] * m.vals[1][1]) + (v[2] * m.vals[1][2]);
+  res[2] =
+      (v[0] * m.vals[2][0]) + (v[1] * m.vals[2][1]) + (v[2] * m.vals[2][2]);
+  return res;
+}
 
-    // get the dot product of 2 Vec<3>s
-    inline float dot(Vec<3>& a, Vec<3>& b)
-    {
-        return (a[0] * b[0]) + (a[1] * b[1]) + (a[2] * b[2]);
+// get the cross product of 2 Mat<4, 4>s
+inline Mat<4, 4> cross(Mat<4, 4> &a, Mat<4, 4> &b) {
+  Mat<4, 4> res;
+  for (size_t i = 0; i < 4; i++) {
+    for (size_t j = 0; j < 4; j++) {
+      res[i][j] = a[i][j] * b[j][i];
     }
+  }
+  return res;
+}
 
-    // get the cross product of 2 Vec<3>s
-    inline Vec<3> cross(Vec<3>& a, Vec<3>& b)
-    {
-        Vec<3> res;
-        res[0] = (a[1] * b[2]) - (a[2] * b[1]);
-        res[1] = (a[2] * b[0]) - (a[0] * b[2]);
-        res[2] = (a[0] * b[1]) - (a[1] * b[0]);
-        return res;
+template <int m, int n> void dbg_mat(Mat<m, n> &mat) {
+  std::cout << "Mat<" << m << ", " << n << ">:\n";
+  for (size_t i = 0; i < m; i++) {
+    for (size_t j = 0; j < n; j++) {
+      std::cout << mat[i][j] << " ";
     }
+    std::cout << "\n";
+  }
+  std::cout << "\n";
+}
 
-    inline Vec<3> cross(Vec<3>& v, Mat<3, 3>& m)
-    {
-        Vec<3> res;
-        res[0] = (v[0] * m.vals[0][0]) + (v[1] * m.vals[0][1]) + (v[2] * m.vals[0][2]);
-        res[1] = (v[0] * m.vals[1][0]) + (v[1] * m.vals[1][1]) + (v[2] * m.vals[1][2]);
-        res[2] = (v[0] * m.vals[2][0]) + (v[1] * m.vals[2][1]) + (v[2] * m.vals[2][2]);
-        return res;
-    }
+template <int n> void dbg_vec(Vec<n> &v) {
+  std::cout << "Vec<" << n << ">:\n";
+  for (size_t i = 0; i < n; i++) {
+    std::cout << v[i] << " ";
+  }
+  std::cout << "\n\n";
+}
 
-    // get the cross product of 2 Mat<4, 4>s
-    inline Mat<4, 4> cross(Mat<4, 4>& a, Mat<4, 4>& b)
-    {
-        Mat<4,4> res;
-        for (size_t i = 0; i < 4; i++)
-        {
-            for (size_t j = 0; j < 4; j++)
-            {
-                res[i][j] = a[i][j] * b[j][i];
-            }
-        }
-        return res;
-    }
+// add translation values to a 4x4 matrix
+inline Mat<4, 4> translate(Mat<4, 4> &mat, Vec<3> &v) {
+  Mat<4, 4> res;
+  res[3][0] = v[0];
+  res[3][1] = v[1];
+  res[3][2] = v[2];
+  res[3][3] = 1.0f;
+  return res;
+}
 
-    template<int m, int n>
-    void dbg_mat(Mat<m, n>& mat)
-    {
-        std::cout << "Mat<" << m << ", " << n << ">:\n";
-        for (size_t i = 0; i < m; i++)
-        {
-            for (size_t j = 0; j < n; j++)
-            {
-                std::cout << mat[i][j] << " ";
-            }
-            std::cout << "\n";
-        }
-        std::cout << "\n";
-    }
+inline Mat<4, 4> create_translation_matrix(Vec<3> &v) {
+  Mat<4, 4> mat;
+  mat[0][0] = 1.0f;
+  mat[1][1] = 1.0f;
+  mat[2][2] = 1.0f;
+  mat[3][3] = 1.0f;
 
-    template<int n>
-    void dbg_vec(Vec<n>& v)
-    {
-        std::cout << "Vec<" << n << ">:\n";
-        for (size_t i = 0; i < n; i++)
-        {
-            std::cout << v[i] << " ";
-        }
-        std::cout << "\n\n";
-    }
+  return translate(mat, v);
+}
 
-    // add translation values to a 4x4 matrix
-    inline Mat<4, 4> translate(Mat<4, 4>& mat, Vec<3>& v)
-    {
-        Mat<4, 4> res;
-        res[3][0] = v[0];
-        res[3][1] = v[1];
-        res[3][2] = v[2];
-        res[3][3] = 1.0f;
-        return res;
-    }
+// add rotation values to a 4x4 matrix
+inline Mat<4, 4> rotate(Mat<4, 4> &mat, float theta, Vec<3> &axis) {
+  // radians?
+  float angle = radians(theta);
+  auto c = std::cos(angle);
+  auto s = std::sin(angle);
+  auto t = axis * (1 - c);
+  std::cout << "theta:" << theta << " angle: " << angle << " c: " << c
+            << " t: " << t << "\n";
 
-    inline Mat<4, 4> create_translation_matrix(Vec<3>& v)
-    {
-        Mat<4, 4> mat;
-        mat[0][0] = 1.0f;
-        mat[1][1] = 1.0f;
-        mat[2][2] = 1.0f;
-        mat[3][3] = 1.0f;
+  Vec<3> temp;
+  temp[0] = t;
+  temp[1] = t;
+  temp[2] = t;
 
-        return translate(mat, v);
-    }
+  Mat<4, 4> q;
+  q[0][0] = c + temp[0] * axis[0];
+  q[0][1] = 0 + temp[0] * axis[1] + s * axis[2];
+  q[0][2] = 0 + temp[0] * axis[2] - s * axis[0];
 
-    // add rotation values to a 4x4 matrix
-    inline Mat<4, 4> rotate(Mat<4, 4>& mat, float theta, Vec<3>& axis)
-    {
-        // radians?
-        float angle = radians(theta);
-        auto c = std::cos(angle);
-        auto s = std::sin(angle);
-        auto t = axis * (1 - c);
-        std::cout << "theta:" << theta << " angle: " << angle << " c: " << c << " t: " << t << "\n";
+  q[1][0] = 0 + temp[1] * axis[0] - s * axis[2];
+  q[1][1] = c + temp[1] * axis[1];
+  q[1][2] = 0 + temp[1] * axis[2] + s * axis[0];
 
-        Vec<3> temp;
-        temp[0] = t;
-        temp[1] = t;
-        temp[2] = t;
+  q[2][0] = 0 + temp[2] * axis[0] + s * axis[1];
+  q[2][1] = 0 + temp[2] * axis[1] - s * axis[0];
+  q[2][2] = c + temp[2] * axis[2];
 
-        Mat<4, 4> q;
-        q[0][0] = c + temp[0] * axis[0];
-		q[0][1] = 0 + temp[0] * axis[1] + s * axis[2];
-		q[0][2] = 0 + temp[0] * axis[2] - s * axis[0];
+  Mat<4, 4> res;
 
-		q[1][0] = 0 + temp[1] * axis[0] - s * axis[2];
-		q[1][1] = c + temp[1] * axis[1];
-		q[1][2] = 0 + temp[1] * axis[2] + s * axis[0];
-
-		q[2][0] = 0 + temp[2] * axis[0] + s * axis[1];
-		q[2][1] = 0 + temp[2] * axis[1] - s * axis[0];
-		q[2][2] = c + temp[2] * axis[2];
-
-        Mat<4, 4> res;
-
-        return cross(res, q);
-    }
+  return cross(res, q);
+}
 } // namespace xen
 
 #endif // MATH_H

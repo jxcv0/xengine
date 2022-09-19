@@ -1,41 +1,51 @@
 #include "resourcesubsystem.h"
 
+#include <sstream>
 #include <stdexcept>
 #include <string>
-#include <sstream>
 #include <vector>
 
 #include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
 #include <assimp/material.h>
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
 #include <assimp/texture.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-#include "types.h"
 #include "resource.h"
+#include "types.h"
 
 /*------------------------------------------------------------------------------
  */
-Resource<Model>
-ResourceSubsystem::load_model(const char *filepath) {
+auto ResourceSubsystem::mesh_loaded(const char *filepath) const {
+  return std::find_if(m_loaded_models.begin(), m_loaded_models.end(),
+                      [=](const auto &r) { return r.filepath() == filepath; });
+}
+
+/*------------------------------------------------------------------------------
+ */
+auto ResourceSubsystem::material_loaded(const char *filepath) const {
+  return std::find_if(m_loaded_materials.begin(), m_loaded_materials.end(),
+                      [=](const auto &r) { return r.filepath() == filepath; });
+}
+
+/*------------------------------------------------------------------------------
+ */
+Resource<Model> ResourceSubsystem::load_model(const char *filepath) {
   auto it = mesh_loaded(filepath);
-  if(m_loaded_models.end() != it) {
+  if (m_loaded_models.end() != it) {
     return *it;
   }
 
   Assimp::Importer importer;
-  auto flags = (aiProcess_Triangulate |
-                aiProcess_FlipUVs | 
-                aiProcess_GenNormals |
-                aiProcess_CalcTangentSpace);
+  auto flags = (aiProcess_Triangulate | aiProcess_FlipUVs |
+                aiProcess_GenNormals | aiProcess_CalcTangentSpace);
 
   const aiScene *scene = importer.ReadFile(filepath, flags);
 
-  if (nullptr == scene ||
-      scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE ||
+  if (nullptr == scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE ||
       nullptr == scene->mRootNode) {
     throw std::runtime_error(importer.GetErrorString());
   }
@@ -49,11 +59,9 @@ ResourceSubsystem::load_model(const char *filepath) {
 
 /*------------------------------------------------------------------------------
  */
-std::vector<Mesh>
-ResourceSubsystem::process_node(const char *filepath,
-                                aiNode *node,
-                                const aiScene *scene)
-{
+std::vector<Mesh> ResourceSubsystem::process_node(const char *filepath,
+                                                  aiNode *node,
+                                                  const aiScene *scene) {
   std::vector<Mesh> meshes;
   for (auto i = 0; i < node->mNumMeshes; ++i) {
     aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
@@ -70,36 +78,29 @@ ResourceSubsystem::process_node(const char *filepath,
 
 /*------------------------------------------------------------------------------
  */
-Mesh
-ResourceSubsystem::process_mesh(const char *filepath,
-                                aiMesh *mesh,
-                                const aiScene *scene)
-{
+Mesh ResourceSubsystem::process_mesh(const char *filepath, aiMesh *mesh,
+                                     const aiScene *scene) {
   std::vector<Vertex> vertices(mesh->mNumVertices);
   std::vector<uint32_t> indices(mesh->mNumFaces * 3); // triangulated
 
   // vertices
   for (auto i = 0; i < mesh->mNumVertices; ++i) {
     Vertex vertex;
-    vertex.m_position = glm::vec3(mesh->mVertices[i].x,
-                                  mesh->mVertices[i].y,
+    vertex.m_position = glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y,
                                   mesh->mVertices[i].z);
 
-    vertex.m_normal = glm::vec3(mesh->mNormals[i].x,
-                                mesh->mNormals[i].y,
+    vertex.m_normal = glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y,
                                 mesh->mNormals[i].z);
 
     // assuming vertices only have one texture coordinate per vertex
-    vertex.m_tex_coord = glm::vec2(mesh->mTextureCoords[0][i].x,
-                                   mesh->mTextureCoords[0][i].y);
+    vertex.m_tex_coord =
+        glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
 
-    vertex.m_tangent = glm::vec3(mesh->mTangents[i].x,
-                                 mesh->mTangents[i].y,
+    vertex.m_tangent = glm::vec3(mesh->mTangents[i].x, mesh->mTangents[i].y,
                                  mesh->mTangents[i].z);
 
-    vertex.m_bitangent = glm::vec3(mesh->mBitangents[i].x,
-                                   mesh->mBitangents[i].y,
-                                   mesh->mBitangents[i].z);
+    vertex.m_bitangent = glm::vec3(
+        mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z);
 
     vertices.push_back(vertex);
   }
@@ -121,10 +122,10 @@ ResourceSubsystem::process_mesh(const char *filepath,
 
 /*------------------------------------------------------------------------------
  */
-Resource<Material>
-ResourceSubsystem::load_materials(aiMaterial *mat, const char *filepath) {
+Resource<Material> ResourceSubsystem::load_materials(aiMaterial *mat,
+                                                     const char *filepath) {
   auto it = material_loaded(filepath);
-  if(m_loaded_materials.end() != it) {
+  if (m_loaded_materials.end() != it) {
     return *it;
   }
   auto diff = load_textures(mat, aiTextureType_DIFFUSE);
@@ -133,73 +134,55 @@ ResourceSubsystem::load_materials(aiMaterial *mat, const char *filepath) {
   auto height = load_textures(mat, aiTextureType_AMBIENT);
 
   auto material = new Material();
-  material->m_textures.insert(material->m_textures.end(),
-      diff.begin(), diff.end());
-  material->m_textures.insert(material->m_textures.end(),
-      spec.begin(), spec.end());
-  material->m_textures.insert(material->m_textures.end(),
-      norm.begin(), norm.end());
-  material->m_textures.insert(material->m_textures.end(),
-      height.begin(), height.end());
+  material->m_textures.insert(material->m_textures.end(), diff.begin(),
+                              diff.end());
+  material->m_textures.insert(material->m_textures.end(), spec.begin(),
+                              spec.end());
+  material->m_textures.insert(material->m_textures.end(), norm.begin(),
+                              norm.end());
+  material->m_textures.insert(material->m_textures.end(), height.begin(),
+                              height.end());
   Resource<Material> resource(material, filepath);
   return resource;
 }
 
 /*------------------------------------------------------------------------------
  */
-std::vector<Texture>
-ResourceSubsystem::load_textures(aiMaterial *mat, aiTextureType type)
-{
+std::vector<Texture> ResourceSubsystem::load_textures(aiMaterial *mat,
+                                                      aiTextureType type) {
   std::vector<Texture> textures;
   stbi_set_flip_vertically_on_load(true);
   for (auto i = 0; i < mat->GetTextureCount(type); ++i) {
     aiString aistr;
     mat->GetTexture(type, 0, &aistr);
     Texture texture;
-    texture.mp_data = stbi_load(aistr.C_Str(),
-                                &texture.m_width,
-                                &texture.m_height,
-                                &texture.m_num_channels,
-                                0);
+    texture.mp_data = stbi_load(aistr.C_Str(), &texture.m_width,
+                                &texture.m_height, &texture.m_num_channels, 0);
     if (nullptr == texture.mp_data) {
       // TODO load default.
     }
 
     switch (type) {
-      case aiTextureType_DIFFUSE:
-        texture.m_type = TextureType::diffuse;
-        break;
-      case aiTextureType_SPECULAR:
-        texture.m_type = TextureType::specular;
-        break;
-      case aiTextureType_HEIGHT:
-        texture.m_type = TextureType::normal;
-        break;
-      case aiTextureType_AMBIENT:
-        texture.m_type = TextureType::height;
-        break;
-      default: 
-        texture.m_type = TextureType::diffuse;
-        break;
+    case aiTextureType_DIFFUSE:
+      texture.m_type = TextureType::diffuse;
+      break;
+    case aiTextureType_SPECULAR:
+      texture.m_type = TextureType::specular;
+      break;
+    case aiTextureType_HEIGHT:
+      texture.m_type = TextureType::normal;
+      break;
+    case aiTextureType_AMBIENT:
+      texture.m_type = TextureType::height;
+      break;
+    default:
+      texture.m_type = TextureType::diffuse;
+      break;
     }
 
     textures.push_back(texture);
   }
   return textures;
-}
-
-/*------------------------------------------------------------------------------
- */
-auto ResourceSubsystem::mesh_loaded(const char* filepath) const {
-  return std::find_if(m_loaded_models.begin(), m_loaded_models.end(),
-      [=](const auto &r){ return r.filepath() == filepath; });
-}
-
-/*------------------------------------------------------------------------------
- */
-auto ResourceSubsystem::material_loaded(const char *filepath) const {
-  return std::find_if(m_loaded_materials.begin(), m_loaded_materials.end(),
-      [=](const auto &r){ return r.filepath() == filepath; });
 }
 
 /*------------------------------------------------------------------------------
@@ -220,7 +203,7 @@ Mesh::gen_buffers() {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER,
                m_indices.size() * sizeof(uint32_t),
-               m_indices.data(), GL_STATIC_DRAW); 
+               m_indices.data(), GL_STATIC_DRAW);
 
   // vertex positions
   glEnableVertexAttribArray(0);
@@ -253,4 +236,3 @@ Mesh::gen_buffers() {
 
 /*------------------------------------------------------------------------------
  */
-
