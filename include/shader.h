@@ -116,12 +116,14 @@ namespace ShaderUtils {
  */
 void check_compile(int id);
 
-/*! @brief Check the link status of the shader program.
- *  @throw ShaderLinkError
+/**
+ * @brief Check the link status of the shader program.
+ *
+ * @throw ShaderLinkError
  */
 void check_link(int id);
 
-/*! @brief Load a shader from a file.
+/** @brief Load a shader from a file.
  *  @param vert_path Path to the vertex shader.
  *  @param frag_path Path to the fragment shader.
  *  @return A new Shader object.

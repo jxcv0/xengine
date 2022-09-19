@@ -1,16 +1,9 @@
-#ifndef ALLOC_H
-#define ALLOC_H
+#ifndef ALLOC_H_
+#define ALLOC_H_
 
 #include "checkerr.h"
 
-#ifdef XEN_DEBUG
-#include <string>
-#endif
-
-// TODO general heap allocator
-// TODO block/pool (SLAB/SLOB?) allocator
-
-namespace xen::mem {
+namespace MemoryUtils {
 using uint8 = unsigned char;
 
 // aligned allocation
@@ -60,6 +53,7 @@ void free_aligned(void *ptr) {
   }
 }
 
+// TODO redo this
 template <typename T>
 struct StackAllocator {
   // allocate aligned memory up front
@@ -125,6 +119,6 @@ struct StackAllocator {
   uintptr_t _end;
   uintptr_t _mkr;
 };
-}  // namespace xen::mem
+}  // namespace MemoryUtils
 
-#endif  // ALLOC_H
+#endif  // ALLOC_H_

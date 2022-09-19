@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "entitysubsystem.h"
 #include "mainwindow.h"
 #include "resourcesubsystem.h"
 #include "shader.h"
@@ -9,6 +10,8 @@
 int main(int argc, char const *argv[]) {
   auto model = ResourceSubsystem::instance().load_model(
       "assets/models/cyborg/cyborg.obj");
+
+  auto entity = EntitySubsystem::instance().create_entity();
 
   MainWindow main_window(1080, 600, std::string("main-window"));
   main_window.set_hint(GLFW_CONTEXT_VERSION_MAJOR, 4);

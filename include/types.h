@@ -6,9 +6,6 @@
 #include <string>
 #include <vector>
 
-using eid_t = uint32_t;
-using cid_t = uint32_t;
-
 /**
  * @brief A single vertex.
  */
@@ -52,7 +49,7 @@ struct Material {
  */
 struct Mesh {
   std::vector<Vertex> m_vertices;
-  std::vector<uint32_t> m_indices;
+  std::vector<std::uint32_t> m_indices;
 };
 
 /**
