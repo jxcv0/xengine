@@ -22,7 +22,7 @@ public:
    *
    * @return A const reference to the instance.
    */
-  static ResourceSubsystem &instance() {
+  static ResourceSubsystem& instance() {
     static ResourceSubsystem *r = new ResourceSubsystem();
     return *r;
   }
