@@ -18,22 +18,6 @@ class ResourceSubsystem {
 
 public:
   /**
-   * @brief Check if a mesh resource has been loaded from a path.
-   *
-   * @param filepath The filepath to the resource.
-   * @return An iterator to the resource.
-   */
-  auto mesh_loaded(const char *filepath) const;
-
-  /**
-   * @brief Check if a material resource has been loaded from a path.
-   *
-   * @param filepath The filepath to the resource.
-   * @return An iterator to the resource.
-   */
-  auto material_loaded(const char *filepath) const;
-
-  /**
    * @brief Get the static instance of the subsystem.
    *
    * @return A const reference to the instance.
@@ -97,6 +81,22 @@ private:
    * @return The image texture.
    */
   std::vector<Texture> load_textures(aiMaterial *mat, aiTextureType type);
+
+  /**
+   * @brief Check if a mesh resource has been loaded from a path.
+   *
+   * @param filepath The filepath to the resource.
+   * @return An iterator to the resource.
+   */
+  auto mesh_loaded(const char *filepath) const;
+
+  /**
+   * @brief Check if a material resource has been loaded from a path.
+   *
+   * @param filepath The filepath to the resource.
+   * @return An iterator to the resource.
+   */
+  auto material_loaded(const char *filepath) const;
 };
 
 #endif // RESOURCESUBSYSTEM_H_
