@@ -44,20 +44,15 @@ public:
    * @param filepath The filepath to the resource.
    * @return An iterator to the resource.
    */
-  auto mesh_loaded(const char* filepath) const {
-    return std::find_if(m_loaded_models.begin(), m_loaded_models.end(),
-        [=](const auto &r){ return r.filepath() == filepath; });
-  }
+  auto mesh_loaded(const char* filepath) const;
 
   /**
    * @brief Check if a material resource has been loaded from a path.
    * 
    * @param filepath The filepath to the resource.
-   * @return An iterator to the resource.  */
-  auto material_loaded(const char *filepath) const {
-    return std::find_if(m_loaded_materials.begin(), m_loaded_materials.end(),
-        [=](const auto &r){ return r.filepath() == filepath; });
-  }
+   * @return An iterator to the resource. 
+   */
+  auto material_loaded(const char *filepath) const;
 
 private:
   // singleton
@@ -72,8 +67,8 @@ private:
   // ResourceList<Texture> m_loaded_textures; 
 
   std::vector<Mesh> process_node(const char *filepath,
-                                  aiNode *node,
-                                  const aiScene *scene);
+                                 aiNode *node,
+                                 const aiScene *scene);
 
   /**
    * @brief Process mesh data.

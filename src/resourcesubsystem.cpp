@@ -189,6 +189,20 @@ ResourceSubsystem::load_textures(aiMaterial *mat, aiTextureType type)
 }
 
 /*------------------------------------------------------------------------------
+ */
+auto ResourceSubsystem::mesh_loaded(const char* filepath) const {
+  return std::find_if(m_loaded_models.begin(), m_loaded_models.end(),
+      [=](const auto &r){ return r.filepath() == filepath; });
+}
+
+/*------------------------------------------------------------------------------
+ */
+auto ResourceSubsystem::material_loaded(const char *filepath) const {
+  return std::find_if(m_loaded_materials.begin(), m_loaded_materials.end(),
+      [=](const auto &r){ return r.filepath() == filepath; });
+}
+
+/*------------------------------------------------------------------------------
  * TODO this should be elsewhere
 void
 Mesh::gen_buffers() {
