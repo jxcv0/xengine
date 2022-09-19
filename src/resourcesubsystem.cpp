@@ -29,7 +29,9 @@ ResourceSubsystem::load_model(const char *filepath) {
   Assimp::Importer importer;
   auto flags = (aiProcess_Triangulate |
                 aiProcess_FlipUVs | 
-                aiProcess_GenNormals);
+                aiProcess_GenNormals |
+                aiProcess_CalcTangentSpace);
+
   const aiScene *scene = importer.ReadFile(filepath, flags);
 
   if (nullptr == scene ||
@@ -125,29 +127,65 @@ ResourceSubsystem::load_materials(aiMaterial *mat, const char *filepath) {
   if(m_loaded_materials.end() != it) {
     return *it;
   }
-  auto diff = load_texture(mat, aiTextureType_DIFFUSE);
-  auto spec = load_texture(mat, aiTextureType_SPECULAR);
-  auto height = load_texture(mat, aiTextureType_AMBIENT);
-  Resource<Material> material(new Material{diff, spec, height}, filepath);
-  return material;
+  auto diff = load_textures(mat, aiTextureType_DIFFUSE);
+  auto spec = load_textures(mat, aiTextureType_SPECULAR);
+  auto norm = load_textures(mat, aiTextureType_HEIGHT);
+  auto height = load_textures(mat, aiTextureType_AMBIENT);
+
+  auto material = new Material();
+  material->m_textures.insert(material->m_textures.end(),
+      diff.begin(), diff.end());
+  material->m_textures.insert(material->m_textures.end(),
+      spec.begin(), spec.end());
+  material->m_textures.insert(material->m_textures.end(),
+      norm.begin(), norm.end());
+  material->m_textures.insert(material->m_textures.end(),
+      height.begin(), height.end());
+  Resource<Material> resource(material, filepath);
+  return resource;
 }
 
 /*------------------------------------------------------------------------------
  */
-Texture
-ResourceSubsystem::load_texture(aiMaterial *mat, aiTextureType type)
+std::vector<Texture>
+ResourceSubsystem::load_textures(aiMaterial *mat, aiTextureType type)
 {
+  std::vector<Texture> textures;
   stbi_set_flip_vertically_on_load(true);
-  assert(1 == mat->GetTextureCount(type));
-  aiString aistr;
-  mat->GetTexture(type, 0, &aistr);
-  Texture tex;
-  tex.mp_data = stbi_load(
-      aistr.C_Str(), &tex.m_width, &tex.m_height, &tex.m_num_channels, 0);
-  if (nullptr == tex.mp_data) {
-    // TODO load default.
+  for (auto i = 0; i < mat->GetTextureCount(type); ++i) {
+    aiString aistr;
+    mat->GetTexture(type, 0, &aistr);
+    Texture texture;
+    texture.mp_data = stbi_load(aistr.C_Str(),
+                                &texture.m_width,
+                                &texture.m_height,
+                                &texture.m_num_channels,
+                                0);
+    if (nullptr == texture.mp_data) {
+      // TODO load default.
+    }
+
+    switch (type) {
+      case aiTextureType_DIFFUSE:
+        texture.m_type = TextureType::diffuse;
+        break;
+      case aiTextureType_SPECULAR:
+        texture.m_type = TextureType::specular;
+        break;
+      case aiTextureType_HEIGHT:
+        texture.m_type = TextureType::normal;
+        break;
+      case aiTextureType_AMBIENT:
+        texture.m_type = TextureType::height;
+        break;
+      default: 
+        texture.m_type = TextureType::diffuse;
+        break;
+    }
+
+    textures.push_back(texture);
   }
-  return tex;
+  return textures;
 }
 
 /*------------------------------------------------------------------------------

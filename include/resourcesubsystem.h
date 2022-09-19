@@ -105,7 +105,7 @@ private:
    * @param type The type of the image to load.
    * @return The image texture.
    */
-  Texture load_texture(aiMaterial *mat, aiTextureType type);
+  std::vector<Texture> load_textures(aiMaterial *mat, aiTextureType type);
 };
 
 #endif // RESOURCESUBSYSTEM_H_

@@ -20,6 +20,13 @@ struct Vertex { glm::vec3 m_position;
   glm::vec3 m_bitangent;
 };
 
+enum class TextureType {
+  diffuse,
+  specular,
+  normal,
+  height
+};
+
 /**
  * @brief An image texture
  */
@@ -28,6 +35,7 @@ struct Texture {
   int m_height;
   int m_num_channels;
   unsigned char *mp_data;
+  TextureType m_type;
 
   /**
    * @brief Free image memory.
@@ -36,13 +44,11 @@ struct Texture {
 };
 
 /**
- * @brief A material component consisting of 3 texure types.
+ * @brief A material is an array of textures.
  *        We assume these images will never be used outside of a material.
  */
 struct Material {
-  Texture mp_diffuse;
-  Texture mp_specular;
-  Texture mp_ambient;
+  std::vector<Texture> m_textures;
 };
 
 
