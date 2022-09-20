@@ -59,17 +59,25 @@ struct Model {
   std::vector<Mesh> m_meshes;
 };
 
-/** @brief A basic light source.
+/**
+ * @brief A basic light source.
  *         TODO all of it.
  */
 struct Light {
-  glm::vec3 colour = glm::vec3(1.0f);
-  glm::vec3 position;
+  glm::vec3 m_colour = glm::vec3(1.0f);
+  glm::vec3 m_position;
+  float m_constant = 1.0f;
+  float m_linear = 0.09f;
+  float m_quadratic = 0.032f;
+};
 
-  // attenuation
-  float constant = 1.0f;
-  float linear = 0.09f;
-  float quadratic = 0.032f;
+/**
+ * @brief A transformation component.
+ */
+struct Transform {
+    glm::vec3 m_position;
+    glm::quat m_rotation;
+    glm::vec3 m_scale;
 };
 
 #endif  // TYPES_H_

@@ -21,6 +21,7 @@ find_package(assimp REQUIRED)
 set(
   HEADERS 
     include/entitysubsystem.h
+    include/component.h
     include/logger.h
     include/types.h
     include/keys.h

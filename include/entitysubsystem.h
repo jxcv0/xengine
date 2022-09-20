@@ -45,6 +45,12 @@ class EntitySubsystem {
    */
   eid_t create_entity();
 
+  /**
+   * @brief Create an entity with a signature.
+   *
+   * @param sig The signature of the entity.
+   * @return The id of the new entity.
+   */
   eid_t create_entity(signature_t sig);
 
   /**
