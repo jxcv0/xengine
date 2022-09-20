@@ -13,6 +13,8 @@ const std::uint8_t MAX_COMPONENTS = 32;
 /**
  * @brief eid_t's are used to acces the signature array to find the id of it's
  *        associated components
+ *
+ *  TODO replace asserts with better error handling.
  */
 using eid_t = std::uint32_t;
 
@@ -54,7 +56,7 @@ class EntitySubsystem {
   eid_t create_entity(signature_t sig);
 
   /**
-   * @brief Decouple an id from components and make the id available to new
+   * @brief Remove and entity from circulaton and make the id available to new
    *        entities.
    * 
    * @param id The id of the entity to destroy.

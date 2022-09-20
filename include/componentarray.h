@@ -19,9 +19,30 @@ public:
     ComponentArray() = default;
     ~ComponentArray() = default;
 
-    cid_t add(eid_t entity, Component component);
+    /**
+     * @brief Update an enities component.
+     *
+     * @param entity The entity to add the component to.
+     * @param component The component.
+     * @return The id of the component.
+     */
+    cid_t update(eid_t entity, Component component);
 
+    /**
+     * @brief Remove the association between a component and an entity.
+     *
+     * @param entity The entity to reset.
+     */
     void reset(eid_t entity);
+
+    /**
+     * @brief Get a reference to an entities component.
+     *
+     * @param entity The entity.
+     * @return The component associated with the entity.
+     */
+    Component& get(eid_t entity);
+
 private:
     std::array<Component, MAX_COMPONENTS> m_components;
     std::map<eid_t, cid_t> m_entity_to_component;
