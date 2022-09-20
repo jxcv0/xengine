@@ -21,7 +21,7 @@ find_package(assimp REQUIRED)
 set(
   HEADERS 
     include/entitysubsystem.h
-    include/component.h
+    include/componentarray.h
     include/logger.h
     include/types.h
     include/keys.h
@@ -35,6 +35,7 @@ set(
 set(
   SOURCES 
     src/entitysubsystem.cpp
+    src/componentarray.cpp
     src/main.cpp
     src/shader.cpp
     src/resourcesubsystem.cpp
