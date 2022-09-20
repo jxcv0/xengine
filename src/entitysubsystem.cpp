@@ -1,4 +1,5 @@
 #include "entitysubsystem.h"
+
 #include <iterator>
 
 /*------------------------------------------------------------------------------
@@ -19,7 +20,7 @@ eid_t EntitySubsystem::create_entity() {
   m_available_eids.pop();
   ++m_num_entities;
 
-  return entity ;
+  return entity;
 }
 
 /*------------------------------------------------------------------------------
@@ -53,4 +54,3 @@ signature_t EntitySubsystem::get_signature(eid_t entity) {
   assert(entity < MAX_ENTITIES);
   return m_signatures[entity];
 }
-

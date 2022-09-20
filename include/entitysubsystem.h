@@ -58,14 +58,14 @@ class EntitySubsystem {
   /**
    * @brief Remove and entity from circulaton and make the id available to new
    *        entities.
-   * 
+   *
    * @param id The id of the entity to destroy.
    */
   void destroy_entity(eid_t entity);
 
   /**
    * @brief Set the signature of an entity.
-   * 
+   *
    * @param enitity The entity.
    * @param sig The new signature.
    */
@@ -73,7 +73,7 @@ class EntitySubsystem {
 
   /**
    * @brief Get the signature of an entity.
-   * 
+   *
    * @param entity The entity.
    * @return The signature of the entity.
    */

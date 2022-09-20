@@ -75,9 +75,9 @@ struct Light {
  * @brief A transformation component.
  */
 struct Transform {
-    glm::vec3 m_position;
-    glm::quat m_rotation;
-    glm::vec3 m_scale;
+  glm::vec3 m_position;
+  glm::quat m_rotation;
+  glm::vec3 m_scale;
 };
 
 #endif  // TYPES_H_
