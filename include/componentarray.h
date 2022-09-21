@@ -3,10 +3,17 @@
 
 #include <cassert>
 #include <cstdint>
-#include <stdexcept>
 #include <map>
+#include <stdexcept>
 
 #include "entitysubsystem.h"
+
+/**
+ * @brief Components are identified by a unique id
+ */
+using cid_t = std::uint32_t;
+
+const auto ERR_NOT_FOUND = MAX_ENTITIES + 1;
 
 /**
  * @brief Interface to notify Component arrays of different types of the
@@ -25,69 +32,11 @@ class i_ComponentArray {
 };
 
 /**
- * @brief Components are identified by a unique id
- */
-using cid_t = std::uint32_t;
-
-/**
  * @brief Manages a contiguous array of components and keeps track of the
  * association between entities and components.
  */
 template <typename Component>
 class ComponentArray : public i_ComponentArray {
-  /**
-   * @brief Maps entity component relationships using contiguous array.
-   */
-  class ECMap {
-   public:
-
-    /**
-     * @Brief Get the index of an entities associated component (it's id).
-     *
-     * @param entity The entity id.
-     * @return The id of the component.
-     */
-    cid_t operator[](eid_t entity) {
-      for (auto &pair : m_map) {
-        if (pair.m_entity == entity) {
-          return pair.m_component;
-        } else {
-          throw std::invalid_argument("Entity id not found in map");
-        }
-        return 0;
-      }
-    }
-       
-    /**
-     * @Brief Get a component's associated entity
-     *
-     * @param component The id of the component.
-     * @return The id of the entity.
-     */
-    eid_t operator[](cid_t component) {
-      for (auto &pair : m_map) {
-        if (pair.m_component == component) {
-          return pair.m_entity;
-        } else {
-          throw std::invalid_argument("Component id not found in map");
-        }
-        return 0;
-      }
-    }
-
-   private: 
-    /**
-     * @brief An entity and its associated component.
-     */
-    struct ECPair {
-        eid_t m_entity;
-        cid_t m_component;
-    };
-    // an array could also be used here but this may use less memory, testing
-    // required.
-    std::vector<ECPair> m_map;
-  };
-
  public:
   ComponentArray() = default;
   ~ComponentArray() = default;
@@ -140,7 +89,7 @@ class ComponentArray : public i_ComponentArray {
    * @param entity The entity.
    * @return The component associated with the entity.
    */
-  Component& get(eid_t entity) {
+  Component &get(eid_t entity) {
     assert(m_entity_to_idx.contains(entity));
     return &m_entity_to_idx[entity];
   }
@@ -155,6 +104,75 @@ class ComponentArray : public i_ComponentArray {
   };
 
  private:
+  /**
+   * @brief An entity and its associated component.
+   */
+  struct ECPair {
+    eid_t m_entity;
+    cid_t m_component;
+  };
+
+  /**
+   * @Brief Get the index of an entities associated component (it's id).
+   *
+   * @param entity The entity id.
+   * @return The id of the component if successful otherwise and error
+   *         constant.
+   */
+  cid_t find_cid(eid_t entity) const {
+    for (const auto &pair : m_map) {
+      if (pair.m_entity == entity) {
+        return pair.m_component;
+      }
+      return ERR_NOT_FOUND;
+    }
+  }
+
+  /**
+   * @Brief Get a component's associated entity
+   *
+   * @param component The id of the component.
+   * @return The id of the entity if successful otherwise and error constant.
+   */
+  eid_t find_eid(cid_t component) const {
+    for (const auto &pair : m_map) {
+      if (pair.m_component == component) {
+        return pair.m_entity;
+      }
+      return ERR_NOT_FOUND;
+    }
+  }
+
+  /**
+   * @brief Store an entity component relationship. If the entity id is
+   *        already stored in the map then its component is overwritten.
+   *
+   * @param entity The entity id.
+   * @param component The component id.
+   */
+  void assign(eid_t entity, cid_t component) {
+    auto it = std::find_if(m_map.begin(), m_map.end(), [=](const auto &pair) {
+      return pair.m_entity == entity;
+    });
+    auto entity_id = find_eid(entity);
+    if (it == m_map.end()) {
+      m_map.push_back({entity, component});
+    } else {
+      it.m_component = component;
+    }
+  }
+
+  /**
+   * @brief Remove a pair from the map
+   *
+   * @param entity The entity of the pair to remove.
+   */
+  void remove(eid_t entity) {}
+
+  // an array could also be used here but this may use less memory, testing
+  // required.
+  std::vector<ECPair> m_map;
+
   std::array<Component, MAX_COMPONENTS> m_components;
   std::map<eid_t, cid_t> m_entity_to_idx;
   std::map<cid_t, eid_t> m_idx_to_entity;
