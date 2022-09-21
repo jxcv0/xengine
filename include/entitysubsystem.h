@@ -14,7 +14,6 @@ const std::uint8_t MAX_COMPONENTS = 32;
  * @brief eid_t's are used to acces the signature array to find the id of it's
  *        associated components
  *
- *  TODO replace asserts with better error handling.
  */
 using eid_t = std::uint32_t;
 
