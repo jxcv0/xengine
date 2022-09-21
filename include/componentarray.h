@@ -3,7 +3,6 @@
 
 #include <cassert>
 #include <cstdint>
-#include <stdexcept>
 #include <map>
 #include <stdexcept>
 
@@ -36,59 +35,6 @@ class i_ComponentArray {
  */
 template <typename Component>
 class ComponentArray : public i_ComponentArray {
-  /**
-   * @brief Maps entity component relationships using contiguous array.
-   */
-  class ECMap {
-   public:
-
-    /**
-     * @Brief Get the index of an entities associated component (it's id).
-     *
-     * @param entity The entity id.
-     * @return The id of the component.
-     */
-    cid_t operator[](eid_t entity) {
-      for (auto &pair : m_map) {
-        if (pair.m_entity == entity) {
-          return pair.m_component;
-        } else {
-          throw std::invalid_argument("Entity id not found in map");
-        }
-        return 0;
-      }
-    }
-       
-    /**
-     * @Brief Get a component's associated entity
-     *
-     * @param component The id of the component.
-     * @return The id of the entity.
-     */
-    eid_t operator[](cid_t component) {
-      for (auto &pair : m_map) {
-        if (pair.m_component == component) {
-          return pair.m_entity;
-        } else {
-          throw std::invalid_argument("Component id not found in map");
-        }
-        return 0;
-      }
-    }
-
-   private: 
-    /**
-     * @brief An entity and its associated component.
-     */
-    struct ECPair {
-        eid_t m_entity;
-        cid_t m_component;
-    };
-    // an array could also be used here but this may use less memory, testing
-    // required.
-    std::vector<ECPair> m_map;
-  };
-
  public:
   ComponentArray() = default;
   ~ComponentArray() = default;
