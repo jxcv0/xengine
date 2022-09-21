@@ -46,15 +46,39 @@ class ComponentArray : public i_ComponentArray {
    * @return The id of the component.
    */
   cid_t add(eid_t entity, Component component) {
-    assert(!m_entity_to_component.contains(entity));
+    assert(!m_entity_to_idx.contains(entity));
+    auto idx = m_num_components;
+    m_entity_to_idx[entity] = idx;
+    m_idx_to_entity[idx] = entity;
+    m_components[idx] = component;
+    ++m_num_components;
   }
 
   /**
    * @brief Remove the association between a component and an entity.
+   *        Reseting components maintains the contiguity of the data in the
+   *        array.
    *
    * @param entity The entity to reset.
    */
-  void reset(eid_t entity) {}
+  void reset(eid_t entity) {
+    assert(m_entity_to_idx.contains(entity));
+
+    // copy to last element into removed idx to defragment
+    auto idx_removed = m_entity_to_idx[entity];
+    auto last = m_num_components - 1;
+    m_components[idx_removed] = m_components[last];
+
+    // update mapping
+    auto last_entity = m_idx_to_entity[last];
+    m_entity_to_idx[last_entity] = idx_removed;
+    m_idx_to_entity[idx_removed] = last_entity;
+
+    // remove dangling entries
+    m_entity_to_idx.erase(entity);
+    m_idx_to_entity.erase(idx_removed);
+    --m_num_components;
+  }
 
   /**
    * @brief Get a reference to an entities component.
@@ -62,19 +86,24 @@ class ComponentArray : public i_ComponentArray {
    * @param entity The entity.
    * @return The component associated with the entity.
    */
-  Component& get(eid_t entity) {}
+  Component& get(eid_t entity) {
+    assert(m_entity_to_idx.contains(entity));
+    return &m_entity_to_idx[entity];
+  }
 
   /**
    * @brief Implimentation of virtual i_ComponentArray.
    */
-  void notify_destroyed(eid_t entity) override{
-
+  void notify_destroyed(eid_t entity) override {
+    if (m_entity_to_idx.contains(entity)) {
+      reset(entity);
+    }
   };
 
  private:
   std::array<Component, MAX_COMPONENTS> m_components;
-  std::map<eid_t, cid_t> m_entity_to_component;
-  std::map<cid_t, eid_t> m_component_to_entity;
+  std::map<eid_t, cid_t> m_entity_to_idx;
+  std::map<cid_t, eid_t> m_idx_to_entity;
   std::uint32_t m_num_components = 0;
 };
 

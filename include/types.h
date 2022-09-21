@@ -2,6 +2,7 @@
 #define TYPES_H_
 
 #include <cstdint>
+#include <glm/ext.hpp>
 #include <glm/glm.hpp>
 #include <string>
 #include <vector>
