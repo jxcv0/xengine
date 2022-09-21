@@ -167,10 +167,17 @@ class ComponentArray : public i_ComponentArray {
    *
    * @param entity The entity of the pair to remove.
    */
-  void remove(eid_t entity) {}
+  void remove(eid_t entity) {
+    auto it = std::find_if(m_map.begin(), m_map.end(), [=](const auto &pair) {
+      return pair.m_entity == entity;
+    });
+    if (it != m_map.end()) {
+      m_components.erase(it);
+    }
+  }
 
-  // an array could also be used here but this may use less memory, testing
-  // required.
+  // An array could also be used here but this may use less memory as not all
+  // entities require all component types.
   std::vector<ECPair> m_map;
 
   std::array<Component, MAX_COMPONENTS> m_components;
