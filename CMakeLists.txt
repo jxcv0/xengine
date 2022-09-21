@@ -36,7 +36,7 @@ set(
 set(
   SOURCES 
     src/entitysubsystem.cpp
-    sr/main.cpp
+    src/main.cpp
     src/shader.cpp
     src/resourcesubsystem.cpp
     src/types.cpp
