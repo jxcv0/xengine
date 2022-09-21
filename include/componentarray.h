@@ -34,6 +34,15 @@ using cid_t = std::uint32_t;
  */
 template <typename Component>
 class ComponentArray : public i_ComponentArray {
+  /**
+   * @brief Maps entity component relationships using contiguous array.
+   */
+  class ECMap {
+    // an array could also be used here but this may use less memory, testing
+    // required.
+    std::vector<std::pair<eid_t, cid_t>> m_map;
+  };
+
  public:
   ComponentArray() = default;
   ~ComponentArray() = default;
