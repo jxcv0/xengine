@@ -8,9 +8,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 set(TEST_COMMON_LIBS xengine GTest::gtest_main)
 
-add_executable(placeholdertest placeholdertest.cpp)
+add_executable(entitysubsystem_tests entitysubsystem_tests.cpp)
 
-target_link_libraries(placeholdertest ${TEST_COMMON_LIBS})
+target_link_libraries(entitysubsystem_tests ${TEST_COMMON_LIBS})
 
 include(GoogleTest)
-gtest_discover_tests(placeholdertest)
+gtest_discover_tests(entitysubsystem_tests)
