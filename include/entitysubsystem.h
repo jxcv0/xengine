@@ -30,14 +30,9 @@ using signature_t = std::bitset<MAX_COMPONENTS>;
 class EntitySubsystem {
  public:
   /**
-   * @brief Get the static instance of the subsystem.
-   *
-   * @return A const reference to the instance.
+   * @brief Populate the free list with all possible eid's.
    */
-  static EntitySubsystem &instance() {
-    static EntitySubsystem *r = new EntitySubsystem();
-    return *r;
-  }
+  EntitySubsystem();
 
   /**
    * @brief Create a new entity and assign it a unique id.
@@ -79,18 +74,6 @@ class EntitySubsystem {
   signature_t get_signature(eid_t entity);
 
  private:
-  /**
-   * @brief Construct the subsystem instance and make eids available in the
-   *        queue.
-   */
-  EntitySubsystem();
-
-  // singleton
-  EntitySubsystem(const EntitySubsystem &) = delete;
-  EntitySubsystem(EntitySubsystem &&) = delete;
-  EntitySubsystem &operator=(const EntitySubsystem &) = delete;
-  EntitySubsystem &operator=(EntitySubsystem &&) = delete;
-
   std::queue<eid_t> m_available_eids;
   std::array<signature_t, MAX_ENTITIES> m_signatures;
   std::uint32_t m_num_entities = 0;

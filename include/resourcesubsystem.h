@@ -28,8 +28,6 @@ class ResourceSubsystem {
     return *r;
   }
 
-  ~ResourceSubsystem() = default;
-
   /**
    * @brief Load a mesh from file.
    *
@@ -40,6 +38,7 @@ class ResourceSubsystem {
 
  private:
   // singleton
+  ~ResourceSubsystem() = default;
   ResourceSubsystem() = default;
   ResourceSubsystem(const ResourceSubsystem &) = delete;
   ResourceSubsystem(ResourceSubsystem &&) = delete;
