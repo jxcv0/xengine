@@ -44,13 +44,12 @@ set(
 set(
   SOURCES 
     src/entitysubsystem.cpp
-    src/main.cpp
     src/shader.cpp
     src/resourcesubsystem.cpp
     src/types.cpp
 )
 
-add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS}) 
+add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})
 set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 
 target_include_directories(
@@ -73,6 +72,7 @@ target_link_libraries(
 
 add_subdirectory(lib/glad)
 add_subdirectory(test)
+add_subdirectory(example)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
