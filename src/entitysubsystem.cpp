@@ -13,7 +13,7 @@ EntitySubsystem::EntitySubsystem() {
 /*------------------------------------------------------------------------------
  */
 eid_t EntitySubsystem::create_entity() {
-  if (m_num_entities < MAX_ENTITIES) {
+  if (m_num_entities > MAX_ENTITIES) {
     return -1;
   }
   auto entity = m_available_eids.front();
