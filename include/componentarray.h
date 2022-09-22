@@ -13,8 +13,6 @@
  */
 using cid_t = std::uint32_t;
 
-const auto ERR_NOT_FOUND = MAX_ENTITIES + 1;
-
 /**
  * @brief Interface to notify Component arrays of different types of the
  * destruction of an entity.
@@ -49,37 +47,22 @@ class ComponentArray : public i_ComponentArray {
    * @return The id of the component.
    */
   cid_t add(eid_t entity, Component component) {
-    assert(!m_entity_to_idx.contains(entity));
-    auto idx = m_num_components;
-    m_entity_to_idx[entity] = idx;
-    m_idx_to_entity[idx] = entity;
-    m_components[idx] = component;
+    assert(find_pair(entity) == m_map.end());
+    auto new_cid = m_num_components;
+    m_components[new_cid] = component;
+    assign(entity, component);
     ++m_num_components;
   }
 
   /**
    * @brief Remove the association between a component and an entity.
-   *        Reseting components maintains the contiguity of the data in the
+   *        Resetting components maintains the contiguity of the data in the
    *        array.
    *
    * @param entity The entity to reset.
    */
   void reset(eid_t entity) {
-    assert(m_entity_to_idx.contains(entity));
-
-    // copy to last element into removed idx to defragment
-    auto idx_removed = m_entity_to_idx[entity];
-    auto last = m_num_components - 1;
-    m_components[idx_removed] = m_components[last];
-
-    // update mapping
-    auto last_entity = m_idx_to_entity[last];
-    m_entity_to_idx[last_entity] = idx_removed;
-    m_idx_to_entity[idx_removed] = last_entity;
-
-    // remove dangling entries
-    m_entity_to_idx.erase(entity);
-    m_idx_to_entity.erase(idx_removed);
+    remove(entity);
     --m_num_components;
   }
 
@@ -90,15 +73,16 @@ class ComponentArray : public i_ComponentArray {
    * @return The component associated with the entity.
    */
   Component &get(eid_t entity) {
-    assert(m_entity_to_idx.contains(entity));
-    return &m_entity_to_idx[entity];
+    auto it = find_pair(entity);
+    assert(it != m_map.end());
+    return *it;
   }
 
   /**
    * @brief Implimentation of virtual i_ComponentArray.
    */
   void notify_destroyed(eid_t entity) override {
-    if (m_entity_to_idx.contains(entity)) {
+    if (find_pair(entity) != m_map.end()) {
       reset(entity);
     }
   };
@@ -113,34 +97,17 @@ class ComponentArray : public i_ComponentArray {
   };
 
   /**
-   * @Brief Get the index of an entities associated component (it's id).
-   *
-   * @param entity The entity id.
-   * @return The id of the component if successful otherwise and error
-   *         constant.
-   */
-  cid_t find_cid(eid_t entity) const {
-    for (const auto &pair : m_map) {
-      if (pair.m_entity == entity) {
-        return pair.m_component;
-      }
-      return ERR_NOT_FOUND;
-    }
-  }
-
-  /**
-   * @Brief Get a component's associated entity
+   * @Brief Get an iterator to the map entry comtaining a component id. If the
+   *        component is not found then the iterator will point to the end of
+   *        the map.
    *
    * @param component The id of the component.
-   * @return The id of the entity if successful otherwise and error constant.
+   * @return The iterator pointing to the entry or the end of the map.
    */
-  eid_t find_eid(cid_t component) const {
-    for (const auto &pair : m_map) {
-      if (pair.m_component == component) {
-        return pair.m_entity;
-      }
-      return ERR_NOT_FOUND;
-    }
+  auto find_pair(eid_t entity) const {
+    return std::find_if(m_map.begin(), m_map.end(), [=](const auto &pair) {
+      return pair.m_entity == entity;
+    });
   }
 
   /**
@@ -151,10 +118,7 @@ class ComponentArray : public i_ComponentArray {
    * @param component The component id.
    */
   void assign(eid_t entity, cid_t component) {
-    auto it = std::find_if(m_map.begin(), m_map.end(), [=](const auto &pair) {
-      return pair.m_entity == entity;
-    });
-    auto entity_id = find_eid(entity);
+    auto it = find_pair(entity);
     if (it == m_map.end()) {
       m_map.push_back({entity, component});
     } else {
@@ -163,14 +127,12 @@ class ComponentArray : public i_ComponentArray {
   }
 
   /**
-   * @brief Remove a pair from the map
+   * @brief Remove an entity from the map using an entity id.
    *
    * @param entity The entity of the pair to remove.
    */
   void remove(eid_t entity) {
-    auto it = std::find_if(m_map.begin(), m_map.end(), [=](const auto &pair) {
-      return pair.m_entity == entity;
-    });
+    auto it = find_pair(entity);
     if (it != m_map.end()) {
       m_components.erase(it);
     }
@@ -179,10 +141,9 @@ class ComponentArray : public i_ComponentArray {
   // An array could also be used here but this may use less memory as not all
   // entities require all component types.
   std::vector<ECPair> m_map;
-
   std::array<Component, MAX_COMPONENTS> m_components;
-  std::map<eid_t, cid_t> m_entity_to_idx;
-  std::map<cid_t, eid_t> m_idx_to_entity;
+  // std::map<eid_t, cid_t> m_entity_to_idx;
+  // std::map<cid_t, eid_t> m_idx_to_entity;
   std::uint32_t m_num_components = 0;
 };
 
