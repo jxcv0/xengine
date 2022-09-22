@@ -13,6 +13,14 @@ set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG release-1.12.1
+)
+FetchContent_MakeAvailable(googletest)
+
 find_package(OpenGL REQUIRED)
 find_package(glfw3 3.3 REQUIRED)
 find_package(glm REQUIRED)
@@ -36,7 +44,7 @@ set(
 set(
   SOURCES 
     src/entitysubsystem.cpp
-    sr/main.cpp
+    src/main.cpp
     src/shader.cpp
     src/resourcesubsystem.cpp
     src/types.cpp
@@ -64,6 +72,7 @@ target_link_libraries(
 )
 
 add_subdirectory(lib/glad)
+add_subdirectory(test)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
