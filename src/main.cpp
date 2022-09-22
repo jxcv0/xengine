@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "entitysubsystem.h"
+#include "componentarray.h"
 #include "mainwindow.h"
 #include "resourcesubsystem.h"
 #include "shader.h"
