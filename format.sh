@@ -1,2 +1,2 @@
 #!/bin/bash
-clang-format-14 -i -style=Google include/* src/*
+clang-format-14 -i -style=Google include/* src/* test/*

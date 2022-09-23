@@ -13,13 +13,9 @@ EntitySubsystem::EntitySubsystem() {
 /*------------------------------------------------------------------------------
  */
 eid_t EntitySubsystem::create_entity() {
-  if (m_num_entities < MAX_ENTITIES) {
-    return -1;
-  }
   auto entity = m_available_eids.front();
   m_available_eids.pop();
   ++m_num_entities;
-
   return entity;
 }
 
@@ -52,5 +48,6 @@ void EntitySubsystem::set_signature(eid_t entity, signature_t sig) {
 
 signature_t EntitySubsystem::get_signature(eid_t entity) {
   assert(entity < MAX_ENTITIES);
+  assert(entity < m_num_entities);
   return m_signatures[entity];
 }
