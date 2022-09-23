@@ -1,10 +1,10 @@
 #include <iostream>
 
-#include "entitysubsystem.h"
-#include "componentarray.h"
-#include "mainwindow.h"
-#include "resourcesubsystem.h"
-#include "shader.h"
+#include <entitysubsystem.h>
+#include <componentarray.h>
+#include <mainwindow.h>
+#include <resourcesubsystem.h>
+#include <shader.h>
 
 // void on_mouse(GLFWwindow *window, double xPosIn, double yPosIn);
 

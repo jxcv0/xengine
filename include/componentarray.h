@@ -50,8 +50,9 @@ class ComponentArray : public i_ComponentArray {
     assert(find_pair(entity) == m_map.end());
     auto new_cid = m_num_components;
     m_components[new_cid] = component;
-    assign(entity, component);
+    assign(entity, new_cid);
     ++m_num_components;
+    return new_cid;
   }
 
   /**
@@ -122,7 +123,8 @@ class ComponentArray : public i_ComponentArray {
     if (it == m_map.end()) {
       m_map.push_back({entity, component});
     } else {
-      it.m_component = component;
+      auto pair = *it;
+      pair.m_component = component;
     }
   }
 
@@ -134,7 +136,7 @@ class ComponentArray : public i_ComponentArray {
   void remove(eid_t entity) {
     auto it = find_pair(entity);
     if (it != m_map.end()) {
-      m_components.erase(it);
+      m_map.erase(it);
     }
   }
 
@@ -142,9 +144,8 @@ class ComponentArray : public i_ComponentArray {
   // entities require all component types.
   std::vector<ECPair> m_map;
   std::array<Component, MAX_COMPONENTS> m_components;
-  // std::map<eid_t, cid_t> m_entity_to_idx;
-  // std::map<cid_t, eid_t> m_idx_to_entity;
   std::uint32_t m_num_components = 0;
 };
 
 #endif  // COMPONENTARRAY_H_
+
