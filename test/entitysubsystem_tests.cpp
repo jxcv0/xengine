@@ -1,6 +1,5 @@
-#include <gtest/gtest.h>
-
 #include <entitysubsystem.h>
+#include <gtest/gtest.h>
 
 TEST(entitysubsystem_tests, create_entity) {
   EntitySubsystem entity_subsystem;
@@ -26,7 +25,7 @@ TEST(entitysubsystem_tests, destroy_entity) {
   ASSERT_EQ(sig, signature);
   entity_subsystem.destroy_entity(entity_id);
   ASSERT_DEATH(signature = entity_subsystem.get_signature(entity_id),
-          "Assertion `entity < m_num_entities' failed");
+               "Assertion `entity < m_num_entities' failed");
 }
 
 TEST(entitysubsystem_tests, set_signature) {
@@ -37,3 +36,4 @@ TEST(entitysubsystem_tests, set_signature) {
   auto signature = entity_subsystem.get_signature(entity_id);
   ASSERT_EQ(sig, signature);
 }
+
