@@ -48,5 +48,6 @@ void EntitySubsystem::set_signature(eid_t entity, signature_t sig) {
 
 signature_t EntitySubsystem::get_signature(eid_t entity) {
   assert(entity < MAX_ENTITIES);
+  assert(entity < m_num_entities);
   return m_signatures[entity];
 }
