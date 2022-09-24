@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <map>
 #include <stdexcept>
+#include <type_traits>
 
 #include "entitysubsystem.h"
 
@@ -76,7 +77,10 @@ class ComponentArray : public i_ComponentArray {
   Component &get(eid_t entity) {
     auto it = find_pair(entity);
     assert(it != m_map.end());
-    return *it;
+    auto pair = *it;
+    auto component_id = pair.m_component;
+    assert(component_id < m_num_components);
+    return m_components[component_id];
   }
 
   /**
@@ -148,4 +152,3 @@ class ComponentArray : public i_ComponentArray {
 };
 
 #endif  // COMPONENTARRAY_H_
-

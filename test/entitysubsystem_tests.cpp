@@ -9,7 +9,7 @@ TEST(entitysubsystem_tests, create_entity) {
   EXPECT_EQ(other_entity, 1);
 }
 
-TEST(entitysubsystem_tests, create_entity_with_signature) {
+TEST(entitysubsystem_tests, create_entity_sig) {
   EntitySubsystem entity_subsystem;
   signature_t sig{0xA};
   auto entity_id = entity_subsystem.create_entity(sig);
@@ -36,4 +36,3 @@ TEST(entitysubsystem_tests, set_signature) {
   auto signature = entity_subsystem.get_signature(entity_id);
   ASSERT_EQ(sig, signature);
 }
-
