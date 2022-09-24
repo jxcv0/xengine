@@ -126,10 +126,14 @@ Resource<Material> ResourceSubsystem::load_materials(aiMaterial *mat,
   if (m_loaded_materials.end() != it) {
     return *it;
   }
-  auto diff = load_textures(mat, aiTextureType_DIFFUSE);
-  auto spec = load_textures(mat, aiTextureType_SPECULAR);
-  auto norm = load_textures(mat, aiTextureType_HEIGHT);
-  auto height = load_textures(mat, aiTextureType_AMBIENT);
+
+  std::string path = filepath;
+  auto dir = path.substr(0, path.find_last_of('/'));
+
+  auto diff = load_textures(dir.c_str(), mat, aiTextureType_DIFFUSE);
+  auto spec = load_textures(dir.c_str(), mat, aiTextureType_SPECULAR);
+  auto norm = load_textures(dir.c_str(), mat, aiTextureType_HEIGHT);
+  auto height = load_textures(dir.c_str(), mat, aiTextureType_AMBIENT);
 
   auto material = new Material();
   material->m_textures.insert(material->m_textures.end(), diff.begin(),
@@ -146,15 +150,20 @@ Resource<Material> ResourceSubsystem::load_materials(aiMaterial *mat,
 
 /*------------------------------------------------------------------------------
  */
-std::vector<Texture> ResourceSubsystem::load_textures(aiMaterial *mat,
+std::vector<Texture> ResourceSubsystem::load_textures(const char *dir,
+                                                      aiMaterial *mat,
                                                       aiTextureType type) {
   std::vector<Texture> textures;
   stbi_set_flip_vertically_on_load(true);
   for (auto i = 0; i < mat->GetTextureCount(type); ++i) {
     aiString aistr;
     mat->GetTexture(type, 0, &aistr);
+    std::string filepath = dir;
+    filepath.append("/");
+    filepath.append(aistr.C_Str());
+    // std::cout << "Loading texture from: " << filepath << "\n";
     Texture texture;
-    texture.mp_data = stbi_load(aistr.C_Str(), &texture.m_width,
+    texture.mp_data = stbi_load(filepath.c_str(), &texture.m_width,
                                 &texture.m_height, &texture.m_num_channels, 0);
     // if (nullptr == texture.mp_data) {
     //   TODO load default.
