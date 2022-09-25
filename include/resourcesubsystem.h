@@ -7,7 +7,11 @@
 #include <vector>
 
 #include "resource.h"
-#include "types.h"
+#include "texture.h"
+#include "model.h"
+#include "mesh.h"
+#include "material.h"
+#include "texture.h"
 
 /**
  * @brief The resource management subsystem. Loads resources from files into
@@ -34,7 +38,7 @@ class ResourceSubsystem {
    * @param filepath The path to the mesh file.
    * @return The resource.
    */
-  Resource<Model> load_model(const char *filepath);
+  Resource<Model> load_wvobj(const char *filepath);
 
  private:
   // singleton

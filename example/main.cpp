@@ -11,7 +11,7 @@
 EntitySubsystem entity_ss;
 
 int main(int argc, char const *argv[]) {
-  auto model = ResourceSubsystem::instance().load_model(
+  auto model = ResourceSubsystem::instance().load_wvobj(
       "assets/models/cyborg/cyborg.obj");
 
   auto entity = entity_ss.create_entity();

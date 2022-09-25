@@ -38,6 +38,12 @@ set(
     include/shader.h
     include/resourcesubsystem.h
     include/resource.h
+    include/material.h
+    include/texture.h
+    include/model.h
+    include/mesh.h
+    include/vertex.h
+
     lib/stb/stb_image.h
 )
 
@@ -46,7 +52,7 @@ set(
     src/entitysubsystem.cpp
     src/shader.cpp
     src/resourcesubsystem.cpp
-    src/types.cpp
+    src/texture.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})

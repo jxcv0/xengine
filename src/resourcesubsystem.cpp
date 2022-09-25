@@ -8,12 +8,9 @@
 #include <assimp/Importer.hpp>
 #include <sstream>
 #include <stdexcept>
-#include <string>
-#include <vector>
+
 #define STB_IMAGE_IMPLEMENTATION
-#include "resource.h"
 #include "stb_image.h"
-#include "types.h"
 
 /*------------------------------------------------------------------------------
  */
@@ -31,7 +28,7 @@ auto ResourceSubsystem::material_loaded(const char *filepath) const {
 
 /*------------------------------------------------------------------------------
  */
-Resource<Model> ResourceSubsystem::load_model(const char *filepath) {
+Resource<Model> ResourceSubsystem::load_wvobj(const char *filepath) {
   auto it = mesh_loaded(filepath);
   if (m_loaded_models.end() != it) {
     return *it;
