@@ -22,4 +22,4 @@ struct Texture {
   ~Texture();
 };
 
-#endif // TEXTURE_H_
+#endif  // TEXTURE_H_

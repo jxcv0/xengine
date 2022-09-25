@@ -6,11 +6,10 @@
 #include <algorithm>
 #include <vector>
 
-#include "resource.h"
-#include "texture.h"
-#include "model.h"
-#include "mesh.h"
 #include "material.h"
+#include "mesh.h"
+#include "model.h"
+#include "resource.h"
 #include "texture.h"
 
 /**
@@ -84,7 +83,8 @@ class ResourceSubsystem {
    * @param type The type of the image to load.
    * @return The image texture.
    */
-  std::vector<Texture> load_textures(const char *dir, aiMaterial *mat, aiTextureType type);
+  std::vector<Texture> load_textures(const char *dir, aiMaterial *mat,
+                                     aiTextureType type);
 
   /**
    * @brief Check if a mesh resource has been loaded from a path.

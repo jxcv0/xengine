@@ -2,6 +2,7 @@
 #define MATERIAL_H_
 
 #include <vector>
+
 #include "texture.h"
 
 /**
@@ -12,4 +13,4 @@ struct Material {
   std::vector<Texture> m_textures;
 };
 
-#endif // MATERIAL_H_
+#endif  // MATERIAL_H_

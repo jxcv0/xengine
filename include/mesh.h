@@ -1,8 +1,8 @@
 #ifndef MESH_H_
 #define MESH_H_
 
-#include <vector>
 #include <cstdint>
+#include <vector>
 
 #include "vertex.h"
 
@@ -15,4 +15,4 @@ struct Mesh {
   std::vector<std::uint32_t> m_indices;
 };
 
-#endif // MESH_H_
+#endif  // MESH_H_

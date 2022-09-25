@@ -2,6 +2,7 @@
 #define MODEL_H_
 
 #include <vector>
+
 #include "mesh.h"
 
 /**
@@ -11,4 +12,4 @@ struct Model {
   std::vector<Mesh> m_meshes;
 };
 
-#endif // MODEL_H_
+#endif  // MODEL_H_
