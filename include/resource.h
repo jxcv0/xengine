@@ -9,12 +9,6 @@
  */
 template <typename ResourceType>
 class Resource {
-  std::shared_ptr<ResourceType> mp_resource;
-  std::filesystem::path m_filepath;
-
-  Resource &operator=(const Resource &) = delete;
-  Resource &operator=(Resource &&) = delete;
-
  public:
   /** @brief Construct a Resource. We assume the memory has not already been
    *         allocated.
@@ -22,10 +16,9 @@ class Resource {
   Resource(ResourceType *resource, const char *filepath)
       : mp_resource(resource), m_filepath(filepath) {}
 
-  /** @brief Copy constructor
-   */
   Resource(const Resource<ResourceType> &r) = default;
-
+  Resource &operator=(const Resource &) = default;
+  Resource &operator=(Resource &&) = default;
   ~Resource() = default;
 
   /** @brief Comparison operator. If the filepaths are the same then resources
@@ -47,5 +40,10 @@ class Resource {
    *  @return The filepath string.
    */
   std::string filepath() const { return m_filepath.string(); }
+
+ private:
+  std::shared_ptr<ResourceType> mp_resource;
+  std::filesystem::path m_filepath;
 };
+
 #endif  // RESOURCE_H_
