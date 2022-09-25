@@ -32,7 +32,6 @@ set(
     include/componentsubsystem.h
     include/componentarray.h
     include/logger.h
-    include/types.h
     include/keys.h
     include/mainwindow.h
     include/shader.h
