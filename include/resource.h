@@ -4,14 +4,16 @@
 #include <filesystem>
 #include <memory>
 
-/** @brief A game resource.
- *         Manages the memory of the underying resource via a shared pointer.
+/**
+ * @brief A game resource.
+ *        Manages the memory of the underying resource via a shared pointer.
  */
 template <typename ResourceType>
 class Resource {
  public:
-  /** @brief Construct a Resource. We assume the memory has not already been
-   *         allocated.
+  /**
+   * @brief Construct a Resource. We assume the memory has not already been
+   *        allocated.
    */
   Resource(ResourceType *resource, const char *filepath)
       : mp_resource(resource), m_filepath(filepath) {}
@@ -21,23 +23,27 @@ class Resource {
   Resource &operator=(Resource &&) = default;
   ~Resource() = default;
 
-  /** @brief Comparison operator. If the filepaths are the same then resources
+  /**
+   * @brief Comparison operator. If the filepaths are the same then resources
    *         are assumed to be identical.
-   *  @param r The other Resource of any templated type.
-   *  @return true if the paths to the resource are the same, otherwise false.
+   * @param r The other Resource of any templated type.
+   * @return true if the paths to the resource are the same, otherwise false.
    */
   template <typename T>
   bool operator==(const Resource<T> &r) {
     return m_filepath.string() == r.string();
   }
 
-  /** @brief Get a const ref to the underlying resource.
-   *  @return A const reference to the resource.
+  /**
+   * @brief Get a const ref to the underlying resource.
+   * @return A const reference to the resource.
    */
   const inline ResourceType &get() const { return mp_resource.get(); }
 
-  /** @brief Get the filepath of the resource as a string.
-   *  @return The filepath string.
+  /**
+   * @brief Get the filepath of the resource as a string.
+   *
+   * @return The filepath string.
    */
   std::string filepath() const { return m_filepath.string(); }
 

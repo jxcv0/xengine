@@ -40,21 +40,6 @@ class ResourceSubsystem {
   Resource<Model> load_wvobj(const char *filepath);
 
  private:
-  // singleton
-  ~ResourceSubsystem() = default;
-  ResourceSubsystem() = default;
-  ResourceSubsystem(const ResourceSubsystem &) = delete;
-  ResourceSubsystem(ResourceSubsystem &&) = delete;
-  ResourceSubsystem &operator=(const ResourceSubsystem &) = delete;
-  ResourceSubsystem &operator=(ResourceSubsystem &&) = delete;
-
-  ResourceList<Model> m_loaded_models;
-  ResourceList<Material> m_loaded_materials;
-  // ResourceList<Texture> m_loaded_textures;
-
-  std::vector<Mesh> process_node(const char *filepath, aiNode *node,
-                                 const aiScene *scene);
-
   /**
    * @brief Process mesh data.
    *
@@ -64,6 +49,17 @@ class ResourceSubsystem {
    * @return Mesh data.
    */
   Mesh process_mesh(const char *filepath, aiMesh *mesh, const aiScene *scene);
+
+  /**
+   * @brief Recursively process all nodes in a scene.
+   *
+   * @param filepath the path to the model file.
+   * @param node The node to proccess
+   * @param scene The pointer to the top level scene.
+   * @return A collection of meshes from the nodes.
+   */
+  std::vector<Mesh> process_node(const char *filepath, aiNode *node,
+                                 const aiScene *scene);
 
   /**
    * @brief Load materials from file. This is done when the filepath
@@ -101,6 +97,18 @@ class ResourceSubsystem {
    * @return An iterator to the resource.
    */
   auto material_loaded(const char *filepath) const;
+
+  // singleton
+  ~ResourceSubsystem() = default;
+  ResourceSubsystem() = default;
+  ResourceSubsystem(const ResourceSubsystem &) = delete;
+  ResourceSubsystem(ResourceSubsystem &&) = delete;
+  ResourceSubsystem &operator=(const ResourceSubsystem &) = delete;
+  ResourceSubsystem &operator=(ResourceSubsystem &&) = delete;
+
+  ResourceList<Model> m_loaded_models;
+  ResourceList<Material> m_loaded_materials;
+  // ResourceList<Texture> m_loaded_textures;
 };
 
 #endif  // RESOURCESUBSYSTEM_H_
