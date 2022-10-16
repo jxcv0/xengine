@@ -21,9 +21,6 @@ class BlockAllocator {
   BlockAllocator(std::size_t nblocks) {
     if (s_mempool == nullptr) {
       s_mempool = static_cast<T*>(std::calloc(nblocks, sizeof(T)));
-    } else if (m_free_list.size() < nblocks) {
-      s_mempool = static_cast<T*>(
-          std::realloc(s_mempool, m_free_list.size() + nblocks));
     }
   }
 
@@ -58,9 +55,9 @@ class BlockAllocator {
     // TODO
   }
 
- public:
+ private:
   std::list<std::uintptr_t> m_free_list;
-  static T* s_mempool;
+  static inline T* s_mempool = nullptr;
 };
 
 #endif  // BLOCKALLOCATOR_H_
