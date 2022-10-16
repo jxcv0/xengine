@@ -1,30 +1,14 @@
 #include <iostream>
 
-#include <entitysubsystem.h>
-#include <componentarray.h>
 #include <mainwindow.h>
-#include <resourcesubsystem.h>
-#include <shader.h>
-
-// void on_mouse(GLFWwindow *window, double xPosIn, double yPosIn);
-
-EntitySubsystem entity_ss;
 
 int main(int argc, char const *argv[]) {
-  auto model = ResourceSubsystem::instance().load_wvobj(
-      "assets/models/cyborg/cyborg.obj");
-
-  auto entity = entity_ss.create_entity();
-
   MainWindow main_window(1080, 600, std::string("main-window"));
   main_window.set_hint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   main_window.set_hint(GLFW_CONTEXT_VERSION_MINOR, 6);
   main_window.set_hint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   // main_window.set_cursor_position_callback(on_mouse);
   main_window.show();
-
-  Shader shader = ShaderUtils::load("assets/shaders/model.vert",
-                                    "assets/shaders/model.frag");
 
   while (!main_window.should_close()) {
     main_window.update_input();

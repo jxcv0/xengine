@@ -28,30 +28,12 @@ find_package(assimp REQUIRED)
 
 set(
   HEADERS 
-    include/entitysubsystem.h
-    include/componentsubsystem.h
-    include/componentarray.h
-    include/logger.h
-    include/keys.h
     include/mainwindow.h
-    include/shader.h
-    include/resourcesubsystem.h
-    include/resource.h
-    include/material.h
-    include/texture.h
-    include/model.h
-    include/mesh.h
-    include/vertex.h
-
-    lib/stb/stb_image.h
+    include/blockallocator.h
 )
 
 set(
   SOURCES 
-    src/entitysubsystem.cpp
-    src/shader.cpp
-    src/resourcesubsystem.cpp
-    src/texture.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})
