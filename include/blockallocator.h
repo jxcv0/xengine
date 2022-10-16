@@ -22,6 +22,10 @@ class BlockAllocator {
     if (s_mempool == nullptr) {
       s_mempool = static_cast<T*>(std::calloc(nblocks, sizeof(T)));
     }
+    uintptr_t start = reinterpret_cast<uintptr_t>(s_mempool);
+    for (auto i = 0; i < nblocks; i++) {
+      m_free_list.push_back(start += sizeof(T));
+    }
   }
 
   ~BlockAllocator() = default;
