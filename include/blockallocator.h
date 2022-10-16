@@ -3,7 +3,8 @@
 
 #include <cstdint>
 #include <cstdlib>
-#include <list>
+#include <queue>
+#include <stdexcept>
 
 /**
  * @brief Allocate fixed size blocks of memory
@@ -24,7 +25,7 @@ class BlockAllocator {
     }
     uintptr_t start = reinterpret_cast<uintptr_t>(s_mempool);
     for (auto i = 0; i < nblocks; i++) {
-      m_free_list.push_back(start += sizeof(T));
+      m_free_list.push(start += sizeof(T));
     }
   }
 
@@ -37,8 +38,13 @@ class BlockAllocator {
    * @return A pointer to the new allocated blocks
    */
   T* allocate(std::size_t n = sizeof(T)) {
-    // TODO
-    return nullptr;
+    if (!m_free_list.empty()) {
+      auto ptr = m_free_list.front();
+      m_free_list.pop();
+      return reinterpret_cast<T*>(ptr);
+    } else {
+      throw std::runtime_error("out of memory");
+    }
   }
 
   /**
@@ -60,7 +66,7 @@ class BlockAllocator {
   }
 
  private:
-  std::list<std::uintptr_t> m_free_list;
+  std::queue<std::uintptr_t> m_free_list;
   static inline T* s_mempool = nullptr;
 };
 
