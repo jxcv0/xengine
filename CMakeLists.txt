@@ -30,6 +30,7 @@ set(
   HEADERS 
     include/mainwindow.h
     include/blockallocator.h
+    include/texture.h
 )
 
 set(
