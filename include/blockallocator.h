@@ -20,9 +20,7 @@ class BlockAllocator {
    * @param nblocks Allocate enough memory to store nblock instances of T.
    */
   BlockAllocator(std::size_t nblocks) {
-    if (mp_mempool == nullptr) {
-      mp_mempool = std::unique_ptr<T[]>(new T[nblocks]);
-    }
+    mp_mempool = std::unique_ptr<T[]>(new T[nblocks]);
     uintptr_t start = reinterpret_cast<uintptr_t>(mp_mempool.get());
     for (auto i = 0; i < nblocks; i++) {
       m_free_list.push(start += sizeof(T));
