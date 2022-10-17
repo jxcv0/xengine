@@ -2,9 +2,9 @@
 #define BLOCKALLOCATOR_H_
 
 #include <cstdint>
+#include <memory>
 #include <queue>
 #include <stdexcept>
-#include <memory>
 
 /**
  * @brief Allocate fixed size blocks of memory

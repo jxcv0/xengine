@@ -1,6 +1,7 @@
+#include <gtest/gtest.h>
+
 #include <cassert>
 #include <cstdint>
-#include <gtest/gtest.h>
 #include <stdexcept>
 
 #include "blockallocator.h"
