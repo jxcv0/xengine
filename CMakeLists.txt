@@ -34,6 +34,7 @@ set(
 
 set(
   SOURCES 
+    lib/stb/stb_image.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})
@@ -54,6 +55,7 @@ target_link_libraries(
       glad
       OpenGL::GL
       dl
+      m
       assimp
 )
 
