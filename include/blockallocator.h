@@ -2,9 +2,9 @@
 #define BLOCKALLOCATOR_H_
 
 #include <cstdint>
-#include <cstdlib>
 #include <queue>
 #include <stdexcept>
+#include <memory>
 
 /**
  * @brief Allocate fixed size blocks of memory
@@ -20,10 +20,10 @@ class BlockAllocator {
    * @param nblocks Allocate enough memory to store nblock instances of T.
    */
   BlockAllocator(std::size_t nblocks) {
-    if (s_mempool == nullptr) {
-      s_mempool = static_cast<T*>(std::calloc(nblocks, sizeof(T)));
+    if (mp_mempool == nullptr) {
+      mp_mempool = std::unique_ptr<T[]>(new T[nblocks]);
     }
-    uintptr_t start = reinterpret_cast<uintptr_t>(s_mempool);
+    uintptr_t start = reinterpret_cast<uintptr_t>(mp_mempool.get());
     for (auto i = 0; i < nblocks; i++) {
       m_free_list.push(start += sizeof(T));
     }
@@ -38,13 +38,14 @@ class BlockAllocator {
    * @return A pointer to the new allocated blocks
    */
   T* allocate(std::size_t n = sizeof(T)) {
+    T* ptr = nullptr;
     if (!m_free_list.empty()) {
-      auto ptr = m_free_list.front();
+      ptr = reinterpret_cast<T*>(m_free_list.front());
       m_free_list.pop();
-      return reinterpret_cast<T*>(ptr);
     } else {
       throw std::runtime_error("out of memory");
     }
+    return ptr;
   }
 
   /**
@@ -55,19 +56,13 @@ class BlockAllocator {
    *
    */
   void deallocate(T* p, std::size_t n = sizeof(T)) {
-    // TODO
-  }
-
-  /**
-   * @brief Free all blocks of memory.
-   */
-  void deallocate_all() {
-    // TODO
+    p = nullptr;
+    m_free_list.push(reinterpret_cast<uintptr_t>(p));
   }
 
  private:
   std::queue<std::uintptr_t> m_free_list;
-  static inline T* s_mempool = nullptr;
+  std::unique_ptr<T[]> mp_mempool;
 };
 
 #endif  // BLOCKALLOCATOR_H_
