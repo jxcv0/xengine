@@ -12,11 +12,9 @@ template <typename ResourceType>
 class Resource {
  public:
   /**
-   * @brief Construct a Resource. We assume the memory has not already been
-   *        allocated.
+   * @brief Construct a Resource.
    */
-  Resource(ResourceType *resource, const char *filepath)
-      : mp_resource(resource), m_filepath(filepath) {}
+  Resource(const char *filepath) : mp_resource(nullptr) m_filepath(filepath) {}
 
   Resource(const Resource<ResourceType> &r) = default;
   Resource &operator=(const Resource &) = default;
@@ -25,27 +23,29 @@ class Resource {
 
   /**
    * @brief Comparison operator. If the filepaths are the same then resources
-   *         are assumed to be identical.
+   *        are assumed to be identical.
+   *
    * @param r The other Resource of any templated type.
    * @return true if the paths to the resource are the same, otherwise false.
    */
   template <typename T>
   bool operator==(const Resource<T> &r) {
-    return m_filepath.string() == r.string();
+    return m_filepath.string() == r.filepath();
   }
 
   /**
    * @brief Get a const ref to the underlying resource.
+   *
    * @return A const reference to the resource.
    */
   const inline ResourceType &get() const { return mp_resource.get(); }
 
   /**
-   * @brief Get the filepath of the resource as a string.
+   * @brief Get the filepath of the resource.
    *
-   * @return The filepath string.
+   * @return The filepath.
    */
-  std::string filepath() const { return m_filepath.string(); }
+  std::filesystem::path filepath() const { return m_filepath; }
 
  private:
   std::shared_ptr<ResourceType> mp_resource;
