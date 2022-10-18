@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_BUILD_TYPE debug)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
-set(CMAKE_C_FLAGS "-Wno-dev")
+set(CMAKE_C_FLAGS)
 
 enable_testing()
 
@@ -30,10 +30,13 @@ set(
   HEADERS 
     include/mainwindow.h
     include/blockallocator.h
+    include/texture.h
 )
 
 set(
   SOURCES 
+    src/importer.cpp
+    lib/stb/stb_image.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})
@@ -54,6 +57,7 @@ target_link_libraries(
       glad
       OpenGL::GL
       dl
+      m
       assimp
 )
 

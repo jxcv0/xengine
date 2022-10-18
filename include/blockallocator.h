@@ -36,13 +36,11 @@ class BlockAllocator {
    * @return A pointer to the new allocated blocks
    */
   T* allocate(std::size_t n = sizeof(T)) {
-    T* ptr = nullptr;
-    if (!m_free_list.empty()) {
-      ptr = reinterpret_cast<T*>(m_free_list.front());
-      m_free_list.pop();
-    } else {
+    if (m_free_list.empty()) {
       throw std::runtime_error("out of memory");
     }
+    T* ptr = reinterpret_cast<T*>(m_free_list.front());
+    m_free_list.pop();
     return ptr;
   }
 

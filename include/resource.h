@@ -8,13 +8,15 @@
  * @brief A game resource.
  *        Manages the memory of the underying resource via a shared pointer.
  */
-template <typename ResourceType>
+template <typename ResourceType, typename Allocator>
 class Resource {
  public:
   /**
-   * @brief Construct a Resource.
+   * @brief Constructvencs a Resource.
    */
-  Resource(const char *filepath) : mp_resource(nullptr) m_filepath(filepath) {}
+  Resource(const std::filesystem::path filepath,
+           std::shared_ptr<Allocator> allocator)
+      : mp_resource(nullptr) m_filepath(filepath), mp_allocator(allocator) {}
 
   Resource(const Resource<ResourceType> &r) = default;
   Resource &operator=(const Resource &) = default;
@@ -30,7 +32,7 @@ class Resource {
    */
   template <typename T>
   bool operator==(const Resource<T> &r) {
-    return m_filepath.string() == r.filepath();
+    return m_filepath == r.filepath();
   }
 
   /**
@@ -50,6 +52,7 @@ class Resource {
  private:
   std::shared_ptr<ResourceType> mp_resource;
   std::filesystem::path m_filepath;
+  std::shared_ptr<Allocator> mp_allocator;
 };
 
 #endif  // RESOURCE_H_
