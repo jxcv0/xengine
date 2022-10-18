@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_BUILD_TYPE debug)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
-set(CMAKE_C_FLAGS "-Wno-dev")
+set(CMAKE_C_FLAGS)
 
 enable_testing()
 
@@ -35,6 +35,7 @@ set(
 
 set(
   SOURCES 
+    src/importer.cpp
     lib/stb/stb_image.cpp
 )
 

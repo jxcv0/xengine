@@ -1,6 +1,7 @@
 #ifndef IMPORTER_H_
 #define IMPORTER_H_
 
+#include <cassert>
 #include <filesystem>
 #include <memory>
 
@@ -27,10 +28,7 @@ void import(T *dest, const std::filesystem::path &filepath) {
  * @param filepath The path to the file to import.
  */
 template <>
-void import(Texture *texture, const std::filesystem::path &filepath) {
-  texture->mp_data = stbi_load(filepath.c_str(), &texture->m_width,
-                               &texture->m_height, &texture->m_num_channels, 0);
-}
+void import(Texture *texture, const std::filesystem::path &filepath);
 }  // namespace import_impl
 
 template <typename T>
