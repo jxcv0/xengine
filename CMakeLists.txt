@@ -36,6 +36,7 @@ set(
 set(
   SOURCES 
     lib/stb/stb_image.cpp
+    src/texture.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})
