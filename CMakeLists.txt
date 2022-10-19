@@ -31,7 +31,6 @@ set(
     include/mainwindow.h
     include/poolallocator.h
     include/texture.h
-    include/threadpool.h
 )
 
 set(
@@ -60,11 +59,13 @@ target_link_libraries(
       dl
       m
       assimp
+      threadpool
 )
 
 add_subdirectory(lib/glad)
 add_subdirectory(test)
 add_subdirectory(example)
+add_subdirectory(include/threadpool)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
