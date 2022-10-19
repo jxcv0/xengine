@@ -1,27 +1,31 @@
 #ifndef THREADPOOL_H_
 #define THREADPOOL_H_
 
+#include <future>
 #include <memory>
+#include <thread>
 #include <type_traits>
 #include <vector>
-#include <future>
 
 #include "i_task.h"
+#include "task.h"
 
 class ThreadPool {
  public:
-  ThreadPool() {
-  }
+  ThreadPool() {}
 
-  ~ThreadPool() {
-  }
+  ~ThreadPool() {}
 
   template <typename Function, typename... Args>
-  std::future<typename std::result_of<typename std::decay<Function>::type>(
-      typename std::decay<Args>::type...)> schedule_task();
+  auto schedule_task(Function&& f, Args&&... args) {
+    Task task(f, args...);
+    m_tasks.push_back(&task);
+    return task.get_future();
+  }
 
  private:
   std::vector<i_Task*> m_tasks;
+  std::vector<std::thread> m_worker_threads;
 };
 
-#endif // THREADPOOL_H_
+#endif  // THREADPOOL_H_
