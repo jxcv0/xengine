@@ -29,7 +29,7 @@ find_package(assimp REQUIRED)
 set(
   HEADERS 
     include/mainwindow.h
-    include/blockallocator.h
+    include/poolallocator.h
     include/texture.h
 )
 

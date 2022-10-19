@@ -16,9 +16,9 @@ class Resource {
    */
   Resource(const std::filesystem::path filepath,
            std::shared_ptr<Allocator> allocator)
-      : mp_resource(nullptr) m_filepath(filepath), mp_allocator(allocator) {}
+      : mp_resource(nullptr), m_filepath(filepath), mp_allocator(allocator) {}
 
-  Resource(const Resource<ResourceType> &r) = default;
+  Resource(const Resource<ResourceType, Allocator> &r) = default;
   Resource &operator=(const Resource &) = default;
   Resource &operator=(Resource &&) = default;
   ~Resource() = default;
@@ -31,7 +31,7 @@ class Resource {
    * @return true if the paths to the resource are the same, otherwise false.
    */
   template <typename T>
-  bool operator==(const Resource<T> &r) {
+  bool operator==(const Resource<T, Allocator> &r) {
     return m_filepath == r.filepath();
   }
 
