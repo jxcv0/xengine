@@ -31,6 +31,7 @@ set(
     include/mainwindow.h
     include/poolallocator.h
     include/texture.h
+    include/threadpool.h
 )
 
 set(
