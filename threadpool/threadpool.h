@@ -10,15 +10,26 @@
 
 #include "task.h"
 
+/**
+ * @brief A pool of worker threads.
+ */
 class ThreadPool {
  public:
-  ThreadPool(size_t nthreads) : m_should_run(true) {
+  /**
+   * @brief Construct a thread pool with a fixed number of worker threads.
+   *
+   * @param nthread The number of worker threads.
+   */
+  ThreadPool(std::size_t nthreads) : m_should_run(true) {
     m_worker_threads.reserve(nthreads);
     for(auto i = 0; i < nthreads; i++) {
       m_worker_threads.emplace_back(std::thread(&ThreadPool::run, this));
     }
   }
 
+  /**
+   * @brief Stop join all worker threads.
+   */
   ~ThreadPool() {
     m_should_run.store(false);
     for (auto &thread : m_worker_threads) {
@@ -26,6 +37,14 @@ class ThreadPool {
     }
   }
 
+  /**
+   * @brief Add a task to the task buffer and get a future that will store the
+   *        result;
+   * 
+   * @param f The function that the task will call.
+   * @param args The arguments the function will be called with.
+   * @return A future that can be waited on for the result of the task.
+   */
   template <typename Function, typename... Args>
   auto schedule_task(Function&& f, Args&&... args) {
     // TODO allocator for this
@@ -36,13 +55,13 @@ class ThreadPool {
   }
 
  private:
+  /**
+   * @brief The main work loop.
+   */
   void run() {
     while(m_should_run.load()) {
       std::unique_lock lk(m_mutex);
-      if (m_tasks.empty()) {
-        lk.unlock();
-        continue;
-      }
+      if (m_tasks.empty()) { continue; }
       auto task = m_tasks.front();
       m_tasks.erase(m_tasks.begin());
       lk.unlock();
@@ -50,7 +69,7 @@ class ThreadPool {
     }
   };
 
-  std::vector<Task*> m_tasks; // TODO shared_ptr??
+  std::vector<Task*> m_tasks;
   std::vector<std::thread> m_worker_threads;
   std::mutex m_mutex;
   std::atomic<bool> m_should_run;
