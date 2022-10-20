@@ -11,6 +11,18 @@
 template <typename T, std::size_t N>
 class Allocator {
  public:
+  
+  /**
+   * @brief Construct an Allocator<T, N> instance.
+   */
+  Allocator() {
+    uintptr_t start = reinterpret_cast<uintptr_t>(&m_buffer[0]);
+    auto bufsize = sizeof(T) * N;
+    for (; start < bufsize; start += sizeof(T)) {
+      m_free_list.push(start);
+      start += sizeof(T);
+    }
+  }
 
   /**
    * @brief Allocate storage suitable for an array of type T[n].
@@ -18,14 +30,26 @@ class Allocator {
    * @param n The number of instances to allocate for.
    */
   T* allocate(std::size_t n) {
+    return reinterpret_cast<T*>(m_free_list.front());
+    m_free_list.pop();
   }
 
+  /**
+   * @brief Deallocate memory at p.
+   * 
+   * @param p Pointer to the memory.
+   * @param n The size of the array.
+   */
   void deallocate(T* p, std::size_t n) {
+    for (auto i = 0; i < n; i++) {
+      m_free_list.push(reinterpret_cast<uintptr_t>(p[i]));
+      p[i] = nullptr;
+    }
   }
 
  private:
   std::queue<uintptr_t> m_free_list;
-  char m_buffer[N];
+  char m_buffer[sizeof(T) * N];
 };
 
 #endif // ALLOCATOR_H_
