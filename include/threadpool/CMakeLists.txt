@@ -8,7 +8,6 @@ set(
 set(
     HEADERS
         threadpool.h
-        i_task.h
         task.h
 )
 

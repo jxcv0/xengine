@@ -7,29 +7,35 @@
 #include <type_traits>
 #include <utility>
 
-#include "i_task.h"
+#include "task.h"
+
+class Task {
+ public:
+  virtual ~Task() {}
+  virtual void invoke() = 0;
+};
 
 template <typename Function, typename... Args>
-class Task : public i_Task {
+class SpecializedTask : public Task {
+ public:
   using ReturnType =
       typename std::result_of<typename std::decay<Function>::type(
           typename std::decay<Args>::type...)>::type;
 
- public:
-  Task(Function f, Args... args) {
-    mp_task = std::make_shared<std::packaged_task<Function(Args...)>>(
+  SpecializedTask(Function f, Args... args) {
+    m_task = std::packaged_task<ReturnType()>(
         std::bind(std::forward<Function>(f), std::forward<Args>(args)...));
   }
 
   /**
    * @brief
    */
-  auto get_future() { return mp_task->get_future(); }
+  auto get_future() { return m_task.get_future(); }
 
-  void invoke() override { mp_task(); }
+  void invoke() override { m_task(); }
 
  private:
-  std::shared_ptr<std::packaged_task<Function(Args...)>> mp_task;
+  std::packaged_task<ReturnType()> m_task;
 };
 
 #endif  // TASK_H_
