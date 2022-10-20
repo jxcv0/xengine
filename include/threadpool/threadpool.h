@@ -3,6 +3,7 @@
 
 #include <future>
 #include <memory>
+#include <mutex>
 #include <thread>
 #include <type_traits>
 #include <vector>
@@ -11,21 +12,52 @@
 
 class ThreadPool {
  public:
-  ThreadPool() {
+  ThreadPool(size_t nthreads) {
+    m_should_run.store(true);
+    m_worker_threads.reserve(nthreads);
+    for(auto i = 0; i < nthreads; i++) {
+      m_worker_threads.emplace_back(std::thread(&ThreadPool::run, this));
+    }
   }
 
-  ~ThreadPool() {}
+  ~ThreadPool() {
+    m_should_run.store(false);
+    for (auto &thread : m_worker_threads) {
+      m_cond.notify_all();
+      thread.join();
+    }
+  }
 
   template <typename Function, typename... Args>
   auto schedule_task(Function&& f, Args&&... args) {
+    // TODO allocator for this
     auto task = new SpecializedTask<Function, Args...>(f, args...);
-    m_tasks.push_back(task);
+    {
+        std::lock_guard lk(m_mutex);
+        m_tasks.push_back(task);
+    }
+    m_cond.notify_one();
     return task->get_future();
   }
 
  private:
-  std::vector<Task*> m_tasks;
+  void run() {
+    while(m_should_run.load()) {
+      std::unique_lock lk(m_mutex);
+      while(m_tasks.empty()) { m_cond.wait(lk); }
+      auto task = m_tasks.front();
+      m_tasks.erase(m_tasks.begin());
+      lk.unlock();
+      m_cond.notify_one();
+      task->invoke();
+    }
+  };
+
+  std::vector<Task*> m_tasks; // TODO shared_ptr??
   std::vector<std::thread> m_worker_threads;
+  std::mutex m_mutex;
+  std::condition_variable m_cond;
+  std::atomic<bool> m_should_run;
 };
 
 #endif  // THREADPOOL_H_

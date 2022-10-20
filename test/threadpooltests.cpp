@@ -6,7 +6,7 @@ int add(int a, int b) {
 }
 
 TEST(threadpooltests, threadpool) {
-  ThreadPool tp;
+  ThreadPool tp(1);
   auto result5 = tp.schedule_task(add, 5, 8);
   auto result6 = tp.schedule_task(add, 6, 8);
   auto result7 = tp.schedule_task(add, 7, 8);
@@ -16,9 +16,15 @@ TEST(threadpooltests, threadpool) {
 
   int i = -1;
   i = result5.get();
+  ASSERT_EQ(i, 13);
   i = result6.get();
+  ASSERT_EQ(i, 14);
   i = result7.get();
+  ASSERT_EQ(i, 15);
   i = result8.get();
+  ASSERT_EQ(i, 16);
   i = result9.get();
+  ASSERT_EQ(i, 17);
   i = result10.get();
+  ASSERT_EQ(i, 18);
 }
