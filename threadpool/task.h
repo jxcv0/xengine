@@ -7,14 +7,20 @@
 #include <type_traits>
 #include <utility>
 
-#include "task.h"
-
+/**
+ * @brief The task interface.
+ */
 class Task {
  public:
   virtual ~Task() {}
   virtual void invoke() = 0;
 };
 
+/**
+ * @brief Class template that wraps a std::packaged_task and realizes the Task
+ *        interface. This way the threadpool can store a task with any arguments
+ *        and return types.
+ */
 template <typename Function, typename... Args>
 class SpecializedTask : public Task {
  public:
@@ -22,16 +28,26 @@ class SpecializedTask : public Task {
       typename std::result_of<typename std::decay<Function>::type(
           typename std::decay<Args>::type...)>::type;
 
+  /**
+   * @brief Construct a SpecializedClass instance.
+   */
   SpecializedTask(Function f, Args... args) {
     m_task = std::packaged_task<ReturnType()>(
         std::bind(std::forward<Function>(f), std::forward<Args>(args)...));
   }
 
+  virtual ~SpecializedTask() {}
+
   /**
-   * @brief
+   * @brief Get the future of this task.
+   *
+   * @return The associated future of this task.
    */
   auto get_future() { return m_task.get_future(); }
 
+  /**
+   * @brief Invoke this task.
+   */
   void invoke() override { m_task(); }
 
  private:
