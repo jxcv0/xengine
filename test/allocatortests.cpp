@@ -30,3 +30,16 @@ TEST(allocatortests, allocate_array) {
   ASSERT_EQ(strs[0], "1");
   ASSERT_EQ(strs[3], "4");
 }
+
+TEST(allocatortests, stdlib_allocator) {
+  std::vector<int, Allocator<int, 5>> vec;
+  for (int i = 0; i < 5; i++) {
+    vec.push_back(i);
+  }
+  ASSERT_EQ(vec[0], 0);
+  ASSERT_EQ(vec[1], 1);
+  ASSERT_EQ(vec[2], 2);
+  ASSERT_EQ(vec[3], 3);
+  ASSERT_EQ(vec[4], 4);
+  ASSERT_THROW(vec.push_back(5), std::bad_alloc);
+}

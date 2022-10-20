@@ -6,14 +6,17 @@
 #include <memory>
 #include <new>
 #include <queue>
+#include <iostream>
 
 /**
  * @brief Preallocated memory buffer.
  */
-template <typename T, std::size_t N>
+template <typename T, size_t N>
 class Allocator {
  public:
   
+  using value_type = T;
+
   /**
    * @brief Construct an Allocator<T, N> instance.
    */
@@ -24,6 +27,7 @@ class Allocator {
       m_free_list.push(start);
       start += sizeof(T);
     }
+    std::cout << "size: " << m_free_list.size() << "\n";
   }
 
   /**
@@ -48,10 +52,19 @@ class Allocator {
    */
   void deallocate(T* p, std::size_t n) {
     for (auto i = 0; i < n; i++) {
-      m_free_list.push(reinterpret_cast<uintptr_t>(p[i]));
-      p[i] = nullptr;
+      m_free_list.push(reinterpret_cast<uintptr_t>(&p[i]));
     }
   }
+
+  /**
+   * @brief Use std allocator for rebind
+   *
+   * TODO can this be improved? where is it used?
+   */
+  template <typename U>
+  struct rebind {
+    using other = std::allocator<U>;
+  };
 
  private:
   std::queue<uintptr_t> m_free_list;
