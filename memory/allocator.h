@@ -2,6 +2,7 @@
 #define ALLOCATOR_H_
 
 #include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <queue>
 
