@@ -59,11 +59,14 @@ target_link_libraries(
       dl
       m
       assimp
+      threadpool
 )
 
 add_subdirectory(lib/glad)
 add_subdirectory(test)
 add_subdirectory(example)
+add_subdirectory(threadpool)
+add_subdirectory(memory)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
