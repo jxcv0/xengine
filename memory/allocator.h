@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <new>
 #include <queue>
 
 /**
@@ -19,7 +20,7 @@ class Allocator {
   Allocator() {
     uintptr_t start = reinterpret_cast<uintptr_t>(&m_buffer[0]);
     auto bufsize = sizeof(T) * N;
-    for (; start < bufsize; start += sizeof(T)) {
+    for (auto i = 0; i < N; i++) {
       m_free_list.push(start);
       start += sizeof(T);
     }
@@ -31,8 +32,12 @@ class Allocator {
    * @param n The number of instances to allocate for.
    */
   T* allocate(std::size_t n) {
-    return reinterpret_cast<T*>(m_free_list.front());
+    if (m_free_list.empty()) {
+      throw std::bad_alloc();
+    }
+    T *p = reinterpret_cast<T*>(m_free_list.front());
     m_free_list.pop();
+    return p;
   }
 
   /**
