@@ -9,38 +9,42 @@
 #include <iostream>
 
 /**
- * @brief Preallocated memory buffer.
+ * @brief Allocator with dynamically sized object pool.
  */
-template <typename T, size_t N>
+template <typename T>
 class Allocator {
  public:
   
   using value_type = T;
 
   /**
-   * @brief Construct an Allocator<T, N> instance.
+   * @brief Construct an Allocator<T> object.
+   *
+   * @param n The initial size of the object pool.
    */
-  Allocator() {
-    uintptr_t start = reinterpret_cast<uintptr_t>(&m_buffer[0]);
-    auto bufsize = sizeof(T) * N;
-    for (auto i = 0; i < N; i++) {
-      m_free_list.push(start);
-      start += sizeof(T);
+  Allocator(std::size_t n = 1) : m_capacity(n), m_size(0) {
+    m_object_pool = static_cast<T*>(std::calloc(m_capacity, sizeof(T)));
+    for (auto i = 0; i < m_capacity; i++) {
+      auto addr = reinterpret_cast<std::uintptr_t>(&m_object_pool[i]);
+      m_free_list.push(addr);
     }
-    std::cout << "size: " << m_free_list.size() << "\n";
   }
+
+  ~Allocator() { std::free(m_object_pool); }
 
   /**
    * @brief Allocate storage suitable for an array of type T[n].
+   *        If the buffer is full and there are no more free objects then a new
+   *        T is constructed at the back of the buffer and a pointer to it is
+   *        returned.
    *
    * @param n The number of instances to allocate for.
+   * @return a pointer to the allocated memory
    */
   T* allocate(std::size_t n) {
-    if (m_free_list.empty()) {
-      throw std::bad_alloc();
-    }
-    T *p = reinterpret_cast<T*>(m_free_list.front());
-    m_free_list.pop();
+    T* p = nullptr;
+    if (m_size == m_capacity) { resize(); }
+    p = reinterpret_cast<T*>(m_free_list.front());
     return p;
   }
 
@@ -57,18 +61,51 @@ class Allocator {
   }
 
   /**
+   * @brief Get the current capacity of the Allocators object pool.
+   *
+   * @return The current capacity of the object pool.
+   */
+  std::size_t capacity() { return m_capacity; }
+
+  /**
    * @brief Use std allocator for rebind
    *
    * TODO can this be improved? where is it used?
    */
   template <typename U>
   struct rebind {
-    using other = std::allocator<U>;
+    using other = Allocator<U>;
   };
 
  private:
+
+  /**
+   * @brief Search for a block of contiguous memory large enough to store an
+   *        array of type T[n]
+   */
+  T* find_contiguous(std::size_t n) {
+    // TODO
+    return nullptr;
+  }
+
+  void resize() {
+    m_capacity *= 2;
+    auto new_mem = std::realloc(m_object_pool, m_capacity);
+    if (new_mem != nullptr) {
+      m_object_pool = static_cast<T*>(new_mem);
+    } else {
+      throw std::bad_alloc();
+    }
+    for (auto i = m_size; i < m_capacity; i++) {
+      auto addr = reinterpret_cast<std::uintptr_t>(&m_object_pool[i]);
+      m_free_list.push(addr);
+    }
+  }
+
   std::queue<uintptr_t> m_free_list;
-  char m_buffer[sizeof(T) * N];
+  T* m_object_pool;
+  std::size_t m_capacity;
+  std::size_t m_size;
 };
 
 #endif // ALLOCATOR_H_

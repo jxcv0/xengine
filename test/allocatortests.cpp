@@ -9,20 +9,14 @@
 
 
 TEST(allocatortests, allocate) {
-  Allocator<int, 1> allocator;
+  Allocator<int> allocator;
   auto ptr = allocator.allocate(1);
   ASSERT_NE(ptr, nullptr);
-}
-
-TEST(allocatortests, allocate_throw) {
-  Allocator<float, 1> allocator;
-  auto f1 = allocator.allocate(1);
-  ASSERT_NE(f1, nullptr);
-  ASSERT_THROW(auto f2 = allocator.allocate(1), std::bad_alloc);
+  ASSERT_EQ(allocator.capacity(), 1);
 }
 
 TEST(allocatortests, allocate_array) {
-  Allocator<std::string, 10> str_alloc;
+  Allocator<std::string> str_alloc;
   std::string *strs = str_alloc.allocate(4);
   strs[0] = "1";
   strs[1] = "2";
@@ -32,15 +26,14 @@ TEST(allocatortests, allocate_array) {
   ASSERT_EQ(strs[3], "4");
 }
 
-//TEST(allocatortests, stdlib_allocator) {
-//  std::vector<std::string, Allocator<std::string, 5>> vec;
-//  for (int i = 0; i < 5; i++) {
-//    vec.push_back(std::to_string(i));
-//  }
-//  ASSERT_EQ(vec[0], "0");
-//  ASSERT_EQ(vec[1], "1");
-//  ASSERT_EQ(vec[2], "2");
-//  ASSERT_EQ(vec[3], "3");
-//  ASSERT_EQ(vec[4], "4");
-//  ASSERT_THROW(vec.push_back(std::to_string(5)), std::bad_alloc);
-//}
+TEST(allocatortests, stdlib_allocator) {
+  std::vector<std::string, Allocator<std::string>> vec;
+  for (int i = 0; i < 5; i++) {
+    vec.push_back(std::to_string(i));
+  }
+  ASSERT_EQ(vec[0], "0");
+  ASSERT_EQ(vec[1], "1");
+  ASSERT_EQ(vec[2], "2");
+  ASSERT_EQ(vec[3], "3");
+  ASSERT_EQ(vec[4], "4");
+}
