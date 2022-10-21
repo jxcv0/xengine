@@ -30,6 +30,9 @@ class SpecializedTask : public Task {
 
   /**
    * @brief Construct a SpecializedClass instance.
+   *
+   * @param f The function the task will execute.
+   * @param args The arguments the function will be called with.
    */
   SpecializedTask(Function f, Args... args) {
     m_task = std::packaged_task<ReturnType()>(
@@ -39,7 +42,7 @@ class SpecializedTask : public Task {
   virtual ~SpecializedTask() {}
 
   /**
-   * @brief Get the future of this task.
+   * @brief Get the associated future of this task.
    *
    * @return The associated future of this task.
    */
