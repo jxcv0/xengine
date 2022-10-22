@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 #include <resource.h>
-
 #include <texture.h>
 
 TEST(resourcestests, resource_test) {
