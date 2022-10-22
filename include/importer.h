@@ -48,7 +48,6 @@ class Importer {
   /**
    * @brief Import the data from the file.
    *
-   * @param allocator The allocating class for the new data.
    * @return A pointer to the data.
    */
   T *import() {
