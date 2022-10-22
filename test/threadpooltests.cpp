@@ -1,9 +1,7 @@
 #include <gtest/gtest.h>
 #include <threadpool.h>
 
-int add(int a, int b) {
-  return a + b;
-}
+int add(int a, int b) { return a + b; }
 
 TEST(threadpooltests, threadpool) {
   ThreadPool tp(1);
@@ -15,16 +13,16 @@ TEST(threadpooltests, threadpool) {
   auto result10 = tp.schedule_task(add, 10, 8);
 
   int i = -1;
-  i = result5.get();
-  ASSERT_EQ(i, 13);
   i = result6.get();
   ASSERT_EQ(i, 14);
   i = result7.get();
   ASSERT_EQ(i, 15);
-  i = result8.get();
-  ASSERT_EQ(i, 16);
+  i = result5.get();
+  ASSERT_EQ(i, 13);
   i = result9.get();
   ASSERT_EQ(i, 17);
   i = result10.get();
   ASSERT_EQ(i, 18);
+  i = result8.get();
+  ASSERT_EQ(i, 16);
 }

@@ -52,21 +52,23 @@ target_include_directories(
 target_link_libraries(
   ${PROJECT_NAME}
     PUBLIC
+      glad
+      threadpool
+      memory
+
       glfw
       glm::glm
-      glad
       OpenGL::GL
       dl
       m
       assimp
-      threadpool
 )
 
 add_subdirectory(lib/glad)
-add_subdirectory(test)
 add_subdirectory(example)
 add_subdirectory(threadpool)
 add_subdirectory(memory)
+add_subdirectory(test)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
