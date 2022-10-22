@@ -31,7 +31,7 @@ template <>
 void import(Texture *texture, const std::filesystem::path &filepath);
 }  // namespace import_impl
 
-template <typename T>
+template <typename T, template <typename> typename Allocator = std::allocator>
 class Importer {
  public:
   /**
@@ -39,25 +39,25 @@ class Importer {
    *
    * @param filepath The filepath of the data to import.
    */
-  Importer(std::filesystem::path filepath) : m_filepath(filepath){};
+  Importer(std::filesystem::path filepath)
+      : m_filepath(filepath), m_allocator() {}
 
   ~Importer() = default;
 
   /**
    * @brief Import the data from the file.
    *
-   * @param allocator The allocating class for the new data.
    * @return A pointer to the data.
    */
-  template <typename Allocator>
-  T *import(Allocator &allocator) {
-    T *dest = allocator.allocate(sizeof(T));
+  T *import() {
+    T *dest = m_allocator.allocate(sizeof(T));
     import_impl::import(dest, m_filepath);
     return dest;
   }
 
  private:
   std::filesystem::path m_filepath;
+  Allocator<T> m_allocator;
 };
 
 #endif  // IMPORTER_H_
