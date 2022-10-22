@@ -47,7 +47,7 @@ class ThreadPool {
    */
   template <typename Function, typename... Args>
   auto schedule_task(Function&& f, Args&&... args) {
-    // TODO allocator for this
+    // this must be slow
     auto task = new SpecializedTask<Function, Args...>(f, args...);
     std::lock_guard lk(m_mutex);
     m_tasks.push_back(task);
@@ -68,6 +68,7 @@ class ThreadPool {
       m_tasks.erase(m_tasks.begin());
       lk.unlock();
       task->invoke();
+      delete task; // this must be slow
     }
   };
 
