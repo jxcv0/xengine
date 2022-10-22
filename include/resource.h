@@ -4,21 +4,25 @@
 #include <filesystem>
 #include <memory>
 
+#include "importer.h"
+
 /**
  * @brief A game resource.
  *        Manages the memory of the underying resource via a shared pointer.
  */
-template <typename ResourceType, typename Allocator>
+template <typename ResourceType,
+          template <typename> typename Allocator = std::allocator>
 class Resource {
  public:
   /**
-   * @brief Constructvencs a Resource.
+   * @brief Constructs a Resource.
+   *
+   * @param filepath The path to the file the resource can be loaded from.
    */
-  Resource(const std::filesystem::path filepath,
-           std::shared_ptr<Allocator> allocator)
-      : mp_resource(nullptr) m_filepath(filepath), mp_allocator(allocator) {}
+  Resource(const std::filesystem::path filepath)
+      : mp_resource(nullptr), m_filepath(filepath), m_importer(filepath) {}
 
-  Resource(const Resource<ResourceType> &r) = default;
+  Resource(const Resource<ResourceType, Allocator> &r) = default;
   Resource &operator=(const Resource &) = default;
   Resource &operator=(Resource &&) = default;
   ~Resource() = default;
@@ -38,9 +42,14 @@ class Resource {
   /**
    * @brief Get a const ref to the underlying resource.
    *
-   * @return A const reference to the resource.
+   * @return A shared pointer to the resource.
    */
-  const inline ResourceType &get() const { return mp_resource.get(); }
+  auto get() {
+    if (mp_resource == nullptr) {
+      mp_resource.reset(m_importer.import());
+    }
+    return mp_resource;
+  }
 
   /**
    * @brief Get the filepath of the resource.
@@ -52,7 +61,7 @@ class Resource {
  private:
   std::shared_ptr<ResourceType> mp_resource;
   std::filesystem::path m_filepath;
-  std::shared_ptr<Allocator> mp_allocator;
+  Importer<ResourceType, Allocator> m_importer;
 };
 
 #endif  // RESOURCE_H_

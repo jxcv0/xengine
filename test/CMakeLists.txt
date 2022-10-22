@@ -10,10 +10,13 @@ set(TEST_COMMON_LIBS xengine GTest::gtest_main)
 
 add_executable(blockallocatortests blockallocatortests.cpp)
 add_executable(importertests importertests.cpp)
+add_executable(resourcetests resourcetests.cpp)
 
 target_link_libraries(blockallocatortests ${TEST_COMMON_LIBS})
 target_link_libraries(importertests ${TEST_COMMON_LIBS})
+target_link_libraries(resourcetests ${TEST_COMMON_LIBS})
 
 include(GoogleTest)
 gtest_discover_tests(blockallocatortests)
 gtest_discover_tests(importertests)
+gtest_discover_tests(resourcetests)

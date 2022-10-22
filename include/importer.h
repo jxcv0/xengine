@@ -34,14 +34,13 @@ void import(Texture *texture, const std::filesystem::path &filepath);
 template <typename T, template <typename> typename Allocator = std::allocator>
 class Importer {
  public:
-
   /**
    * @brief Construct an importer that will operate on a filepath.
    *
    * @param filepath The filepath of the data to import.
    */
   Importer(std::filesystem::path filepath)
-    : m_filepath(filepath), m_allocator() {}
+      : m_filepath(filepath), m_allocator() {}
 
   ~Importer() = default;
 
