@@ -34,7 +34,8 @@ int main(int argc, char **argv) {
   }
 
   for (auto &fut : futures) {
-    std::cout << "result: " << fut.get() << "\n";
+    // std::cout << "result: " << fut.get() << "\n";
+    fut.get();
   }
 
   std::cout << "done\n";
