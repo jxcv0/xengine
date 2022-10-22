@@ -1,9 +1,7 @@
 #include <gtest/gtest.h>
 #include <threadpool.h>
 
-int add(int a, int b) {
-  return a + b;
-}
+int add(int a, int b) { return a + b; }
 
 TEST(threadpooltests, threadpool) {
   ThreadPool tp(1);

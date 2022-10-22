@@ -22,7 +22,7 @@ class ThreadPool {
    */
   ThreadPool(std::size_t nthreads) : m_should_run(true) {
     m_worker_threads.reserve(nthreads);
-    for(auto i = 0; i < nthreads; i++) {
+    for (auto i = 0; i < nthreads; i++) {
       m_worker_threads.emplace_back(std::thread(&ThreadPool::run, this));
     }
   }
@@ -32,7 +32,7 @@ class ThreadPool {
    */
   ~ThreadPool() {
     m_should_run.store(false);
-    for (auto &thread : m_worker_threads) {
+    for (auto& thread : m_worker_threads) {
       thread.join();
     }
   }
@@ -40,7 +40,7 @@ class ThreadPool {
   /**
    * @brief Add a task to the task buffer and get a future that will store the
    *        result;
-   * 
+   *
    * @param f The function that the task will call.
    * @param args The arguments the function will be called with.
    * @return A future that can be waited on for the result of the task.
@@ -59,9 +59,11 @@ class ThreadPool {
    * @brief The main work loop.
    */
   void run() {
-    while(m_should_run.load()) {
+    while (m_should_run.load()) {
       std::unique_lock lk(m_mutex);
-      if (m_tasks.empty()) { continue; }
+      if (m_tasks.empty()) {
+        continue;
+      }
       auto task = m_tasks.front();
       m_tasks.erase(m_tasks.begin());
       lk.unlock();

@@ -5,7 +5,6 @@
  * @
  */
 template <typename T>
-class MemoryPool {
-};
+class MemoryPool {};
 
-#endif // MEMORYPOOL_H_
+#endif  // MEMORYPOOL_H_

@@ -1,12 +1,11 @@
-#include <gtest/gtest.h>
 #include <allocator.h>
+#include <gtest/gtest.h>
 
 #include <cassert>
 #include <cstdint>
 #include <memory>
 #include <new>
 #include <stdexcept>
-
 
 TEST(allocatortests, allocate) {
   Allocator<int> allocator;

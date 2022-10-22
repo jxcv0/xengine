@@ -3,10 +3,10 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <iostream>
 #include <memory>
 #include <new>
 #include <queue>
-#include <iostream>
 
 /**
  * @brief Allocator with dynamically sized object pool.
@@ -14,7 +14,6 @@
 template <typename T>
 class Allocator {
  public:
-  
   using value_type = T;
 
   /**
@@ -22,7 +21,7 @@ class Allocator {
    *
    * @param n The initial size of the object pool.
    */
-  Allocator(std::size_t n = 1) : m_capacity(n), m_size(0) {
+  Allocator() : m_capacity(1), m_size(0) {
     m_object_pool = static_cast<T*>(std::calloc(m_capacity, sizeof(T)));
     for (auto i = 0; i < m_capacity; i++) {
       auto addr = reinterpret_cast<std::uintptr_t>(&m_object_pool[i]);
@@ -43,14 +42,17 @@ class Allocator {
    */
   T* allocate(std::size_t n) {
     T* p = nullptr;
-    if (m_size == m_capacity) { resize(); }
+    if (m_size == m_capacity) {
+      resize();
+    }
     p = reinterpret_cast<T*>(m_free_list.front());
+    m_size++;
     return p;
   }
 
   /**
    * @brief Deallocate memory at p.
-   * 
+   *
    * @param p Pointer to the memory.
    * @param n The size of the array.
    */
@@ -68,9 +70,8 @@ class Allocator {
   std::size_t capacity() { return m_capacity; }
 
   /**
-   * @brief Use std allocator for rebind
-   *
-   * TODO can this be improved? where is it used?
+   * @brief Rebind for allocating multiple types
+   *        i.e std::vector<std::string, Allocator<std::string>>.
    */
   template <typename U>
   struct rebind {
@@ -78,7 +79,6 @@ class Allocator {
   };
 
  private:
-
   /**
    * @brief Search for a block of contiguous memory large enough to store an
    *        array of type T[n]
@@ -108,4 +108,4 @@ class Allocator {
   std::size_t m_size;
 };
 
-#endif // ALLOCATOR_H_
+#endif  // ALLOCATOR_H_
