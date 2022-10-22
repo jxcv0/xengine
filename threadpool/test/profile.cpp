@@ -5,7 +5,7 @@
 #include <string>
 #include <random>
 #include <cmath>
-#include <type_traits>
+#include <cassert>
 
 float rootrandstr() {
   float f1, f2;
@@ -37,6 +37,8 @@ int main(int argc, char **argv) {
     // std::cout << "result: " << fut.get() << "\n";
     fut.get();
   }
+
+  assert(futures.size() == n_tasks);
 
   std::cout << "done\n";
 
