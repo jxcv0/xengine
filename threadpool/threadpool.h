@@ -64,10 +64,13 @@ class ThreadPool {
    * @brief The main work loop.
    */
   void run() {
-    for(;;) {
+    for (;;) {
       std::unique_lock lk(m_mutex);
-      m_cv.wait(lk, [this]{ return !m_tasks.empty() || m_should_run == false; });
-      if (m_should_run == false) { return; }
+      m_cv.wait(lk,
+                [this] { return !m_tasks.empty() || m_should_run == false; });
+      if (m_should_run == false) {
+        return;
+      }
       auto task = m_tasks.front();
       m_tasks.erase(m_tasks.begin());
       lk.unlock();

@@ -30,9 +30,9 @@ class Allocator {
     }
   }
 
-	/**
-	 * @brief Destruct the instance. Free the memory used by the pool.
-	 */
+  /**
+   * @brief Destruct the instance. Free the memory used by the pool.
+   */
   ~Allocator() { std::free(m_object_pool); }
 
   /**

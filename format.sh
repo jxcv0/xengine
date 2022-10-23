@@ -10,6 +10,9 @@ popd
 pushd resource
 ${FORMAT_CMD} *.h *.cpp
 popd
+pushd ecs
+${FORMAT_CMD} *.h *.cpp
+popd
 pushd test
 ${FORMAT_CMD} *.cpp 
 popd
