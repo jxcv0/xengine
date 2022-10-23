@@ -1,6 +1,7 @@
 #ifndef THREADPOOL_H_
 #define THREADPOOL_H_
 
+#include <condition_variable>
 #include <future>
 #include <memory>
 #include <mutex>
@@ -31,8 +32,11 @@ class ThreadPool {
    * @brief Stop join all worker threads.
    */
   ~ThreadPool() {
-    m_should_run.store(false);
+    std::unique_lock lk(m_mutex);
+    m_should_run = false;
+    lk.unlock();
     for (auto& thread : m_worker_threads) {
+      m_cv.notify_all();
       thread.join();
     }
   }
@@ -51,6 +55,7 @@ class ThreadPool {
     auto task = new SpecializedTask<Function, Args...>(f, args...);
     std::lock_guard lk(m_mutex);
     m_tasks.push_back(task);
+    m_cv.notify_one();
     return task->get_future();
   }
 
@@ -59,14 +64,14 @@ class ThreadPool {
    * @brief The main work loop.
    */
   void run() {
-    while (m_should_run.load()) {
+    for(;;) {
       std::unique_lock lk(m_mutex);
-      if (m_tasks.empty()) {
-        continue;
-      }
+      m_cv.wait(lk, [this]{ return !m_tasks.empty() || m_should_run == false; });
+      if (m_should_run == false) { return; }
       auto task = m_tasks.front();
       m_tasks.erase(m_tasks.begin());
       lk.unlock();
+      m_cv.notify_one();
       task->invoke();
       delete task;  // this must be slow
     }
@@ -75,7 +80,8 @@ class ThreadPool {
   std::vector<Task*> m_tasks;
   std::vector<std::thread> m_worker_threads;
   std::mutex m_mutex;
-  std::atomic<bool> m_should_run;
+  std::condition_variable m_cv;
+  bool m_should_run;
 };
 
 #endif  // THREADPOOL_H_
