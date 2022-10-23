@@ -68,7 +68,7 @@ class ThreadPool {
       m_tasks.erase(m_tasks.begin());
       lk.unlock();
       task->invoke();
-      delete task; // this must be slow
+      delete task;  // this must be slow
     }
   };
 

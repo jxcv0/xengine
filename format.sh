@@ -7,6 +7,9 @@ popd
 pushd memory
 ${FORMAT_CMD} *.h *.cpp
 popd
+pushd resource
+${FORMAT_CMD} *.h *.cpp
+popd
 pushd test
 ${FORMAT_CMD} *.cpp 
 popd
