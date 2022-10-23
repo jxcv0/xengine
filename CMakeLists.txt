@@ -58,6 +58,7 @@ target_link_libraries(
       dl
       m
       assimp
+      pthread
 )
 
 add_subdirectory(lib/glad)
