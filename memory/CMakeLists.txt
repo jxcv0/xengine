@@ -3,11 +3,13 @@ project(memory)
 
 set(
     SOURCES
+        heap.h
 )
 
 set(
     HEADERS
         allocator.h
+	heap.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})
