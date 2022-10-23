@@ -29,14 +29,10 @@ find_package(assimp REQUIRED)
 set(
   HEADERS 
     include/mainwindow.h
-    include/poolallocator.h
-    include/texture.h
 )
 
 set(
   SOURCES 
-    src/importer.cpp
-    lib/stb/stb_image.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})
@@ -46,7 +42,6 @@ target_include_directories(
   ${PROJECT_NAME}
     PUBLIC
       ${PROJECT_SOURCE_DIR}/include
-      ${PROJECT_SOURCE_DIR}/lib/stb
 )
 
 target_link_libraries(
@@ -55,6 +50,7 @@ target_link_libraries(
       glad
       threadpool
       memory
+      resource
 
       glfw
       glm::glm
@@ -65,9 +61,11 @@ target_link_libraries(
 )
 
 add_subdirectory(lib/glad)
+add_subdirectory(lib/stb)
 add_subdirectory(example)
 add_subdirectory(threadpool)
 add_subdirectory(memory)
+add_subdirectory(resource)
 add_subdirectory(test)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

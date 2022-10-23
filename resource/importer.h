@@ -5,7 +5,6 @@
 #include <filesystem>
 #include <memory>
 
-#include "stb_image.h"
 #include "texture.h"
 
 /**

@@ -1,7 +1,7 @@
 #ifndef TEXTURE_H_
 #define TEXTURE_H_
 
-#include "stb_image.h"
+#include <stb_image.h>
 
 /**
  * @brief The texture type.
@@ -21,11 +21,7 @@ struct Texture {
   /**
    * @brief Free image memory.
    */
-  ~Texture() {
-    if (mp_data != nullptr) {
-      stbi_image_free(mp_data);
-    }
-  }
+  ~Texture();
 };
 
 #endif  // TEXTURE_H_
