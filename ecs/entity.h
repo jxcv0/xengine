@@ -1,8 +1,12 @@
 #ifndef ENTITY_H_
 #define ENTITY_H_
 
-#include <cassert>
+#include <array>
 #include <cstdint>
+#include <queue>
+#include <stdexcept>
+
+#include "entitysubsystem.h"
 
 /**
  * @brief An entity used to associate components.
@@ -10,8 +14,8 @@
  */
 class Entity {
  public:
-  using std::uint32_t = id_t;
-  using std::uint16_t = signature_t;
+  using id_t = std::uint32_t;
+  using signature_t = std::uint16_t;
 
   /**
    * @brief Construct an entity from an id.
@@ -39,37 +43,50 @@ class Entity {
    *
    * @param new_sig The new signature to and with the current.
    */
-  void update_signature(signature_t new_sig) { m_signature &= sig; }
+  void update_signature(signature_t new_sig) { m_signature &= new_sig; }
 
  public:
   id_t m_id;
-  signature_t m_signature
+  signature_t m_signature;
 };
 
 /**
  * @brief Entity system
  */
 template <std::size_t N = 128>
-class EntitySys {
+class EntitySystem {
  public:
-  EntitySys() = default;
-  ~EntitySys = default;
+  /**
+   * @brief Construct an EntitySystem object. Populate the free list with
+   *        available entity ids that are indexes in the signatures array.
+   */
+  EntitySystem() {
+    for (auto i = 0; i < N; i++) {
+      m_free_list.push(i);
+    }
+  }
 
-  // TODO
+  ~EntitySystem() = default;
 
   /**
-   * @brief Create an entity
+   * @brief Create an entity.
    *
    * @return A new entity.
    */
   Entity create_entity() {
-    assert(m_num_entities < N) auto e =
-        m_entities[m_num_entities] m_num_entities++;
+    if (m_num_entities == N) {
+      throw std::runtime_error("maximum number of entities reached");
+    }
+    auto e = m_signatures[m_num_entities];
+    m_num_entities++;
     return Entity(e);
   }
 
+  // TODO
+
  private:
-  std::array<Entity, N> m_entities;
+  std::queue<Entity::id_t> m_free_list;
+  std::array<Entity::signature_t, N> m_signatures;
   std::size_t m_num_entities;
 };
 
