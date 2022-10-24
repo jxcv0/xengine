@@ -1,10 +1,11 @@
 #ifndef HEAP_H_
 #define HEAP_H_
 
-#include <cstdint.h>
+#include <cstdint>
 
 namespace xen {
-using unsigned char = byte;
+using byte = unsigned char;
+
 /**
  * @brief Initialize the preallocated heap with n bytes of memory.
  *

@@ -51,7 +51,6 @@ target_link_libraries(
       threadpool
       memory
       resource
-      entity
       ecs
 
       glfw

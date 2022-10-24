@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
+#include <mesh.h>
 #include <resource.h>
 #include <texture.h>
-#include <mesh.h>
 
 TEST(resourcestests, texture) {
   Resource<Texture> tex_resource("assets/models/cyborg/cyborg_diffuse.png");
