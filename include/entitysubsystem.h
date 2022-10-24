@@ -11,11 +11,11 @@ const std::uint32_t MAX_ENTITIES = 50000;
 const std::uint8_t MAX_COMPONENTS = 32;
 
 /**
- * @brief eid_t's are used to acces the signature array to find the id of it's
- *        associated components
+ * @brief EntityId's are used to acces the signature array to find the id of
+ * it's associated components
  *
  */
-using eid_t = std::uint32_t;
+using EntityId = std::uint32_t;
 
 /**
  * @brief Each bit represents an entity type. If the entity is associeted with
@@ -39,7 +39,7 @@ class EntitySubsystem {
    *
    * @return The id of the new entity.
    */
-  eid_t create_entity();
+  EntityId create_entity();
 
   /**
    * @brief Create an entity with a signature.
@@ -47,7 +47,7 @@ class EntitySubsystem {
    * @param sig The signature of the entity.
    * @return The id of the new entity.
    */
-  eid_t create_entity(signature_t sig);
+  EntityId create_entity(signature_t sig);
 
   /**
    * @brief Remove and entity from circulaton and make the id available to new
@@ -55,7 +55,7 @@ class EntitySubsystem {
    *
    * @param id The id of the entity to destroy.
    */
-  void destroy_entity(eid_t entity);
+  void destroy_entity(EntityId entity);
 
   /**
    * @brief Set the signature of an entity.
@@ -63,7 +63,7 @@ class EntitySubsystem {
    * @param enitity The entity.
    * @param sig The new signature.
    */
-  void set_signature(eid_t enitity, signature_t sig);
+  void set_signature(EntityId enitity, signature_t sig);
 
   /**
    * @brief Get the signature of an entity.
@@ -71,10 +71,10 @@ class EntitySubsystem {
    * @param entity The entity.
    * @return The signature of the entity.
    */
-  signature_t get_signature(eid_t entity);
+  signature_t get_signature(EntityId entity);
 
  private:
-  std::queue<eid_t> m_available_eids;
+  std::queue<EntityId> m_available_eids;
   std::array<signature_t, MAX_ENTITIES> m_signatures;
   std::uint32_t m_num_entities = 0;
 };

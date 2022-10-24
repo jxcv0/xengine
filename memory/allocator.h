@@ -10,6 +10,7 @@
 
 /**
  * @brief Allocator with dynamically sized object pool.
+ *				Doesnt work coz realloc changes the addresses.
  */
 template <typename T>
 class Allocator {
@@ -29,6 +30,9 @@ class Allocator {
     }
   }
 
+  /**
+   * @brief Destruct the instance. Free the memory used by the pool.
+   */
   ~Allocator() { std::free(m_object_pool); }
 
   /**

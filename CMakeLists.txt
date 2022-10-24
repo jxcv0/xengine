@@ -51,6 +51,8 @@ target_link_libraries(
       threadpool
       memory
       resource
+      entity
+      ecs
 
       glfw
       glm::glm
@@ -58,6 +60,7 @@ target_link_libraries(
       dl
       m
       assimp
+      pthread
 )
 
 add_subdirectory(lib/glad)
@@ -66,6 +69,7 @@ add_subdirectory(example)
 add_subdirectory(threadpool)
 add_subdirectory(memory)
 add_subdirectory(resource)
+add_subdirectory(ecs)
 add_subdirectory(test)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
