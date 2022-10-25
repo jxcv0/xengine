@@ -8,6 +8,7 @@ set(
 set(
     HEADERS
     entity.h
+    component.h
 )
 
 add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})
