@@ -3,7 +3,7 @@
 
 #include <stdexcept>
 
-#include "entitysubsystem.h"
+#include <entity.h>
 
 TEST(entitysubsystemtests, create_entity) {
   EntitySystem<10> es;
