@@ -3,8 +3,6 @@
 
 #include <stdexcept>
 
-#include <entity.h>
-
 TEST(entitysubsystemtests, create_entity) {
   EntitySystem<10> es;
   auto e1 = es.create_entity();

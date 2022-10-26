@@ -26,7 +26,7 @@ class Map {
     if (m_size == N) {
       throw std::out_of_range("maximum size of map reached");
     }
-    m_pairs[m_size++] = { key, value };
+    m_pairs[m_size] = { key, value };
   }
 
   /**
@@ -98,8 +98,8 @@ class Map {
     ValueType m_value;
   };
 
-  Pair m_pairs[N]{0};
-  std::size_t m_size{0};
+  Pair m_pairs[N];
+  std::size_t m_size{0}; // index of last value
 };
 
 #endif  // ECMAP_H_

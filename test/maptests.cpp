@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 #include <map.h>
 #include <stdexcept>
+#include <iostream>
 
 TEST(ecmaptests, assign_and_find) {
   Map<10, int, float> map;

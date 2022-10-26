@@ -1,7 +1,8 @@
+#include <component.h>
+#include <entity.h>
 #include <gtest/gtest.h>
 
-#include <entity.h>
-#include <component.h>
+#include <stdexcept>
 
 struct MockComponent {
   int m_id;
@@ -15,4 +16,16 @@ TEST(componentarraytests, assign) {
   ComponentArray<MockComponent> a;
   a.assign(e, m);
   ASSERT_EQ(m.m_id, a.get_component(e).m_id);
+}
+
+TEST(componentarraytests, erase_entity) {
+  EntitySystem<10> es;
+  auto e = es.create_entity();
+
+  float f = 0.33435f;
+  ComponentArray<float> a;
+  a.assign(e, f);
+  ASSERT_FLOAT_EQ(a.get_component(e), 0.33435f);
+  a.erase_entity(e);
+  ASSERT_THROW(a.get_component(e), std::out_of_range);
 }
