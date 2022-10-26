@@ -10,10 +10,10 @@
  * @brief Very simple unsorted associative container.
  */
 template <std::size_t N, typename KeyType, typename ValueType>
-class ECMap {
+class Map {
  public:
-  ECMap() = default;
-  ~ECMap() = default;
+  Map() = default;
+  ~Map() = default;
 
   /**
    * @brief map a key to a value.
