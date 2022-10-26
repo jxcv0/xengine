@@ -1,11 +1,7 @@
 #ifndef COMPONENT_H_
 #define COMPONENT_H_
 
-#include <array>
-#include <unordered_map>
-
 #include "entity.h"
-#include "map.h"
 
 /**
  * @brief Base class for ComponentArray declaring the erase function.
@@ -40,12 +36,10 @@ class ComponentArray : public ComponentArrayBase {
    * @param c The component to assign to the entity.
    */
   void assign(EntityHandle e, ComponentType c) {
-    if (m_num_components == MAX_ENTITIES) {
-      throw std::runtime_error("maximum number of entities reached");
-    }
-    auto i = m_num_components++;
-    m_components[i] = c;
-    m_map.assign(e, i);
+    m_map[m_num_components].m_handle = e;
+    m_map[m_num_components].m_index = m_num_components;
+    m_components[m_num_components] = c;
+    m_num_components++;
   }
 
   /**
@@ -54,25 +48,38 @@ class ComponentArray : public ComponentArrayBase {
    * @param e The enity to erase.
    */
   void erase_entity(EntityHandle e) override {
-    m_map.remove_by_key(e);
-    m_num_components--;
+    for (int i = 0; i < MAX_ENTITIES; i++) {
+      if (m_map[i].m_handle == e) {
+        m_map[i].m_index = -1; // AKA not in use
+      }
+    }
   }
 
   /**
    * @brief Get the component associated with an entity.
    *
    * @param e The handle of the entity.
-   * @return A reference to the component stored in the array.
+   * @return A pointer to the component stored in the array. If the component is
+   *         not found then nullptr is returned.
    */
-  ComponentType &get_component(EntityHandle e) {
-    auto i = m_map.find_by_key(e);
-    return m_components[i];
+  ComponentType *get_component(EntityHandle e) {
+    for (int i = 0; i < MAX_ENTITIES; i++) {
+      if (m_map[i].m_handle == e) {
+        int index = m_map[i].m_index;
+        if (index != -1) { return &m_components[index]; }
+      }
+    }
+    return nullptr;
   }
 
  private:
-  Map<MAX_ENTITIES, EntityHandle, std::uint32_t> m_map;
-  std::array<ComponentType, MAX_ENTITIES> m_components{0};
-  std::uint32_t m_num_components{0};
+  struct {
+    EntityHandle m_handle;
+    int m_index = -1;
+  } m_map[MAX_ENTITIES];
+
+  ComponentType m_components[MAX_ENTITIES]; // this is wasteful
+  std::uint32_t m_num_components = 0;
 };
 
 #endif  // COMPONENT_H_
