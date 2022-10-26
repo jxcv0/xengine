@@ -7,7 +7,7 @@
 #include <queue>
 #include <stdexcept>
 
-#define MAX_COMPONENTS 16
+#define MAX_ENTITIES 256
 
 using EntityHandle = std::uint32_t;
 using Signature = std::uint16_t;
