@@ -1,8 +1,8 @@
 #ifndef COORDINATOR_H_
 #define COORDINATOR_H_
 
-#include "entity.h"
 #include "component.h"
+#include "entity.h"
 #include "threadpool.h"
 
 class Coordinator {
@@ -16,5 +16,4 @@ class Coordinator {
   std::vector<ComponentArrayBase*> m_component_arrays;
 };
 
-
-#endif // COORDINATOR_H_
+#endif  // COORDINATOR_H_

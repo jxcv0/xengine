@@ -1,5 +1,4 @@
+#include <coordinator.h>
 #include <gtest/gtest.h>
 
-#include <coordinator.h>
-
-TEST(coordinatortests, 
+TEST(coordinatortests,

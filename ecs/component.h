@@ -56,7 +56,7 @@ class ComponentArray : public ComponentArrayBase {
   void erase_entity(EntityHandle e) override {
     for (int i = 0; i < N; i++) {
       if (m_map[i].m_handle == e) {
-        m_map[i].m_index = -1; // AKA not in use
+        m_map[i].m_index = -1;  // AKA not in use
       }
     }
   }
@@ -72,7 +72,9 @@ class ComponentArray : public ComponentArrayBase {
     for (int i = 0; i < N; i++) {
       if (m_map[i].m_handle == e) {
         int index = m_map[i].m_index;
-        if (index != -1) { return &m_components[index]; }
+        if (index != -1) {
+          return &m_components[index];
+        }
       }
     }
     return nullptr;
@@ -84,7 +86,7 @@ class ComponentArray : public ComponentArrayBase {
     int m_index = -1;
   } m_map[N];
 
-  ComponentType m_components[N]; // this is wasteful
+  ComponentType m_components[N];  // this is wasteful
   std::uint32_t m_num_components = 0;
 };
 
