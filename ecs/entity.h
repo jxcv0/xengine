@@ -1,13 +1,15 @@
 #ifndef ENTITY_H_
 #define ENTITY_H_
 
+#ifndef MAX_ENTITIES
+#define MAX_ENTITIES 256
+#endif
+
 #include <array>
 #include <cassert>
 #include <cstdint>
 #include <queue>
 #include <stdexcept>
-
-#define MAX_ENTITIES 256
 
 using EntityHandle = std::uint32_t;
 using Signature = std::uint16_t;
@@ -15,7 +17,7 @@ using Signature = std::uint16_t;
 /**
  * @brief Entity system
  */
-template <std::size_t N = 128>
+template <std::size_t N = MAX_ENTITIES>
 class EntitySystem {
  public:
   /**

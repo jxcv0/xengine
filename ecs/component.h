@@ -1,6 +1,10 @@
 #ifndef COMPONENT_H_
 #define COMPONENT_H_
 
+#ifndef MAX_COMPONENTS
+#define MAX_COMPONENTS 16
+#endif
+
 #include "entity.h"
 
 /**
@@ -22,8 +26,10 @@ class ComponentArrayBase {
  * @brief A contiguous array of components.
  *        Components can be assigned to an entity and accessed using an entity
  *        handle.
+ *
+ *        note: Lessons learned. Simpler is better. Iterators are B.S.
  */
-template <typename ComponentType>
+template <typename ComponentType, std::size_t N = MAX_ENTITIES>
 class ComponentArray : public ComponentArrayBase {
  public:
   ComponentArray() = default;
@@ -48,7 +54,7 @@ class ComponentArray : public ComponentArrayBase {
    * @param e The enity to erase.
    */
   void erase_entity(EntityHandle e) override {
-    for (int i = 0; i < MAX_ENTITIES; i++) {
+    for (int i = 0; i < N; i++) {
       if (m_map[i].m_handle == e) {
         m_map[i].m_index = -1; // AKA not in use
       }
@@ -63,7 +69,7 @@ class ComponentArray : public ComponentArrayBase {
    *         not found then nullptr is returned.
    */
   ComponentType *get_component(EntityHandle e) {
-    for (int i = 0; i < MAX_ENTITIES; i++) {
+    for (int i = 0; i < N; i++) {
       if (m_map[i].m_handle == e) {
         int index = m_map[i].m_index;
         if (index != -1) { return &m_components[index]; }
@@ -76,9 +82,9 @@ class ComponentArray : public ComponentArrayBase {
   struct {
     EntityHandle m_handle;
     int m_index = -1;
-  } m_map[MAX_ENTITIES];
+  } m_map[N];
 
-  ComponentType m_components[MAX_ENTITIES]; // this is wasteful
+  ComponentType m_components[N]; // this is wasteful
   std::uint32_t m_num_components = 0;
 };
 
