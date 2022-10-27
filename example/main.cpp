@@ -1,6 +1,6 @@
-#include <iostream>
-
 #include <mainwindow.h>
+
+#include <iostream>
 
 int main(int argc, char const *argv[]) {
   MainWindow main_window(1080, 600, std::string("main-window"));
