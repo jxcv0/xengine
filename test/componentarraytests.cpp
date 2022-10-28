@@ -11,7 +11,8 @@ struct MockComponent {
 TEST(componentarraytests, assign) {
   EntitySystem<10> es;
   auto e = es.create_entity();
-  MockComponent m = {42};
+  MockComponent m;
+  m.m_id = 42;
 
   ComponentArray<MockComponent> a;
   a.assign(e, m);
