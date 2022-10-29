@@ -2,6 +2,7 @@
 #define VEC3_H_
 
 #include <assert.h>
+
 #include <cmath>
 #include <initializer_list>
 #include <ostream>
@@ -32,9 +33,7 @@ class Vec3 {
    * @param i The index to access.
    * @return The value at index i.
    */
-  constexpr auto operator[](int i) const {
-    return m_data[i];
-  }
+  constexpr auto operator[](int i) const { return m_data[i]; }
 
   /**
    * @brief Get the x component of the Vec3
@@ -75,8 +74,7 @@ class Vec3 {
    * @return A new vec that is the sum of the two vectors
    */
   constexpr inline friend Vec3 operator+(const Vec3& v1, const Vec3& v2) {
-    return Vec3((v1.m_data[0] + v2.m_data[0]), 
-                (v1.m_data[1] + v2.m_data[1]),
+    return Vec3((v1.m_data[0] + v2.m_data[0]), (v1.m_data[1] + v2.m_data[1]),
                 (v1.m_data[2] + v2.m_data[2]));
   }
 
@@ -99,8 +97,7 @@ class Vec3 {
    * @return A new vec that is the sum of the two vectors
    */
   constexpr inline friend Vec3 operator-(const Vec3& v1, const Vec3& v2) {
-    return Vec3((v1.m_data[0] - v2.m_data[0]), 
-                (v1.m_data[1] - v2.m_data[1]),
+    return Vec3((v1.m_data[0] - v2.m_data[0]), (v1.m_data[1] - v2.m_data[1]),
                 (v1.m_data[2] - v2.m_data[2]));
   }
 
@@ -123,9 +120,8 @@ class Vec3 {
    * @return The dot product.
    */
   constexpr inline friend auto dot(const Vec3& v1, const Vec3& v2) {
-    return (v1.m_data[0] * v2.m_data[0]) +
-           (v1.m_data[1] * v2.m_data[1]) +
-           (v1.m_data[2] * v2.m_data[2]) ;
+    return (v1.m_data[0] * v2.m_data[0]) + (v1.m_data[1] * v2.m_data[1]) +
+           (v1.m_data[2] * v2.m_data[2]);
   }
 
   /**
@@ -146,12 +142,10 @@ class Vec3 {
    * @param v2 The other vec3.
    * @return A new Vec3 that contains the cross product.
    */
-  constexpr inline friend Vec3 operator*(const Vec3& v1, const Vec3& v2)  {
-    return Vec3 (
-        (v1.m_data[1] * v2.m_data[2]) - (v1.m_data[2] * v2.m_data[1]),
-        (v1.m_data[2] * v2.m_data[0]) - (v1.m_data[0] * v2.m_data[2]),
-        (v1.m_data[0] * v2.m_data[1]) - (v1.m_data[1] * v2.m_data[0])
-    );
+  constexpr inline friend Vec3 operator*(const Vec3& v1, const Vec3& v2) {
+    return Vec3((v1.m_data[1] * v2.m_data[2]) - (v1.m_data[2] * v2.m_data[1]),
+                (v1.m_data[2] * v2.m_data[0]) - (v1.m_data[0] * v2.m_data[2]),
+                (v1.m_data[0] * v2.m_data[1]) - (v1.m_data[1] * v2.m_data[0]));
   }
 
   /**
@@ -160,12 +154,12 @@ class Vec3 {
    * @param other The other Vec3
    */
   constexpr inline void operator*=(const Vec3& other) noexcept {
-      auto x = (m_data[1] * other[2]) - (m_data[2] * other[1]);
-      auto y = (m_data[2] * other[0]) - (m_data[0] * other[2]);
-      auto z = (m_data[0] * other[1]) - (m_data[1] * other[0]);
-      m_data[0] = x;
-      m_data[1] = y;
-      m_data[2] = z;
+    auto x = (m_data[1] * other[2]) - (m_data[2] * other[1]);
+    auto y = (m_data[2] * other[0]) - (m_data[0] * other[2]);
+    auto z = (m_data[0] * other[1]) - (m_data[1] * other[0]);
+    m_data[0] = x;
+    m_data[1] = y;
+    m_data[2] = z;
   }
 
   /**
@@ -187,9 +181,7 @@ class Vec3 {
    * @return The ostream.
    */
   friend std::ostream& operator<<(std::ostream& os, const Vec3& v) {
-    os << "{ " << v.m_data[0]
-       << ", " << v.m_data[1]
-       << ", " << v.m_data[2]
+    os << "{ " << v.m_data[0] << ", " << v.m_data[1] << ", " << v.m_data[2]
        << " }";
     return os;
   }

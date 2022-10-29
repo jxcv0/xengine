@@ -26,14 +26,14 @@ class MainWindow {
    *  \param name   The name of the window.
    */
   inline MainWindow(float width, float height, std::string name)
-      : m_width(width), m_height(height), m_name(name), m_window(nullptr) {
+      : m_width(width), m_height(height), m_name(name), mp_window(nullptr) {
     glfwInit();
   }
 
   /*! \brief Destroy the window and terminate GLFW.
    */
   ~MainWindow() {
-    glfwDestroyWindow(m_window);
+    glfwDestroyWindow(mp_window);
     glfwTerminate();
   }
 
@@ -48,21 +48,21 @@ class MainWindow {
   /*! \brief Create and show the window.
    */
   void show() {
-    if (nullptr != m_window) {
+    if (nullptr != mp_window) {
       return;
     }
 
-    m_window =
+    mp_window =
         glfwCreateWindow(m_width, m_height, m_name.data(), nullptr, nullptr);
-    if (nullptr == m_window) {
+    if (nullptr == mp_window) {
       perror("unable to create glfwwindow");
       glfwTerminate();
       return;
     }
 
-    glfwMakeContextCurrent(m_window);
+    glfwMakeContextCurrent(mp_window);
     glfwSetFramebufferSizeCallback(
-        m_window, [](GLFWwindow *window, int width, int height) {
+        mp_window, [](GLFWwindow *window, int width, int height) {
           glViewport(0, 0, width, height);
         });
 
@@ -72,7 +72,7 @@ class MainWindow {
       return;
     }
 
-    glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(mp_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // depth testing
     glEnable(GL_DEPTH_TEST);
@@ -86,11 +86,11 @@ class MainWindow {
   /*! \brief  Check if the window should close.
    *  \return true if window should close, otherwise returns false.
    */
-  inline bool should_close() { return glfwWindowShouldClose(m_window); }
+  inline bool should_close() { return glfwWindowShouldClose(mp_window); }
 
   /*! \brief Swap front and back buffer of the window.
    */
-  inline void swap_buffers() { glfwSwapBuffers(m_window); }
+  inline void swap_buffers() { glfwSwapBuffers(mp_window); }
 
   /*! \brief Process all pending events.
    */
@@ -112,7 +112,7 @@ class MainWindow {
    */
   template <typename Function>
   inline void set_cursor_position_callback(Function function) {
-    glfwSetCursorPosCallback(m_window, function);
+    glfwSetCursorPosCallback(mp_window, function);
   }
 
   /*! \brief Update input buffer.
@@ -120,7 +120,7 @@ class MainWindow {
   void update_input() {
     m_input_buffer = 0;
     for (auto key : KEYS) {
-      if (glfwGetKey(m_window, key) == GLFW_PRESS) {
+      if (glfwGetKey(mp_window, key) == GLFW_PRESS) {
         m_input_buffer |= key;
       }
     }
@@ -147,12 +147,12 @@ class MainWindow {
   }
 
  private:
-  GLFWwindow *m_window;  // not std::unique_ptr as it is managed by glfw
-  float m_width;
-  float m_height;
-  std::string m_name;
-  int m_input_buffer;
-  float m_fov;
+  GLFWwindow *mp_window;
+  float m_width = 640;
+  float m_height = 480;
+  std::string m_name = "XENGINE_WINDOW";
+  std::uint32_t m_input_buffer;
+  float m_fov = 60.0f;
   glm::mat4 m_perspective_matrix;
 };
 

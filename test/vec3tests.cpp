@@ -69,9 +69,9 @@ TEST(vec3tests, subtract_in_place) {
 }
 
 TEST(vec3test, dot) {
-    Vec3 v1(1.0f, -3.2f, 0.0f);
-    Vec3 v2(5.4f, 3.2f, -5.0f);
-    ASSERT_FLOAT_EQ(dot(v1, v2), -4.84);
+  Vec3 v1(1.0f, -3.2f, 0.0f);
+  Vec3 v2(5.4f, 3.2f, -5.0f);
+  ASSERT_FLOAT_EQ(dot(v1, v2), -4.84);
 }
 
 TEST(vec3tests, cross) {
