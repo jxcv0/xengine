@@ -75,6 +75,30 @@ class Vec3 {
   }
 
   /**
+   * @brief Subtract 2 vec3s.
+   *
+   * @param v1 The first vec3.
+   * @param v2 The other vec3.
+   * @return A new vec that is the sum of the two vectors
+   */
+  constexpr inline friend Vec3 operator-(const Vec3& v1, const Vec3& v2) {
+    return Vec3((v1.m_data[0] - v2.m_data[0]), 
+                (v1.m_data[1] - v2.m_data[1]),
+                (v1.m_data[2] - v2.m_data[2]));
+  }
+
+  /**
+   * @brief Subtract a Vec3 with from the vector.
+   *
+   * @param other The other vector.
+   */
+  constexpr inline void operator-=(const Vec3& other) noexcept {
+    m_data[0] -= other.x();
+    m_data[1] -= other.y();
+    m_data[2] -= other.z();
+  }
+
+  /**
    * @brief Multiply the Vec3 with a scalar
    *
    * @param scalar The value to multiply the values by.
