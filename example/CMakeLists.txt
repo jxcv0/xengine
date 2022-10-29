@@ -9,4 +9,3 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 add_executable(example main.cpp)
 
 target_link_libraries(example xengine)
-

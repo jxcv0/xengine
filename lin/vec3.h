@@ -41,21 +41,21 @@ class Vec3 {
    *
    * @return A floating point value.
    */
-  constexpr auto x() const noexcept { return m_data[0]; }
+  constexpr inline auto x() const noexcept { return m_data[0]; }
 
   /**
    * @brief Get the y component of the Vec3
    *
    * @return A floating point value.
    */
-  constexpr auto y() const noexcept { return m_data[1]; }
+  constexpr inline auto y() const noexcept { return m_data[1]; }
 
   /**
    * @brief Get the z component of the Vec3
    *
    * @return A floating point value.
    */
-  constexpr auto z() const noexcept { return m_data[2]; }
+  constexpr inline auto z() const noexcept { return m_data[2]; }
 
   /**
    * @brief Multiply the Vec3 by a scalar.
@@ -63,7 +63,7 @@ class Vec3 {
    * @param scalar The scalar value.
    * @return A new Vec3 containing the result.
    */
-  constexpr auto operator*(float scalar) const noexcept {
+  constexpr inline auto operator*(float scalar) const noexcept {
     return Vec3(m_data[0] * scalar, m_data[1] * scalar, m_data[2] * scalar);
   }
 
