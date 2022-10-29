@@ -10,10 +10,6 @@ class Coordinator {
   Coordinator() : m_threadpool(4) {}
   ~Coordinator() = default;
 
-  struct my_struct {
-    int m_i = 0;
-  };
-
  private:
   ThreadPool m_threadpool;
   EntitySystem<> m_entity_system;
