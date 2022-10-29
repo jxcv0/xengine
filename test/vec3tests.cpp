@@ -38,3 +38,12 @@ TEST(vec3tests, add) {
   ASSERT_FLOAT_EQ(result.y(), 0.0f);
   ASSERT_FLOAT_EQ(result.z(), -5.0f);
 }
+
+TEST(vec3tests, add_in_place) {
+  Vec3 v1(1.0f, -3.2f, 0.0f);
+  Vec3 v2(5.4f, 3.2f, -5.0f);
+  v1 += v2;
+  ASSERT_FLOAT_EQ(v1.x(), 6.4f);
+  ASSERT_FLOAT_EQ(v1.y(), 0.0f);
+  ASSERT_FLOAT_EQ(v1.z(), -5.0f);
+}

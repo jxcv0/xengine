@@ -63,6 +63,22 @@ class Vec3 {
                 (v1.m_data[2] + v2.m_data[2]));
   }
 
+  /**
+   * @brief Sum the Vec3 with another.
+   *
+   * @param other The other vector.
+   */
+  constexpr inline void operator+=(const Vec3& other) noexcept {
+    m_data[0] += other.x();
+    m_data[1] += other.y();
+    m_data[2] += other.z();
+  }
+
+  /**
+   * @brief Multiply the Vec3 with a scalar
+   *
+   * @param scalar The value to multiply the values by.
+   */
   constexpr inline void operator*=(float scalar) noexcept {
     m_data[0] *= scalar;
     m_data[1] *= scalar;
