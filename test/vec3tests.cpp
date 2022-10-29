@@ -1,5 +1,11 @@
 #include <gtest/gtest.h>
 #include <vec3.h>
+#include <iostream>
+
+TEST(vec3test, ostream) {
+  Vec3 vec(1.05f, 0.833f, 30.0f);
+  std::cout << "ostream test: " << vec << "\n";
+}
 
 TEST(vec3tests, default_values) {
   Vec3 vec;
