@@ -1,34 +1,104 @@
 #ifndef VEC3_H_
 #define VEC3_H_
 
+#include <cmath>
+#include <initializer_list>
+#include <ostream>
+
 /**
- * @brief A 3 dimentional vector.
+ * @brief A 3 dimensional vector.
  */
 class Vec3 {
  public:
+  Vec3() = default;
+
+  /**
+   * @brief Construct a Vec3 from 3 float.
+   *
+   * @param x The initial x component.
+   * @param y The initial y component.
+   * @param z The initial z component.
+   */
+  constexpr inline Vec3(float x, float y, float z) {
+    m_data[0] = x;
+    m_data[1] = y;
+    m_data[2] = z;
+  }
+
   /**
    * @brief Get the x component of the Vec3
    *
    * @return A floating point value.
    */
-  constexpr float x() const noexcept { return m_data[0]; }
+  constexpr auto x() const noexcept { return m_data[0]; }
 
   /**
    * @brief Get the y component of the Vec3
    *
    * @return A floating point value.
    */
-  constexpr float y() const noexcept { return m_data[1]; }
+  constexpr auto y() const noexcept { return m_data[1]; }
 
   /**
    * @brief Get the z component of the Vec3
    *
    * @return A floating point value.
    */
-  constexpr float z() const noexcept { return m_data[2]; }
+  constexpr auto z() const noexcept { return m_data[2]; }
+
+  constexpr auto operator*(float scalar) const noexcept {
+    return x() * scalar + y() * scalar + z() * scalar;
+  }
+
+  /**
+   * @brief Add together 2 vec3s.
+   *
+   * @param v1 The first vec3.
+   * @param v2 The other vec3.
+   * @return A new vec that is the sum of the two vectors
+   */
+  constexpr inline friend Vec3 operator+(const Vec3& v1, const Vec3& v2) {
+    return Vec3((v1.m_data[0] + v2.m_data[0]), 
+                (v1.m_data[1] + v2.m_data[1]),
+                (v1.m_data[2] + v2.m_data[2]));
+  }
+
+  constexpr inline void operator*=(float scalar) noexcept {
+    m_data[0] *= scalar;
+    m_data[1] *= scalar;
+    m_data[2] *= scalar;
+  }
+
+  constexpr auto operator*=(const Vec3& other) const noexcept {}
+
+  /**
+   * @brief return a normalized version of the vector with magnitude of 1.0f.
+   *
+   * @return A vec3 with normalized values.
+   */
+  auto normalize() const noexcept {
+    auto l = std::sqrt((m_data[0] * m_data[0]) + (m_data[1] * m_data[1]) +
+                       (m_data[2] * m_data[2]));
+    return Vec3(m_data[0] / l, m_data[1] / l, m_data[2] / l);
+  }
+
+  /**
+   * @brief Stream operator to aid in debugging.
+   *
+   * @param os Outstream to append stream to.
+   * @param v The vector to stream.
+   * @return The ostream.
+   */
+  friend std::ostream& operator<<(std::ostream& os, const Vec3& v) {
+    os << "{ " << v.m_data[0]
+       << ", " << v.m_data[1]
+       << ", " << v.m_data[2]
+       << " }";
+    return os;
+  }
 
  private:
-  float m_data[3];
+  float m_data[3] = {0};
 };
 
 #endif  // VEC3_H_
