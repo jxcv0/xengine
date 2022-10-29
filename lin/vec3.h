@@ -57,8 +57,14 @@ class Vec3 {
    */
   constexpr auto z() const noexcept { return m_data[2]; }
 
+  /**
+   * @brief Multiply the Vec3 by a scalar.
+   *
+   * @param scalar The scalar value.
+   * @return A new Vec3 containing the result.
+   */
   constexpr auto operator*(float scalar) const noexcept {
-    return x() * scalar + y() * scalar + z() * scalar;
+    return Vec3(m_data[0] * scalar, m_data[1] * scalar, m_data[2] * scalar);
   }
 
   /**

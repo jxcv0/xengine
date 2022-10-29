@@ -11,7 +11,9 @@ TEST(vec3tests, default_values) {
 TEST(vec3tests, scalar) {
   Vec3 vec(1.0f, 2.0f, 3.0f);
   auto result = vec * 0.1f;
-  ASSERT_FLOAT_EQ(result, 0.6f);
+  ASSERT_FLOAT_EQ(result.x(), 0.1f);
+  ASSERT_FLOAT_EQ(result.y(), 0.2f);
+  ASSERT_FLOAT_EQ(result.z(), 0.3f);
 }
 
 TEST(vec3tests, scalar_in_place) {
