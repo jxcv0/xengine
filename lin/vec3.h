@@ -1,8 +1,6 @@
 #ifndef VEC3_H_
 #define VEC3_H_
 
-#include <assert.h>
-
 #include <cmath>
 #include <initializer_list>
 #include <ostream>
@@ -33,7 +31,13 @@ class Vec3 {
    * @param i The index to access.
    * @return The value at index i.
    */
-  constexpr auto operator[](int i) const { return m_data[i]; }
+  constexpr inline auto operator[](int i) const { return m_data[i]; }
+
+  constexpr inline bool operator==(const Vec3& other) const noexcept {
+    return (m_data[0] == other[0]) &&
+           (m_data[1] == other[1]) &&
+           (m_data[2] == other[2]);
+  }
 
   /**
    * @brief Get the x component of the Vec3
@@ -125,7 +129,7 @@ class Vec3 {
   }
 
   /**
-   * @brief Multiply the Vec3 with a scalar
+   * @brief Multiply the Vec3 with a scalar.
    *
    * @param scalar The value to multiply the values by.
    */

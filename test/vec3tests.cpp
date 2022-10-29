@@ -8,6 +8,15 @@ TEST(vec3tests, default_values) {
   ASSERT_FLOAT_EQ(vec.z(), 0.0f);
 }
 
+TEST(vec3tests, copy_construction) {
+  Vec3 vec(1.05f, 0.833f, 30.0f);
+  auto other = vec;
+  ASSERT_FLOAT_EQ(other.x(), 1.05f);
+  ASSERT_FLOAT_EQ(other.y(), 0.833f);
+  ASSERT_FLOAT_EQ(other.z(), 30.0f);
+  ASSERT_EQ(vec, other);
+}
+
 TEST(vec3tests, scalar) {
   Vec3 vec(1.0f, 2.0f, 3.0f);
   auto result = vec * 0.1f;
