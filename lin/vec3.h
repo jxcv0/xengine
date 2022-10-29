@@ -1,6 +1,7 @@
 #ifndef VEC3_H_
 #define VEC3_H_
 
+#include <assert.h>
 #include <cmath>
 #include <initializer_list>
 #include <ostream>
@@ -23,6 +24,16 @@ class Vec3 {
     m_data[0] = x;
     m_data[1] = y;
     m_data[2] = z;
+  }
+
+  /**
+   * @brief Access Vec3 with subscript operator.
+   *
+   * @param i The index to access.
+   * @return The value at index i.
+   */
+  constexpr auto operator[](int i) const {
+    return m_data[i];
   }
 
   /**
@@ -99,6 +110,19 @@ class Vec3 {
   }
 
   /**
+   * @brief Get the dot product of two Vec3s
+   *
+   * @param v1 The first Vec3.
+   * @param v2 The second Vec3.
+   * @return The dot product.
+   */
+  constexpr inline friend auto dot(const Vec3& v1, const Vec3& v2) {
+    return (v1.m_data[0] * v2.m_data[0]) +
+           (v1.m_data[1] * v2.m_data[1]) +
+           (v1.m_data[2] * v2.m_data[2]) ;
+  }
+
+  /**
    * @brief Multiply the Vec3 with a scalar
    *
    * @param scalar The value to multiply the values by.
@@ -109,7 +133,34 @@ class Vec3 {
     m_data[2] *= scalar;
   }
 
-  constexpr auto operator*=(const Vec3& other) const noexcept {}
+  /**
+   * @brief Get the cross product of two Vec3s.
+   *
+   * @param v1 The first vec3.
+   * @param v2 The other vec3.
+   * @return A new Vec3 that contains the cross product.
+   */
+  constexpr inline friend Vec3 operator*(const Vec3& v1, const Vec3& v2)  {
+    return Vec3 (
+        (v1.m_data[1] * v2.m_data[2]) - (v1.m_data[2] * v2.m_data[1]),
+        (v1.m_data[2] * v2.m_data[0]) - (v1.m_data[0] * v2.m_data[2]),
+        (v1.m_data[0] * v2.m_data[1]) - (v1.m_data[1] * v2.m_data[0])
+    );
+  }
+
+  /**
+   * @brief Cross the Vec3 with another.
+   *
+   * @param other The other Vec3
+   */
+  constexpr inline void operator*=(const Vec3& other) noexcept {
+      auto x = (m_data[1] * other[2]) - (m_data[2] * other[1]);
+      auto y = (m_data[2] * other[0]) - (m_data[0] * other[2]);
+      auto z = (m_data[0] * other[1]) - (m_data[1] * other[0]);
+      m_data[0] = x;
+      m_data[1] = y;
+      m_data[2] = z;
+  }
 
   /**
    * @brief return a normalized version of the vector with magnitude of 1.0f.
