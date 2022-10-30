@@ -43,24 +43,26 @@ class Mat4 {
    */
   constexpr inline friend auto operator*(const Mat4& m1, const Mat4& m2) {
     Mat4 result(0.0f);
-    // result.values[0][1] = dot_vec4(m1[0]), col_mat4(m2, 1));
-    // result.values[0][2] = dot_vec4(row_mat4(m1, 0), col_mat4(m2, 2));
-    // result.values[0][3] = dot_vec4(row_mat4(m1, 0), col_mat4(m2, 3));
+    result.m_data[0][0] = dot(m1[0], m2.col(0));
+    result.m_data[0][1] = dot(m1[0], m2.col(1));
+    result.m_data[0][2] = dot(m1[0], m2.col(2));
+    result.m_data[0][3] = dot(m1[0], m2.col(3));
 
-    // result.values[1][0] = dot_vec4(row_mat4(m1, 1), col_mat4(m2, 0));
-    // result.values[1][1] = dot_vec4(row_mat4(m1, 1), col_mat4(m2, 1));
-    // result.values[1][2] = dot_vec4(row_mat4(m1, 1), col_mat4(m2, 2));
-    // result.values[1][3] = dot_vec4(row_mat4(m1, 1), col_mat4(m2, 3));
+    result.m_data[1][0] = dot(m1[1], m2.col(0));
+    result.m_data[1][1] = dot(m1[1], m2.col(1));
+    result.m_data[1][2] = dot(m1[1], m2.col(2));
+    result.m_data[1][3] = dot(m1[1], m2.col(3));
 
-    // result.values[2][0] = dot_vec4(row_mat4(m1, 2), col_mat4(m2, 0));
-    // result.values[2][1] = dot_vec4(row_mat4(m1, 2), col_mat4(m2, 1));
-    // result.values[2][2] = dot_vec4(row_mat4(m1, 2), col_mat4(m2, 2));
-    // result.values[2][3] = dot_vec4(row_mat4(m1, 2), col_mat4(m2, 3));
+    result.m_data[2][0] = dot(m1[2], m2.col(0));
+    result.m_data[2][1] = dot(m1[2], m2.col(1));
+    result.m_data[2][2] = dot(m1[2], m2.col(2));
+    result.m_data[2][3] = dot(m1[2], m2.col(3));
 
-    // result.values[3][0] = dot_vec4(row_mat4(m1, 3), col_mat4(m2, 0));
-    // result.values[3][1] = dot_vec4(row_mat4(m1, 3), col_mat4(m2, 1));
-    // result.values[3][2] = dot_vec4(row_mat4(m1, 3), col_mat4(m2, 2));
-    // result.values[3][3] = dot_vec4(row_mat4(m1, 3), col_mat4(m2, 3));
+    result.m_data[3][0] = dot(m1[3], m2.col(0));
+    result.m_data[3][1] = dot(m1[3], m2.col(1));
+    result.m_data[3][2] = dot(m1[3], m2.col(2));
+    result.m_data[3][3] = dot(m1[3], m2.col(3));
+    return result;
   }
 
   /**
@@ -87,7 +89,7 @@ class Mat4 {
     return Vec4(m_data[0][i], m_data[1][i], m_data[2][i], m_data[3][i]);
   }
 
-  float m_data[4][4] = {0};
+  float m_data[4][4];
 };
 
 #endif  // MAT4_H_

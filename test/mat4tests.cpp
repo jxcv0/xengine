@@ -28,3 +28,17 @@ TEST(mat4tests, ostream) {
   Mat4 mat(1.0f);
   std::cout << "ostream test: " << mat << "\n";
 }
+
+// TEST(mat4test, cross) {
+//   Mat4 m1(0.0f);
+//   Mat4 m2(0.0f);
+//   float x = 0.0f;
+//   for (auto i = 0; i < 4; i++) {
+//     for (auto j = 0; j < 4; j++) {
+//       m1[i][j] = x;
+//       m1[i][j] = x;
+//       x += 1.0f;
+//     }
+//   }
+//   std::cout << m1 << "\n";
+// }

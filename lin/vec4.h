@@ -31,6 +31,11 @@ class Vec4 {
    */
   constexpr inline auto operator[](int i) const { return m_data[i]; }
 
+  /**
+   * @brief Comparison operator.
+   *
+   * @param other The other Vec3 to compare against.
+   */
   constexpr inline bool operator==(const Vec4& other) const noexcept {
     return (m_data[0] == other[0]) && (m_data[1] == other[1]) &&
            (m_data[2] == other[2]) && (m_data[3] == other[3]);
