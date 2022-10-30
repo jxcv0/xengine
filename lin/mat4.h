@@ -14,7 +14,7 @@ class Mat4 {
  public:
   /**
    * @brief Construct a matrix with a value in the identity positihons.
-   * 
+   *
    * @param f The value to construct with.
    */
   explicit constexpr inline Mat4(float f) noexcept {
@@ -42,8 +42,7 @@ class Mat4 {
    * @retun The ostream.
    */
   friend std::ostream& operator<<(std::ostream& os, const Mat4& m) {
-    os << "{ " << m[0] << ", " << m[1] << ", "
-               << m[2] << ", " << m[3] << " }";
+    os << "{ " << m[0] << ", " << m[1] << ", " << m[2] << ", " << m[3] << " }";
     return os;
   }
 

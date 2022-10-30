@@ -20,7 +20,8 @@ class Vec4 {
    * @param z The initial z component.
    * @param w The initial w component.
    */
-  constexpr inline Vec4(float x, float y, float z, float w) : m_data{x, y, z, w} { }
+  constexpr inline Vec4(float x, float y, float z, float w)
+      : m_data{x, y, z, w} {}
 
   /**
    * @brief Access Vec4 with subscript operator.
@@ -31,10 +32,8 @@ class Vec4 {
   constexpr inline auto operator[](int i) const { return m_data[i]; }
 
   constexpr inline bool operator==(const Vec4& other) const noexcept {
-    return (m_data[0] == other[0]) &&
-           (m_data[1] == other[1]) &&
-           (m_data[2] == other[2]) &&
-           (m_data[3] == other[3]);
+    return (m_data[0] == other[0]) && (m_data[1] == other[1]) &&
+           (m_data[2] == other[2]) && (m_data[3] == other[3]);
   }
 
   /**
@@ -72,8 +71,8 @@ class Vec4 {
    * @return A new Vec4 containing the result.
    */
   constexpr inline auto operator*(float scalar) const noexcept {
-    return Vec4(m_data[0] * scalar, m_data[1] * scalar,
-                m_data[2] * scalar, m_data[3] * scalar);
+    return Vec4(m_data[0] * scalar, m_data[1] * scalar, m_data[2] * scalar,
+                m_data[3] * scalar);
   }
 
   /**
@@ -167,8 +166,8 @@ class Vec4 {
    * @return The ostream.
    */
   friend std::ostream& operator<<(std::ostream& os, const Vec4& v) {
-    os << "{ " << v.m_data[0] << ", " << v.m_data[1] << ", "
-               << v.m_data[2] << ", " << v.m_data[3] << " }";
+    os << "{ " << v.m_data[0] << ", " << v.m_data[1] << ", " << v.m_data[2]
+       << ", " << v.m_data[3] << " }";
     return os;
   }
 

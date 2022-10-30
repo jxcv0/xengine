@@ -34,8 +34,7 @@ class Vec3 {
   constexpr inline auto operator[](int i) const { return m_data[i]; }
 
   constexpr inline bool operator==(const Vec3& other) const noexcept {
-    return (m_data[0] == other[0]) &&
-           (m_data[1] == other[1]) &&
+    return (m_data[0] == other[0]) && (m_data[1] == other[1]) &&
            (m_data[2] == other[2]);
   }
 

@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <mat4.h>
+
 #include <iostream>
 
 TEST(mat4tests, constructor) {

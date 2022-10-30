@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <vec4.h>
+
 #include <iostream>
 
 TEST(vec3test, ostream) {
