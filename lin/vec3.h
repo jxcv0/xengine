@@ -19,11 +19,7 @@ class Vec3 {
    * @param y The initial y component.
    * @param z The initial z component.
    */
-  constexpr inline Vec3(float x, float y, float z) : m_data{x, y, z} {
-    // m_data[0] = x;
-    // m_data[1] = y;
-    // m_data[2] = z;
-  }
+  constexpr inline Vec3(float x, float y, float z) : m_data{x, y, z} {}
 
   /**
    * @brief Access Vec3 with subscript operator.
@@ -33,6 +29,12 @@ class Vec3 {
    */
   constexpr inline auto operator[](int i) const { return m_data[i]; }
 
+  /**
+   * @brief Comparison operator.
+   *
+   * @param other The other Vec2 to compare against.
+   * @return true if the vectors are the same, otherwise false.
+   */
   constexpr inline bool operator==(const Vec3& other) const noexcept {
     return (m_data[0] == other[0]) && (m_data[1] == other[1]) &&
            (m_data[2] == other[2]);

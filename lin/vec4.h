@@ -6,7 +6,7 @@
 #include <ostream>
 
 /**
- * @brief A 3 dimensional vector.
+ * @brief A 4 dimensional vector.
  */
 class Vec4 {
  public:
