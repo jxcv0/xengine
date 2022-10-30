@@ -42,12 +42,8 @@ class Mat4 {
    * @retun The ostream.
    */
   friend std::ostream& operator<<(std::ostream& os, const Mat4& m) {
-    os << "{ ";
-    for (auto i = 0; i < 4; i++) {
-      os << "{ " << m.m_data[i][0] << ", " << m.m_data[i][1]
-         << ", " << m.m_data[i][2] << ", " << m.m_data[i][3] << " } ";
-    }
-    os << "}";
+    os << "{ " << m[0] << ", " << m[1] << ", "
+               << m[2] << ", " << m[3] << " }";
     return os;
   }
 
