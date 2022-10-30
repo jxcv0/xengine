@@ -19,10 +19,10 @@ class Vec3 {
    * @param y The initial y component.
    * @param z The initial z component.
    */
-  constexpr inline Vec3(float x, float y, float z) {
-    m_data[0] = x;
-    m_data[1] = y;
-    m_data[2] = z;
+  constexpr inline Vec3(float x, float y, float z) : m_data{x, y, z} {
+    // m_data[0] = x;
+    // m_data[1] = y;
+    // m_data[2] = z;
   }
 
   /**
