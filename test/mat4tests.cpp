@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <gtest/gtest.h>
 #include <mat4.h>
 
@@ -14,6 +15,13 @@ TEST(mat4tests, constructor) {
       }
     }
   }
+}
+
+TEST(mat4tests, subscript_operator) {
+  Mat4 mat(1.0f);
+  auto row3 = mat[2];
+  ASSERT_FLOAT_EQ(row3[0], mat[2][0]);
+  ASSERT_FLOAT_EQ(row3[2], mat[2][2]);
 }
 
 TEST(mat4tests, ostream) {
