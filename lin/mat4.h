@@ -5,6 +5,8 @@
 #include <initializer_list>
 #include <ostream>
 
+#include "vec4.h"
+
 /**
  * @brief A 4 x 4 dimensional matrix.
  */
@@ -26,20 +28,26 @@ class Mat4 {
    * @brief Subscript operator to access underlying array.
    *
    * @param i The index to acces;
-   * @return The value at index i;
+   * @return The 4 dimentional vector at index i;
    */
   constexpr inline auto operator[](int i) const noexcept {
-    return m_data[i];
+    return Vec4(m_data[i][0], m_data[i][1], m_data[i][2], m_data[i][3]);
   }
 
+  /**
+   * @brief Stream operator for printing out the matrix.
+   *
+   * @param os The ostream.
+   * @param m The matrix to print out.
+   * @retun The ostream.
+   */
   friend std::ostream& operator<<(std::ostream& os, const Mat4& m) {
     os << "{ ";
     for (auto i = 0; i < 4; i++) {
-      os << "{ " << m.m_data[0] << ", " << m.m_data[1] << ", " << m.m_data[2]
-         << ", " << m.m_data[3]
-         << " }";
+      os << "{ " << m.m_data[i][0] << ", " << m.m_data[i][1]
+         << ", " << m.m_data[i][2] << ", " << m.m_data[i][3] << " } ";
     }
-    os << " }";
+    os << "}";
     return os;
   }
 
