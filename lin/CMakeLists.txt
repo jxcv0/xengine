@@ -8,6 +8,7 @@ set(
 set(
     HEADERS
         vec3.h
+	mat4.h
 )
 
 add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})
