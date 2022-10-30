@@ -8,6 +8,7 @@ set(
 set(
     HEADERS
         vec3.h
+        vec4.h
 	      mat4.h
 )
 
