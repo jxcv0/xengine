@@ -32,6 +32,22 @@ class Vec4 {
   constexpr inline auto operator[](int i) const { return m_data[i]; }
 
   /**
+   * @brief Access Vec4 with subscript operator.
+   *
+   * @param i The index to access.
+   * @return The value at index i.
+   */
+  constexpr inline auto& operator[](int i) { return m_data[i]; }
+
+  /**
+   * @brief Set a component to a value.
+   *
+   * @param i The index of the component.
+   * @param f The new value.
+   */
+  constexpr inline void set(int i, float f) noexcept { m_data[i] = f; }
+
+  /**
    * @brief Comparison operator.
    *
    * @param other The other Vec3 to compare against.

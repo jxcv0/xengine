@@ -4,6 +4,7 @@
 #include <cmath>
 #include <initializer_list>
 #include <ostream>
+#include <cassert>
 
 #include "vec4.h"
 
@@ -30,8 +31,25 @@ class Mat4 {
    * @param i The index to acces;
    * @return The 4 dimentional vector at index i;
    */
-  constexpr inline auto operator[](int i) const noexcept {
-    return Vec4(m_data[i][0], m_data[i][1], m_data[i][2], m_data[i][3]);
+  constexpr inline auto operator[](int i) const noexcept { return m_data[i]; }
+
+  /**
+   * @brief Subscript operator to access underlying array.
+   *
+   * @param i The index to acces;
+   * @return The 4 dimentional vector at index i;
+   */
+  constexpr inline auto& operator[](int i) noexcept { return m_data[i]; }
+
+  /**
+   * @brief Set a component to a value.
+   *
+   * @param i The row of the component.
+   * @param j The column of the component.
+   * @param f The new value.
+   */
+  constexpr inline void set(int i, int j, float f) {
+    m_data[i][j] = f;
   }
 
   /**
@@ -73,7 +91,8 @@ class Mat4 {
    * @retun The ostream.
    */
   friend std::ostream& operator<<(std::ostream& os, const Mat4& m) {
-    os << "{ " << m[0] << ", " << m[1] << ", " << m[2] << ", " << m[3] << " }";
+    os << "{ " << m[0] << ", " << m[1] << ", "
+               << m[2] << ", " << m[3] << " }";
     return os;
   }
 
@@ -89,7 +108,7 @@ class Mat4 {
     return Vec4(m_data[0][i], m_data[1][i], m_data[2][i], m_data[3][i]);
   }
 
-  float m_data[4][4];
+  Vec4 m_data[4];
 };
 
 #endif  // MAT4_H_
