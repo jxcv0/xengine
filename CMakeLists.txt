@@ -46,7 +46,6 @@ target_include_directories(
 target_link_libraries(
   ${PROJECT_NAME}
     PUBLIC
-      glad
       threadpool
       memory
       resource
@@ -70,6 +69,7 @@ add_subdirectory(memory)
 add_subdirectory(resource)
 add_subdirectory(ecs)
 add_subdirectory(lin)
+add_subdirectory(render)
 add_subdirectory(test)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

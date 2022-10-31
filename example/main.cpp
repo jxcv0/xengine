@@ -1,6 +1,13 @@
 #include <mainwindow.h>
+#include <glad.h>
 
 #include <iostream>
+
+float vertices[] {
+  -0.5f, -0.5f, 0.0f,
+   0.5f, -0.5f, 0.0f,
+   0.0f,  0.5f, 0.0f
+};
 
 int main(int argc, char const *argv[]) {
   MainWindow main_window(1080, 600, std::string("main-window"));
@@ -10,14 +17,16 @@ int main(int argc, char const *argv[]) {
   // main_window.set_cursor_position_callback(on_mouse);
   main_window.show();
 
+  unsigned int vbo;
+  glGenBuffers(1, &vbo);
+
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
   while (!main_window.should_close()) {
     main_window.update_input();
     if (main_window.key_pressed(GLFW_KEY_ESCAPE)) {
       break;
-    } else if (main_window.key_pressed(GLFW_KEY_W)) {
-      std::cout << "W\n";
-    } else if (main_window.key_pressed(GLFW_KEY_A)) {
-      std::cout << "A\n";
     }
     main_window.poll_events();
     main_window.clear_buffers();

@@ -6,6 +6,8 @@
 #include <memory>
 
 #include "texture.h"
+#include <shader.h>
+#include <utility>
 
 /**
  * @brief implementation of import function for Importer class.
@@ -28,6 +30,16 @@ void import(T *dest, const std::filesystem::path &filepath) {
  */
 template <>
 void import(Texture *texture, const std::filesystem::path &filepath);
+
+/**
+ * @brief Function specialization for importing GLSL shaders from text files.
+ * 
+ * @param shader A pointer to the Shader object to assign to the program.
+ * @param filepath The path to the file to import.
+ */
+template <>
+void import(Shader *shader, const std::filesystem::path &filepath);
+
 }  // namespace import_impl
 
 template <typename T, template <typename> typename Allocator = std::allocator>
@@ -38,7 +50,7 @@ class Importer {
    *
    * @param filepath The filepath of the data to import.
    */
-  Importer(std::filesystem::path filepath)
+  constexpr explicit inline Importer(const auto filepath)
       : m_filepath(filepath), m_allocator() {}
 
   ~Importer() = default;
