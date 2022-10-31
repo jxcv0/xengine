@@ -1,4 +1,3 @@
-#include <cstddef>
 #include <gtest/gtest.h>
 #include <mat4.h>
 
@@ -40,5 +39,22 @@ TEST(mat4test, cross) {
       x += 1.0f;
     }
   }
-  std::cout << m1 << "\n";
+  auto result = m1 * m2;
+  std::cout << result << "\n";
+  ASSERT_FLOAT_EQ(result[0][0], 56.0f);
+  ASSERT_FLOAT_EQ(result[0][1], 62.0f);
+  ASSERT_FLOAT_EQ(result[0][2], 68.0f);
+  ASSERT_FLOAT_EQ(result[0][3], 74.0f);
+  ASSERT_FLOAT_EQ(result[1][0], 152.0f);
+  ASSERT_FLOAT_EQ(result[1][1], 174.0f);
+  ASSERT_FLOAT_EQ(result[1][2], 196.0f);
+  ASSERT_FLOAT_EQ(result[1][3], 218.0f);
+  ASSERT_FLOAT_EQ(result[2][0], 248.0f);
+  ASSERT_FLOAT_EQ(result[2][1], 286.0f);
+  ASSERT_FLOAT_EQ(result[2][2], 324.0f);
+  ASSERT_FLOAT_EQ(result[2][3], 362.0f);
+  ASSERT_FLOAT_EQ(result[3][0], 344.0f);
+  ASSERT_FLOAT_EQ(result[3][1], 398.0f);
+  ASSERT_FLOAT_EQ(result[3][2], 452.0f);
+  ASSERT_FLOAT_EQ(result[3][3], 506.0);
 }

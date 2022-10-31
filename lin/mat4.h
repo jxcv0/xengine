@@ -1,10 +1,10 @@
 #ifndef MAT4_H_
 #define MAT4_H_
 
+#include <cassert>
 #include <cmath>
 #include <initializer_list>
 #include <ostream>
-#include <cassert>
 
 #include "vec4.h"
 
@@ -48,9 +48,7 @@ class Mat4 {
    * @param j The column of the component.
    * @param f The new value.
    */
-  constexpr inline void set(int i, int j, float f) {
-    m_data[i][j] = f;
-  }
+  constexpr inline void set(int i, int j, float f) { m_data[i][j] = f; }
 
   /**
    * @brief Get the cross product of 2 Mat4's.
@@ -59,7 +57,8 @@ class Mat4 {
    * @param m2 The second matrix.
    * @return A matrix containing the cross product.
    */
-  constexpr inline friend auto operator*(const Mat4& m1, const Mat4& m2) {
+  constexpr inline friend auto operator*(const Mat4& m1,
+                                         const Mat4& m2) noexcept {
     Mat4 result(0.0f);
     result.m_data[0][0] = dot(m1[0], m2.col(0));
     result.m_data[0][1] = dot(m1[0], m2.col(1));
@@ -91,8 +90,7 @@ class Mat4 {
    * @retun The ostream.
    */
   friend std::ostream& operator<<(std::ostream& os, const Mat4& m) {
-    os << "{ " << m[0] << ", " << m[1] << ", "
-               << m[2] << ", " << m[3] << " }";
+    os << "{ " << m[0] << ", " << m[1] << ", " << m[2] << ", " << m[3] << " }";
     return os;
   }
 
