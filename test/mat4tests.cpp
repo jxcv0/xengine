@@ -2,6 +2,7 @@
 #include <mat4.h>
 
 #include <iostream>
+#include <sstream>
 
 TEST(mat4tests, constructor) {
   Mat4 mat(1.0f);
@@ -37,7 +38,9 @@ TEST(mat4test, col) {
 
 TEST(mat4tests, ostream) {
   Mat4 mat(1.0f);
-  std::cout << "ostream test: " << mat << "\n";
+  std::stringstream ss;
+  ss << mat;
+  ASSERT_EQ(ss.str(), std::string("{ { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 } }"));
 }
 
 TEST(mat4test, product) {

@@ -1,11 +1,15 @@
 #include <gtest/gtest.h>
+#include <sstream>
+#include <string>
 #include <vec2.h>
 
 #include <iostream>
 
 TEST(vec2tests, ostream) {
   Vec2 vec(1.05f, 0.833f);
-  std::cout << "ostream test: " << vec << "\n";
+  std::stringstream ss;
+  ss << vec;
+  ASSERT_EQ(ss.str(), std::string("{ 1.05, 0.833 }"));
 }
 
 TEST(vec2tests, default_values) {

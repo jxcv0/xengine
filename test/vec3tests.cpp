@@ -5,7 +5,9 @@
 
 TEST(vec3test, ostream) {
   Vec3 vec(1.05f, 0.833f, 30.0f);
-  std::cout << "ostream test: " << vec << "\n";
+  std::stringstream ss;
+  ss << vec;
+  ASSERT_EQ(ss.str(), std::string("{ 1.05, 0.833, 30 }"));
 }
 
 TEST(vec3tests, default_values) {
