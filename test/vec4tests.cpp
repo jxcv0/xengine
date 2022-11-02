@@ -3,12 +3,12 @@
 
 #include <iostream>
 
-TEST(vec3test, ostream) {
+TEST(vec4tests, ostream) {
   Vec4 vec(1.05f, 0.833f, 30.0f, -1.0f);
   std::cout << "ostream test: " << vec << "\n";
 }
 
-TEST(vec3tests, default_values) {
+TEST(vec4tests, default_values) {
   Vec4 vec;
   ASSERT_FLOAT_EQ(vec.x(), 0.0f);
   ASSERT_FLOAT_EQ(vec.y(), 0.0f);
@@ -16,7 +16,14 @@ TEST(vec3tests, default_values) {
   ASSERT_FLOAT_EQ(vec.w(), 0.0f);
 }
 
-TEST(vec3tests, copy_construction) {
+TEST(vec4tests, subscript) {
+  Vec4 vec(1.0f, 2.0f, 3.0f, 4.0f);
+  ASSERT_FLOAT_EQ(vec[1], 2.0f);
+  vec[2] = 10.0f;
+  ASSERT_FLOAT_EQ(vec[2], 10.0f);
+}
+
+TEST(vec4tests, copy_construction) {
   Vec4 vec(1.05f, 0.833f, 30.0f, -1.0f);
   auto other = vec;
   ASSERT_FLOAT_EQ(other.x(), 1.05f);
@@ -26,7 +33,7 @@ TEST(vec3tests, copy_construction) {
   ASSERT_EQ(vec, other);
 }
 
-TEST(vec3tests, scalar) {
+TEST(vec4tests, scalar) {
   Vec4 vec(1.0f, 2.0f, 3.0f, -2.5f);
   auto result = vec * 0.1f;
   ASSERT_FLOAT_EQ(result.x(), 0.1f);
@@ -35,7 +42,7 @@ TEST(vec3tests, scalar) {
   ASSERT_FLOAT_EQ(result.w(), -0.25f);
 }
 
-TEST(vec3tests, scalar_in_place) {
+TEST(vec4tests, scalar_in_place) {
   Vec4 vec(1.0f, 2.0f, 3.0f, -2.5f);
   vec *= 0.1f;
   ASSERT_FLOAT_EQ(vec.x(), 0.1f);
@@ -44,7 +51,7 @@ TEST(vec3tests, scalar_in_place) {
   ASSERT_FLOAT_EQ(vec.w(), -0.25f);
 }
 
-TEST(vec3tests, normalize) {
+TEST(vec4tests, normalize) {
   Vec4 vec(1.0f, 1.0f, 1.0f, 1.0f);
   auto norm = vec.normalize();
   ASSERT_FLOAT_EQ(norm.x(), 0.5);
@@ -53,7 +60,7 @@ TEST(vec3tests, normalize) {
   ASSERT_FLOAT_EQ(norm.w(), 0.5);
 }
 
-TEST(vec3tests, add) {
+TEST(vec4tests, add) {
   Vec4 v1(1.0f, -3.2f, 0.0f, -1.0f);
   Vec4 v2(5.4f, 3.2f, -5.0f, -1.0f);
   Vec4 result = v1 + v2;
@@ -63,7 +70,7 @@ TEST(vec3tests, add) {
   ASSERT_FLOAT_EQ(result.w(), -2.0f);
 }
 
-TEST(vec3tests, add_in_place) {
+TEST(vec4tests, add_in_place) {
   Vec4 v1(1.0f, -3.2f, 0.0f, -1.0f);
   Vec4 v2(5.4f, 3.2f, -5.0f, -1.0f);
   v1 += v2;
@@ -73,7 +80,7 @@ TEST(vec3tests, add_in_place) {
   ASSERT_FLOAT_EQ(v1.w(), -2.0f);
 }
 
-TEST(vec3tests, subtract) {
+TEST(vec4tests, subtract) {
   Vec4 v1(1.0f, -3.2f, 0.0f, -1.0f);
   Vec4 v2(5.4f, 3.2f, -5.0f, -1.0f);
   Vec4 result = v1 - v2;
@@ -83,7 +90,7 @@ TEST(vec3tests, subtract) {
   ASSERT_FLOAT_EQ(result.w(), 0.0f);
 }
 
-TEST(vec3tests, subtract_in_place) {
+TEST(vec4tests, subtract_in_place) {
   Vec4 v1(1.0f, -3.2f, 0.0f, -1.0f);
   Vec4 v2(5.4f, 3.2f, -5.0f, -1.0f);
   v1 -= v2;
@@ -93,7 +100,7 @@ TEST(vec3tests, subtract_in_place) {
   ASSERT_FLOAT_EQ(v1.w(), 0.0f);
 }
 
-TEST(vec3test, dot) {
+TEST(vec4tests, dot) {
   Vec4 v1(1.0f, -3.2f, 0.0f, 1.0f);
   Vec4 v2(5.4f, 3.2f, -5.0f, -0.5f);
   ASSERT_FLOAT_EQ(dot(v1, v2), -5.34);
