@@ -1,5 +1,6 @@
 #include "importer.h"
 
+#include <filesystem>
 #include <fstream>
 
 template <>
@@ -9,12 +10,14 @@ void import_impl::import(Texture *texture,
                                &texture->m_height, &texture->m_num_channels, 0);
 }
 
-auto import_vertex_shader(auto filepath) {
+// load a shader from file. compile and return handle
+auto import_vertex_shader(std::filesystem::path filepath) {
   std::ifstream in(filepath);
   // TODO 
 }
 
-auto import_fragment_shader(auto filepath) {
+// load a shader from file. compile and return handle
+auto import_fragment_shader(std::filesystem::path filepath) {
   std::ifstream in(filepath);
   // TODO 
 }

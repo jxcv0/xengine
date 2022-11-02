@@ -33,6 +33,7 @@ void import(Texture *texture, const std::filesystem::path &filepath);
 
 /**
  * @brief Function specialization for importing GLSL shaders from text files.
+ *        This function also compiles and links the shader programs.
  * 
  * @param shader A pointer to the Shader object to assign to the program.
  * @param filepath The path to the file to import.
