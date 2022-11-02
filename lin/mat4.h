@@ -4,8 +4,8 @@
 #include <cassert>
 #include <cmath>
 #include <initializer_list>
-#include <ostream>
 #include <iostream>
+#include <ostream>
 
 #include "vec4.h"
 
@@ -108,7 +108,6 @@ class Mat4 {
   }
 
  private:
-
   Vec4 m_data[4];
 };
 

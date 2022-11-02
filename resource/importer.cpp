@@ -13,17 +13,18 @@ void import_impl::import(Texture *texture,
 // load a shader from file. compile and return handle
 auto import_vertex_shader(std::filesystem::path filepath) {
   std::ifstream in(filepath);
-  // TODO 
+  // TODO
 }
 
 // load a shader from file. compile and return handle
 auto import_fragment_shader(std::filesystem::path filepath) {
   std::ifstream in(filepath);
-  // TODO 
+  // TODO
 }
 
 template <>
-void import_impl::import(Shader *shader, const std::filesystem::path &filepath) {
+void import_impl::import(Shader *shader,
+                         const std::filesystem::path &filepath) {
   if (filepath.extension() == ".vert") {
     import_vertex_shader(filepath);
   } else if (filepath.extension() == ".frag") {

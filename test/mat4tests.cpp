@@ -40,7 +40,8 @@ TEST(mat4tests, ostream) {
   Mat4 mat(1.0f);
   std::stringstream ss;
   ss << mat;
-  ASSERT_EQ(ss.str(), std::string("{ { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 } }"));
+  ASSERT_EQ(ss.str(), std::string("{ { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, "
+                                  "1, 0 }, { 0, 0, 0, 1 } }"));
 }
 
 TEST(mat4test, product) {
@@ -50,7 +51,7 @@ TEST(mat4test, product) {
   for (auto i = 0; i < 4; i++) {
     for (auto j = 0; j < 4; j++) {
       m1[i][j] = x;
-      m1[i][j] = x;
+      m2[i][j] = x;
       x += 1.0f;
     }
   }

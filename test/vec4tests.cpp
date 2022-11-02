@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
-#include <sstream>
 #include <vec4.h>
 
 #include <iostream>
+#include <sstream>
 
 TEST(vec4tests, ostream) {
   Vec4 vec(1.05f, 0.833f, 30.0f, -1.0f);

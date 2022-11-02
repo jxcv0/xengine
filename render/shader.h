@@ -22,7 +22,7 @@ class Shader {
   /**
    * @brief Construct a shader from a program id.
    */
-  explicit Shader(unsigned int id) : m_id(id) {};
+  explicit Shader(unsigned int id) : m_id(id){};
 
   /**
    * @brief Installs the program object as part of current rendering state.

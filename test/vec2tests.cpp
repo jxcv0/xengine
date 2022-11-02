@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
-#include <sstream>
-#include <string>
 #include <vec2.h>
 
 #include <iostream>
+#include <sstream>
+#include <string>
 
 TEST(vec2tests, ostream) {
   Vec2 vec(1.05f, 0.833f);

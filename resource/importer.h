@@ -1,13 +1,14 @@
 #ifndef IMPORTER_H_
 #define IMPORTER_H_
 
+#include <shader.h>
+
 #include <cassert>
 #include <filesystem>
 #include <memory>
+#include <utility>
 
 #include "texture.h"
-#include <shader.h>
-#include <utility>
 
 /**
  * @brief implementation of import function for Importer class.
@@ -34,7 +35,7 @@ void import(Texture *texture, const std::filesystem::path &filepath);
 /**
  * @brief Function specialization for importing GLSL shaders from text files.
  *        This function also compiles and links the shader programs.
- * 
+ *
  * @param shader A pointer to the Shader object to assign to the program.
  * @param filepath The path to the file to import.
  */
