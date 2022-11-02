@@ -5,6 +5,7 @@
 #include <cmath>
 #include <initializer_list>
 #include <ostream>
+#include <iostream>
 
 #include "vec4.h"
 
@@ -51,11 +52,12 @@ class Mat4 {
   constexpr inline void set(int i, int j, float f) { m_data[i][j] = f; }
 
   /**
-   * @brief Get the cross product of 2 Mat4's.
+   * @brief Get the matrix product of 2 Mat4's and return the result in a new
+   *        Mat4.
    *
    * @param m1 The first matrix.
    * @param m2 The second matrix.
-   * @return A matrix containing the cross product.
+   * @return A matrix containing the matrix product.
    */
   constexpr inline friend auto operator*(const Mat4& m1,
                                          const Mat4& m2) noexcept {

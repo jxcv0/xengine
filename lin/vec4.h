@@ -35,7 +35,7 @@ class Vec4 {
    * @brief Access Vec4 with subscript operator.
    *
    * @param i The index to access.
-   * @return The value at index i.
+   * @return A reference to the value at index i.
    */
   constexpr inline auto& operator[](int i) { return m_data[i]; }
 

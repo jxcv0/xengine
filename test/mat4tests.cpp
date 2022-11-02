@@ -23,12 +23,18 @@ TEST(mat4tests, subscript_operator) {
   ASSERT_FLOAT_EQ(row3[2], mat[2][2]);
 }
 
+TEST(mat4tests, subscript_assignment) {
+  Mat4 mat(0.0f);
+  mat[2][3] = 42.0f;
+  ASSERT_FLOAT_EQ(mat[2][3], 42.0f);
+}
+
 TEST(mat4tests, ostream) {
   Mat4 mat(1.0f);
   std::cout << "ostream test: " << mat << "\n";
 }
 
-TEST(mat4test, cross) {
+TEST(mat4test, product) {
   Mat4 m1(0.0f);
   Mat4 m2(0.0f);
   float x = 0.0f;
@@ -40,7 +46,6 @@ TEST(mat4test, cross) {
     }
   }
   auto result = m1 * m2;
-  std::cout << result << "\n";
   ASSERT_FLOAT_EQ(result[0][0], 56.0f);
   ASSERT_FLOAT_EQ(result[0][1], 62.0f);
   ASSERT_FLOAT_EQ(result[0][2], 68.0f);
