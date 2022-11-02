@@ -29,7 +29,7 @@ class Mat4 {
   /**
    * @brief Subscript operator to access underlying array.
    *
-   * @param i The index to acces;
+   * @param i The index to access;
    * @return The 4 dimentional vector at index i;
    */
   constexpr inline auto operator[](int i) const noexcept { return m_data[i]; }
@@ -85,6 +85,17 @@ class Mat4 {
   }
 
   /**
+   * @brief Get a column of the matrix.
+   *
+   * @param i The index of the column to return.
+   * @return The column at index i.
+   */
+  constexpr inline Vec4 col(std::size_t i) const noexcept {
+    assert(i < 4);
+    return Vec4(m_data[0][i], m_data[1][i], m_data[2][i], m_data[3][i]);
+  }
+
+  /**
    * @brief Stream operator for printing out the matrix.
    *
    * @param os The ostream.
@@ -97,16 +108,6 @@ class Mat4 {
   }
 
  private:
-  /**
-   * @brief Get a column of the matrix.
-   *
-   * @param i The index of the column to return.
-   * @return The column at index i.
-   */
-  constexpr inline Vec4 col(std::size_t i) const noexcept {
-    assert(i < 4);
-    return Vec4(m_data[0][i], m_data[1][i], m_data[2][i], m_data[3][i]);
-  }
 
   Vec4 m_data[4];
 };

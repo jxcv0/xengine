@@ -17,16 +17,22 @@ TEST(mat4tests, constructor) {
 }
 
 TEST(mat4tests, subscript_operator) {
-  Mat4 mat(1.0f);
+  Mat4 mat(42.0f);
   auto row3 = mat[2];
   ASSERT_FLOAT_EQ(row3[0], mat[2][0]);
   ASSERT_FLOAT_EQ(row3[2], mat[2][2]);
+  ASSERT_FLOAT_EQ(mat[3][3], 42.0f);
+  mat[3][3] = -6.66f;
+  ASSERT_FLOAT_EQ(mat[3][3], -6.66f);
 }
 
-TEST(mat4tests, subscript_assignment) {
-  Mat4 mat(0.0f);
-  mat[2][3] = 42.0f;
-  ASSERT_FLOAT_EQ(mat[2][3], 42.0f);
+TEST(mat4test, col) {
+  Mat4 mat(42.0f);
+  auto col = mat.col(2);
+  ASSERT_FLOAT_EQ(col[0], 0.0f);
+  ASSERT_FLOAT_EQ(col[1], 0.0f);
+  ASSERT_FLOAT_EQ(col[2], 42.0f);
+  ASSERT_FLOAT_EQ(col[3], 0.0f);
 }
 
 TEST(mat4tests, ostream) {
