@@ -16,7 +16,7 @@
 #include <glm/ext.hpp>
 #include <glm/glm.hpp>
 
-#include "keys.h"
+// #include "keys.h"
 
 class MainWindow {
  public:
@@ -115,22 +115,22 @@ class MainWindow {
     glfwSetCursorPosCallback(mp_window, function);
   }
 
-  /*! \brief Update input buffer.
-   */
-  void update_input() {
-    m_input_buffer = 0;
-    for (auto key : KEYS) {
-      if (glfwGetKey(mp_window, key) == GLFW_PRESS) {
-        m_input_buffer |= key;
-      }
-    }
-  }
+  // /*! \brief Update input buffer.
+  //  */
+  // void update_input() {
+  //   m_input_buffer = 0;
+  //   for (auto key : KEYS) {
+  //     if (glfwGetKey(mp_window, key) == GLFW_PRESS) {
+  //       m_input_buffer |= key;
+  //     }
+  //   }
+  // }
 
-  /*! \brief     Linear search through active keys on this window
-   *  \param key The key to check for.
-   *  \return    true if key is pressed, otherwise returns false;
-   */
-  bool key_pressed(int key) { return (m_input_buffer & key) != 0; }
+  // /*! \brief     Linear search through active keys on this window
+  //  *  \param key The key to check for.
+  //  *  \return    true if key is pressed, otherwise returns false;
+  //  */
+  // bool key_pressed(int key) { return (m_input_buffer & key) != 0; }
 
   /*! \brief     Get a projection matrix for this window.
    *  \param fov The field of view.

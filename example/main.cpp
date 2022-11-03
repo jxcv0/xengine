@@ -20,10 +20,6 @@ int main(int argc, char const *argv[]) {
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
   while (!main_window.should_close()) {
-    main_window.update_input();
-    if (main_window.key_pressed(GLFW_KEY_ESCAPE)) {
-      break;
-    }
     main_window.poll_events();
     main_window.clear_buffers();
     main_window.swap_buffers();

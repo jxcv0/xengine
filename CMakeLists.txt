@@ -26,42 +26,6 @@ find_package(glfw3 3.3 REQUIRED)
 find_package(glm REQUIRED)
 find_package(assimp REQUIRED)
 
-set(
-  HEADERS 
-    include/mainwindow.h
-)
-
-set(
-  SOURCES 
-)
-
-add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})
-set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
-
-target_include_directories(
-  ${PROJECT_NAME}
-    PUBLIC
-      ${PROJECT_SOURCE_DIR}/include
-)
-
-target_link_libraries(
-  ${PROJECT_NAME}
-    PUBLIC
-      threadpool
-      memory
-      resource
-      ecs
-      lin
-
-      glfw
-      glm::glm
-      OpenGL::GL
-      dl
-      m
-      assimp
-      pthread
-)
-
 add_subdirectory(lib/glad)
 add_subdirectory(lib/stb)
 add_subdirectory(example)
