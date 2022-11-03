@@ -2,7 +2,7 @@
 #define LIN_H_
 
 #include <cmath>
-#include <numbers>
+// #include <numbers>
 
 #include "mat4.h"
 
@@ -18,12 +18,13 @@ namespace lin {
  * @return A floating point representing the angle in radians.
  */
 constexpr inline float radians(float degrees) noexcept {
-  return degrees * (std::numbers::pi / 180.0f);
+  // return degrees * (std::numbers::pi / 180.0f);
+  return degrees * (M_PI / 180.0f);
 }
 
 constexpr Mat4 perspective(const float fov, const float near, const float far,
                            const float aspect_ratio) {
-  Mat4 result(1.0f);
+  Mat4 result(0.0f);
   auto tanhalffov = std::tan(radians(fov) / 2.0f);
   result[0][0] = 1.0f / (aspect_ratio * tanhalffov);
   result[1][1] = 1.0f / tanhalffov;
