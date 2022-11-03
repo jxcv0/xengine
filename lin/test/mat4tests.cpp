@@ -44,7 +44,7 @@ TEST(mat4tests, ostream) {
                                   "1, 0 }, { 0, 0, 0, 1 } }"));
 }
 
-TEST(mat4test, product) {
+TEST(mat4tests, product) {
   Mat4 m1(0.0f);
   Mat4 m2(0.0f);
   float x = 0.0f;

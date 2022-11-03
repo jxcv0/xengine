@@ -7,6 +7,7 @@
 #include <iostream>
 #include <ostream>
 
+#include "vec2.h"
 #include "vec4.h"
 
 /**

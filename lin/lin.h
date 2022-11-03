@@ -2,9 +2,11 @@
 #define LIN_H_
 
 #include <cmath>
+#include <type_traits>
 // #include <numbers>
 
 #include "mat4.h"
+#include "vec3.h"
 
 /**
  * @brief Linear algebra functions.
@@ -33,6 +35,22 @@ constexpr Mat4 perspective(const float fov, const float near, const float far,
   result[3][2] = -(2.0f * far * near) / (far - near);
   return result;
 }
+
+/**
+ * @brief Create a translation matrix.
+ *
+ * TODO check this is correct
+ * @param v The translation vector.
+ * @return A translation matrix.
+ */
+constexpr Mat4 translate(const Mat4& m, const Vec3& v) {
+  Mat4 result(m);
+  result[3][0] += v[0];
+  result[3][1] += v[1];
+  result[3][2] += v[2];
+  return result;
+}
+
 }  // namespace lin
 
 #endif  // LIN_H_
