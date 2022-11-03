@@ -2,6 +2,7 @@
 #define LIN_H_
 
 #include <cmath>
+#include <functional>
 #include <type_traits>
 // #include <numbers>
 
@@ -49,6 +50,42 @@ constexpr Mat4 translate(const Mat4& m, const Vec3& v) {
   result[3][1] += v[1];
   result[3][2] += v[2];
   return result;
+}
+
+/**
+ * @brief Create a rotation matrix.
+ *
+ * @param m The matrix to apply the rotation to.
+ * @param axis The axis of the rotation.
+ * @param angle The rotation angle in radians.
+ * @return A rotation matrix.
+ */
+constexpr Mat4 rotate(const Mat4& m, const Vec3& axis, float angle) {
+  float c = std::cos(angle);
+  float s = std::sin(angle);
+  float t = 1.0f - c;
+  auto temp = axis * t;
+
+  Mat4 q(0.0f);
+  q[0][0] = c + temp[0] * axis[0];
+  q[0][1] = 0 + temp[0] * axis[1] + s * axis[2];
+  q[0][2] = 0 + temp[0] * axis[2] - s * axis[1];
+
+  q[1][0] = 0 + temp[1] * axis[0] - s * axis[2];
+  q[1][1] = c + temp[1] * axis[1];
+  q[1][2] = 0 + temp[1] * axis[2] + s * axis[0];
+
+  q[2][0] = 0 + temp[2] * axis[0] + s * axis[1];
+  q[2][1] = 0 + temp[2] * axis[1] - s * axis[0];
+  q[2][2] = c + temp[2] * axis[2];
+
+  auto r = m * q;
+  r[3][0] = m[3][0];
+  r[3][1] = m[3][1];
+  r[3][2] = m[3][2];
+  r[3][3] = m[3][3];
+
+  return r;
 }
 
 }  // namespace lin

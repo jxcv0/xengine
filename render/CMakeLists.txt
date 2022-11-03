@@ -3,6 +3,7 @@ project(render)
 
 set(
   SOURCES
+    shader.cpp
 )
 
 set(

@@ -36,3 +36,23 @@ TEST(lintests, translate) {
   ASSERT_FLOAT_EQ(t[3][1], 0.1f);
   ASSERT_FLOAT_EQ(t[3][2], 0.1f);
 }
+
+TEST(lintests, rotate) {
+  auto r = lin::rotate(Mat4(1.0f), Vec3(0.0f, 1.0f, 0.0f), lin::radians(30.0f));
+  ASSERT_FLOAT_EQ(r[0][0], 0.86602539f);
+  ASSERT_FLOAT_EQ(r[0][1], 0.0f);
+  ASSERT_FLOAT_EQ(r[0][2], -0.5f);
+  ASSERT_FLOAT_EQ(r[0][3], 0.0f);
+  ASSERT_FLOAT_EQ(r[1][0], 0.0f);
+  ASSERT_FLOAT_EQ(r[1][1], 1.0f);
+  ASSERT_FLOAT_EQ(r[1][2], 0.0f);
+  ASSERT_FLOAT_EQ(r[1][3], 0.0f);
+  ASSERT_FLOAT_EQ(r[2][0], 0.5f);
+  ASSERT_FLOAT_EQ(r[2][1], 0.0f);
+  ASSERT_FLOAT_EQ(r[2][2], 0.86602539f);
+  ASSERT_FLOAT_EQ(r[2][3], 0.0f);
+  ASSERT_FLOAT_EQ(r[3][0], 0.0f);
+  ASSERT_FLOAT_EQ(r[3][1], 0.0f);
+  ASSERT_FLOAT_EQ(r[3][2], 0.0f);
+  ASSERT_FLOAT_EQ(r[3][3], 1.0f);
+}
