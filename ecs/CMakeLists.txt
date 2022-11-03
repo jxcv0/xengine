@@ -10,6 +10,7 @@ set(
     entity.h
     component.h
     coordinator.h
+    componentarray.h
 )
 
 add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})

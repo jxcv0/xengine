@@ -15,6 +15,7 @@ set(
         mesh.h
         material.h
         texture.h
+        vertex.h
 )
 
 add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})

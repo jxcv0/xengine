@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 #include <importer.h>
-#include <poolallocator.h>
 #include <texture.h>
 
 #include <cassert>
