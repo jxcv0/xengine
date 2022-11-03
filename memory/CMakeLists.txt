@@ -3,15 +3,17 @@ project(memory)
 
 set(
     SOURCES
-        heap.h
+      	heap.cpp
 )
 
 set(
     HEADERS
         allocator.h
-      	heap.cpp
+        heap.h
 )
 
 add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PUBLIC .)
 set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
+
+# add_subdirectory(test)
