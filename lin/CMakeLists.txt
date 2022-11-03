@@ -2,15 +2,16 @@ cmake_minimum_required(VERSION 3.16)
 project(lin)
 
 set(
-    SOURCES
+  SOURCES
 )
 
 set(
-    HEADERS
-        vec2.h
-        vec3.h
-        vec4.h
-	      mat4.h
+  HEADERS
+    vec2.h
+    vec3.h
+    vec4.h
+	  mat4.h
+    lin.h
 )
 
 add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})

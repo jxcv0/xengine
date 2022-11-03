@@ -14,12 +14,14 @@
  */
 class Mat4 {
  public:
+  Mat4() = default;
+
   /**
    * @brief Construct a matrix with a value in the identity positihons.
    *
    * @param f The value to construct with.
    */
-  explicit constexpr inline Mat4(float f) noexcept {
+  constexpr inline Mat4(float f) noexcept {
     m_data[0][0] = f;
     m_data[1][1] = f;
     m_data[2][2] = f;
