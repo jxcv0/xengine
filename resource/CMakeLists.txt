@@ -21,3 +21,5 @@ add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PUBLIC .)
 target_link_libraries(${PROJECT_NAME} PUBLIC stb_image render glad)
 set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
+
+add_subdirectory(test)

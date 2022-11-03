@@ -10,13 +10,9 @@ link_libraries(xengine GTest::gtest_main)
 
 add_executable(poolallocatortests poolallocatortests.cpp)
 add_executable(allocatortests allocatortests.cpp)
-add_executable(importertests importertests.cpp)
-add_executable(resourcetests resourcetests.cpp)
 add_executable(threadpooltests threadpooltests.cpp)
 
 include(GoogleTest)
 gtest_discover_tests(poolallocatortests)
 gtest_discover_tests(allocatortests)
-gtest_discover_tests(importertests)
-gtest_discover_tests(resourcetests)
 gtest_discover_tests(threadpooltests)
