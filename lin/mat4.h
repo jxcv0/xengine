@@ -45,15 +45,6 @@ class Mat4 {
   constexpr inline auto& operator[](int i) noexcept { return m_data[i]; }
 
   /**
-   * @brief Set a component to a value.
-   *
-   * @param i The row of the component.
-   * @param j The column of the component.
-   * @param f The new value.
-   */
-  constexpr inline void set(int i, int j, float f) { m_data[i][j] = f; }
-
-  /**
    * @brief Get the matrix product of 2 Mat4's and return the result in a new
    *        Mat4.
    *

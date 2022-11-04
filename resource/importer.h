@@ -32,16 +32,6 @@ void import(T *dest, const std::filesystem::path &filepath) {
 template <>
 void import(Texture *texture, const std::filesystem::path &filepath);
 
-/**
- * @brief Function specialization for importing GLSL shaders from text files.
- *        This function also compiles and links the shader programs.
- *
- * @param shader A pointer to the Shader object to assign to the program.
- * @param filepath The path to the file to import.
- */
-template <>
-void import(Shader *shader, const std::filesystem::path &filepath);
-
 }  // namespace import_impl
 
 template <typename T, template <typename> typename Allocator = std::allocator>
@@ -52,7 +42,7 @@ class Importer {
    *
    * @param filepath The filepath of the data to import.
    */
-  constexpr explicit inline Importer(const std::filesystem::path filepath)
+  constexpr explicit inline Importer(const std::filesystem::path &filepath)
       : m_filepath(filepath), m_allocator() {}
 
   ~Importer() = default;

@@ -1,8 +1,9 @@
 #include "shader.h"
 
-/*------------------------------------------------------------------------------
- */
-void ShaderUtils::check_compile(int id) {
+#include <exception>
+#include <fstream>
+
+static inline void check_compile(int id) {
   GLint success;
   char infoLog[1024];
   glGetShaderiv(id, GL_COMPILE_STATUS, &success);
@@ -12,9 +13,7 @@ void ShaderUtils::check_compile(int id) {
   }
 }
 
-/*------------------------------------------------------------------------------
- */
-void ShaderUtils::check_link(int id) {
+static inline void check_link(int id) {
   GLint success;
   char infoLog[1024];
   glGetProgramiv(id, GL_LINK_STATUS, &success);
@@ -24,70 +23,40 @@ void ShaderUtils::check_link(int id) {
   }
 }
 
-/*------------------------------------------------------------------------------
- */
-Shader ShaderUtils::load(const char *vert_path, const char *frag_path) {
-  std::string vert_code;
-  std::string frag_code;
-  std::ifstream vert_file;
-  std::ifstream frag_file;
+Shader ShaderUtils::load(const std::filesystem::path& vert_path,
+                         const std::filesystem::path& frag_path) {
+  std::ifstream vert_stream(vert_path);
+  std::ifstream frag_stream(frag_path);
 
-  vert_file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-  frag_file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+  std::string vert_str;
+  std::string frag_str;
+  vert_stream >> vert_str;
+  frag_stream >> frag_str;
 
-  try {
-    vert_file.open(vert_path);
-    std::stringstream vertStream;
-    vertStream << vert_file.rdbuf();
-    vert_file.close();
-    vert_code = vertStream.str();
-  } catch (std::ifstream::failure &e) {
-    std::cout << "Unable to load vertex shader " << vert_path << " " << e.what()
-              << "\n";
-  }
+  const char* vert_code_cstr = vert_str.c_str();
+  const char* frag_code_cstr = frag_str.c_str();
 
-  try {
-    frag_file.open(frag_path);
-    std::stringstream fragStream;
-    fragStream << frag_file.rdbuf();
-    frag_file.close();
-    frag_code = fragStream.str();
-  } catch (std::ifstream::failure &e) {
-    std::cout << "Unable to load fragment shader " << frag_path << " "
-              << e.what() << "\n";
-  }
-
-  const char *vert_code_cstr = vert_code.c_str();
-  const char *frag_code_cstr = frag_code.c_str();
-  unsigned int vert_id, frag_id;
+  unsigned int vert_id;
+  unsigned int frag_id;
 
   vert_id = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vert_id, 1, &vert_code_cstr, NULL);
+  glShaderSource(vert_id, 1, &vert_code_cstr, nullptr);
   glCompileShader(vert_id);
-  try {
-    check_compile(vert_id);
-  } catch (const std::runtime_error &e) {
-    std::cout << e.what();
-  }
+
+  check_compile(vert_id);
 
   frag_id = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(frag_id, 1, &frag_code_cstr, NULL);
+  glShaderSource(frag_id, 1, &frag_code_cstr, nullptr);
   glCompileShader(frag_id);
-  try {
-    check_compile(frag_id);
-  } catch (const std::runtime_error &e) {
-    std::cout << e.what();
-  }
+
+  check_compile(frag_id);
 
   auto program_id = glCreateProgram();
   glAttachShader(program_id, vert_id);
   glAttachShader(program_id, frag_id);
   glLinkProgram(program_id);
-  try {
-    check_link(program_id);
-  } catch (const std::runtime_error &e) {
-    std::cout << e.what();
-  }
+
+  check_link(program_id);
 
   glDeleteShader(vert_id);
   glDeleteShader(frag_id);

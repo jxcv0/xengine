@@ -1,6 +1,7 @@
 #ifndef SHADER_H
 #define SHADER_H
 
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -12,7 +13,10 @@
 #include <glad.h>
 #endif
 
-#include <glm/glm.hpp>
+#include <mat4.h>
+#include <vec2.h>
+#include <vec3.h>
+#include <vec4.h>
 
 /**
  * @brief A GLSL Shader.
@@ -66,7 +70,7 @@ class Shader {
    * @param uniform_name The name of the uniform.
    * @param value The value to set the uniform to.
    */
-  void set_uniform(const char *uniform_name, const glm::vec2 &value) {
+  void set_uniform(const char *uniform_name, const Vec2 &value) {
     glUniform2fv(glGetUniformLocation(m_id, uniform_name), 1, &value[0]);
   }
 
@@ -76,7 +80,7 @@ class Shader {
    * @param uniform_name The name of the uniform.
    * @param value The value to set the uniform to.
    */
-  void set_uniform(const char *uniform_name, const glm::vec3 &value) {
+  void set_uniform(const char *uniform_name, const Vec3 &value) {
     glUniform3fv(glGetUniformLocation(m_id, uniform_name), 1, &value[0]);
   }
 
@@ -86,7 +90,7 @@ class Shader {
    * @param uniform_name The name of the uniform.
    * @param value The value to set the uniform to.
    */
-  void set_uniform(const char *uniform_name, const glm::vec4 &value) {
+  void set_uniform(const char *uniform_name, const Vec4 &value) {
     glUniform4fv(glGetUniformLocation(m_id, uniform_name), 1, &value[0]);
   }
 
@@ -96,39 +100,27 @@ class Shader {
    * @param uniform_name The name of the uniform.
    * @param value The value to set the uniform to.
    */
-  void set_uniform(const char *uniform_name, const glm::mat4 &value) {
+  void set_uniform(const char *uniform_name, const Mat4 &value) {
     auto loc = glGetUniformLocation(m_id, uniform_name);
     glUniformMatrix4fv(loc, 1, GL_FALSE, &value[0][0]);
   }
 
  private:
-  unsigned int m_id;  // Handle to the program object
+  unsigned int m_id;
 };
 
+/**
+ * @brief Utility functions.
+ */
 namespace ShaderUtils {
-
-/**
- * @brief Check the compilation status of a shader.
- *
- * @param id The id of the shader.
- */
-void check_compile(int id);
-
-/**
- * @brief Check the link status of the shader program.
- *
- * @throw ShaderLinkError
- */
-void check_link(int id);
 
 /** @brief Load a shader from a file.
  *  @param vert_path Path to the vertex shader.
  *  @param frag_path Path to the fragment shader.
  *  @return A new Shader object.
- *
- *  TODO shaders can all be loaded and compiled at once before game start.
  */
-Shader load(const char *vert_path, const char *frag_path);
+Shader load(const std::filesystem::path &vert_path,
+            const std::filesystem::path &frag_path);
 }  // namespace ShaderUtils
 
 #endif  // SHADER_H
