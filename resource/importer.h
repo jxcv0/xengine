@@ -52,7 +52,7 @@ class Importer {
    *
    * @param filepath The filepath of the data to import.
    */
-  constexpr explicit inline Importer(const auto filepath)
+  constexpr explicit inline Importer(const std::filesystem::path filepath)
       : m_filepath(filepath), m_allocator() {}
 
   ~Importer() = default;
