@@ -2,6 +2,7 @@
 
 #include <exception>
 #include <fstream>
+#include <sstream>
 
 static inline void check_compile(int id) {
   GLint success;
@@ -28,13 +29,17 @@ Shader ShaderUtils::load(const std::filesystem::path& vert_path,
   std::ifstream vert_stream(vert_path);
   std::ifstream frag_stream(frag_path);
 
-  std::string vert_str;
-  std::string frag_str;
-  vert_stream >> vert_str;
-  frag_stream >> frag_str;
+  std::stringstream vert_ss;
+  std::stringstream frag_ss;
 
-  const char* vert_code_cstr = vert_str.c_str();
-  const char* frag_code_cstr = frag_str.c_str();
+  vert_ss << vert_stream.rdbuf();
+  frag_ss << frag_stream.rdbuf();
+
+  auto vert = vert_ss.str();
+  auto frag = frag_ss.str();
+
+  const char* vert_code_cstr = vert.c_str();
+  const char* frag_code_cstr = frag.c_str();
 
   unsigned int vert_id;
   unsigned int frag_id;
