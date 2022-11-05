@@ -1,3 +1,4 @@
+#include "shader.h"
 #include <glad.h>
 #include <mainwindow.h>
 
@@ -10,6 +11,10 @@ int main(int argc, char const *argv[]) {
   main_window.set_hint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   main_window.set_hint(GLFW_CONTEXT_VERSION_MINOR, 6);
   main_window.set_hint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+  auto shader = ShaderUtils::load("assets/shaders/hellotriangle.vert", 
+                                  "assets/shaders/hellotriangle.frag");
+
   // main_window.set_cursor_position_callback(on_mouse);
   main_window.show();
 
@@ -18,9 +23,14 @@ int main(int argc, char const *argv[]) {
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+  glEnableVertexAttribArray(0);
+
+  shader.use();
 
   while (!main_window.should_close()) {
     main_window.poll_events();
+
     main_window.clear_buffers();
     main_window.swap_buffers();
   }
