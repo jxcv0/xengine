@@ -191,6 +191,13 @@ class Vec3 {
     return os;
   }
 
+  /**
+   * @brief Access the underlying array for OpenGL API.
+   *
+   * @return A const pointer to the underlying array.
+   */
+  const constexpr inline auto value_ptr() const noexcept { return &m_data[0]; }
+
  private:
   float m_data[3] = {0};
 };

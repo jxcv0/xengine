@@ -100,6 +100,15 @@ class Mat4 {
     return os;
   }
 
+  /**
+   * @brief Access the underlying array for OpenGL API.
+   *
+   * @return A const pointer to the underlying array.
+   */
+  const constexpr inline auto value_ptr() const noexcept {
+    return m_data[0].value_ptr();
+  }
+
  private:
   Vec4 m_data[4];
 };
