@@ -8,7 +8,8 @@
 #include <memory>
 #include <utility>
 
-#include "texture.h"
+#include <model.h>
+#include <texture.h>
 
 /**
  * @brief implementation of import function for Importer class.
@@ -31,6 +32,15 @@ void import(T *dest, const std::filesystem::path &filepath) {
  */
 template <>
 void import(Texture *texture, const std::filesystem::path &filepath);
+
+/**
+ * @brief Function specialization for importing a model.
+ *
+ * @param model A pointer to the destination model instance.
+ * @param filepath The path to the file to import.
+ */
+template<>
+void import(Model *model, const std::filesystem::path& filepath);
 
 }  // namespace import_impl
 
