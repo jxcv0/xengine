@@ -19,8 +19,11 @@ int main(int argc, char const *argv[]) {
                                   "assets/shaders/hellotriangle.frag");
 
 
-  unsigned int vbo;
+  unsigned int vbo, vao;
   glGenBuffers(1, &vbo);
+  glGenVertexArrays(1, &vao);
+
+  glBindVertexArray(vao);
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -31,8 +34,10 @@ int main(int argc, char const *argv[]) {
 
   while (!main_window.should_close()) {
     main_window.poll_events();
-
     main_window.clear_buffers();
+
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+
     main_window.swap_buffers();
   }
 
