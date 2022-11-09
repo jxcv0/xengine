@@ -13,11 +13,10 @@ int main(int argc, char const *argv[]) {
   main_window.set_hint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   // main_window.set_cursor_position_callback(on_mouse);
-  main_window.show(); // TODO
+  main_window.show();  // TODO
 
   auto shader = ShaderUtils::load("assets/shaders/hellotriangle.vert",
                                   "assets/shaders/hellotriangle.frag");
-
 
   unsigned int vbo, vao;
   glGenBuffers(1, &vbo);

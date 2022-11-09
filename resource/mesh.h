@@ -1,11 +1,10 @@
 #ifndef MESH_H_
 #define MESH_H_
 
-#include <cstdint>
 #include <vector>
 
-#include "vertex.h"
 #include "material.h"
+#include "vertex.h"
 
 /**
  * @brief A Mesh component. This may in fact be a collection of different

@@ -1,15 +1,14 @@
 #ifndef IMPORTER_H_
 #define IMPORTER_H_
 
+#include <model.h>
 #include <shader.h>
+#include <texture.h>
 
 #include <cassert>
 #include <filesystem>
 #include <memory>
 #include <utility>
-
-#include <model.h>
-#include <texture.h>
 
 /**
  * @brief implementation of import function for Importer class.
@@ -40,8 +39,8 @@ void import(Texture *texture, const std::filesystem::path &filepath);
  * @param mesh A pointer to the destination mesh instance.
  * @param filepath The path to the file to import.
  */
-template<>
-void import(Mesh *mesh, const std::filesystem::path& filepath);
+template <>
+void import(Mesh *mesh, const std::filesystem::path &filepath);
 
 }  // namespace import_impl
 

@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
 #include <importer.h>
-#include <stdexcept>
-#include <texture.h>
 #include <model.h>
+#include <texture.h>
 
 #include <cassert>
+#include <stdexcept>
 
 TEST(importertests, import_texture) {
   Importer<Texture> tex_importer("assets/models/cyborg/cyborg_diffuse.png");
@@ -15,8 +15,7 @@ TEST(importertests, import_texture) {
 
 TEST(importertests, unsupported_file_exception) {
   Importer<Model> imp("unsupported_file.nocando");
-  ASSERT_THROW(imp.import(),
-      std::runtime_error);
+  ASSERT_THROW(imp.import(), std::runtime_error);
 }
 
 TEST(importertests, parsing) {

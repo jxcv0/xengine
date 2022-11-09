@@ -34,8 +34,8 @@ class Resource {
    * @param r The other Resource of any templated type.
    * @return true if the paths to the resource are the same, otherwise false.
    */
-  template <typename T>
-  bool operator==(const Resource<T, Allocator> &r) {
+  template <typename T, template <typename> typename A>
+  bool operator==(const Resource<T, A> &r) {
     return m_filepath == r.filepath();
   }
 
