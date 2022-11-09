@@ -15,14 +15,19 @@ void import_impl::import(Texture *texture,
                                &texture->m_height, &texture->m_num_channels, 0);
 }
 
-static inline auto parse_mtllib(std::stringstream& line) {
+static inline auto parse_mtllib(std::filesystem::path filepath,
+                                std::stringstream& line) {
   std::string str;
   line >> str;
-  return std::filesystem::path(str.c_str());
+
+  filepath.replace_filename(str);
+  std::ifstream mtllib_stream(filepath);
+  // TODO parse .mtl file
+  return nullptr;
 }
 
 template<>
-void import_impl::import(Model *model, const std::filesystem::path& filepath) {
+void import_impl::import(Mesh *mesh, const std::filesystem::path& filepath) {
   if (filepath.extension() != ".obj") {
     throw std::runtime_error("file extension not supported");
   }
@@ -35,9 +40,9 @@ void import_impl::import(Model *model, const std::filesystem::path& filepath) {
       // skip comments
       continue;
     } else if (line_token == "mtllib") {
-      auto mtllib_filepath = parse_mtllib(linestream);
+      auto mtllib = parse_mtllib(filepath, linestream);
     } else if (line_token == "o") {
-      std::cout << "object group\n";
+      std::cout << "object name\n";
     } else if (line_token == "v") {
       std::cout << "vertex\n";
     } else if (line_token == "vt") {

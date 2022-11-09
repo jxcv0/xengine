@@ -34,14 +34,14 @@ template <>
 void import(Texture *texture, const std::filesystem::path &filepath);
 
 /**
- * @brief Function specialization for importing a model from a wavefront .obj
+ * @brief Function specialization for importing a mesh from a wavefront .obj
  *        file. Meshes MUST be triangulated.
  *
- * @param model A pointer to the destination model instance.
+ * @param mesh A pointer to the destination mesh instance.
  * @param filepath The path to the file to import.
  */
 template<>
-void import(Model *model, const std::filesystem::path& filepath);
+void import(Mesh *mesh, const std::filesystem::path& filepath);
 
 }  // namespace import_impl
 
