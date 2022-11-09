@@ -20,7 +20,7 @@ class Resource {
    * @param filepath The path to the file the resource can be loaded from.
    */
   Resource(const std::filesystem::path filepath)
-      : mp_resource(nullptr), m_filepath(filepath), m_importer(filepath) {}
+      : mp_resource(nullptr), m_filepath(filepath) {}
 
   Resource(const Resource<ResourceType, Allocator> &r) = default;
   Resource &operator=(const Resource &) = default;
@@ -46,7 +46,8 @@ class Resource {
    */
   auto get() {
     if (mp_resource == nullptr) {
-      mp_resource.reset(m_importer.import());
+      Importer<ResourceType> importer(m_filepath);
+      mp_resource.reset(importer.import());
     }
     return mp_resource;
   }
@@ -61,7 +62,6 @@ class Resource {
  private:
   std::shared_ptr<ResourceType> mp_resource;
   std::filesystem::path m_filepath;
-  Importer<ResourceType, Allocator> m_importer;
 };
 
 #endif  // RESOURCE_H_

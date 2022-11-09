@@ -11,6 +11,6 @@ TEST(resourcestests, texture) {
 }
 
 TEST(resourcestests, mesh) {
-  Resource<Mesh> mesh_resource("assets/models/cube.obj");
+  Resource<Mesh> mesh_resource("assets/models/cube/cube.obj");
   auto mesh = mesh_resource.get();
 }
