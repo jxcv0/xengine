@@ -56,47 +56,20 @@ struct Index {
   int m_tex_coord_index;
 };
 
+// parse face ("f") line of .obj file
 static auto parse_face(std::stringstream& line) {
-
+  int vertex, normal, tex_coords;
+  line >> vertex >> normal >> tex_coords;
+  return Index{vertex--, normal--, tex_coords--};
 }
 
 template <>
 void import_impl::import(Mesh *mesh, const std::filesystem::path &filepath) {
-
   if (filepath.extension() != ".obj") {
     throw std::runtime_error("file extension not supported");
   }
 
   std::ifstream filestream(filepath);
 
-  // temporary storage for parsed data
-  std::vector<Vec3> positions;
-  std::vector<Vec2> tex_coords;
-  std::vector<Vec3> normals;
-  // std::vector<Material> materials;
-  std::vector<Index> indices;
-
-  for (std::string line; std::getline(filestream, line);) {
-    std::stringstream linestream(line);
-    std::string line_token;
-    linestream >> line_token;
-    if (line_token == "#") {
-      // skip comments - kinda redundant optimization
-      continue;
-    } else if (line_token == "mtllib") {
-      auto mtllib = parse_mtllib(mesh, filepath, linestream);
-    } else if (line_token == "v") {
-      positions.push_back(parse_vertex(linestream));
-    } else if (line_token == "vt") {
-      tex_coords.push_back(parse_tex_coords(linestream));
-    } else if (line_token == "vn") {
-      normals.push_back(parse_normal(linestream));
-    } else if (line_token == "usemtl") {
-      // TODO use materials 
-    } else if (line_token == "f") {
-      // TODO
-      // indices.push_back(parse_face(linestream));
-      std::cout << "face\n";
-    }
-  }
+  // TODO ...
 }
