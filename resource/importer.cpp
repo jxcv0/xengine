@@ -16,13 +16,20 @@
 #include <string>
 #include <vector>
 
-#include "mesh.h"
+#include <mesh.h>
+#include <material.h>
 
 template <>
 void import_impl::import(Texture* texture,
                          const std::filesystem::path& filepath) {
   texture->mp_data = stbi_load(filepath.c_str(), &texture->m_width,
                                &texture->m_height, &texture->m_num_channels, 0);
+}
+
+template<>
+void import_impl::import(Material* material,
+                         const std::filesystem::path& filepath) {
+
 }
 
 // parse "v" and "vn" lines
@@ -86,8 +93,8 @@ void import_impl::import(Mesh* mesh, const std::filesystem::path& filepath) {
   std::vector<std::string> normal_lines;
   std::vector<std::string> tex_coord_lines;
   std::vector<std::string> face_lines;
-  std::string mtllib_line;
-  std::string usemtl_line;
+  // std::string mtllib_line;
+  // std::string usemtl_line;
 
   // divide lines up based on first token
   std::ifstream filestream(filepath);
@@ -100,10 +107,10 @@ void import_impl::import(Mesh* mesh, const std::filesystem::path& filepath) {
       tex_coord_lines.push_back(line.substr(3));
     } else if (line.substr(0, 2) == "f ") {
       face_lines.push_back(line.substr(2));
-    } else if (line.substr(0, 7) == "mtllib ") {
-      mtllib_line = line.substr(7);
-    } else if (line.substr(0, 7) == "usemtl ") {
-      usemtl_line = line.substr(7);
+    // } else if (line.substr(0, 7) == "mtllib ") {
+    //   mtllib_line = line.substr(7);
+    // } else if (line.substr(0, 7) == "usemtl ") {
+    //   usemtl_line = line.substr(7);
     }
   }
 
