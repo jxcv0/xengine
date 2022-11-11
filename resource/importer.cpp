@@ -1,21 +1,25 @@
 #include "importer.h"
-#include "vec2.h"
 
-#include <ios>
 #include <stb_image.h>
+#include <unistd.h>
+#include <vec3.h>
 
+#include <cmath>
+#include <cstdlib>
 #include <filesystem>
 #include <fstream>
+#include <ios>
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include <unistd.h>
 #include <vector>
-#include <vec3.h>
+
+#include "mesh.h"
+#include "vec2.h"
 
 template <>
-void import_impl::import(Texture *texture,
-                         const std::filesystem::path &filepath) {
+void import_impl::import(Texture* texture,
+                         const std::filesystem::path& filepath) {
   texture->mp_data = stbi_load(filepath.c_str(), &texture->m_width,
                                &texture->m_height, &texture->m_num_channels, 0);
 }
@@ -23,7 +27,7 @@ void import_impl::import(Texture *texture,
 // parse "v" and "vn" lines
 std::vector<Vec3> parse_vec3_lines(const std::vector<std::string>& lines) {
   std::vector<Vec3> vectors;
-  for (auto& line : lines) {
+  for (const auto& line : lines) {
     std::stringstream lstream(line);
     float x, y, z;
     lstream >> x >> y >> z;
@@ -35,7 +39,7 @@ std::vector<Vec3> parse_vec3_lines(const std::vector<std::string>& lines) {
 // parse "vt" lines
 std::vector<Vec2> parse_vec2_lines(const std::vector<std::string>& lines) {
   std::vector<Vec2> vectors;
-  for (auto& line : lines) {
+  for (const auto& line : lines) {
     std::stringstream lstream(line);
     float x, y;
     lstream >> x >> y;
@@ -44,27 +48,35 @@ std::vector<Vec2> parse_vec2_lines(const std::vector<std::string>& lines) {
   return vectors;
 }
 
-// a set of indexes for uncompressing .obj
-struct IndexSet {
-  int position[3];
-  int normal[3];
-  int tex_coords[3];
-};
+auto parse_face_tok(const std::string& face) {
+  using size_type = std::string::size_type;
+  unsigned int temp[3];
+  size_type pos = 0, last = 0;
+  for (auto i = 0; i < 3; i++) {
+    pos = face.find('/', last);
+    temp[i] = std::atoi(face.substr(last, pos - last).c_str());
+    last = ++pos;
+  }
+  return Mesh::Index{--temp[0], --temp[1], --temp[2]};
+}
 
-// separate "f" lines into individual index strings
-std::vector<std::string> separate_face_line(const std::string& line) {
-  std::vector<std::string> strings(3);
-  std::stringstream lstream(line);
-  std::string s1, s2, s3;
-  lstream >> s1 >> s2 >> s2;
-  strings.push_back(s1);
-  strings.push_back(s2);
-  strings.push_back(s3);
-  return strings;
+std::vector<Mesh::Index> parse_face_lines(
+    const std::vector<std::string>& lines) {
+  std::vector<Mesh::Index> indices;
+
+  for (const auto& line : lines) {
+    std::stringstream lstream(line);
+    std::string face;
+    for (auto i = 0; i < 3; i++) {
+      lstream >> face;
+      indices.push_back(parse_face_tok(face));
+    }
+  }
+  return indices;
 }
 
 template <>
-void import_impl::import(Mesh *mesh, const std::filesystem::path &filepath) {
+void import_impl::import(Mesh* mesh, const std::filesystem::path& filepath) {
   if (filepath.extension() != ".obj") {
     throw std::runtime_error("file extension not supported");
   }
@@ -95,10 +107,11 @@ void import_impl::import(Mesh *mesh, const std::filesystem::path &filepath) {
   }
 
   auto positions = parse_vec3_lines(position_lines);
-  auto normals = parse_vec3_lines(normal_lines);
   auto tex_coords = parse_vec2_lines(tex_coord_lines);
-
-  for (auto pos : positions) {
-      std::cout << pos << "\n";
+  auto normals = parse_vec3_lines(normal_lines);
+  auto indices = parse_face_lines(face_lines);
+  for (auto i : indices) {
+    std::cout << i.m_position_idx << " " << i.m_tex_coord_idx << " "
+              << i.m_normal_idx << "\n";
   }
 }

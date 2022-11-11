@@ -4,7 +4,9 @@
 
 #include <iostream>
 
-float vertices[]{-0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.0f};
+auto get_verts() {
+  return new float[9]{-0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.0f};
+}
 
 int main(int argc, char const *argv[]) {
   MainWindow main_window(1080, 600, std::string("main-window"));
@@ -24,8 +26,12 @@ int main(int argc, char const *argv[]) {
 
   glBindVertexArray(vao);
 
+  auto vertices = get_verts();
+
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+  // delete[] vertices;
+  glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 9, vertices, GL_STATIC_DRAW);
+  delete[] vertices;  // this could be useful
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
 
