@@ -1,8 +1,10 @@
 #include "importer.h"
 
+#include <algorithm>
 #include <stb_image.h>
 #include <unistd.h>
 #include <vec3.h>
+#include <vec2.h>
 
 #include <cmath>
 #include <cstdlib>
@@ -15,7 +17,6 @@
 #include <vector>
 
 #include "mesh.h"
-#include "vec2.h"
 
 template <>
 void import_impl::import(Texture* texture,
@@ -110,8 +111,8 @@ void import_impl::import(Mesh* mesh, const std::filesystem::path& filepath) {
   auto tex_coords = parse_vec2_lines(tex_coord_lines);
   auto normals = parse_vec3_lines(normal_lines);
   auto indices = parse_face_lines(face_lines);
-  for (auto i : indices) {
-    std::cout << i.m_position_idx << " " << i.m_tex_coord_idx << " "
-              << i.m_normal_idx << "\n";
-  }
+  mesh->m_positions = positions;
+  mesh->m_tex_coords = tex_coords;
+  mesh->m_normals = normals;
+  mesh->m_indices = indices;
 }
