@@ -4,11 +4,6 @@
 #include <stb_image.h>
 
 /**
- * @brief The texture type.
- */
-enum class TextureType { diffuse, specular, normal, height };
-
-/**
  * @brief An image texture.
  */
 struct Texture {
@@ -16,7 +11,6 @@ struct Texture {
   int m_height;
   int m_num_channels;
   unsigned char *mp_data = nullptr;
-  TextureType m_type;
 
   /**
    * @brief Free image memory.

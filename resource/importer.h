@@ -1,10 +1,10 @@
 #ifndef IMPORTER_H_
 #define IMPORTER_H_
 
+#include <material.h>
 #include <model.h>
 #include <shader.h>
 #include <texture.h>
-#include <material.h>
 
 #include <cassert>
 #include <filesystem>
@@ -23,15 +23,6 @@ template <typename T>
 void import(T *dest, const std::filesystem::path &filepath) {
   throw std::runtime_error("no implementation for importing type");
 }
-
-/**
- * @brief Function specialization for importing a texture.
- *
- * @param texture A pointer to the destination texture instance.
- * @param filepath The path to the file to import.
- */
-template <>
-void import(Texture *texture, const std::filesystem::path &filepath);
 
 /**
  * @brief Function specialization for importing a mesh from a wavefront .obj

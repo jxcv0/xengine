@@ -1,12 +1,14 @@
 #include "importer.h"
 
-#include <algorithm>
+#include <material.h>
 #include <math.h>
+#include <mesh.h>
 #include <stb_image.h>
 #include <unistd.h>
-#include <vec3.h>
 #include <vec2.h>
+#include <vec3.h>
 
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
 #include <filesystem>
@@ -17,17 +19,16 @@
 #include <string>
 #include <vector>
 
-#include <mesh.h>
-#include <material.h>
+#include "texture.h"
 
-template <>
-void import_impl::import(Texture* texture,
-                         const std::filesystem::path& filepath) {
-  texture->mp_data = stbi_load(filepath.c_str(), &texture->m_width,
-                               &texture->m_height, &texture->m_num_channels, 0);
+auto load_texture(const std::filesystem::path& filepath) {
+  Texture texture;
+  texture.mp_data = stbi_load(filepath.c_str(), &texture.m_width,
+                              &texture.m_height, &texture.m_num_channels, 0);
+  return texture;
 }
 
-template<>
+template <>
 void import_impl::import(Material* material,
                          const std::filesystem::path& filepath) {
   if (filepath.extension() != ".mtl") {
@@ -43,7 +44,17 @@ void import_impl::import(Material* material,
       std::stringstream lstream(line.substr(7));
       std::filesystem::path texture_path;
       lstream >> texture_path;
-      // to be continued ...
+      material->m_map_diffuse = load_texture(texture_path);
+    } else if (line.substr(0, 9) == "map_Bump ") {
+      std::stringstream lstream(line.substr(9));
+      std::filesystem::path texture_path;
+      lstream >> texture_path;
+      material->m_map_bump = load_texture(texture_path);
+    } else if (line.substr(0, 7) == "map_Ks ") {
+      std::stringstream lstream(line.substr(7));
+      std::filesystem::path texture_path;
+      lstream >> texture_path;
+      material->m_map_specular = load_texture(texture_path);
     }
   }
 }
@@ -123,10 +134,10 @@ void import_impl::import(Mesh* mesh, const std::filesystem::path& filepath) {
       tex_coord_lines.push_back(line.substr(3));
     } else if (line.substr(0, 2) == "f ") {
       face_lines.push_back(line.substr(2));
-    // } else if (line.substr(0, 7) == "mtllib ") {
-    //   mtllib_line = line.substr(7);
-    // } else if (line.substr(0, 7) == "usemtl ") {
-    //   usemtl_line = line.substr(7);
+      // } else if (line.substr(0, 7) == "mtllib ") {
+      //   mtllib_line = line.substr(7);
+      // } else if (line.substr(0, 7) == "usemtl ") {
+      //   usemtl_line = line.substr(7);
     }
   }
 
