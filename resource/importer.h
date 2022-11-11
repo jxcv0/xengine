@@ -4,6 +4,7 @@
 #include <model.h>
 #include <shader.h>
 #include <texture.h>
+#include <material.h>
 
 #include <cassert>
 #include <filesystem>
@@ -36,12 +37,21 @@ void import(Texture *texture, const std::filesystem::path &filepath);
  * @brief Function specialization for importing a mesh from a wavefront .obj
  *        file. Meshes MUST be triangulated.
  *
- * @param mesh A pointer to the destination mesh instance.
+ * @param mesh A pointer to the destination mesh.
  * @param filepath The path to the file to import.
  */
 template <>
 void import(Mesh *mesh, const std::filesystem::path &filepath);
 
+/**
+ * @brief Function specialization for importing a material from a wavefront
+ *        .mtl file.
+ *
+ * @param texture A pointer to the destination material.
+ * @param filepath The path to the file to import.
+ */
+template <>
+void import(Material *material, const std::filesystem::path &filepath);
 }  // namespace import_impl
 
 template <typename T, template <typename> typename Allocator = std::allocator>

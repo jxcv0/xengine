@@ -11,13 +11,10 @@
  *        We assume these images will never be used outside of a material.
  */
 struct Material {
-  Vec3 m_ambient;          // Ka
-  Vec3 m_diffuse;          // Kd
-  Vec3 m_specular;         // Ks
-  float m_specular_exp;    // specular exponent
-  Texture m_map_diffuse; 
-  Texture m_map_bump;
-  Texture m_map_specular;
+  float m_specular_exp;   // specular exponent
+  Texture m_map_diffuse;  // map_Kd
+  Texture m_map_bump;     // map_Bump
+  Texture m_map_specular; // map_Ks
 };
 
 #endif  // MATERIAL_H_

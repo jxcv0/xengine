@@ -1,6 +1,7 @@
 #include "importer.h"
 
 #include <algorithm>
+#include <math.h>
 #include <stb_image.h>
 #include <unistd.h>
 #include <vec3.h>
@@ -29,7 +30,22 @@ void import_impl::import(Texture* texture,
 template<>
 void import_impl::import(Material* material,
                          const std::filesystem::path& filepath) {
+  if (filepath.extension() != ".mtl") {
+    throw std::runtime_error("file extension not supported");
+  }
 
+  std::ifstream filestream(filepath);
+  for (std::string line; std::getline(filestream, line);) {
+    if (line.substr(0, 3) == "Ns ") {
+      std::stringstream lstream(line.substr(2));
+      lstream >> material->m_specular_exp;
+    } else if (line.substr(0, 7) == "map_Kd ") {
+      std::stringstream lstream(line.substr(7));
+      std::filesystem::path texture_path;
+      lstream >> texture_path;
+      // to be continued ...
+    }
+  }
 }
 
 // parse "v" and "vn" lines
@@ -93,7 +109,7 @@ void import_impl::import(Mesh* mesh, const std::filesystem::path& filepath) {
   std::vector<std::string> normal_lines;
   std::vector<std::string> tex_coord_lines;
   std::vector<std::string> face_lines;
-  // std::string mtllib_line;
+  // std::string mtllib_line; where to put this?
   // std::string usemtl_line;
 
   // divide lines up based on first token

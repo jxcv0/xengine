@@ -18,7 +18,7 @@ TEST(importertests, unsupported_file_exception) {
   ASSERT_THROW(imp.import(), std::runtime_error);
 }
 
-TEST(importer_impltests, parsing) {
+TEST(importer_impltests, obj_parsing) {
   Mesh mesh;
   import_impl::import(&mesh, "assets/models/cube/cube.obj");
 
@@ -51,4 +51,10 @@ TEST(importer_impltests, parsing) {
   ASSERT_EQ(mesh.m_indices.back().m_position_idx, 7);
   ASSERT_EQ(mesh.m_indices.back().m_tex_coord_idx, 10);
   ASSERT_EQ(mesh.m_indices.back().m_normal_idx, 5);
+}
+
+TEST(import_impltests, mtl_parsing) {
+  Material material;
+  import_impl::import(&material, "assets/models/cyborg/cyborg.mtl");
+  ASSERT_FLOAT_EQ(material.m_specular_exp, 92.15686f);
 }
