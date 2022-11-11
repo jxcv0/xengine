@@ -1,5 +1,7 @@
 #include "importer.h"
+#include "vec2.h"
 
+#include <ios>
 #include <stb_image.h>
 
 #include <filesystem>
@@ -7,6 +9,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <unistd.h>
 #include <vector>
 #include <vec3.h>
 
@@ -17,50 +20,47 @@ void import_impl::import(Texture *texture,
                                &texture->m_height, &texture->m_num_channels, 0);
 }
 
-// parse mtllib line of .obj file
-static auto parse_mtllib(Mesh *mesh, std::filesystem::path filepath,
-                         std::stringstream &line) {
-  std::string str;
-  line >> str;
-
-  filepath.replace_filename(str);
-  std::ifstream mtllib_stream(filepath);
-  // TODO parse .mtl file
-  return nullptr;
+// parse "v" and "vn" lines
+std::vector<Vec3> parse_vec3_lines(const std::vector<std::string>& lines) {
+  std::vector<Vec3> vectors;
+  for (auto& line : lines) {
+    std::stringstream lstream(line);
+    float x, y, z;
+    lstream >> x >> y >> z;
+    vectors.push_back(Vec3(x, y, z));
+  }
+  return vectors;
 }
 
-// parse vertex ("v") line of .obj file
-static auto parse_vertex(std::stringstream& line) {
-  float x, y, z;
-  line >> x >> y >> z;
-  return Vec3(x, y, z);
+// parse "vt" lines
+std::vector<Vec2> parse_vec2_lines(const std::vector<std::string>& lines) {
+  std::vector<Vec2> vectors;
+  for (auto& line : lines) {
+    std::stringstream lstream(line);
+    float x, y;
+    lstream >> x >> y;
+    vectors.push_back(Vec2(x, y));
+  }
+  return vectors;
 }
 
-// parse texture coordinates ("vt") line of .obj file
-static auto parse_tex_coords(std::stringstream& line) {
-  float x, y;
-  line >> x >> y;
-  return Vec2(x, y);
-}
-
-// parse texture coordinates ("vt") line of .obj file
-static auto parse_normal(std::stringstream& line) {
-  float x, y, z;
-  line >> x >> y >> z;
-  return Vec3(x, y, z);
-}
-
-struct Index {
-  int m_vertex_index;
-  int m_normal;
-  int m_tex_coord_index;
+// a set of indexes for uncompressing .obj
+struct IndexSet {
+  int position[3];
+  int normal[3];
+  int tex_coords[3];
 };
 
-// parse face ("f") line of .obj file
-static auto parse_face(std::stringstream& line) {
-  int vertex, normal, tex_coords;
-  line >> vertex >> normal >> tex_coords;
-  return Index{vertex--, normal--, tex_coords--};
+// separate "f" lines into individual index strings
+std::vector<std::string> separate_face_line(const std::string& line) {
+  std::vector<std::string> strings(3);
+  std::stringstream lstream(line);
+  std::string s1, s2, s3;
+  lstream >> s1 >> s2 >> s2;
+  strings.push_back(s1);
+  strings.push_back(s2);
+  strings.push_back(s3);
+  return strings;
 }
 
 template <>
@@ -69,7 +69,36 @@ void import_impl::import(Mesh *mesh, const std::filesystem::path &filepath) {
     throw std::runtime_error("file extension not supported");
   }
 
-  std::ifstream filestream(filepath);
+  std::vector<std::string> position_lines;
+  std::vector<std::string> normal_lines;
+  std::vector<std::string> tex_coord_lines;
+  std::vector<std::string> face_lines;
+  std::string mtllib_line;
+  std::string usemtl_line;
 
-  // TODO ...
+  // divide lines up based on first token
+  std::ifstream filestream(filepath);
+  for (std::string line; std::getline(filestream, line);) {
+    if (line.substr(0, 2) == "v ") {
+      position_lines.push_back(line.substr(2));
+    } else if (line.substr(0, 3) == "vn ") {
+      normal_lines.push_back(line.substr(3));
+    } else if (line.substr(0, 3) == "vt ") {
+      tex_coord_lines.push_back(line.substr(3));
+    } else if (line.substr(0, 2) == "f ") {
+      face_lines.push_back(line.substr(2));
+    } else if (line.substr(0, 7) == "mtllib ") {
+      mtllib_line = line.substr(7);
+    } else if (line.substr(0, 7) == "usemtl ") {
+      usemtl_line = line.substr(7);
+    }
+  }
+
+  auto positions = parse_vec3_lines(position_lines);
+  auto normals = parse_vec3_lines(normal_lines);
+  auto tex_coords = parse_vec2_lines(tex_coord_lines);
+
+  for (auto pos : positions) {
+      std::cout << pos << "\n";
+  }
 }

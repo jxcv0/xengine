@@ -19,6 +19,6 @@ TEST(importertests, unsupported_file_exception) {
 }
 
 TEST(importertests, parsing) {
-  Importer<Model> imp("assets/models/cube/cube.obj");
-  auto model = imp.import();
+  Importer<Mesh> imp("assets/models/cube/cube.obj");
+  auto mesh = imp.import();
 }
