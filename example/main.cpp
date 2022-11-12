@@ -1,8 +1,11 @@
 #include <glad.h>
 #include <mainwindow.h>
 #include <shader.h>
+// #include <mesh.h>
 
 #include <iostream>
+
+// TODO copy learnopengl code for cube here then replace with Resource<Mesh>
 
 auto get_verts() {
   return new float[9]{-0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.0f};
