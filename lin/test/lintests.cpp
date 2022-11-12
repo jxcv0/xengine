@@ -56,3 +56,27 @@ TEST(lintests, rotate) {
   ASSERT_FLOAT_EQ(r[3][2], 0.0f);
   ASSERT_FLOAT_EQ(r[3][3], 1.0f);
 }
+
+TEST(lintests, look_at) {
+  Vec3 eye(3.0f, 3.0f, 3.0f);
+  Vec3 ctr(1.0f, 0.0f, 1.0f);
+  Vec3 up(0.0f, 1.0f, 0.0f);
+
+  auto a = lin::look_at(eye, eye + ctr, up);
+  ASSERT_FLOAT_EQ(a[0][0], -0.707107f);
+  ASSERT_FLOAT_EQ(a[0][1], 0.0f);
+  ASSERT_FLOAT_EQ(a[0][2], -0.707107f);
+  ASSERT_FLOAT_EQ(a[0][3], 0.0f);
+  ASSERT_FLOAT_EQ(a[1][0], 0.0f);
+  ASSERT_FLOAT_EQ(a[1][1], 1.0f);
+  ASSERT_FLOAT_EQ(a[1][2], -0.0f);
+  ASSERT_FLOAT_EQ(a[1][3], 0.0f);
+  ASSERT_FLOAT_EQ(a[2][0], 0.707107f);
+  ASSERT_FLOAT_EQ(a[2][1], -0.0f);
+  ASSERT_FLOAT_EQ(a[2][2], -0.707107f);
+  ASSERT_FLOAT_EQ(a[2][3], 0.0f);
+  ASSERT_FLOAT_EQ(a[3][0], -0.0f);
+  ASSERT_FLOAT_EQ(a[3][1], -3.0f);
+  ASSERT_FLOAT_EQ(a[3][2], 4.24264f);
+  ASSERT_FLOAT_EQ(a[3][3], 1.0f);
+}

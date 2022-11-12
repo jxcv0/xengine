@@ -65,6 +65,7 @@ class Importer {
    */
   T *import() {
     T *dest = m_allocator.allocate(sizeof(T));
+    // seems to be the simplest way of doing partial template specialization
     import_impl::import(dest, m_filepath);
     return dest;
   }
