@@ -25,6 +25,14 @@ constexpr inline float radians(float degrees) noexcept {
   return degrees * (M_PI / 180.0f);
 }
 
+/**
+ * @brief Create perspective matrix.
+ *
+ * @param fov The field of view in degrees.
+ * @param near The near clip distance.
+ * @param far The far clip distance.
+ * @param aspect_ratio The aspect ratio of the frustum
+ */
 constexpr Mat4 perspective(const float fov, const float near, const float far,
                            const float aspect_ratio) {
   Mat4 result(0.0f);
@@ -45,11 +53,11 @@ constexpr Mat4 perspective(const float fov, const float near, const float far,
  * @param up The up direction of the view.
  * @return A view matrix.
  */
-Mat4 look_at(const Vec3& eye, const Vec3& ctr, const Vec3& up) {
+inline Mat4 look_at(const Vec3& eye, const Vec3& ctr, const Vec3& up) {
   auto f = (ctr - eye).normalize();
   auto s = (f * up).normalize();
   auto u = s * f;
-    
+
   Mat4 mat(1.0f);
   mat[0][0] = s[0];
   mat[1][0] = s[1];
@@ -86,14 +94,15 @@ constexpr Mat4 translate(const Mat4& m, const Vec3& v) {
 }
 
 /**
- * @brief Create a rotation matrix.
+ * @brief Rotate a matrix about a vector.
  *
  * @param m The matrix to apply the rotation to.
  * @param axis The axis of the rotation.
- * @param angle The rotation angle in radians.
+ * @param angle The rotation angle in degrees.
  * @return A rotation matrix.
  */
 constexpr Mat4 rotate(const Mat4& m, const Vec3& axis, float angle) {
+  auto a = radians(angle);
   float c = std::cos(angle);
   float s = std::sin(angle);
   float t = 1.0f - c;

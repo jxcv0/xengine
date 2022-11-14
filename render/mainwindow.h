@@ -12,10 +12,7 @@
 #endif
 
 #include <GLFW/glfw3.h>
-
-#include <glm/ext.hpp>
-#include <glm/glm.hpp>
-
+#include <lin.h>
 // #include "keys.h"
 
 class MainWindow {
@@ -136,12 +133,11 @@ class MainWindow {
    *  \param fov The field of view.
    *  \return    The projection matrix.
    */
-  glm::mat4 projection_matrix(float fov) {
-    if (fov == m_fov) {
+  auto projection_matrix(float fov) {
+    if (fov != m_fov) {
       m_fov = fov;
-      m_perspective_matrix =
-          glm::perspective(glm::radians(m_fov),
-                           ((float)m_width / (float)m_height), 0.1f, 100.0f);
+      m_perspective_matrix = lin::perspective(
+          m_fov, ((float)m_width / (float)m_height), 0.1f, 100.0f);
     }
     return m_perspective_matrix;
   }
@@ -152,8 +148,8 @@ class MainWindow {
   float m_height = 480;
   std::string m_name = "XENGINE_WINDOW";
   std::uint32_t m_input_buffer;
-  float m_fov = 60.0f;
-  glm::mat4 m_perspective_matrix;
+  float m_fov = 0.0f;
+  Mat4 m_perspective_matrix;
 };
 
 #endif  // MAINWINDOW_H_

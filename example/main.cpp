@@ -1,6 +1,9 @@
 #include <glad.h>
 #include <mainwindow.h>
 #include <shader.h>
+
+#include "lin.h"
+#include "vec3.h"
 // #include <mesh.h>
 
 #include <iostream>
@@ -18,10 +21,10 @@ int main(int argc, char const *argv[]) {
   main_window.set_hint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   // main_window.set_cursor_position_callback(on_mouse);
-  main_window.show();  // TODO
+  main_window.show();  // TODO redo main window
 
-  auto shader = ShaderUtils::load("assets/shaders/hellotriangle.vert",
-                                  "assets/shaders/hellotriangle.frag");
+  auto shader =
+      ShaderUtils::load("render/glsl/uber.vert", "render/glsl/uber.frag");
 
   unsigned int vbo, vao;
   glGenBuffers(1, &vbo);
@@ -32,12 +35,21 @@ int main(int argc, char const *argv[]) {
   auto vertices = get_verts();
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  // delete[] vertices;
   glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 9, vertices, GL_STATIC_DRAW);
   delete[] vertices;  // this could be useful
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
 
+  // this all works but the rendered thing is off the screen
+  auto projection_matrix = main_window.projection_matrix(60.0f);
+  // auto view_matrix = lin::look_at(Vec3()
+  Mat4 view_matrix(1.0f);
+  view_matrix = lin::translate(view_matrix, Vec3(0.0f, 0.0f, -3.0f));
+  Mat4 model_matrix(1.0f);
+  model_matrix = lin::rotate(model_matrix, Vec3(1.0f, 0.0f, 0.0f), -55.0f);
+  shader.set_uniform("projection", projection_matrix);
+  shader.set_uniform("view", view_matrix);
+  shader.set_uniform("model", model_matrix);
   shader.use();
 
   while (!main_window.should_close()) {
