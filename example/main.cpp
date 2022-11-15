@@ -10,10 +10,6 @@
 
 // TODO copy learnopengl code for cube here then replace with Resource<Mesh>
 
-auto get_verts() {
-  return new float[9]{-0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.0f};
-}
-
 int main(int argc, char const *argv[]) {
   MainWindow main_window(1080, 600, std::string("main-window"));
   main_window.set_hint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -32,21 +28,22 @@ int main(int argc, char const *argv[]) {
 
   glBindVertexArray(vao);
 
-  auto vertices = get_verts();
+  float vertices[] = {
+    // TODO make cube
+  };
 
+  // TODO set up buffers for cube
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 9, vertices, GL_STATIC_DRAW);
-  delete[] vertices;  // this could be useful
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
 
-  // this all works but the rendered thing is off the screen
   auto projection_matrix = main_window.projection_matrix(60.0f);
-  // auto view_matrix = lin::look_at(Vec3()
   Mat4 view_matrix(1.0f);
   view_matrix = lin::translate(view_matrix, Vec3(0.0f, 0.0f, -3.0f));
   Mat4 model_matrix(1.0f);
   model_matrix = lin::rotate(model_matrix, Vec3(1.0f, 0.0f, 0.0f), -55.0f);
+
   shader.set_uniform("projection", projection_matrix);
   shader.set_uniform("view", view_matrix);
   shader.set_uniform("model", model_matrix);

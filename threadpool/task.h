@@ -59,6 +59,9 @@ class SpecializedTask : public Task {
         std::bind(std::forward<Function>(f), std::forward<Args>(args)...));
   }
 
+  /**
+   * @brief Desctuctor.
+   */
   virtual ~SpecializedTask() {}
 
   /**
