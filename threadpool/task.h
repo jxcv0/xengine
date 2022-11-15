@@ -17,12 +17,32 @@ class Task {
 };
 
 /**
- * @brief Class template that wraps a std::packaged_task and realizes the Task
- *        interface. This way the threadpool can store a task with any arguments
- *        and return types.
+ * @brief Alternative interface for specializing tasks that so far does not work
+ *        for some reason.
+ */
+// class TaskView {
+//  public:
+//   template <typename Schedulable>
+//   explicit TaskView(const Schedulable& s)
+//       : mp_task{&s}
+//       , invoke_impl{[](const void *task) {
+//           return static_cast<const Schedulable*>(task)->invoke(); }}
+//   { }
+//
+//   void invoke() { invoke_impl(mp_task); }
+//  private:
+//   const void *mp_task;
+//   void (*invoke_impl)(const void*);
+// };
+
+/**
+ * @brief Class template that wraps a std::packaged_task. This way the
+ *        threadpool can store a task with any arguments and return types.
+ *        This solves problems I don't have yet and create problems that I
+ *        definitely do have.
  */
 template <typename Function, typename... Args>
-class SpecializedTask : public Task {
+class SpecializedTask {
  public:
   using ReturnType =
       typename std::result_of<typename std::decay<Function>::type(
@@ -51,7 +71,7 @@ class SpecializedTask : public Task {
   /**
    * @brief Invoke this task.
    */
-  void invoke() override { m_task(); }
+  void invoke() { m_task(); }
 
  private:
   std::packaged_task<ReturnType()> m_task;
