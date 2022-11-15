@@ -42,7 +42,7 @@ class Task {
  *        definitely do have.
  */
 template <typename Function, typename... Args>
-class SpecializedTask {
+class SpecializedTask : public Task {
  public:
   using ReturnType =
       typename std::result_of<typename std::decay<Function>::type(
@@ -71,7 +71,7 @@ class SpecializedTask {
   /**
    * @brief Invoke this task.
    */
-  void invoke() { m_task(); }
+  void invoke() override { m_task(); }
 
  private:
   std::packaged_task<ReturnType()> m_task;

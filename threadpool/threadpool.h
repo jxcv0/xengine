@@ -54,7 +54,7 @@ class ThreadPool {
     // TODO needs allocator
     auto task = new SpecializedTask<Function, Args...>(f, args...);
     std::lock_guard lk(m_mutex);
-    m_tasks.push_back(TaskView(task));
+    m_tasks.push_back(task);
     m_cv.notify_one();
     return task->get_future();
   }
@@ -75,12 +75,12 @@ class ThreadPool {
       m_tasks.erase(m_tasks.begin());
       lk.unlock();
       m_cv.notify_one();
-      task.invoke();
-      // delete task;  // TODO see above
+      task->invoke();
+      delete task;  // TODO see above
     }
   };
 
-  std::vector<TaskView> m_tasks;
+  std::vector<Task*> m_tasks;
   std::vector<std::thread> m_worker_threads;
   std::mutex m_mutex;
   std::condition_variable m_cv;
