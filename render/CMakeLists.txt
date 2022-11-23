@@ -4,12 +4,14 @@ project(render)
 set(
   SOURCES
     shader.cpp
+    checkerr.cpp
 )
 
 set(
   HEADERS
     mainwindow.h
     shader.h
+    checkerr.h
 )
 
 add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})
