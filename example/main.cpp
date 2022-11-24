@@ -60,11 +60,10 @@ int main(int argc, char const *argv[]) {
   auto view_matrix = lin::translate(Mat4(1.0f), Vec3(0.0f, 0.0f, -3.0f));
   auto model_matrix = lin::translate(Mat4(1.0f), Vec3(0.0f, 0.0f, 0.0f));
 
-  shader.use();
   shader.set_uniform("projection", projection_matrix);
   shader.set_uniform("view", view_matrix);
   shader.set_uniform("model", model_matrix);
-  gl_print_error(std::cout, __FILE__, __LINE__);
+  shader.use();
 
   while (!main_window.should_close()) {
     main_window.poll_events();

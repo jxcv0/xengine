@@ -73,7 +73,6 @@ class MainWindow {
 
     int flags;
     glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
-    std::cout << flags << "\n";
     if (flags & GL_CONTEXT_FLAG_DEBUG_BIT) {
       glEnable(GL_DEBUG_OUTPUT);
       glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
