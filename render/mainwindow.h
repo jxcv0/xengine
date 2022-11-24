@@ -84,12 +84,12 @@ class MainWindow {
     glfwSetInputMode(mp_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // depth testing
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
+    // glEnable(GL_DEPTH_TEST);
+    // glDepthFunc(GL_LESS);
 
     // face culling
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+    // glEnable(GL_CULL_FACE);
+    // glCullFace(GL_BACK);
   }
 
   /*! \brief  Check if the window should close.

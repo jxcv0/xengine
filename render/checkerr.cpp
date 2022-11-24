@@ -39,7 +39,7 @@ void gl_debug_output(GLenum source, GLenum type, unsigned int id,
                               GLenum severity, GLsizei length,
                               const char *message, const void *user_param) {
   // ignore non-significant error/warning codes
-  if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
+  // if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
 
 
   switch (source) {
@@ -103,10 +103,10 @@ void gl_debug_output(GLenum source, GLenum type, unsigned int id,
       std::cout << " - severity medium";
       break;
     case GL_DEBUG_SEVERITY_LOW:
-      std::cout << " - severity: low";
+      std::cout << " - severity low";
       break;
     case GL_DEBUG_SEVERITY_NOTIFICATION:
-      std::cout << " - severity: notification";
+      std::cout << " - severity notification";
       break;
   }
   std::cout << "\n";
