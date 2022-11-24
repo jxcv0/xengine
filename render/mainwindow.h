@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+#include "checkerr.h"
+
 #ifndef OPENGL_LIBS
 #define OPENGL_LIBS
 #include <glad.h>
@@ -67,6 +69,17 @@ class MainWindow {
       perror("Unable to initialize GLAD");
       glfwTerminate();
       return;
+    }
+
+    int flags;
+    glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+    std::cout << flags << "\n";
+    if (flags & GL_CONTEXT_FLAG_DEBUG_BIT) {
+      glEnable(GL_DEBUG_OUTPUT);
+      glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+      glDebugMessageCallback(gl_debug_output, nullptr);
+      glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0,
+                            nullptr, GL_TRUE);
     }
 
     glfwSetInputMode(mp_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);

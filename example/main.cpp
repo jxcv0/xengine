@@ -17,6 +17,7 @@ int main(int argc, char const *argv[]) {
   main_window.set_hint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   main_window.set_hint(GLFW_CONTEXT_VERSION_MINOR, 6);
   main_window.set_hint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  main_window.set_hint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 
   // main_window.set_cursor_position_callback(on_mouse);
   main_window.show();  // TODO redo main window so that gl context can be
@@ -25,9 +26,16 @@ int main(int argc, char const *argv[]) {
   auto shader =
       ShaderUtils::load("render/glsl/uber.vert", "render/glsl/uber.frag");
 
-  float vertices[] = {0.5f, -0.5f, -0.5f, 0.5f,  -0.5f, 0.5f,  -0.5f, -0.5f,
-                      0.5f, -0.5f, -0.5f, -0.5f, 0.5f,  0.5f,  -0.5f, 0.5f,
-                      0.5f, 0.5f,  -0.5f, 0.5f,  0.5f,  -0.5f, 0.5f,  -0.5f};
+  float vertices[] = {
+    0.5f, -0.5f, -0.5f,
+    0.5f,  -0.5f, 0.5f,
+    -0.5f, -0.5f, 0.5f,
+    -0.5f, -0.5f, -0.5f,
+    0.5f,  0.5f,  -0.5f,
+    0.5f, 0.5f, 0.5f,
+    -0.5f, 0.5f, 0.5f,
+    -0.5f, 0.5f, -0.5f
+  };
 
   /*
   float vertices[] = {
@@ -50,18 +58,17 @@ int main(int argc, char const *argv[]) {
 
   auto projection_matrix = main_window.projection_matrix(60.0f);
   auto view_matrix = lin::translate(Mat4(1.0f), Vec3(0.0f, 0.0f, -3.0f));
+  auto model_matrix = lin::translate(Mat4(1.0f), Vec3(0.0f, 0.0f, 0.0f));
 
-  auto model_matrix = lin::rotate(Mat4(1.0f), Vec3(1.0f, 0.0f, 0.0f), -55.0f);
-
+  shader.use();
   shader.set_uniform("projection", projection_matrix);
   shader.set_uniform("view", view_matrix);
   shader.set_uniform("model", model_matrix);
-  shader.use();
+  gl_print_error(std::cout, __FILE__, __LINE__);
 
   while (!main_window.should_close()) {
     main_window.poll_events();
     main_window.clear_buffers();
-    gl_print_error(__FILE__, __LINE__);
 
     glDrawArrays(GL_TRIANGLES, 0, 8);
 

@@ -105,7 +105,7 @@ class Mat4 {
    *
    * @return A const pointer to the underlying array.
    */
-  const constexpr inline auto value_ptr() const noexcept {
+  const constexpr inline float* value_ptr() const noexcept {
     return m_data[0].value_ptr();
   }
 
