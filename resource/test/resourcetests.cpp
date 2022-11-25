@@ -4,10 +4,10 @@
 #include <texture.h>
 
 TEST(resourcestests, texture) {
-  Resource<Texture> tex_resource("assets/models/cyborg/cyborg_diffuse.png");
-  auto tex = tex_resource.get();
+  Resource<Material> material_res("assets/models/cyborg/cyborg_diffuse.png");
+  auto tex = material_res.get();
   ASSERT_NE(tex, nullptr);
-  ASSERT_EQ(tex->m_width, 1024);
+  ASSERT_EQ(material_res.get()->m_map_diffuse.m_width, 1024);
 }
 
 TEST(resourcestests, mesh) {

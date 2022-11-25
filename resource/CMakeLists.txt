@@ -3,13 +3,13 @@ project(resource)
 
 set(
     SOURCES
-        importer.cpp
+        import.cpp
 )
 
 set(
     HEADERS
         resource.h
-        importer.h
+        import.h
         logallocator.h
 )
 

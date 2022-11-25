@@ -45,7 +45,6 @@ class LogAllocator {
    * @brief Allocates storage suitable for an array object of type T[n] and
    *        creates the array, but does not construct array elements.
    *
-   *
    * @param n The number of elements to allocate storage for.
    * @return A pointer to the newly allocated memory.
    * @throws std::bad_alloc()
@@ -73,4 +72,5 @@ class LogAllocator {
     std::free(p);
   }
 };
+
 #endif  // LOGALLOCATOR_H_

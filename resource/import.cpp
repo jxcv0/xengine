@@ -1,4 +1,4 @@
-#include "importer.h"
+#include "import.h"
 
 #include <material.h>
 #include <math.h>
@@ -29,7 +29,7 @@ auto load_texture(const std::filesystem::path& filepath) {
 }
 
 template <>
-void import_impl::import(Material* material,
+void xen::import(Material* material,
                          const std::filesystem::path& filepath) {
   if (filepath.extension() != ".mtl") {
     throw std::runtime_error("file extension not supported");
@@ -111,7 +111,7 @@ std::vector<Mesh::Index> parse_face_lines(
 }
 
 template <>
-void import_impl::import(Mesh* mesh, const std::filesystem::path& filepath) {
+void xen::import(Mesh* mesh, const std::filesystem::path& filepath) {
   if (filepath.extension() != ".obj") {
     throw std::runtime_error("file extension not supported");
   }

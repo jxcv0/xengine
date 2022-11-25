@@ -1,9 +1,12 @@
-#ifndef IMPORTER_H_
-#define IMPORTER_H_
+#ifndef IMPORT_H_
+#define IMPORT_H_
 
+#include <cstring>
+#include <exception>
 #include <material.h>
 #include <model.h>
 #include <shader.h>
+#include <stdexcept>
 #include <texture.h>
 
 #include <cassert>
@@ -11,10 +14,7 @@
 #include <memory>
 #include <utility>
 
-/**
- * @brief implementation of import function for Importer class.
- */
-namespace import_impl {
+namespace xen {
 
 /**
  * @brief Unspecialized import function throws runtime error.
@@ -43,36 +43,6 @@ void import(Mesh *mesh, const std::filesystem::path &filepath);
  */
 template <>
 void import(Material *material, const std::filesystem::path &filepath);
-}  // namespace import_impl
+}  // namespace xen
 
-template <typename T, template <typename> typename Allocator = std::allocator>
-class Importer {
- public:
-  /**
-   * @brief Construct an importer that will operate on a filepath.
-   *
-   * @param filepath The filepath of the data to import.
-   */
-  constexpr explicit inline Importer(const std::filesystem::path &filepath)
-      : m_filepath(filepath), m_allocator() {}
-
-  ~Importer() = default;
-
-  /**
-   * @brief Import the data from the file.
-   *
-   * @return A pointer to the data.
-   */
-  T *import() {
-    T *dest = m_allocator.allocate(sizeof(T));
-    // seems to be the simplest way of doing partial template specialization
-    import_impl::import(dest, m_filepath);
-    return dest;
-  }
-
- private:
-  std::filesystem::path m_filepath;
-  Allocator<T> m_allocator;
-};
-
-#endif  // IMPORTER_H_
+#endif  // IMPORT_H_

@@ -1,10 +1,11 @@
 #ifndef RESOURCE_H_
 #define RESOURCE_H_
 
+#include <alloca.h>
 #include <filesystem>
 #include <memory>
 
-#include "importer.h"
+#include "import.h"
 
 /**
  * @brief A game resource.
@@ -20,18 +21,25 @@ class Resource {
    * @param filepath The path to the file the resource can be loaded from.
    */
   Resource(const std::filesystem::path filepath)
-      : mp_resource(nullptr), m_filepath(filepath) {}
+        : m_allocator()
+        , m_filepath(filepath) {
+    mp_resource = m_allocator.allocate(1);
+    xen::import(mp_resource, filepath);
+  }
 
   Resource(const Resource<ResourceType, Allocator> &r) = default;
   Resource &operator=(const Resource &) = default;
   Resource &operator=(Resource &&) = default;
-  ~Resource() = default;
+
+  ~Resource() {
+    m_allocator.deallocate(mp_resource, 1);
+  }
 
   /**
    * @brief Comparison operator. If the filepaths are the same then resources
    *        are assumed to be identical.
    *
-   * @param r The other Resource of any templated type.
+   * @param r The other Resource object.
    * @return true if the paths to the resource are the same, otherwise false.
    */
   template <typename T, template <typename> typename A>
@@ -40,17 +48,11 @@ class Resource {
   }
 
   /**
-   * @brief Get a const ref to the underlying resource.
+   * @brief Get a pointer to the underlying resource.
    *
    * @return A shared pointer to the resource.
    */
-  auto get() {
-    if (mp_resource == nullptr) {
-      Importer<ResourceType> importer(m_filepath);
-      mp_resource.reset(importer.import());
-    }
-    return mp_resource;
-  }
+  const auto get() const { return mp_resource; }
 
   /**
    * @brief Get the filepath of the resource.
@@ -60,7 +62,8 @@ class Resource {
   std::filesystem::path filepath() const { return m_filepath; }
 
  private:
-  std::shared_ptr<ResourceType> mp_resource;
+  ResourceType *mp_resource;
+  Allocator<ResourceType> m_allocator;
   std::filesystem::path m_filepath;
 };
 

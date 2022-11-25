@@ -1,19 +1,28 @@
+#include "material.h"
+#include <exception>
 #include <gtest/gtest.h>
-#include <importer.h>
+#include <import.h>
 #include <model.h>
 #include <texture.h>
 
 #include <cassert>
 #include <stdexcept>
 
-TEST(importertests, unsupported_file_exception) {
-  Importer<Model> imp("unsupported_file.nocando");
-  ASSERT_THROW(imp.import(), std::runtime_error);
+TEST(importtests, import_error) {
+  struct NotImportable {} obj;
+  ASSERT_THROW(xen::import(&obj, "unsupported_file.nocando"),
+          std::exception);
 }
 
-TEST(importer_impltests, obj_parsing) {
+TEST(importtests, unsupported_file_type) {
   Mesh mesh;
-  import_impl::import(&mesh, "assets/models/cube/cube.obj");
+  ASSERT_THROW(xen::import(&mesh, "unsupported_file.nocando"),
+          std::exception);
+}
+
+TEST(importtests, mesh) {
+  Mesh mesh;
+  xen::import(&mesh, "assets/models/cube/cube.obj");
 
   // positions
   ASSERT_FLOAT_EQ(mesh.m_positions.front().x(), 1.00000f);
@@ -46,8 +55,9 @@ TEST(importer_impltests, obj_parsing) {
   ASSERT_EQ(mesh.m_indices.back().m_normal_idx, 5);
 }
 
-TEST(import_impltests, mtl_parsing) {
+TEST(importtests, mtl) {
   Material material;
-  import_impl::import(&material, "assets/models/cyborg/cyborg.mtl");
+  xen::import(&material, "assets/models/cyborg/cyborg.mtl");
   ASSERT_FLOAT_EQ(material.m_specular_exp, 92.15686f);
+  // TODO ...
 }
