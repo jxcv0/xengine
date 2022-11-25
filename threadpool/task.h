@@ -10,30 +10,11 @@
 /**
  * @brief The task interface.
  */
-class Task {
+class ITask {
  public:
-  virtual ~Task() {}
+  virtual ~ITask() {}
   virtual void invoke() = 0;
 };
-
-/**
- * @brief Alternative interface for specializing tasks that so far does not work
- *        for some reason.
- */
-// class TaskView {
-//  public:
-//   template <typename Schedulable>
-//   explicit TaskView(const Schedulable& s)
-//       : mp_task{&s}
-//       , invoke_impl{[](const void *task) {
-//           return static_cast<const Schedulable*>(task)->invoke(); }}
-//   { }
-//
-//   void invoke() { invoke_impl(mp_task); }
-//  private:
-//   const void *mp_task;
-//   void (*invoke_impl)(const void*);
-// };
 
 /**
  * @brief Class template that wraps a std::packaged_task. This way the
@@ -42,7 +23,7 @@ class Task {
  *        definitely do have.
  */
 template <typename Function, typename... Args>
-class SpecializedTask : public Task {
+class Task : public ITask {
  public:
   using ReturnType =
       typename std::result_of<typename std::decay<Function>::type(
@@ -54,7 +35,7 @@ class SpecializedTask : public Task {
    * @param f The function the task will execute.
    * @param args The arguments the function will be called with.
    */
-  SpecializedTask(Function f, Args... args) {
+  Task(Function f, Args... args) {
     m_task = std::packaged_task<ReturnType()>(
         std::bind(std::forward<Function>(f), std::forward<Args>(args)...));
   }
@@ -62,7 +43,7 @@ class SpecializedTask : public Task {
   /**
    * @brief Desctuctor.
    */
-  virtual ~SpecializedTask() {}
+  virtual ~Task() {}
 
   /**
    * @brief Get the associated future of this task.

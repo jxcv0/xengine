@@ -24,6 +24,8 @@ void import(T *dest, const std::filesystem::path &filepath) {
   throw std::runtime_error("no implementation for importing type");
 }
 
+// TODO mesh and material to be treated as separate components??
+
 /**
  * @brief Function specialization for importing a mesh from a wavefront .obj
  *        file. Meshes MUST be triangulated.

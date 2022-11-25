@@ -1,8 +1,13 @@
 #ifndef THREADPOOL_H_
 #define THREADPOOL_H_
 
+#include <any>
 #include <condition_variable>
+#include <cstddef>
+#include <cstdlib>
+#include <fstream>
 #include <future>
+#include <iostream>
 #include <memory>
 #include <mutex>
 #include <thread>
@@ -51,8 +56,10 @@ class ThreadPool {
    */
   template <typename Function, typename... Args>
   auto schedule_task(Function&& f, Args&&... args) {
-    // TODO needs allocator
-    auto task = new SpecializedTask<Function, Args...>(f, args...);
+    // TODO needs variable size allocator
+    using task_type = Task<Function, Args...>;
+    auto task = new task_type(f, args...);
+    report(task);
     std::lock_guard lk(m_mutex);
     m_tasks.push_back(task);
     m_cv.notify_one();
@@ -76,15 +83,23 @@ class ThreadPool {
       lk.unlock();
       m_cv.notify_one();
       task->invoke();
-      delete task;  // TODO see above
+      delete task;
     }
   };
 
-  std::vector<Task*> m_tasks;
+  std::vector<ITask*> m_tasks;
   std::vector<std::thread> m_worker_threads;
   std::mutex m_mutex;
   std::condition_variable m_cv;
   bool m_should_run;
+
+  // data collecting for allocator
+  template <typename T>
+  void report(T* p) const {
+    static std::ofstream of("tp.log");
+    of << "Allocated " << sizeof(T) << " bytes at " << std::hex << std::showbase
+       << p << std::dec << '\n';
+  }
 };
 
 #endif  // THREADPOOL_H_
