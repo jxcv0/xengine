@@ -10,6 +10,7 @@ set(
     HEADERS
         resource.h
         importer.h
+        logallocator.h
 )
 
 add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})
