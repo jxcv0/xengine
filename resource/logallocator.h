@@ -5,7 +5,27 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
-#include <ostream>
+#include <mutex>
+
+/**
+ * @brief Static logging function for instances of LogAllocator.
+ *        Logs to a file called allocations.log the number, size of the
+ *        instances in bytes, the type of the instances and the address,
+ *        separated by commas.
+ *
+ * @param p The pointer to the newly allocated/freed memory.
+ * @param n The number of instances.
+ * @param alloc Flag to specify if the operation was allocating or freeing.
+ */
+template <typename U>
+static void report_alloc(U *p, std::size_t n, bool alloc = true) {
+  static std::ofstream of("allocations.log");
+  static std::mutex log_mutex;
+  std::lock_guard lk(log_mutex);
+  of << (alloc ? "A" : "D") << "," << n << "," << sizeof(n) << ","
+     << typeid(U).name() << "," << std::hex << std::showbase
+     << reinterpret_cast<void *>(p) << std::dec << "\n";
+}
 
 /**
  * @brief Allocator that tracks allocations so that it can eventually be
@@ -24,28 +44,33 @@ class LogAllocator {
   /**
    * @brief Allocates storage suitable for an array object of type T[n] and
    *        creates the array, but does not construct array elements.
-   *        
+   *
    *
    * @param n The number of elements to allocate storage for.
    * @return A pointer to the newly allocated memory.
+   * @throws std::bad_alloc()
    */
-  [[nodiscard]] T* allocate(std::size_t n) {
-      LogAllocator::log<T>(n);
-      return nullptr;
+  T *allocate(std::size_t n) {
+    if (auto p = static_cast<T *>(std::malloc(n * sizeof(T)))) {
+      report_alloc<T>(p, n);
+      return p;
+    }
+    throw std::bad_alloc();
   }
-
- private:
 
   /**
-   * @brief Static logging function for all instances of LogAllocator.
-   *        Logs to a file called allocations.log the number, the
-   *        size in bytes and the type of the instances separated by commas.
-   * @param n The number of instances.
+   * @brief Deallocates storage pointed to p, which must be a value returned by
+   * a previous call to allocate that has not been invalidated by an intervening
+   * call to deallocate. n must match the value previously passed to allocate.
+   *
+   * @param p The storage to free that was previously obtained by a call to
+   *          LogAllocator::allocate.
+   * @param n The number of values pointed to by p must match the value
+   *          previously passed to allocate.
    */
-  template <typename U>
-  static void log(std::size_t n) {
-    static std::ofstream of("allocations.log");
-    of << n << "," << sizeof(n) << "," << typeid(U).name() << "\n";
+  void deallocate(T *p, std::size_t n) noexcept {
+    report_alloc(p, n, false);
+    std::free(p);
   }
 };
-#endif // LOGALLOCATOR_H_
+#endif  // LOGALLOCATOR_H_
