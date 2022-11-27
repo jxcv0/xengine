@@ -4,8 +4,6 @@
 #include <condition_variable>
 #include <cstddef>
 #include <cstdlib>
-#include <iostream>
-#include <memory>
 #include <mutex>
 #include <thread>
 #include <vector>
