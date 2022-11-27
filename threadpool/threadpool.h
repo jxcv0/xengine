@@ -1,23 +1,32 @@
 #ifndef THREADPOOL_H_
 #define THREADPOOL_H_
 
-#include <any>
 #include <condition_variable>
 #include <cstddef>
 #include <cstdlib>
-#include <fstream>
-#include <future>
 #include <iostream>
 #include <memory>
 #include <mutex>
 #include <thread>
-#include <type_traits>
 #include <vector>
 
-#include "task.h"
+#define L1CLS 64 // TODO move this elsewhere
+#define MAX_TASKS 8
+
+struct Task {
+  virtual ~Task() = default;
+  virtual void process() = 0;
+};
 
 /**
  * @brief A pool of worker threads.
+ * 	  1. Separate readonly (after initialization) from rw variables.
+ * 	  2. Group rw variables that are used together into a struct so that
+ * 	     memory locations are close together.
+ * 	  3. Move rw variables that are shared between threads to thier own
+ * 	     cacheline using padding.
+ * 	  4. Variables shared by multiple threads but independantly should be
+ * 	     moved to TLS.
  */
 class ThreadPool {
  public:
@@ -26,7 +35,7 @@ class ThreadPool {
    *
    * @param nthread The number of worker threads.
    */
-  ThreadPool(std::size_t nthreads) : m_should_run(true) {
+  ThreadPool(std::size_t nthreads) : m_should_run(true), m_index(0) {
     m_worker_threads.reserve(nthreads);
     for (auto i = 0; i < nthreads; i++) {
       m_worker_threads.emplace_back(std::thread(&ThreadPool::run, this));
@@ -47,23 +56,15 @@ class ThreadPool {
   }
 
   /**
-   * @brief Add a task to the task buffer and get a future that will store the
-   *        result;
+   * @brief Add a task to the task buffer.
    *
-   * @param f The function that the task will call.
-   * @param args The arguments the function will be called with.
-   * @return A future that can be waited on for the result of the task.
+   * @param t The task to process on a separate thread.
    */
-  template <typename Function, typename... Args>
-  auto schedule_task(Function&& f, Args&&... args) {
-    // TODO needs variable size allocator
-    using task_type = Task<Function, Args...>;
-    auto task = new task_type(f, args...);
-    report(task);
-    std::lock_guard lk(m_mutex);
-    m_tasks.push_back(task);
+  void schedule_task(Task &t) {
+    std::unique_lock lk(m_mutex);
+    m_cv.wait(lk, [this]{ return m_index != MAX_TASKS; });
+    m_tasks[m_index++] = &t;
     m_cv.notify_one();
-    return task->get_future();
   }
 
  private:
@@ -74,32 +75,23 @@ class ThreadPool {
     for (;;) {
       std::unique_lock lk(m_mutex);
       m_cv.wait(lk,
-                [this] { return !m_tasks.empty() || m_should_run == false; });
+                [this] { return !m_index == 0 || m_should_run == false; });
       if (m_should_run == false) {
         return;
       }
-      auto task = m_tasks.front();
-      m_tasks.erase(m_tasks.begin());
+      auto task = m_tasks[--m_index];
       lk.unlock();
       m_cv.notify_one();
-      task->invoke();
-      delete task;
+      task->process();
     }
   };
 
-  std::vector<ITask*> m_tasks;
+  unsigned int m_index;
+  Task* m_tasks[MAX_TASKS]; // 4 cache lines of pointers.
   std::vector<std::thread> m_worker_threads;
   std::mutex m_mutex;
   std::condition_variable m_cv;
   bool m_should_run;
-
-  // data collecting for allocator
-  template <typename T>
-  void report(T* p) const {
-    static std::ofstream of("tp.log");
-    of << "Allocated " << sizeof(T) << " bytes at " << std::hex << std::showbase
-       << p << std::dec << '\n';
-  }
 };
 
 #endif  // THREADPOOL_H_
