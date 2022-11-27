@@ -8,6 +8,8 @@
 #include <thread>
 #include <vector>
 
+#include <iostream>
+
 #define L1CLS 64 // TODO move this elsewhere
 #define MAX_TASKS 8
 
