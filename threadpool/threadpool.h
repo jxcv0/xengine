@@ -20,6 +20,8 @@ struct Task {
 
 /**
  * @brief A pool of worker threads.
+ *    TODO use pthreads instead stdlibc++ thread has some shinanigainry.
+ *
  * 	  1. Separate readonly (after initialization) from rw variables.
  * 	  2. Group rw variables that are used together into a struct so that
  * 	     memory locations are close together.

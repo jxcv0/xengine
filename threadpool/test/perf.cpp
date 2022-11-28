@@ -1,24 +1,25 @@
-#include <condition_variable>
-#include <mutex>
 #include <threadpool.h>
-#include <iostream>
+
+#include <condition_variable>
 #include <future>
+#include <iostream>
+#include <mutex>
 
 ThreadPool threadpool(std::thread::hardware_concurrency() - 1);
 std::mutex shared_mutex;
 
 class Timer {
-public:
+ public:
   using time_point = std::chrono::time_point<std::chrono::steady_clock>;
 
-  Timer() {
-    m_start = std::chrono::steady_clock::now();
-  }
+  Timer() { m_start = std::chrono::steady_clock::now(); }
 
   ~Timer() {
     auto end = std::chrono::steady_clock::now();
-    auto diff = end - m_start;
-    std::cout << "time taken: " << std::chrono::duration_cast<std::chrono::microseconds>(end - m_start).count() << " us\n";
+    auto diff =
+        std::chrono::duration_cast<std::chrono::microseconds>(end - m_start)
+            .count();
+    std::cout << "time taken: " << diff << " us\n";
   }
 
  private:
@@ -35,10 +36,9 @@ class Fib : public Task {
     m_result[0] = 0;
     m_result[1] = 1;
     for (i = 2; i < m_count; i++) {
-      m_result[i] = m_result[i-1] + m_result[i-2];
+      m_result[i] = m_result[i - 1] + m_result[i - 2];
     }
   }
-  
 
  private:
   std::vector<int> m_result;
