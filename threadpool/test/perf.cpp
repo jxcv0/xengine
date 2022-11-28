@@ -1,9 +1,11 @@
+#include <condition_variable>
+#include <mutex>
 #include <threadpool.h>
 #include <iostream>
 #include <future>
 
 ThreadPool threadpool(std::thread::hardware_concurrency() - 1);
-std::mutex os_mutex;
+std::mutex shared_mutex;
 
 class Timer {
 public:
@@ -16,7 +18,7 @@ public:
   ~Timer() {
     auto end = std::chrono::steady_clock::now();
     auto diff = end - m_start;
-    std::cout << "time taken: " << std::chrono::duration_cast<std::chrono::microseconds>(end - m_start).count() << "\n";
+    std::cout << "time taken: " << std::chrono::duration_cast<std::chrono::microseconds>(end - m_start).count() << " us\n";
   }
 
  private:
@@ -25,33 +27,22 @@ public:
 
 class Fib : public Task {
  public:
-  Fib(int n) : m_n(n) {}
+  Fib(int n) : m_count(n), m_result(n) {}
+  virtual ~Fib() = default;
 
   void process() override {
-    int f[m_n];
     int i;
-    f[0] = 0;
-    f[1] = 1;
-    for (i = 2; i < m_n; i++) {
-      f[i] = f[i-1] + f[i-2];
+    m_result[0] = 0;
+    m_result[1] = 1;
+    for (i = 2; i < m_count; i++) {
+      m_result[i] = m_result[i-1] + m_result[i-2];
     }
-
-    /*
-    for (i = 0; i < m_n; i++) {
-      std::lock_guard lk(os_mutex);
-      std::cout << f[i] << " ";
-    }
-    */
-    m_complete.set_value();
   }
-
-  auto get_future() {
-    return m_complete.get_future();
-  }
+  
 
  private:
-  std::promise<void> m_complete;
-  int m_n;
+  std::vector<int> m_result;
+  int m_count;
 };
 
 int main() {
@@ -68,7 +59,5 @@ int main() {
   threadpool.schedule_task(f5);
   Fib f6(10);
   threadpool.schedule_task(f6);
-  auto fut1 = f1.get_future();
-  fut1.get();
   return 0;
 }

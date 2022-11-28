@@ -43,7 +43,7 @@ class ThreadPool {
   }
 
   /**
-   * @brief Stop join all worker threads.
+   * @brief Stop and join all worker threads.
    */
   ~ThreadPool() {
     std::unique_lock lk(m_mutex);
@@ -53,6 +53,11 @@ class ThreadPool {
       m_cv.notify_all();
       thread.join();
     }
+  }
+
+  void stop() {
+    std::lock_guard lk(m_mutex);
+    m_should_run = false;
   }
 
   /**
@@ -75,8 +80,9 @@ class ThreadPool {
     for (;;) {
       std::unique_lock lk(m_mutex);
       m_cv.wait(lk,
-                [this] { return !m_index == 0 || m_should_run == false; });
+                [this] { return m_index != 0 || m_should_run == false; });
       if (m_should_run == false) {
+        std::cout << "returning\n";
         return;
       }
       auto task = m_tasks[--m_index];
