@@ -8,7 +8,6 @@
 #include <thread>
 #include <vector>
 
-#include <iostream>
 
 #define L1CLS 64 // TODO move this elsewhere
 #define MAX_TASKS 8
@@ -64,13 +63,15 @@ class ThreadPool {
 
   /**
    * @brief Add a task to the task buffer.
+   *        TODO - launch policy?
+   *             - priority
    *
    * @param t The task to process on a separate thread.
    */
-  void schedule_task(Task &t) {
+  void schedule_task(Task* t) {
     std::unique_lock lk(m_mutex);
-    m_cv.wait(lk, [this]{ return m_index != MAX_TASKS; });
-    m_tasks[m_index++] = &t;
+    m_cv.wait(lk, [this]{ return m_index < MAX_TASKS; });
+    m_tasks[m_index++] = t;
     m_cv.notify_one();
   }
 
@@ -84,7 +85,6 @@ class ThreadPool {
       m_cv.wait(lk,
                 [this] { return m_index != 0 || m_should_run == false; });
       if (m_should_run == false) {
-        std::cout << "returning\n";
         return;
       }
       auto task = m_tasks[--m_index];
@@ -95,7 +95,7 @@ class ThreadPool {
   };
 
   unsigned int m_index;
-  Task* m_tasks[MAX_TASKS]; // 4 cache lines of pointers.
+  Task* m_tasks[MAX_TASKS];
   std::vector<std::thread> m_worker_threads;
   std::mutex m_mutex;
   std::condition_variable m_cv;

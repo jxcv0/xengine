@@ -1,3 +1,5 @@
+#include <atomic>
+#include <clocale>
 #include <threadpool.h>
 
 #include <condition_variable>
@@ -6,7 +8,10 @@
 #include <mutex>
 
 ThreadPool threadpool(std::thread::hardware_concurrency() - 1);
-std::mutex shared_mutex;
+
+std::mutex counter_mutex;
+std::condition_variable counter_cv;
+std::atomic_int counter = 0;
 
 class Timer {
  public:
@@ -19,7 +24,7 @@ class Timer {
     auto diff =
         std::chrono::duration_cast<std::chrono::microseconds>(end - m_start)
             .count();
-    std::cout << "time taken: " << diff << " us\n";
+    std::cout << diff << "us\n";
   }
 
  private:
@@ -28,36 +33,69 @@ class Timer {
 
 class Fib : public Task {
  public:
-  Fib(int n) : m_count(n), m_result(n) {}
+  Fib(int n) : m_count(n) {}
   virtual ~Fib() = default;
 
   void process() override {
-    int i;
-    m_result[0] = 0;
-    m_result[1] = 1;
+    unsigned int f[m_count];
+    unsigned int i;
+    f[0] = 0;
+    f[1] = 1;
     for (i = 2; i < m_count; i++) {
-      m_result[i] = m_result[i - 1] + m_result[i - 2];
+      f[i] = f[i - 1] + f[i - 2];
     }
+    std::lock_guard lk(counter_mutex);
+    std::cout << "fib calculated: ";
+    for (i = 0; i < m_count; i++) {
+      std::cout << f[i] << " ";
+    }
+    std::cout << "\n";
+    counter++;
+    counter_cv.notify_one();
   }
 
  private:
-  std::vector<int> m_result;
-  int m_count;
+  unsigned int m_count;
 };
 
 int main() {
+  std::cout << sizeof(ThreadPool) << "\n\n";
+  counter = 0;
   Timer t;
-  Fib f1(10);
-  threadpool.schedule_task(f1);
-  Fib f2(10);
-  threadpool.schedule_task(f2);
-  Fib f3(10);
-  threadpool.schedule_task(f3);
-  Fib f4(10);
-  threadpool.schedule_task(f4);
-  Fib f5(10);
-  threadpool.schedule_task(f5);
+  Fib f1(9);
+  Fib f2(14);
+  Fib f3(13);
+  Fib f4(22);
+  Fib f5(14);
   Fib f6(10);
-  threadpool.schedule_task(f6);
+  threadpool.schedule_task(&f1);
+  threadpool.schedule_task(&f2);
+  threadpool.schedule_task(&f3);
+  threadpool.schedule_task(&f4);
+  threadpool.schedule_task(&f5);
+  threadpool.schedule_task(&f6);
+  threadpool.schedule_task(&f3);
+  threadpool.schedule_task(&f4);
+  threadpool.schedule_task(&f5);
+  threadpool.schedule_task(&f6);
+  threadpool.schedule_task(&f5);
+  threadpool.schedule_task(&f6);
+  threadpool.schedule_task(&f1);
+  threadpool.schedule_task(&f2);
+  threadpool.schedule_task(&f3);
+  threadpool.schedule_task(&f4);
+  threadpool.schedule_task(&f5);
+  threadpool.schedule_task(&f6);
+  threadpool.schedule_task(&f3);
+  threadpool.schedule_task(&f4);
+  threadpool.schedule_task(&f5);
+
+  // wait for threads to finish before destroying tasks.
+  std::unique_lock lk(counter_mutex);
+  counter_cv.wait(lk, [&]{ return counter == 21; });
+  std::cout << "time taken to complete tasks: ";
   return 0;
 }
+
+// first iteration 60 us average
+// 

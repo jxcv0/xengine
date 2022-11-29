@@ -8,7 +8,6 @@ set(
 set(
     HEADERS
         threadpool.h
-        task.h
 )
 
 add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})
