@@ -13,7 +13,7 @@ class Coordinator {
  private:
   ThreadPool m_threadpool;
   EntitySystem<> m_entity_system;
-  std::vector<ComponentArrayBase*> m_component_arrays;
+  std::vector<ComponentArrayBase *> m_component_arrays;
 };
 
 #endif  // COORDINATOR_H_

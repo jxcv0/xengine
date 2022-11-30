@@ -7,7 +7,8 @@
 TEST(lintests, radians) { ASSERT_FLOAT_EQ(lin::radians(3.122f), 0.054489179f); }
 
 TEST(lintests, perspective) {
-  auto pm = lin::perspective(45.0f, 0.1f, 100.0f, (800.0f / 600.0f));
+  auto pm =
+      lin::perspective(lin::radians(45.0f), (800.0f / 600.0f), 0.1f, 100.0f);
 
   ASSERT_FLOAT_EQ(pm[0][0], 1.81066f);
   ASSERT_FLOAT_EQ(pm[0][1], 0.0f);

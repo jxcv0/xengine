@@ -1,8 +1,5 @@
 #include <gtest/gtest.h>
 #include <threadpool.h>
-#include <cmath>
-
-int add(int a, int b) { return a + b; }
 
 class Add : public Task {
  public:
@@ -14,7 +11,8 @@ class Add : public Task {
   }
 
   auto get_result() {
-    while (!m_done) {} // yuck
+    while (!m_done) {
+    }  // yuck
     return m_result;
   }
 
@@ -35,12 +33,18 @@ TEST(threadpooltests, threadpool) {
   Add add5(5, 31);
   Add add6(6, 31);
 
-  tp.schedule_task(add1);
-  tp.schedule_task(add2);
-  tp.schedule_task(add3);
-  tp.schedule_task(add4);
-  tp.schedule_task(add5);
-  tp.schedule_task(add6);
+  tp.schedule_task(&add1);
+  tp.schedule_task(&add2);
+  tp.schedule_task(&add3);
+  tp.schedule_task(&add4);
+  tp.schedule_task(&add5);
+  tp.schedule_task(&add6);
+  tp.schedule_task(&add1);
+  tp.schedule_task(&add2);
+  tp.schedule_task(&add3);
+  tp.schedule_task(&add4);
+  tp.schedule_task(&add5);
+  tp.schedule_task(&add6);
 
   int result;
   result = add1.get_result();

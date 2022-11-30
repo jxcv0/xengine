@@ -35,7 +35,7 @@ class Vec2 {
    * @param other The other Vec3 to compare against.
    * @return true if the vectors are the same, otherwise false.
    */
-  constexpr inline bool operator==(const Vec2& other) const noexcept {
+  constexpr inline bool operator==(const Vec2 &other) const noexcept {
     return (m_data[0] == other[0]) && (m_data[1] == other[1]);
   }
 
@@ -53,7 +53,7 @@ class Vec2 {
    */
   constexpr inline auto y() const noexcept { return m_data[1]; }
 
-  friend std::ostream& operator<<(std::ostream& os, const Vec2& v) {
+  friend std::ostream &operator<<(std::ostream &os, const Vec2 &v) {
     os << "{ " << v.m_data[0] << ", " << v.m_data[1] << " }";
     return os;
   }

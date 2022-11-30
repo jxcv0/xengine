@@ -20,7 +20,7 @@ void heap_init(std::size_t n);
  * @return a pointer to the memory.
  */
 template <typename T>
-T* malloc(std::size_t n);
+T *malloc(std::size_t n);
 
 /**
  * @brief Free the memory allocated at p.
@@ -29,7 +29,7 @@ T* malloc(std::size_t n);
  * @param n The number of the elements pointed to by p.
  */
 template <typename T>
-void free(T* p, std::size_t n);
+void free(T *p, std::size_t n);
 };  // namespace xen
 
 #endif  // HEAP_H_

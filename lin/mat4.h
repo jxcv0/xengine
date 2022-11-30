@@ -42,7 +42,7 @@ class Mat4 {
    * @param i The index to acces;
    * @return The 4 dimentional vector at index i;
    */
-  constexpr inline auto& operator[](int i) noexcept { return m_data[i]; }
+  constexpr inline auto &operator[](int i) noexcept { return m_data[i]; }
 
   /**
    * @brief Get the matrix product of 2 Mat4's and return the result in a new
@@ -52,8 +52,8 @@ class Mat4 {
    * @param m2 The second matrix.
    * @return A matrix containing the matrix product.
    */
-  constexpr inline friend auto operator*(const Mat4& m1,
-                                         const Mat4& m2) noexcept {
+  constexpr inline friend auto operator*(const Mat4 &m1,
+                                         const Mat4 &m2) noexcept {
     Mat4 result(0.0f);
     result.m_data[0][0] = dot(m1[0], m2.col(0));
     result.m_data[0][1] = dot(m1[0], m2.col(1));
@@ -95,7 +95,7 @@ class Mat4 {
    * @param m The matrix to print out.
    * @retun The ostream.
    */
-  friend std::ostream& operator<<(std::ostream& os, const Mat4& m) {
+  friend std::ostream &operator<<(std::ostream &os, const Mat4 &m) {
     os << "{ " << m[0] << ", " << m[1] << ", " << m[2] << ", " << m[3] << " }";
     return os;
   }
@@ -105,7 +105,7 @@ class Mat4 {
    *
    * @return A const pointer to the underlying array.
    */
-  const constexpr inline float* value_ptr() const noexcept {
+  const constexpr inline float *value_ptr() const noexcept {
     return m_data[0].value_ptr();
   }
 

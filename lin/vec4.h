@@ -37,7 +37,7 @@ class Vec4 {
    * @param i The index to access.
    * @return A reference to the value at index i.
    */
-  constexpr inline auto& operator[](int i) { return m_data[i]; }
+  constexpr inline auto &operator[](int i) { return m_data[i]; }
 
   /**
    * @brief Set a component to a value.
@@ -52,7 +52,7 @@ class Vec4 {
    *
    * @param other The other Vec3 to compare against.
    */
-  constexpr inline bool operator==(const Vec4& other) const noexcept {
+  constexpr inline bool operator==(const Vec4 &other) const noexcept {
     return (m_data[0] == other[0]) && (m_data[1] == other[1]) &&
            (m_data[2] == other[2]) && (m_data[3] == other[3]);
   }
@@ -103,7 +103,7 @@ class Vec4 {
    * @param v2 The other vec4.
    * @return A new vec that is the sum of the two vectors
    */
-  constexpr inline friend Vec4 operator+(const Vec4& v1, const Vec4& v2) {
+  constexpr inline friend Vec4 operator+(const Vec4 &v1, const Vec4 &v2) {
     return Vec4((v1.m_data[0] + v2.m_data[0]), (v1.m_data[1] + v2.m_data[1]),
                 (v1.m_data[2] + v2.m_data[2]), v1.m_data[3] + v2.m_data[3]);
   }
@@ -113,7 +113,7 @@ class Vec4 {
    *
    * @param other The other vector.
    */
-  constexpr inline void operator+=(const Vec4& other) noexcept {
+  constexpr inline void operator+=(const Vec4 &other) noexcept {
     m_data[0] += other.x();
     m_data[1] += other.y();
     m_data[2] += other.z();
@@ -127,7 +127,7 @@ class Vec4 {
    * @param v2 The other vec3.
    * @return A new vec that is the sum of the two vectors
    */
-  constexpr inline friend Vec4 operator-(const Vec4& v1, const Vec4& v2) {
+  constexpr inline friend Vec4 operator-(const Vec4 &v1, const Vec4 &v2) {
     return Vec4((v1.m_data[0] - v2.m_data[0]), (v1.m_data[1] - v2.m_data[1]),
                 (v1.m_data[2] - v2.m_data[2]), (v1.m_data[3] - v2.m_data[3]));
   }
@@ -137,7 +137,7 @@ class Vec4 {
    *
    * @param other The other vector.
    */
-  constexpr inline void operator-=(const Vec4& other) noexcept {
+  constexpr inline void operator-=(const Vec4 &other) noexcept {
     m_data[0] -= other.x();
     m_data[1] -= other.y();
     m_data[2] -= other.z();
@@ -151,7 +151,7 @@ class Vec4 {
    * @param v2 The second Vec4.
    * @return The dot product.
    */
-  constexpr inline friend auto dot(const Vec4& v1, const Vec4& v2) {
+  constexpr inline friend auto dot(const Vec4 &v1, const Vec4 &v2) {
     return (v1.m_data[0] * v2.m_data[0]) + (v1.m_data[1] * v2.m_data[1]) +
            (v1.m_data[2] * v2.m_data[2]) + (v1.m_data[3] * v2.m_data[3]);
   }
@@ -186,7 +186,7 @@ class Vec4 {
    * @param v The vector to stream.
    * @return The ostream.
    */
-  friend std::ostream& operator<<(std::ostream& os, const Vec4& v) {
+  friend std::ostream &operator<<(std::ostream &os, const Vec4 &v) {
     os << "{ " << v.m_data[0] << ", " << v.m_data[1] << ", " << v.m_data[2]
        << ", " << v.m_data[3] << " }";
     return os;
@@ -197,7 +197,9 @@ class Vec4 {
    *
    * @return A const pointer to the underlying array.
    */
-  const constexpr inline float* value_ptr() const noexcept { return &m_data[0]; }
+  const constexpr inline float *value_ptr() const noexcept {
+    return &m_data[0];
+  }
 
  private:
   float m_data[4] = {0};

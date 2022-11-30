@@ -65,10 +65,10 @@ class ComponentArray : public ComponentArrayBase {
    * @brief Get the component associated with an entity.
    *
    * @param e The handle of the entity.
-   * @return A pointer to the component stored in the array. If the component is
-   *         not found then nullptr is returned.
+   * @return A pointer to the component stored in the array. If the component
+   * is not found then nullptr is returned.
    */
-  ComponentType *get_component(EntityHandle e) {
+  ComponentType* get_component(EntityHandle e) {
     for (int i = 0; i < N; i++) {
       if (m_map[i].m_handle == e) {
         int index = m_map[i].m_index;

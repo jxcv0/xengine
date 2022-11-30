@@ -30,21 +30,18 @@ int gl_print_error(std::ostream &os, const char *file, int line) {
         error = "INVALID_FRAMEBUFFER_OPERATION";
         break;
     }
-    std::cout << error << " | " << file << " (" << line << ")" << "\n";
+    std::cout << error << " | " << file << " (" << line << ")"
+              << "\n";
   }
   return errorCode;
 }
 
 void gl_debug_output(GLenum source, GLenum type, unsigned int id,
-                              GLenum severity, GLsizei length,
-                              const char *message, const void *user_param) {
-  // ignore non-significant error/warning codes
-  // if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
-
-
+                     GLenum severity, GLsizei length, const char *message,
+                     const void *user_param) {
   switch (source) {
     case GL_DEBUG_SOURCE_API:
-        std::cout << "api: ";
+      std::cout << "api: ";
       break;
     case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
       std::cout << "window system: ";
@@ -93,21 +90,21 @@ void gl_debug_output(GLenum source, GLenum type, unsigned int id,
       break;
   }
 
-  std::cout << "(" << id << "): " << message;
-
   switch (severity) {
     case GL_DEBUG_SEVERITY_HIGH:
-      std::cout << " - severity high";
+      std::cout << "high severity: ";
       break;
     case GL_DEBUG_SEVERITY_MEDIUM:
-      std::cout << " - severity medium";
+      std::cout << "medium severity";
       break;
     case GL_DEBUG_SEVERITY_LOW:
-      std::cout << " - severity low";
+      std::cout << "low severity";
       break;
-    case GL_DEBUG_SEVERITY_NOTIFICATION:
-      std::cout << " - severity notification";
-      break;
+      // case GL_DEBUG_SEVERITY_NOTIFICATION:
+      // std::cout << "";
+      // break;
   }
+
+  std::cout << "(" << id << "): " << message;
   std::cout << "\n";
 }

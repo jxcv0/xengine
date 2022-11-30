@@ -24,8 +24,8 @@ static inline void check_link(int id) {
   }
 }
 
-Shader ShaderUtils::load(const std::filesystem::path& vert_path,
-                         const std::filesystem::path& frag_path) {
+Shader ShaderUtils::load(const std::filesystem::path &vert_path,
+                         const std::filesystem::path &frag_path) {
   std::ifstream vert_stream(vert_path);
   std::ifstream frag_stream(frag_path);
 
@@ -38,8 +38,8 @@ Shader ShaderUtils::load(const std::filesystem::path& vert_path,
   auto vert = vert_ss.str();
   auto frag = frag_ss.str();
 
-  const char* vert_code_cstr = vert.c_str();
-  const char* frag_code_cstr = frag.c_str();
+  const char *vert_code_cstr = vert.c_str();
+  const char *frag_code_cstr = frag.c_str();
 
   unsigned int vert_id;
   unsigned int frag_id;

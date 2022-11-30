@@ -59,8 +59,9 @@ class LogAllocator {
 
   /**
    * @brief Deallocates storage pointed to p, which must be a value returned by
-   * a previous call to allocate that has not been invalidated by an intervening
-   * call to deallocate. n must match the value previously passed to allocate.
+   * a previous call to allocate that has not been invalidated by an
+   * intervening call to deallocate. n must match the value previously passed
+   * to allocate.
    *
    * @param p The storage to free that was previously obtained by a call to
    *          LogAllocator::allocate.

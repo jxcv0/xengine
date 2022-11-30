@@ -8,8 +8,7 @@
 #include <thread>
 #include <vector>
 
-
-#define L1CLS 64 // TODO move this elsewhere
+#define L1CLS 64  // TODO move this elsewhere
 #define MAX_TASKS 8
 
 struct Task {
@@ -50,7 +49,7 @@ class ThreadPool {
     std::unique_lock lk(m_mutex);
     m_should_run = false;
     lk.unlock();
-    for (auto& thread : m_worker_threads) {
+    for (auto &thread : m_worker_threads) {
       m_cv.notify_all();
       thread.join();
     }
@@ -68,9 +67,9 @@ class ThreadPool {
    *
    * @param t The task to process on a separate thread.
    */
-  void schedule_task(Task* t) {
+  void schedule_task(Task *t) {
     std::unique_lock lk(m_mutex);
-    m_cv.wait(lk, [this]{ return m_index < MAX_TASKS; });
+    m_cv.wait(lk, [this] { return m_index < MAX_TASKS; });
     m_tasks[m_index++] = t;
     m_cv.notify_one();
   }
@@ -82,8 +81,7 @@ class ThreadPool {
   void run() {
     for (;;) {
       std::unique_lock lk(m_mutex);
-      m_cv.wait(lk,
-                [this] { return m_index != 0 || m_should_run == false; });
+      m_cv.wait(lk, [this] { return m_index != 0 || m_should_run == false; });
       if (m_should_run == false) {
         return;
       }
@@ -95,7 +93,7 @@ class ThreadPool {
   };
 
   unsigned int m_index;
-  Task* m_tasks[MAX_TASKS];
+  Task *m_tasks[MAX_TASKS];
   std::vector<std::thread> m_worker_threads;
   std::mutex m_mutex;
   std::condition_variable m_cv;

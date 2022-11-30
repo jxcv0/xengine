@@ -23,7 +23,7 @@ class Allocator {
    * @param n The initial size of the object pool.
    */
   Allocator() : m_capacity(1), m_size(0) {
-    m_object_pool = static_cast<T*>(std::calloc(m_capacity, sizeof(T)));
+    m_object_pool = static_cast<T *>(std::calloc(m_capacity, sizeof(T)));
     for (auto i = 0; i < m_capacity; i++) {
       auto addr = reinterpret_cast<std::uintptr_t>(&m_object_pool[i]);
       m_free_list.push(addr);
@@ -44,12 +44,12 @@ class Allocator {
    * @param n The number of instances to allocate for.
    * @return a pointer to the allocated memory
    */
-  T* allocate(std::size_t n) {
-    T* p = nullptr;
+  T *allocate(std::size_t n) {
+    T *p = nullptr;
     if (m_size == m_capacity) {
       resize();
     }
-    p = reinterpret_cast<T*>(m_free_list.front());
+    p = reinterpret_cast<T *>(m_free_list.front());
     m_size++;
     return p;
   }
@@ -60,7 +60,7 @@ class Allocator {
    * @param p Pointer to the memory.
    * @param n The size of the array.
    */
-  void deallocate(T* p, std::size_t n) {
+  void deallocate(T *p, std::size_t n) {
     for (auto i = 0; i < n; i++) {
       m_free_list.push(reinterpret_cast<uintptr_t>(&p[i]));
     }
@@ -87,7 +87,7 @@ class Allocator {
    * @brief Search for a block of contiguous memory large enough to store an
    *        array of type T[n]
    */
-  T* find_contiguous(std::size_t n) {
+  T *find_contiguous(std::size_t n) {
     // TODO
     return nullptr;
   }
@@ -96,7 +96,7 @@ class Allocator {
     m_capacity *= 2;
     auto new_mem = std::realloc(m_object_pool, m_capacity);
     if (new_mem != nullptr) {
-      m_object_pool = static_cast<T*>(new_mem);
+      m_object_pool = static_cast<T *>(new_mem);
     } else {
       throw std::bad_alloc();
     }
@@ -107,7 +107,7 @@ class Allocator {
   }
 
   std::queue<uintptr_t> m_free_list;
-  T* m_object_pool;
+  T *m_object_pool;
   std::size_t m_capacity;
   std::size_t m_size;
 };

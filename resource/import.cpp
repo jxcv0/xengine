@@ -21,7 +21,7 @@
 
 #include "texture.h"
 
-auto load_texture(const std::filesystem::path& filepath) {
+auto load_texture(const std::filesystem::path &filepath) {
   Texture texture;
   texture.mp_data = stbi_load(filepath.c_str(), &texture.m_width,
                               &texture.m_height, &texture.m_num_channels, 0);
@@ -29,8 +29,7 @@ auto load_texture(const std::filesystem::path& filepath) {
 }
 
 template <>
-void xen::import(Material* material,
-                         const std::filesystem::path& filepath) {
+void xen::import(Material *material, const std::filesystem::path &filepath) {
   if (filepath.extension() != ".mtl") {
     throw std::runtime_error("file extension not supported");
   }
@@ -60,9 +59,9 @@ void xen::import(Material* material,
 }
 
 // parse "v" and "vn" lines
-std::vector<Vec3> parse_vec3_lines(const std::vector<std::string>& lines) {
+std::vector<Vec3> parse_vec3_lines(const std::vector<std::string> &lines) {
   std::vector<Vec3> vectors;
-  for (const auto& line : lines) {
+  for (const auto &line : lines) {
     std::stringstream lstream(line);
     float x, y, z;
     lstream >> x >> y >> z;
@@ -72,9 +71,9 @@ std::vector<Vec3> parse_vec3_lines(const std::vector<std::string>& lines) {
 }
 
 // parse "vt" lines
-std::vector<Vec2> parse_vec2_lines(const std::vector<std::string>& lines) {
+std::vector<Vec2> parse_vec2_lines(const std::vector<std::string> &lines) {
   std::vector<Vec2> vectors;
-  for (const auto& line : lines) {
+  for (const auto &line : lines) {
     std::stringstream lstream(line);
     float x, y;
     lstream >> x >> y;
@@ -83,7 +82,7 @@ std::vector<Vec2> parse_vec2_lines(const std::vector<std::string>& lines) {
   return vectors;
 }
 
-auto parse_face_tok(const std::string& face) {
+auto parse_face_tok(const std::string &face) {
   using size_type = std::string::size_type;
   unsigned int temp[3];
   size_type pos = 0, last = 0;
@@ -96,10 +95,10 @@ auto parse_face_tok(const std::string& face) {
 }
 
 std::vector<Mesh::Index> parse_face_lines(
-    const std::vector<std::string>& lines) {
+    const std::vector<std::string> &lines) {
   std::vector<Mesh::Index> indices;
 
-  for (const auto& line : lines) {
+  for (const auto &line : lines) {
     std::stringstream lstream(line);
     std::string face;
     for (auto i = 0; i < 3; i++) {
@@ -111,7 +110,7 @@ std::vector<Mesh::Index> parse_face_lines(
 }
 
 template <>
-void xen::import(Mesh* mesh, const std::filesystem::path& filepath) {
+void xen::import(Mesh *mesh, const std::filesystem::path &filepath) {
   if (filepath.extension() != ".obj") {
     throw std::runtime_error("file extension not supported");
   }

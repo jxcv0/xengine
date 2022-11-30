@@ -33,13 +33,14 @@ constexpr inline float radians(float degrees) noexcept {
  * @param far The far clip distance.
  * @param aspect_ratio The aspect ratio of the frustum
  */
-constexpr Mat4 perspective(const float fov, const float near, const float far,
-                           const float aspect_ratio) {
+constexpr Mat4 perspective(const float fov, const float aspect_ratio,
+                           const float near, const float far) {
+  const auto t = std::tan(fov / 2.0f);
+
   Mat4 result(0.0f);
-  auto tanhalffov = std::tan(radians(fov) / 2.0f);
-  result[0][0] = 1.0f / (aspect_ratio * tanhalffov);
-  result[1][1] = 1.0f / tanhalffov;
-  result[2][2] = (far + near) / (near - far);
+  result[0][0] = 1.0f / (aspect_ratio * t);
+  result[1][1] = 1.0f / t;
+  result[2][2] = -(far + near) / (far - near);
   result[2][3] = -1.0f;
   result[3][2] = -(2.0f * far * near) / (far - near);
   return result;
@@ -53,7 +54,7 @@ constexpr Mat4 perspective(const float fov, const float near, const float far,
  * @param up The up direction of the view.
  * @return A view matrix.
  */
-inline Mat4 look_at(const Vec3& eye, const Vec3& ctr, const Vec3& up) {
+inline Mat4 look_at(const Vec3 &eye, const Vec3 &ctr, const Vec3 &up) {
   auto f = (ctr - eye).normalize();
   auto s = (f * up).normalize();
   auto u = s * f;
@@ -85,7 +86,7 @@ inline Mat4 look_at(const Vec3& eye, const Vec3& ctr, const Vec3& up) {
  * @param v The translation vector.
  * @return A translation matrix.
  */
-constexpr Mat4 translate(const Mat4& m, const Vec3& v) {
+constexpr Mat4 translate(const Mat4 &m, const Vec3 &v) {
   Mat4 result(m);
   result[3][0] += v[0];
   result[3][1] += v[1];
@@ -101,33 +102,34 @@ constexpr Mat4 translate(const Mat4& m, const Vec3& v) {
  * @param angle The rotation angle in degrees.
  * @return A rotation matrix.
  */
-constexpr Mat4 rotate(const Mat4& m, const Vec3& axis, float angle) {
-  auto a = radians(angle);
-  float c = std::cos(angle);
-  float s = std::sin(angle);
-  float t = 1.0f - c;
-  auto temp = axis * t;
+inline Mat4 rotate(const Mat4 &m, const Vec3 &v, float angle) {
+  const auto a = angle;
+  const auto c = std::cos(a);
+  const auto s = std::sin(a);
 
-  Mat4 q(0.0f);
-  q[0][0] = c + temp[0] * axis[0];
-  q[0][1] = 0 + temp[0] * axis[1] + s * axis[2];
-  q[0][2] = 0 + temp[0] * axis[2] - s * axis[1];
+  Mat4 result;
+  Vec3 axis = v.normalize();
 
-  q[1][0] = 0 + temp[1] * axis[0] - s * axis[2];
-  q[1][1] = c + temp[1] * axis[1];
-  q[1][2] = 0 + temp[1] * axis[2] + s * axis[0];
+  result[0][0] = c + (1.0f - c) * axis.x() * axis.x();
+  result[0][1] = (1.0f - c) * axis.x() * axis.y() + s * axis.z();
+  result[0][2] = (1.0f - c) * axis.x() * axis.z() - s * axis.y();
+  result[0][3] = 0.0f;
 
-  q[2][0] = 0 + temp[2] * axis[0] + s * axis[1];
-  q[2][1] = 0 + temp[2] * axis[1] - s * axis[0];
-  q[2][2] = c + temp[2] * axis[2];
+  result[1][0] = (1.0f - c) * axis.y() * axis.x() - s * axis.z();
+  result[1][1] = c + (1.0f - c) * axis.y() * axis.y();
+  result[1][2] = (1.0f - c) * axis.y() * axis.z() + s * axis.x();
+  result[1][3] = 0.0f;
 
-  auto r = m * q;
-  r[3][0] = m[3][0];
-  r[3][1] = m[3][1];
-  r[3][2] = m[3][2];
-  r[3][3] = m[3][3];
+  result[2][0] = (1.0f - c) * axis.z() * axis.x() + s * axis.y();
+  result[2][1] = (1.0f - c) * axis.z() * axis.y() - s * axis.x();
+  result[2][2] = c + (1.0f - c) * axis.z() * axis.z();
+  result[2][3] = 0.0f;
 
-  return r;
+  result[3][0] = 0.0f;
+  result[3][1] = 0.0f;
+  result[3][2] = 0.0f;
+  result[3][3] = 1.0f;
+  return m * result;
 }
 
 }  // namespace lin

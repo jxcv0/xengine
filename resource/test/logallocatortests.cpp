@@ -6,11 +6,8 @@
 #include <type_traits>
 
 TEST(logallocatortests, allocate) {
-  LogAllocator<std::function<void(void)>> a;
-  ASSERT_NO_THROW(
-    auto i = a.allocate(10);
-    a.deallocate(i, 10);
-  );
+  LogAllocator<std::function<void(void)> > a;
+  ASSERT_NO_THROW(auto i = a.allocate(10); a.deallocate(i, 10););
 }
 
 // manual test

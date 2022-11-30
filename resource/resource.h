@@ -2,6 +2,7 @@
 #define RESOURCE_H_
 
 #include <alloca.h>
+
 #include <filesystem>
 #include <memory>
 
@@ -21,8 +22,7 @@ class Resource {
    * @param filepath The path to the file the resource can be loaded from.
    */
   Resource(const std::filesystem::path filepath)
-        : m_allocator()
-        , m_filepath(filepath) {
+      : m_allocator(), m_filepath(filepath) {
     mp_resource = m_allocator.allocate(1);
     xen::import(mp_resource, filepath);
   }
@@ -31,9 +31,7 @@ class Resource {
   Resource &operator=(const Resource &) = default;
   Resource &operator=(Resource &&) = default;
 
-  ~Resource() {
-    m_allocator.deallocate(mp_resource, 1);
-  }
+  ~Resource() { m_allocator.deallocate(mp_resource, 1); }
 
   /**
    * @brief Comparison operator. If the filepaths are the same then resources

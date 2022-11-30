@@ -35,7 +35,7 @@ class Vec3 {
    * @param other The other Vec2 to compare against.
    * @return true if the vectors are the same, otherwise false.
    */
-  constexpr inline bool operator==(const Vec3& other) const noexcept {
+  constexpr inline bool operator==(const Vec3 &other) const noexcept {
     return (m_data[0] == other[0]) && (m_data[1] == other[1]) &&
            (m_data[2] == other[2]);
   }
@@ -78,7 +78,7 @@ class Vec3 {
    * @param v2 The other vec3.
    * @return A new vec that is the sum of the two vectors
    */
-  constexpr inline friend Vec3 operator+(const Vec3& v1, const Vec3& v2) {
+  constexpr inline friend Vec3 operator+(const Vec3 &v1, const Vec3 &v2) {
     return Vec3((v1.m_data[0] + v2.m_data[0]), (v1.m_data[1] + v2.m_data[1]),
                 (v1.m_data[2] + v2.m_data[2]));
   }
@@ -88,7 +88,7 @@ class Vec3 {
    *
    * @param other The other vector.
    */
-  constexpr inline void operator+=(const Vec3& other) noexcept {
+  constexpr inline void operator+=(const Vec3 &other) noexcept {
     m_data[0] += other.x();
     m_data[1] += other.y();
     m_data[2] += other.z();
@@ -101,7 +101,7 @@ class Vec3 {
    * @param v2 The other vec3.
    * @return A new vec that is the sum of the two vectors
    */
-  constexpr inline friend Vec3 operator-(const Vec3& v1, const Vec3& v2) {
+  constexpr inline friend Vec3 operator-(const Vec3 &v1, const Vec3 &v2) {
     return Vec3((v1.m_data[0] - v2.m_data[0]), (v1.m_data[1] - v2.m_data[1]),
                 (v1.m_data[2] - v2.m_data[2]));
   }
@@ -111,7 +111,7 @@ class Vec3 {
    *
    * @param other The other vector.
    */
-  constexpr inline void operator-=(const Vec3& other) noexcept {
+  constexpr inline void operator-=(const Vec3 &other) noexcept {
     m_data[0] -= other.x();
     m_data[1] -= other.y();
     m_data[2] -= other.z();
@@ -124,7 +124,7 @@ class Vec3 {
    * @param v2 The second Vec3.
    * @return The dot product.
    */
-  constexpr inline friend auto dot(const Vec3& v1, const Vec3& v2) {
+  constexpr inline friend auto dot(const Vec3 &v1, const Vec3 &v2) {
     return (v1.m_data[0] * v2.m_data[0]) + (v1.m_data[1] * v2.m_data[1]) +
            (v1.m_data[2] * v2.m_data[2]);
   }
@@ -147,7 +147,7 @@ class Vec3 {
    * @param v2 The other vec3.
    * @return A new Vec3 that contains the cross product.
    */
-  constexpr inline friend Vec3 operator*(const Vec3& v1, const Vec3& v2) {
+  constexpr inline friend Vec3 operator*(const Vec3 &v1, const Vec3 &v2) {
     return Vec3((v1.m_data[1] * v2.m_data[2]) - (v1.m_data[2] * v2.m_data[1]),
                 (v1.m_data[2] * v2.m_data[0]) - (v1.m_data[0] * v2.m_data[2]),
                 (v1.m_data[0] * v2.m_data[1]) - (v1.m_data[1] * v2.m_data[0]));
@@ -158,7 +158,7 @@ class Vec3 {
    *
    * @param other The other Vec3
    */
-  constexpr inline void operator*=(const Vec3& other) noexcept {
+  constexpr inline void operator*=(const Vec3 &other) noexcept {
     auto x = (m_data[1] * other[2]) - (m_data[2] * other[1]);
     auto y = (m_data[2] * other[0]) - (m_data[0] * other[2]);
     auto z = (m_data[0] * other[1]) - (m_data[1] * other[0]);
@@ -185,7 +185,7 @@ class Vec3 {
    * @param v The vector to stream.
    * @return The ostream.
    */
-  friend std::ostream& operator<<(std::ostream& os, const Vec3& v) {
+  friend std::ostream &operator<<(std::ostream &os, const Vec3 &v) {
     os << "{ " << v.m_data[0] << ", " << v.m_data[1] << ", " << v.m_data[2]
        << " }";
     return os;

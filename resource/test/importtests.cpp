@@ -1,23 +1,23 @@
-#include "material.h"
-#include <exception>
 #include <gtest/gtest.h>
 #include <import.h>
 #include <model.h>
 #include <texture.h>
 
 #include <cassert>
+#include <exception>
 #include <stdexcept>
 
+#include "material.h"
+
 TEST(importtests, import_error) {
-  struct NotImportable {} obj;
-  ASSERT_THROW(xen::import(&obj, "unsupported_file.nocando"),
-          std::exception);
+  struct NotImportable {
+  } obj;
+  ASSERT_THROW(xen::import(&obj, "unsupported_file.nocando"), std::exception);
 }
 
 TEST(importtests, unsupported_file_type) {
   Mesh mesh;
-  ASSERT_THROW(xen::import(&mesh, "unsupported_file.nocando"),
-          std::exception);
+  ASSERT_THROW(xen::import(&mesh, "unsupported_file.nocando"), std::exception);
 }
 
 TEST(importtests, mesh) {

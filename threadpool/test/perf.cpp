@@ -1,7 +1,7 @@
-#include <atomic>
-#include <clocale>
 #include <threadpool.h>
 
+#include <atomic>
+#include <clocale>
 #include <condition_variable>
 #include <future>
 #include <iostream>
@@ -92,10 +92,10 @@ int main() {
 
   // wait for threads to finish before destroying tasks.
   std::unique_lock lk(counter_mutex);
-  counter_cv.wait(lk, [&]{ return counter == 21; });
+  counter_cv.wait(lk, [&] { return counter == 21; });
   std::cout << "time taken to complete tasks: ";
   return 0;
 }
 
 // first iteration 60 us average
-// 
+//

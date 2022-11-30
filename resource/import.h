@@ -1,17 +1,17 @@
 #ifndef IMPORT_H_
 #define IMPORT_H_
 
-#include <cstring>
-#include <exception>
 #include <material.h>
 #include <model.h>
 #include <shader.h>
-#include <stdexcept>
 #include <texture.h>
 
 #include <cassert>
+#include <cstring>
+#include <exception>
 #include <filesystem>
 #include <memory>
+#include <stdexcept>
 #include <utility>
 
 namespace xen {
