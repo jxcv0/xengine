@@ -9,7 +9,7 @@ set(
 
 set(
   HEADERS
-    mainwindow.h
+    window.h
     shader.h
     checkerr.h
 )
