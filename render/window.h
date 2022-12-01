@@ -1,10 +1,7 @@
 #ifndef MAINWINDOW_H_
 #define MAINWINDOW_H_
 
-#include <algorithm>
 #include <cstdint>
-#include <string>
-#include <vector>
 
 #include "checkerr.h"
 
@@ -12,15 +9,23 @@
 #define OPENGL_LIBS
 #include <glad.h>
 #endif
-
 #include <GLFW/glfw3.h>
-#include <lin.h>
+
+#include "lin.h"
 
 /**
  * @brief Wraps a GLFWWindow* in an raii class.
  */
 class Window {
  public:
+  /**
+   * @brief Create and display a window with a width, height and name.
+   *        Also initialize OpenGL context and debug logging.
+   * 
+   * @param width The starting width of the window.
+   * @param height The starting height of the window.
+   * @param name The name of the window.
+   */
   Window(float width, float height, const char *name)
       : m_width(width), m_height(height), mp_window(nullptr) {
     glfwInit();
@@ -57,12 +62,12 @@ class Window {
     glfwSetInputMode(mp_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // depth testing
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
+    //glEnable(GL_DEPTH_TEST);
+    //glDepthFunc(GL_LESS);
 
     // face culling
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+    //glEnable(GL_CULL_FACE);
+    //glCullFace(GL_BACK);
   }
 
   /**
