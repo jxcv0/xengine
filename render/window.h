@@ -21,7 +21,7 @@ class Window {
   /**
    * @brief Create and display a window with a width, height and name.
    *        Also initialize OpenGL context and debug logging.
-   * 
+   *
    * @param width The starting width of the window.
    * @param height The starting height of the window.
    * @param name The name of the window.
@@ -62,12 +62,12 @@ class Window {
     glfwSetInputMode(mp_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // depth testing
-    //glEnable(GL_DEPTH_TEST);
-    //glDepthFunc(GL_LESS);
+    // glEnable(GL_DEPTH_TEST);
+    // glDepthFunc(GL_LESS);
 
     // face culling
-    //glEnable(GL_CULL_FACE);
-    //glCullFace(GL_BACK);
+    // glEnable(GL_CULL_FACE);
+    // glCullFace(GL_BACK);
   }
 
   /**
@@ -123,16 +123,15 @@ class Window {
    * @brief Calulate the projection matrix for the window.
    */
   auto projection_matrix(float fov) {
-    return lin::perspective(lin::radians(m_fov),
+    return lin::perspective(lin::radians(fov),
                             ((float)m_width / (float)m_height), 0.1f, 100.0f);
   }
 
  private:
   GLFWwindow *mp_window;
-  float m_width = 640;
-  float m_height = 480;
+  float m_width;
+  float m_height;
   // std::uint32_t m_input_buffer;
-  float m_fov = 0.0f;
   // Mat4 m_perspective_matrix;
 };
 

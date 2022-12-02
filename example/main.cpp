@@ -1,9 +1,4 @@
-#include <glm/ext.hpp>
-#include <glm/ext/matrix_transform.hpp>
-#include <glm/glm.hpp>
-#include <glm/gtx/string_cast.hpp>
 #include <iostream>
-#include <string>
 
 #include "checkerr.h"
 #include "lin.h"
@@ -54,26 +49,9 @@ int main(int argc, char const *argv[]) {
                         (void *)(3 * sizeof(float)));
   glEnableVertexAttribArray(1);
 
-  auto projection_matrix = lin::perspective(
-      lin::radians(60), ((float)window_width / (float)window_height), 0.1, 100);
+  auto projection_matrix = window.projection_matrix(60);
   auto view_matrix = lin::translate(Mat4(1), Vec3(0, 0, -3));
   auto model_matrix = lin::rotate(Mat4(1), Vec3(1, 0, 0), lin::radians(-55));
-
-  std::cout << model_matrix << "\n";
-  std::cout << glm::to_string(glm::rotate(glm::mat4(1.0f), glm::radians(-55.0f),
-                                          glm::vec3(1.0f, 0.0f, 0.0f)))
-            << "\n\n";
-
-  std::cout << view_matrix << "\n";
-  std::cout << glm::to_string(glm::translate(glm::mat4(1.0f),
-                                             glm::vec3(0.0f, 0.0f, -3.0f)))
-            << "\n\n";
-
-  std::cout << projection_matrix << "\n";
-  std::cout << glm::to_string(glm::perspective(
-                   glm::radians(60.0f),
-                   ((float)window_width / (float)window_height), 0.1f, 100.0f))
-            << "\n\n";
 
   shader.use();
   shader.set_uniform("projection", projection_matrix);

@@ -12,6 +12,7 @@ set(
     window.h
     shader.h
     checkerr.h
+    camera.h
 )
 
 add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})

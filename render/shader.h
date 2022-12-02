@@ -6,11 +6,10 @@
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
-#include <string>
 
 #ifndef OPENGL_LIBS
 #define OPENGL_LIBS
-#include <glad.h>
+#include "glad.h"
 #endif
 
 #include <mat4.h>
