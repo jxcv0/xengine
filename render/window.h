@@ -132,7 +132,6 @@ class Window {
   float m_width;
   float m_height;
   // std::uint32_t m_input_buffer;
-  // Mat4 m_perspective_matrix;
 };
 
 #endif  // MAINWINDOW_H_

@@ -12,14 +12,15 @@ constexpr Vec3 GLOBAL_UP(0, 1, 0);
  */
 class Camera {
  public:
-  Camera() = default;
+  Camera() : m_pos(0, 0, 3) {
+  }
 
   /**
    * @brief Calculate a view matrix based on camera position.
    *
    * @return a Mat4 view matrix.
    */
-  constexpr auto view_matrix() {
+  auto view_matrix() {
     return lin::look_at(m_pos, m_pos + m_view_dir, m_up);
   }
 
@@ -34,6 +35,7 @@ class Camera {
     y_offset *= m_mouse_sensetivity;
     m_yaw += x_offset;
     m_pitch += y_offset;
+
     if (m_pitch > 89.0f) {
       m_pitch = 89.0f;
     } else if (m_pitch < -89.0f) {
@@ -45,6 +47,7 @@ class Camera {
         std::sin(lin::radians(m_pitch)),
         std::sin(lin::radians(m_yaw)) * std::cos(lin::radians(m_pitch)));
 
+    std::cout << m_pitch << " " << m_yaw << "\n";
     m_view_dir = temp_view.normalize();
     m_right = (m_view_dir * GLOBAL_UP).normalize();
     m_up = (m_right * m_view_dir).normalize();

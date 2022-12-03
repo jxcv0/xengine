@@ -1,14 +1,23 @@
 #include <iostream>
 
+#include "camera.h"
 #include "checkerr.h"
 #include "lin.h"
 #include "mat4.h"
 #include "shader.h"
 #include "vec3.h"
 #include "window.h"
+#include "camera.h"
+
+void on_mouse(GLFWwindow *window, double x, double y);
 
 constexpr auto window_width = 1080;
 constexpr auto window_height = 600;
+float last_x = window_width / 2.0f;
+float last_y = window_height / 2.0f;
+bool first_mouse = true;
+
+Camera camera;
 
 int main(int argc, char const *argv[]) {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -16,6 +25,7 @@ int main(int argc, char const *argv[]) {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
   Window window(window_width, window_height, "xengine");
+  window.set_cursor_position_callback(on_mouse);
 
   auto shader =
       ShaderUtils::load("render/glsl/uber.vert", "render/glsl/uber.frag");
@@ -50,12 +60,12 @@ int main(int argc, char const *argv[]) {
   glEnableVertexAttribArray(1);
 
   auto projection_matrix = window.projection_matrix(60);
-  auto view_matrix = lin::translate(Mat4(1), Vec3(0, 0, -3));
+  // auto view_matrix = lin::translate(Mat4(1), Vec3(0, 0, -3));
   auto model_matrix = lin::rotate(Mat4(1), Vec3(1, 0, 0), lin::radians(-55));
 
   shader.use();
   shader.set_uniform("projection", projection_matrix);
-  shader.set_uniform("view", view_matrix);
+  shader.set_uniform("view", camera.view_matrix());
   shader.set_uniform("model", model_matrix);
 
   while (!window.should_close()) {
@@ -72,6 +82,16 @@ int main(int argc, char const *argv[]) {
   return 0;
 }
 
-// void on_mouse(GLFWwindow *window, double x, double y) {
-// xen::camera::update_aim(static_cast<float>(x), static_cast<float>(y), 0.1f);
-// }
+void on_mouse(GLFWwindow *window, double x, double y) {
+  auto x_pos = static_cast<float>(x);
+  auto y_pos = static_cast<float>(y);
+  if (first_mouse) {
+    last_x = x_pos;
+    last_y = y_pos;
+  }
+  auto x_offset = x_pos - last_x;
+  auto y_offset = last_y - y_pos;
+  last_x = x_pos;
+  last_y = y_pos;
+  camera.process_mouse_movement(static_cast<float>(x_offset), static_cast<float>(y_offset));
+}
