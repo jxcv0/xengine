@@ -47,7 +47,6 @@ class Camera {
         std::sin(lin::radians(m_pitch)),
         std::sin(lin::radians(m_yaw)) * std::cos(lin::radians(m_pitch)));
 
-    std::cout << m_pitch << " " << m_yaw << "\n";
     m_view_dir = temp_view.normalize();
     m_right = (m_view_dir * GLOBAL_UP).normalize();
     m_up = (m_right * m_view_dir).normalize();
@@ -57,7 +56,7 @@ class Camera {
   float m_yaw = 0;
   float m_pitch = 0;
   // float m_movement_speed = 1;
-  float m_mouse_sensetivity = 1;
+  float m_mouse_sensetivity = 1.0f;
   Vec3 m_pos;
   Vec3 m_view_dir;
   Vec3 m_up;

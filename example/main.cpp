@@ -65,12 +65,13 @@ int main(int argc, char const *argv[]) {
 
   shader.use();
   shader.set_uniform("projection", projection_matrix);
-  shader.set_uniform("view", camera.view_matrix());
   shader.set_uniform("model", model_matrix);
 
   while (!window.should_close()) {
     window.clear_buffers();
     glClearColor(0.2, 0.3, 0.3, 1);
+
+    shader.set_uniform("view", camera.view_matrix());
 
     glBindVertexArray(vao);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void *)(0));
@@ -88,10 +89,11 @@ void on_mouse(GLFWwindow *window, double x, double y) {
   if (first_mouse) {
     last_x = x_pos;
     last_y = y_pos;
+    first_mouse = false;
   }
-  auto x_offset = x_pos - last_x;
-  auto y_offset = last_y - y_pos;
+  float x_offset = x_pos - last_x;
+  float y_offset = last_y - y_pos;
   last_x = x_pos;
   last_y = y_pos;
-  camera.process_mouse_movement(static_cast<float>(x_offset), static_cast<float>(y_offset));
+  camera.process_mouse_movement(x_offset, y_offset);
 }
