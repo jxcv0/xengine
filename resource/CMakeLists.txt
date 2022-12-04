@@ -11,6 +11,7 @@ set(
         resource.h
         import.h
         logallocator.h
+        mmapfile.h
 )
 
 add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})
