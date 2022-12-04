@@ -29,7 +29,7 @@ class ComponentArrayBase {
  *
  *        note: Lessons learned. Simpler is better. Iterators are B.S.
  */
-template <typename ComponentType, std::size_t N = MAX_ENTITIES>
+template <typename ComponentType, unsigned int N = MAX_ENTITIES>
 class ComponentArray : public ComponentArrayBase {
  public:
   ComponentArray() = default;
@@ -54,7 +54,7 @@ class ComponentArray : public ComponentArrayBase {
    * @param e The enity to erase.
    */
   void erase_entity(EntityHandle e) override {
-    for (int i = 0; i < N; i++) {
+    for (unsigned int i = 0; i < N; i++) {
       if (m_map[i].m_handle == e) {
         m_map[i].m_index = -1;  // AKA not in use
       }
@@ -69,7 +69,7 @@ class ComponentArray : public ComponentArrayBase {
    * is not found then nullptr is returned.
    */
   ComponentType* get_component(EntityHandle e) {
-    for (int i = 0; i < N; i++) {
+    for (unsigned int i = 0; i < N; i++) {
       if (m_map[i].m_handle == e) {
         int index = m_map[i].m_index;
         if (index != -1) {

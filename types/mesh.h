@@ -7,14 +7,13 @@
 #include <vector>
 
 /**
- * @brief A Mesh component. This may in fact be a collection of different
- *        Meshes from the same directory.
+ * @brief A Mesh component.
  */
 struct Mesh {
   // Stores the indexes into the vertex data.
   // This makes parsing .obj's much easier at the expense of a slighly more
   // expensive call to glBufferData(GL_ARRAY_BUFFER, ... );
-  // This is because the data needs to be "unwrapped" into a separate buffer
+  // This is because the data needs to be decompressed into a separate buffer
   // using this as a key before being passed to OpenGL calls.
   struct Index {
     unsigned int m_position_idx;

@@ -20,7 +20,8 @@ namespace xen {
  * @brief Unspecialized import function throws runtime error.
  */
 template <typename T>
-void import(T *dest, const std::filesystem::path &filepath) {
+void import([[maybe_unused]] T *dest,
+            [[maybe_unused]] const std::filesystem::path &filepath) {
   throw std::runtime_error("no implementation for importing type");
 }
 

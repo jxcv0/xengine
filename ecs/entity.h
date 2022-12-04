@@ -17,7 +17,7 @@ using Signature = std::uint16_t;
 /**
  * @brief Entity system
  */
-template <std::size_t N = MAX_ENTITIES>
+template <unsigned int N = MAX_ENTITIES>
 class EntitySystem {
  public:
   /**
@@ -25,7 +25,7 @@ class EntitySystem {
    *        available entity ids that are indexes in the signatures array.
    */
   EntitySystem() {
-    for (auto i = 0; i < N; i++) {
+    for (unsigned int i = 0; i < N; i++) {
       m_free_list.push(i);
     }
   }

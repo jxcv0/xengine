@@ -35,7 +35,7 @@ class ThreadPool {
    *
    * @param nthread The number of worker threads.
    */
-  ThreadPool(std::size_t nthreads) : m_should_run(true), m_index(0) {
+  ThreadPool(int nthreads) : m_should_run(true), m_index(0) {
     m_worker_threads.reserve(nthreads);
     for (auto i = 0; i < nthreads; i++) {
       m_worker_threads.emplace_back(std::thread(&ThreadPool::run, this));
@@ -92,12 +92,12 @@ class ThreadPool {
     }
   };
 
+  bool m_should_run;
   unsigned int m_index;
   Task *m_tasks[MAX_TASKS];
   std::vector<std::thread> m_worker_threads;
   std::mutex m_mutex;
   std::condition_variable m_cv;
-  bool m_should_run;
 };
 
 #endif  // THREADPOOL_H_

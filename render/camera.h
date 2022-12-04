@@ -12,17 +12,14 @@ constexpr Vec3 GLOBAL_UP(0, 1, 0);
  */
 class Camera {
  public:
-  Camera() : m_pos(0, 0, 3) {
-  }
+  Camera() : m_pos(0, 0, 3) {}
 
   /**
    * @brief Calculate a view matrix based on camera position.
    *
    * @return a Mat4 view matrix.
    */
-  auto view_matrix() {
-    return lin::look_at(m_pos, m_pos + m_view_dir, m_up);
-  }
+  auto view_matrix() { return lin::look_at(m_pos, m_pos + m_view_dir, m_up); }
 
   /**
    * @brief Update camera state based on mouse movement.

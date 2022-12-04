@@ -30,15 +30,16 @@ int gl_print_error(std::ostream &os, const char *file, int line) {
         error = "INVALID_FRAMEBUFFER_OPERATION";
         break;
     }
-    std::cout << error << " | " << file << " (" << line << ")"
-              << "\n";
+    os << error << " | " << file << " (" << line << ")"
+       << "\n";
   }
   return errorCode;
 }
 
 void gl_debug_output(GLenum source, GLenum type, unsigned int id,
-                     GLenum severity, GLsizei length, const char *message,
-                     const void *user_param) {
+                     GLenum severity, [[maybe_unused]] GLsizei length,
+                     const char *message,
+                     [[maybe_unused]] const void *user_param) {
   switch (source) {
     case GL_DEBUG_SOURCE_API:
       std::cout << "api: ";

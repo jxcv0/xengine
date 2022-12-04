@@ -27,7 +27,7 @@ TEST(entitysubsystemtests, create_entity_throw) {
   ASSERT_EQ(e2, 1);
   auto e3 = es.create_entity();
   ASSERT_EQ(e3, 2);
-  ASSERT_THROW(auto e3 = es.create_entity(), std::runtime_error);
+  ASSERT_THROW(es.create_entity(), std::runtime_error);
 }
 
 TEST(entitysubsystem_tests, set_signature) {

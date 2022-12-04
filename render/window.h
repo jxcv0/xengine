@@ -39,9 +39,8 @@ class Window {
 
     glfwMakeContextCurrent(mp_window);
     glfwSetFramebufferSizeCallback(
-        mp_window, [](GLFWwindow *window, int width, int height) {
-          glViewport(0, 0, width, height);
-        });
+        mp_window, []([[maybe_unused]] GLFWwindow *window, int width,
+                      int height) { glViewport(0, 0, width, height); });
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
       perror("glad: unable to load opengl");
@@ -128,9 +127,9 @@ class Window {
   }
 
  private:
-  GLFWwindow *mp_window;
   float m_width;
   float m_height;
+  GLFWwindow *mp_window;
   // std::uint32_t m_input_buffer;
 };
 

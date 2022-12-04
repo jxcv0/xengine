@@ -4,10 +4,10 @@
 #include "checkerr.h"
 #include "lin.h"
 #include "mat4.h"
+#include "resource.h"
 #include "shader.h"
 #include "vec3.h"
 #include "window.h"
-#include "camera.h"
 
 void on_mouse(GLFWwindow *window, double x, double y);
 
@@ -19,7 +19,7 @@ bool first_mouse = true;
 
 Camera camera;
 
-int main(int argc, char const *argv[]) {
+int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -83,7 +83,7 @@ int main(int argc, char const *argv[]) {
   return 0;
 }
 
-void on_mouse(GLFWwindow *window, double x, double y) {
+void on_mouse([[maybe_unused]] GLFWwindow *window, double x, double y) {
   auto x_pos = static_cast<float>(x);
   auto y_pos = static_cast<float>(y);
   if (first_mouse) {
