@@ -1,6 +1,8 @@
 #include "import.h"
-#include "mmapfile.h"
+
 #include <stdexcept>
+
+#include "mmapfile.h"
 
 auto load_texture(const std::filesystem::path &filepath) {
   Texture texture;
@@ -14,19 +16,18 @@ void xen::import(Material *material, const std::filesystem::path &filepath) {
   if (filepath.extension() != ".mtl") {
     throw std::runtime_error("file extension not supported");
   }
-  (void) material;
+  (void)material;
 }
 
 template <>
-void xen::import(Mesh *mesh, const std::filesystem::path &filepath) {
+void xen::import([[maybe_unused]] Mesh *mesh,
+                 const std::filesystem::path &filepath) {
   if (filepath.extension() != ".obj") {
     throw std::runtime_error("file extension not supported");
   }
 
   MmapFile file(filepath);
   if (!file.valid()) {
-
   }
-
-  file.data();
+  // TODO
 }

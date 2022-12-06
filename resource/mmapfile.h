@@ -56,24 +56,16 @@ class MmapFile {
   inline auto valid() const { return mp_addr != nullptr; }
 
   /**
-   * @brief Get mapped memory address.
+   * @brief Get a string view into the file.
    *
-   * @return A pointer to the memory address.
+   * @return a std::string view that points to the mapped memory.
    */
-  const char* data() const { return static_cast<const char*>(mp_addr); }
-
-  /**
-   * @brief Get the size of the memory mapped to the file.
-   *
-   * @return The size of the memory.
-   */
-  auto len() const { return m_len; }
-
-  auto get_line() {
+  auto get_view() const {
+    return std::string_view(static_cast<char*>(mp_addr), m_len);
   }
 
  private:
-  void *mp_addr;
+  void* mp_addr;
   std::size_t m_len;
 };
 
