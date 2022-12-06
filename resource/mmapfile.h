@@ -60,7 +60,7 @@ class MmapFile {
    *
    * @return a std::string view that points to the mapped memory.
    */
-  auto get_view() const {
+  auto view() const {
     return std::string_view(static_cast<char*>(mp_addr), m_len);
   }
 

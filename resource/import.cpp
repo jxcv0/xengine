@@ -1,6 +1,10 @@
 #include "import.h"
 
+#include <cstddef>
+#include <iostream>
 #include <stdexcept>
+#include <string>
+#include <string_view>
 
 #include "mmapfile.h"
 
@@ -29,5 +33,14 @@ void xen::import([[maybe_unused]] Mesh *mesh,
   MmapFile file(filepath);
   if (!file.valid()) {
   }
-  // TODO
+
+  using size_type = std::string_view::size_type;
+  auto view = file.view();
+  size_type curr = 0, prev = 0;
+
+  while ((curr = view.find('\n', prev)) != std::string_view::npos) {
+    auto len = curr - prev + 1;
+    std::cout << view.substr(prev, len);
+    prev += len;
+  }
 }
