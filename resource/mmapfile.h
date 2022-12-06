@@ -42,7 +42,7 @@ class MmapFile {
    */
   friend std::ostream& operator<<(std::ostream& os, const MmapFile& mmf) {
     auto c = static_cast<char*>(mmf.mp_addr);
-    for (size_t i = 0; i < mmf.m_len; i++) {
+    for (std::size_t i = 0; i < mmf.m_len; i++) {
       os << c[i];
     }
     return os;
