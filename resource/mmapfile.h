@@ -30,20 +30,12 @@ class MmapFile {
    *
    * @param filepath The filepath to the file to open.
    */
-  MmapFile(const std::filesystem::path& filepath) noexcept {
-    auto fd = open(filepath.c_str(), O_RDWR);
-    // if (fd == -1) { return; }
-    m_len = lseek(fd, 0, SEEK_END);
-    lseek(fd, 0, SEEK_SET);
-    mp_addr =
-        mmap(nullptr, m_len, (PROT_READ | PROT_WRITE), MAP_PRIVATE, fd, 0);
-    close(fd);
-  }
+  MmapFile(const std::filesystem::path& filepath) noexcept;
 
   /**
    * @brief Destructor. Unmap the memory address.
    */
-  ~MmapFile() { munmap(mp_addr, m_len); }
+  ~MmapFile();
 
   /**
    * @brief Print the contents of the address.
@@ -68,7 +60,7 @@ class MmapFile {
    *
    * @return A pointer to the memory address.
    */
-  const void* data() const { return mp_addr; }
+  const char* data() const { return static_cast<const char*>(mp_addr); }
 
   /**
    * @brief Get the size of the memory mapped to the file.
@@ -77,8 +69,11 @@ class MmapFile {
    */
   auto len() const { return m_len; }
 
+  auto get_line() {
+  }
+
  private:
-  void* mp_addr;
+  void *mp_addr;
   std::size_t m_len;
 };
 

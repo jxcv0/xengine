@@ -5,10 +5,10 @@
 #include <string>
 #include "mmapfile.h"
 
-TEST(mmapfiletests, get_line) {
+TEST(mmapfiletests, mmapfile) {
   MmapFile file("assets/models/cube/cube.obj");
   ASSERT_TRUE(file.valid());
-  auto c = static_cast<const char *>(file.data());
+  auto c = file.data();
   auto nl = static_cast<const char *>(memchr(c, '\n', file.len()));
   const std::string expected = "# Blender v2.76 (sub 0) OBJ File: ''";
   auto size = nl - c;

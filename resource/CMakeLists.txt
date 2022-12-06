@@ -4,6 +4,7 @@ project(resource)
 set(
     SOURCES
         import.cpp
+        mmapfile.cpp
 )
 
 set(
