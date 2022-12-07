@@ -3,67 +3,59 @@
 #include <cstddef>
 #include <cstdlib>
 #include <iostream>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <string_view>
 
-#include "mmapfile.h"
+#include "vec3.h"
 
-
-auto load_texture(const std::filesystem::path &filepath) {
+auto xen::load_texture(const std::filesystem::path &filepath) {
   Texture texture;
   texture.mp_data = stbi_load(filepath.c_str(), &texture.m_width,
                               &texture.m_height, &texture.m_num_channels, 0);
   return texture;
 }
 
-template <>
-void xen::import(Material *material, const std::filesystem::path &filepath) {
-  if (filepath.extension() != ".mtl") {
-    throw std::runtime_error("file extension not supported");
-  }
-  // TODO
-  (void)material;
-}
-
-void parsef([[maybe_unused]] Mesh *mesh, const std::string_view sv) {
-  // using size_type = std::string_view::size_type;
-  // size_type curr = 0, prev = 0;
-
-  const char *p= sv.data();
+Vec3 xen::parse_vec3(const std::string_view &sv) {
+  const char *p = sv.data();
   char *end;
+  float result[3];
+  int i = 0;
   for (float f = std::strtof(p, &end); p != end; f = strtof(p, &end)) {
-    std::cout << f << " ";
+    result[i++] = f;
     p = end;
   }
+  return Vec3(result[0], result[1], result[2]);
 }
 
-void parsei() {
-  // TODO
-}
-
-template <>
-void xen::import([[maybe_unused]] Mesh *mesh,
-                 const std::filesystem::path &filepath) {
-  using size_type = std::string_view::size_type;
-  if (filepath.extension() != ".obj") {
-    throw std::runtime_error("file extension not supported");
+Vec2 xen::parse_vec2(const std::string_view &sv) {
+  const char *p = sv.data();
+  char *end;
+  float result[2];
+  int i = 0;
+  for (float f = std::strtof(p, &end); p != end; f = strtof(p, &end)) {
+    // TODO what is faster for loop with int or this?
+    result[i++] = f;
+    p = end;
   }
+  return Vec2(result[0], result[1]);
+}
 
-  const MmapFile file(filepath);
-  auto view = file.view();
-  size_type curr = 0, prev = 0;
-
-  while ((curr = view.find('\n', prev)) != std::string_view::npos) {
+Mesh::Index xen::parse_index(const std::string_view &sv) {
+  std::string_view::size_type curr = 0;
+  std::string_view::size_type prev = 0;
+  while ((curr = sv.find(' ', prev)) != std::string_view::npos) {
     auto len = curr - prev + 1;
-    auto line = view.substr(prev, len);
-    prev += len;
-
-    if ("v " == line.substr(0, 2)) {
-      parsef(mesh, line.substr(2));
-      break;
-    } else if ("vt " == line.substr(0, 3)) {
-
+    auto face_tok = sv.substr(prev, len);
+    std::string_view::size_type c = 0;
+    std::string_view::size_type p = 0;
+    while ((c = face_tok.find('/', p)) != std::string_view::npos) {
+      auto l = c - p;
+      std::cout << face_tok.substr(p, l) << "\n";
+      p += l + 1;
     }
+    prev += len;
   }
+  return Mesh::Index{};
 }

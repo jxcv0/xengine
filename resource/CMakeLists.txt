@@ -17,7 +17,8 @@ set(
 
 add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PUBLIC .)
-target_link_libraries(${PROJECT_NAME} PUBLIC render glad lin types)
 set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
+
+target_link_libraries(${PROJECT_NAME} PUBLIC memory render glad lin types)
 
 add_subdirectory(test)
