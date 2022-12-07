@@ -55,7 +55,7 @@ Vec3 parse_vec3(const std::string_view &sv);
 
 Vec2 parse_vec2(const std::string_view &sv);
 
-Mesh::Index parse_index(const std::string_view &sv);
+void parse_index(Mesh::Index *index, const std::string_view &sv);
 
 /**
  * @brief Function specialization for importing a material from a wavefront
@@ -141,7 +141,8 @@ void import(Mesh *mesh, const std::filesystem::path &filepath,
     } else if ("vn " == line.substr(0, 3)) {
       mesh->mp_normals[mesh->m_num_normals++] = parse_vec3(line.substr(3));
     } else if ("f " == line.substr(0, 2)) {
-      mesh->mp_indices[mesh->m_num_indices++] = parse_index(line.substr(2));
+      parse_index(&mesh->mp_indices[mesh->m_num_indices], line.substr(2));
+      mesh->m_num_indices += 3;
     }
   }
 }

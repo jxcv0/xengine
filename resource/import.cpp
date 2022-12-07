@@ -42,20 +42,23 @@ Vec2 xen::parse_vec2(const std::string_view &sv) {
   return Vec2(result[0], result[1]);
 }
 
-Mesh::Index xen::parse_index(const std::string_view &sv) {
+void xen::parse_index(Mesh::Index *index, const std::string_view &sv) {
   std::string_view::size_type curr = 0;
   std::string_view::size_type prev = 0;
+  int i = 0;
   while ((curr = sv.find(' ', prev)) != std::string_view::npos) {
     auto len = curr - prev + 1;
     auto face_tok = sv.substr(prev, len);
     std::string_view::size_type c = 0;
     std::string_view::size_type p = 0;
+    unsigned int result[3];
+    int j = 0;
     while ((c = face_tok.find('/', p)) != std::string_view::npos) {
       auto l = c - p;
-      std::cout << face_tok.substr(p, l) << "\n";
+      result[j++] = std::atoi(face_tok.substr(p, l).data());
       p += l + 1;
     }
+    index[i++] = {--result[0], --result[1], --result[2]};
     prev += len;
   }
-  return Mesh::Index{};
 }
