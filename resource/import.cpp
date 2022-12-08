@@ -8,6 +8,7 @@
 #include <string>
 #include <string_view>
 
+#include "mesh.h"
 #include "vec3.h"
 
 auto xen::load_texture(const std::filesystem::path &filepath) {
@@ -42,23 +43,18 @@ Vec2 xen::parse_vec2(const std::string_view &sv) {
   return Vec2(result[0], result[1]);
 }
 
-void xen::parse_index(Mesh::Index *index, const std::string_view &sv) {
-  std::string_view::size_type curr = 0;
-  std::string_view::size_type prev = 0;
-  int i = 0;
-  while ((curr = sv.find(' ', prev)) != std::string_view::npos) {
-    auto len = curr - prev + 1;
-    auto face_tok = sv.substr(prev, len);
-    std::string_view::size_type c = 0;
-    std::string_view::size_type p = 0;
-    unsigned int result[3];
-    int j = 0;
-    while ((c = face_tok.find('/', p)) != std::string_view::npos) {
-      auto l = c - p;
-      result[j++] = std::atoi(face_tok.substr(p, l).data());
-      p += l + 1;
-    }
-    index[i++] = {--result[0], --result[1], --result[2]};
-    prev += len;
-  }
+Mesh::Index xen::parse_index(const std::string_view &sv) {
+  using size_type = std::string_view::size_type;
+  size_type curr = 0;
+  size_type prev = 0;
+  curr = sv.find('/', prev)) != std::string_view::npos
+  auto len = curr - prev;
+  auto line = sv.substr(prev, len);
+  std::cout << line << " ";
+  prev += len + 1;
+  // do last token
+  auto line = sv.substr(prev, sv.size() - prev);
+  std::cout << line << "\n";
+
+  return Mesh::Index{};
 }
