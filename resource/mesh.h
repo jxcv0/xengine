@@ -141,23 +141,53 @@ class Mesh {
    * @brief Generate gl buffers for this mesh.
    */
   void gen_buffers() {
-    // glGenBuffers(1, &m_vbo);
-    // glGenBuffers(1, &m_ebo);
-    // glGenVertexArrays(1, &m_vao);
-    // glBindVertexArray(m_vao);
+    auto buffsize = m_num_indices * 8;
+    float data[buffsize];  // 8 floats per index
+    float indices[m_num_indices];
 
-    // how many floats needed to make one buffer
-    auto pos_size = 3 * m_num_positions;
-    auto norm_size = 3 * m_num_normals;
-    auto tex_coords_size = 2 * m_num_tex_coords;
-    auto buff_size = pos_size + norm_size + tex_coords_size;
-    float buff[buff_size];
-    memcpy(buff, reinterpret_cast<float *>(mp_positions),
-           pos_size * sizeof(float));
-    for (unsigned int i = 0; i < pos_size; i++) {
-      std::cout << buff[i] << " ";
+    for (unsigned int i = 0, j = 0; i < m_num_indices; i++) {
+      // TODO a fast way of detecting duplicate indices for ebo
+      indices[i] = i;
+      auto index = mp_indices[i];
+      data[j++] = mp_positions[index.m_position_idx].x();
+      data[j++] = mp_positions[index.m_position_idx].y();
+      data[j++] = mp_positions[index.m_position_idx].z();
+      data[j++] = mp_normals[index.m_normal_idx].x();
+      data[j++] = mp_normals[index.m_normal_idx].y();
+      data[j++] = mp_normals[index.m_normal_idx].z();
+      data[j++] = mp_tex_coords[index.m_tex_coord_idx].x();
+      data[j++] = mp_tex_coords[index.m_tex_coord_idx].y();
     }
-    std::cout << "\n";
+
+    glGenBuffers(1, &m_vbo);
+    glGenBuffers(1, &m_ebo);
+    glGenVertexArrays(1, &m_vao);
+    glBindVertexArray(m_vao);
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_DYNAMIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
+                 GL_DYNAMIC_DRAW);
+
+    auto stride = 8 * sizeof(float);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride,
+                          reinterpret_cast<void *>(0));
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride,
+                          reinterpret_cast<void *>(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride,
+                          reinterpret_cast<void *>(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+  }
+
+  void draw() {
+    glBindVertexArray(m_vao);
+    glDrawElements(GL_TRIANGLES, m_num_indices, GL_UNSIGNED_INT, (void *)0);
   }
 
 #ifndef MESH_GTEST

@@ -3,7 +3,6 @@
 #include "camera.h"
 #include "checkerr.h"
 #include "lin.h"
-#include "mallocator.h"
 #include "mat4.h"
 #include "mesh.h"
 #include "shader.h"
@@ -77,9 +76,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
 
     shader.set_uniform("view", camera.view_matrix());
 
+    mesh.draw();
     glBindVertexArray(vao);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void *)(0));
 
+    gl_print_error(std::cout, __FILE__, __LINE__);
     window.swap_buffers();
     window.poll_events();
   }

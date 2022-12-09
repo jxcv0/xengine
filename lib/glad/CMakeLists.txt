@@ -13,4 +13,5 @@ set(
 )
 
 add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})
-target_include_directories(${PROJECT_NAME} PUBLIC include/glad/)
+target_include_directories(glad PUBLIC include/glad/)
+target_link_libraries(glad dl)
