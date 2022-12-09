@@ -27,7 +27,7 @@ class Resource {
   Resource &operator=(const Resource &) = default;
   Resource &operator=(Resource &&) = default;
 
-  ~Resource() { m_alloc.deallocate(mp_resource); }
+  ~Resource() { m_alloc.deallocate(mp_resource, 1); }
 
   /**
    * @brief Comparison operator. If the filepaths are the same then resources

@@ -145,15 +145,15 @@ void import(Mesh *mesh, const std::filesystem::path &filepath,
       size_type f_curr = 0;
       size_type f_prev = 0;
       // delim by spaces
-      while ((f_curr = f_line.find(" ", f_prev)) != std::string_view::npos) { 
+      while ((f_curr = f_line.find(" ", f_prev)) != std::string_view::npos) {
         auto f_len = f_curr - f_prev;
         auto face_tok = f_line.substr(f_prev, f_len);
-        parse_index(face_tok);
+        mesh->mp_indices[mesh->m_num_indices++] = parse_index(face_tok);
         f_prev += f_len + 1;
       }
       // do last token
-      parse_index(f_line.substr(f_prev, f_line.size() - f_prev - 1));
-      std::cout << "\n";
+      mesh->mp_indices[mesh->m_num_indices++] =
+          parse_index(f_line.substr(f_prev, f_line.size() - f_prev - 1));
     }
     // TODO mtl parsing here
   }

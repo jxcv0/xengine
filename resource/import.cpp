@@ -47,14 +47,24 @@ Mesh::Index xen::parse_index(const std::string_view &sv) {
   using size_type = std::string_view::size_type;
   size_type curr = 0;
   size_type prev = 0;
-  curr = sv.find('/', prev)) != std::string_view::npos
-  auto len = curr - prev;
-  auto line = sv.substr(prev, len);
-  std::cout << line << " ";
-  prev += len + 1;
-  // do last token
-  auto line = sv.substr(prev, sv.size() - prev);
-  std::cout << line << "\n";
 
-  return Mesh::Index{};
+  Mesh::Index index;
+  curr = sv.find('/', prev);
+  auto len = curr - prev;
+  auto pos_index = sv.substr(prev, len);
+  index.m_position_idx = std::atoi(pos_index.data()) - 1;
+  prev += len + 1;
+
+  curr = sv.find('/', prev);
+  len = curr - prev;
+  auto tex_coords_index = sv.substr(prev, len);
+  index.m_tex_coord_idx = std::atoi(tex_coords_index.data()) - 1;
+  prev += len + 1;
+
+  curr = sv.find('/', sv.size() - prev);
+  len = curr - prev;
+  auto normal_index = sv.substr(prev, len);
+  index.m_normal_idx = std::atoi(normal_index.data()) - 1;
+
+  return index;
 }
