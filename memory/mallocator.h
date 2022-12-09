@@ -6,6 +6,8 @@
 
 template <typename T>
 struct Mallocator {
+  using value_type = T;
+
   T *allocate(std::size_t n) {
     return static_cast<T *>(std::malloc(n * sizeof(T)));
   }

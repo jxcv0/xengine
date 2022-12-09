@@ -18,7 +18,6 @@ Vec2 Mesh::parse_vec2(const std::string_view &sv) {
   float result[2];
   int i = 0;
   for (float f = std::strtof(p, &end); p != end; f = strtof(p, &end)) {
-    // TODO what is faster for loop with int or this?
     result[i++] = f;
     p = end;
   }

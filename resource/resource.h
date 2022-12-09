@@ -3,10 +3,13 @@
 
 #include <filesystem>
 
+#include "mallocator.h"
+
 /**
  * @brief Manages the memory of a game resource
  */
-template <typename T, template <typename> typename Alloc = std::allocator>
+template <typename ResourceType,
+          template <typename> typename Alloc = Mallocator>
 class Resource {
  public:
   /**
@@ -15,16 +18,18 @@ class Resource {
    * @param filepath The path to the file the resource can be loaded from.
    */
   Resource(const std::filesystem::path filepath)
-      : m_alloc(), m_filepath(filepath) {
-    // mp_resource = m_alloc.allocate(1);
-    // xen::import(mp_resource, filepath, m_alloc);
+      : m_alloc(), m_filepath(filepath), mp_resource(nullptr) {
+    mp_resource = m_alloc.allocate(1);
   }
 
-  Resource(const Resource<T, Alloc> &r) = default;
+  Resource(const Resource<ResourceType, Alloc> &r) = default;
   Resource &operator=(const Resource &) = default;
   Resource &operator=(Resource &&) = default;
 
-  ~Resource() { m_alloc.deallocate(mp_resource, 1); }
+  ~Resource() {
+    mp_resource.unload(m_alloc);
+    m_alloc.deallocate(mp_resource, 1);
+  }
 
   /**
    * @brief Comparison operator. If the filepaths are the same then resources
@@ -50,8 +55,8 @@ class Resource {
   std::filesystem::path filepath() const { return m_filepath; }
 
  private:
-  T *mp_resource;
-  Alloc<T> m_alloc;
+  ResourceType mp_resource;
+  Alloc<ResourceType> m_alloc;
   std::filesystem::path m_filepath;
 };
 
