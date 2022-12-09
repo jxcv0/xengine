@@ -1,34 +1,13 @@
 #include <gtest/gtest.h>
-#include <import.h>
-#include <model.h>
-#include <texture.h>
 
-#include <cassert>
-#include <exception>
-#include <memory>
-#include <stdexcept>
-
-#include "material.h"
-
-TEST(importtests, import_error) {
-  struct NotImportable {
-  } obj;
-  std::allocator<NotImportable> a;
-  ASSERT_THROW(xen::import(&obj, "unsupported_file.nocando", a),
-               std::exception);
-}
-
-TEST(importtests, unsupported_file_type) {
-  Mesh mesh;
-  std::allocator<Mesh> a;
-  ASSERT_THROW(xen::import(&mesh, "unsupported_file.nocando", a),
-               std::exception);
-}
+#define MESH_GTEST
+#include "mallocator.h"
+#include "mesh.h"
 
 TEST(importtests, mesh) {
+  Mallocator<void> a;
   Mesh mesh;
-  std::allocator<Mesh> a;
-  xen::import(&mesh, "assets/models/cube/cube.obj", a);
+  mesh.load("assets/models/cube/cube.obj", a);
 
   // positions
   ASSERT_EQ(mesh.m_num_positions, 8);
@@ -65,11 +44,11 @@ TEST(importtests, mesh) {
   ASSERT_EQ(mesh.mp_indices[mesh.m_num_indices - 1].m_normal_idx, 5);
 }
 
-TEST(importtests, mtl) {
-  /*
+// TEST(importtests, mtl) {
+/*
 Material material;
 xen::import(&material, "assets/models/cyborg/cyborg.mtl");
 ASSERT_FLOAT_EQ(material.m_specular_exp, 92.15686f);
 // TODO ...
 */
-}
+// }

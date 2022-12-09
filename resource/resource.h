@@ -2,13 +2,9 @@
 #define RESOURCE_H_
 
 #include <filesystem>
-#include <memory>
-
-#include "import.h"
 
 /**
- * @brief A game resource.
- *        Manages the memory of the underying resource via a shared pointer.
+ * @brief Manages the memory of a game resource
  */
 template <typename T, template <typename> typename Alloc = std::allocator>
 class Resource {
@@ -18,9 +14,10 @@ class Resource {
    *
    * @param filepath The path to the file the resource can be loaded from.
    */
-  Resource(const std::filesystem::path filepath) : m_filepath(filepath) {
-    mp_resource = m_alloc.allocate(1);
-    xen::import(mp_resource, filepath, m_alloc);
+  Resource(const std::filesystem::path filepath)
+      : m_alloc(), m_filepath(filepath) {
+    // mp_resource = m_alloc.allocate(1);
+    // xen::import(mp_resource, filepath, m_alloc);
   }
 
   Resource(const Resource<T, Alloc> &r) = default;

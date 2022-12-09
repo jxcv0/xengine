@@ -1,24 +1,6 @@
-#include "import.h"
-
-#include <cstddef>
-#include <cstdlib>
-#include <iostream>
-#include <memory>
-#include <stdexcept>
-#include <string>
-#include <string_view>
-
 #include "mesh.h"
-#include "vec3.h"
 
-auto xen::load_texture(const std::filesystem::path &filepath) {
-  Texture texture;
-  texture.mp_data = stbi_load(filepath.c_str(), &texture.m_width,
-                              &texture.m_height, &texture.m_num_channels, 0);
-  return texture;
-}
-
-Vec3 xen::parse_vec3(const std::string_view &sv) {
+Vec3 Mesh::parse_vec3(const std::string_view &sv) {
   const char *p = sv.data();
   char *end;
   float result[3];
@@ -30,7 +12,7 @@ Vec3 xen::parse_vec3(const std::string_view &sv) {
   return Vec3(result[0], result[1], result[2]);
 }
 
-Vec2 xen::parse_vec2(const std::string_view &sv) {
+Vec2 Mesh::parse_vec2(const std::string_view &sv) {
   const char *p = sv.data();
   char *end;
   float result[2];
@@ -43,7 +25,7 @@ Vec2 xen::parse_vec2(const std::string_view &sv) {
   return Vec2(result[0], result[1]);
 }
 
-Mesh::Index xen::parse_index(const std::string_view &sv) {
+Mesh::Index Mesh::parse_index(const std::string_view &sv) {
   using size_type = std::string_view::size_type;
   size_type curr = 0;
   size_type prev = 0;

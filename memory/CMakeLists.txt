@@ -3,19 +3,18 @@ project(memory)
 
 set(
   SOURCES
-    heap.cpp
+    mallocator.cpp
 )
 
 set(
   HEADERS
-    allocator.h
-    heap.h
+    mallocator.h
 )
 
 add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PUBLIC .)
 set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 
-target_link_libraries(memory lin types)
+target_link_libraries(memory )
 
-# add_subdirectory(test)
+add_subdirectory(test)
