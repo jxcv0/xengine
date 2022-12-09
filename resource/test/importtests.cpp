@@ -1,13 +1,14 @@
 #include <gtest/gtest.h>
 
-#define MESH_GTEST
 #include "mallocator.h"
+
+#define MESH_GTEST
 #include "mesh.h"
 
 TEST(importtests, mesh) {
   Mallocator<Mesh> a;
   Mesh *mesh = a.allocate(1);
-  mesh->load("assets/models/cube/cube.obj", a);
+  mesh->load("assets/models/cube/cube.obj");
 
   // positions
   ASSERT_EQ(mesh->m_num_positions, 8);
@@ -45,9 +46,8 @@ TEST(importtests, mesh) {
   ASSERT_EQ(mesh->mp_indices[mesh->m_num_indices - 1].m_tex_coord_idx, 10);
   ASSERT_EQ(mesh->mp_indices[mesh->m_num_indices - 1].m_normal_idx, 5);
 
-  mesh->unload(a);
-  std::cout << "here\n";
-  a.deallocate(mesh, 1);
+  mesh->unload();
+  // a.deallocate(mesh, 1);
 }
 
 // TEST(importtests, mtl) {

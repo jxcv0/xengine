@@ -3,8 +3,9 @@
 #include "camera.h"
 #include "checkerr.h"
 #include "lin.h"
+#include "mallocator.h"
 #include "mat4.h"
-#include "resource.h"
+#include "mesh.h"
 #include "shader.h"
 #include "vec3.h"
 #include "window.h"
@@ -62,6 +63,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
   auto projection_matrix = window.projection_matrix(60);
   // auto view_matrix = lin::translate(Mat4(1), Vec3(0, 0, -3));
   auto model_matrix = lin::rotate(Mat4(1), Vec3(1, 0, 0), lin::radians(-55));
+
+  Mallocator<Mesh> a;
+  Mesh *mesh = a.allocate(1);
+  mesh->load("assets/models/cube/cube.obj", a);
 
   shader.use();
   shader.set_uniform("projection", projection_matrix);

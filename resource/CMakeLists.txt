@@ -10,7 +10,6 @@ set(
 
 set(
   HEADERS
-    resource.h
     mmapfile.h
     mesh.h
     material.h

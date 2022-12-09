@@ -2,6 +2,7 @@
 #define MESH_H_
 
 #include <cstdint>
+#include <cstdlib>
 #include <filesystem>
 
 #include "mmapfile.h"
@@ -27,12 +28,8 @@ class Mesh {
    * @param filepath The filepath to load data from.
    * @param alloc A reference to the allocator to use.
    */
-  template <typename Alloc>
-  void load(const std::filesystem::path &filepath,
-            [[maybe_unused]] Alloc &alloc) {
+  void load(const std::filesystem::path &filepath) {
     using size_type = std::string_view::size_type;
-    using VoidAlloc =
-        typename std::allocator_traits<Alloc>::template rebind_alloc<void>;
 
     if (filepath.extension() != ".obj") {
       mp_memory_block = nullptr;
@@ -76,9 +73,9 @@ class Mesh {
     auto mem_size =
         positions_size + tex_coords_size + normals_size + faces_size;
 
+    // TODO need an allocator here.
     // pointers into memory block
-    VoidAlloc void_alloc;
-    auto *mp_memory_block = void_alloc.allocate(mem_size);
+    auto *mp_memory_block = std::malloc(mem_size);
     auto addr = reinterpret_cast<std::uintptr_t>(mp_memory_block);
 
     // TODO get rid of these C casts.
@@ -128,20 +125,7 @@ class Mesh {
    * @tparam Del The type of the deleter class.
    * @param deleter The deleter class used to free the memory.
    */
-  template <typename Del>
-  void unload([[maybe_unused]] Del &del) {
-    using Deleter =
-        typename std::allocator_traits<Del>::template rebind_alloc<void>;
-    Deleter deleter;
-    auto positions_size = m_num_positions * sizeof(Vec3);
-    auto tex_coords_size = m_num_tex_coords * sizeof(Vec2);
-    auto normals_size = m_num_normals * sizeof(Vec3);
-    auto indices_size = m_num_indices * sizeof(Mesh::Index);
-    auto mem_size =
-        positions_size + tex_coords_size + normals_size + indices_size;
-    deleter.deallocate(mp_memory_block, mem_size);
-    mp_memory_block = nullptr;
-  }
+  void unload() { std::free(mp_memory_block); }
 
   /**
    * @brief Check if the Mesh is currently storing data.
@@ -168,15 +152,15 @@ class Mesh {
    */
   Index parse_index(const std::string_view &sv);
 
+  unsigned int m_num_positions = 0;
+  unsigned int m_num_normals = 0;
+  unsigned int m_num_tex_coords = 0;
+  unsigned int m_num_indices = 0;
   void *mp_memory_block = nullptr;
   Vec3 *mp_positions = nullptr;
   Vec3 *mp_normals = nullptr;
   Vec2 *mp_tex_coords = nullptr;
   Index *mp_indices = nullptr;
-  unsigned int m_num_positions = 0;
-  unsigned int m_num_normals = 0;
-  unsigned int m_num_tex_coords = 0;
-  unsigned int m_num_indices = 0;
 };
 
 #endif  // MESH_H_
