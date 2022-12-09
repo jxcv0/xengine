@@ -3,8 +3,11 @@
 
 #include <cstdint>
 #include <cstdlib>
+#include <cstring>
 #include <filesystem>
+#include <limits>
 
+#include "glad.h"
 #include "mmapfile.h"
 #include "vec2.h"
 #include "vec3.h"
@@ -134,6 +137,29 @@ class Mesh {
    */
   auto in_use() { return mp_memory_block != nullptr; }
 
+  /**
+   * @brief Generate gl buffers for this mesh.
+   */
+  void gen_buffers() {
+    // glGenBuffers(1, &m_vbo);
+    // glGenBuffers(1, &m_ebo);
+    // glGenVertexArrays(1, &m_vao);
+    // glBindVertexArray(m_vao);
+
+    // how many floats needed to make one buffer
+    auto pos_size = 3 * m_num_positions;
+    auto norm_size = 3 * m_num_normals;
+    auto tex_coords_size = 2 * m_num_tex_coords;
+    auto buff_size = pos_size + norm_size + tex_coords_size;
+    float buff[buff_size];
+    memcpy(buff, reinterpret_cast<float *>(mp_positions),
+           pos_size * sizeof(float));
+    for (unsigned int i = 0; i < pos_size; i++) {
+      std::cout << buff[i] << " ";
+    }
+    std::cout << "\n";
+  }
+
 #ifndef MESH_GTEST
  private:
 #endif
@@ -152,6 +178,9 @@ class Mesh {
    */
   Index parse_index(const std::string_view &sv);
 
+  unsigned int m_vbo;
+  unsigned int m_vao;
+  unsigned int m_ebo;
   unsigned int m_num_positions = 0;
   unsigned int m_num_normals = 0;
   unsigned int m_num_tex_coords = 0;

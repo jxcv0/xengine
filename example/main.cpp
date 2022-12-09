@@ -61,12 +61,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
   glEnableVertexAttribArray(1);
 
   auto projection_matrix = window.projection_matrix(60);
-  // auto view_matrix = lin::translate(Mat4(1), Vec3(0, 0, -3));
   auto model_matrix = lin::rotate(Mat4(1), Vec3(1, 0, 0), lin::radians(-55));
 
-  Mallocator<Mesh> a;
-  Mesh *mesh = a.allocate(1);
-  mesh->load("assets/models/cube/cube.obj", a);
+  Mesh mesh;
+  mesh.load("assets/models/cube/cube.obj");
+  mesh.gen_buffers();
 
   shader.use();
   shader.set_uniform("projection", projection_matrix);
