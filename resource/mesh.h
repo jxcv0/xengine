@@ -37,7 +37,7 @@ class Mesh {
    * @tparam Del The type of the deleter class.
    * @param deleter The deleter class used to free the memory.
    */
-  void unload() { std::free(mp_vertices); }
+  void unload() { delete[] mp_vertices; }
 
   /**
    * @brief Check if the Mesh is currently storing data.

@@ -1,5 +1,6 @@
 #include "mesh.h"
 
+#include <array>
 #include <cstdlib>
 
 #include "glad.h"
@@ -93,7 +94,7 @@ void Mesh::load(const std::filesystem::path &filepath) {
     } else if ("vn " == line.substr(0, 3)) {
       num_normals++;
     } else if ("f " == line.substr(0, 2)) {
-      m_num_vertices++;
+      m_num_vertices += 3;  // 3 per line
     }
   }
 
@@ -101,6 +102,8 @@ void Mesh::load(const std::filesystem::path &filepath) {
   Vec3 normals[num_normals];
   Vec2 tex_coords[num_tex_coords];
   Mesh::Index indices[m_num_vertices];
+
+  // TODO buffer overrun here
   num_positions = 0;
   num_tex_coords = 0;
   num_normals = 0;
@@ -137,9 +140,14 @@ void Mesh::load(const std::filesystem::path &filepath) {
     // TODO mtl parsing here
   }
 
+  std::cout << " \n";
+  for (unsigned int i = 0; i < num_normals; i++) {
+    std::cout << normals[i] << "\n";
+  }
+  std::cout << "\n";
+
   // TODO a fast way of detecting duplicate indices for ebo
-  mp_vertices =
-      static_cast<Vertex *>(std::malloc(sizeof(Vertex) * m_num_vertices));
+  mp_vertices = new Vertex[m_num_vertices];
 
   for (unsigned int i = 0; i < m_num_vertices; i++) {
     auto index = indices[i];
