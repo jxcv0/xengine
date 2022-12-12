@@ -77,7 +77,7 @@ class Mesh {
 
   unsigned int m_vbo;
   unsigned int m_vao;
-  unsigned int m_ebo;
+  // unsigned int m_ebo; // TODO worth it?
   unsigned int m_num_vertices = 0;
   Vertex *mp_vertices = nullptr;
 };

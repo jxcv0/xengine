@@ -1,6 +1,9 @@
 #include "mesh.h"
 
+#include <unistd.h>
+
 #include <array>
+#include <cstddef>
 #include <cstdlib>
 
 #include "glad.h"
@@ -155,38 +158,40 @@ void Mesh::load(const std::filesystem::path &filepath) {
  * ----------------------------------------------------------------------------
  */
 void Mesh::gen_buffers() {
+  glGenBuffers(1, &m_vbo);
+  // glGenBuffers(1, &m_ebo);
+  glGenVertexArrays(1, &m_vao);
+  glBindVertexArray(m_vao);
+
+  glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+  glBufferData(GL_ARRAY_BUFFER, m_num_vertices * sizeof(Vertex),
+               static_cast<void *>(mp_vertices), GL_DYNAMIC_DRAW);
+
   /*
-glGenBuffers(1, &m_vbo);
-glGenBuffers(1, &m_ebo);
-glGenVertexArrays(1, &m_vao);
-glBindVertexArray(m_vao);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
+               GL_DYNAMIC_DRAW);
+  */
 
-glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_DYNAMIC_DRAW);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                        reinterpret_cast<void *>(0));
+  glEnableVertexAttribArray(0);
 
-glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
-             GL_DYNAMIC_DRAW);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                        reinterpret_cast<void *>(offsetof(Vertex, m_normal)));
+  glEnableVertexAttribArray(1);
 
-auto stride = 8 * sizeof(float);
-glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride,
-                      reinterpret_cast<void *>(0));
-glEnableVertexAttribArray(0);
-
-glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride,
-                      reinterpret_cast<void *>(3 * sizeof(float)));
-glEnableVertexAttribArray(1);
-
-glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride,
-                      reinterpret_cast<void *>(6 * sizeof(float)));
-glEnableVertexAttribArray(2);
-*/
+  glVertexAttribPointer(
+      2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+      reinterpret_cast<void *>(offsetof(Vertex, m_tex_coord)));
+  glEnableVertexAttribArray(2);
 }
 
 void Mesh::draw() {
+  glBindVertexArray(m_vao);
+  glDrawArrays(GL_TRIANGLES, 0, m_num_vertices);
   /*
-glBindVertexArray(m_vao);
-glDrawElements(GL_TRIANGLES, m_num_indices, GL_UNSIGNED_INT,
-               static_cast<void *>(0));
-               */
+  glDrawElements(GL_TRIANGLES, m_num_indices, GL_UNSIGNED_INT,
+                 static_cast<void *>(0));
+  */
 }
