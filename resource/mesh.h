@@ -59,6 +59,22 @@ class Mesh {
 #ifndef MESH_GTEST
  private:
 #endif
+  struct Index {
+    unsigned int m_position_idx;
+    unsigned int m_tex_coord_idx;
+    unsigned int m_normal_idx;
+
+    constexpr inline auto operator==(const Index &other) const {
+      return other.m_position_idx == m_position_idx &&
+             other.m_normal_idx == m_normal_idx &&
+             other.m_tex_coord_idx == m_tex_coord_idx;
+    }
+  };
+
+  Vec3 parse_vec3(const std::string_view &sv);
+  Vec2 parse_vec2(const std::string_view &sv);
+  Index parse_index(const std::string_view &sv);
+
   unsigned int m_vbo;
   unsigned int m_vao;
   unsigned int m_ebo;
