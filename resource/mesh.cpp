@@ -140,12 +140,6 @@ void Mesh::load(const std::filesystem::path &filepath) {
     // TODO mtl parsing here
   }
 
-  std::cout << " \n";
-  for (unsigned int i = 0; i < num_normals; i++) {
-    std::cout << normals[i] << "\n";
-  }
-  std::cout << "\n";
-
   // TODO a fast way of detecting duplicate indices for ebo
   mp_vertices = new Vertex[m_num_vertices];
 
