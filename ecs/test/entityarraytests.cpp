@@ -1,10 +1,9 @@
-#include <entity.h>
 #include <gtest/gtest.h>
 
-#include <stdexcept>
+#include "entityarray.h"
 
 TEST(entitysubsystemtests, create_entity) {
-  EntitySystem<10> es;
+  EntityArray es;
   auto e1 = es.create_entity();
   ASSERT_EQ(e1, 0);
   auto e2 = es.create_entity();
@@ -12,7 +11,7 @@ TEST(entitysubsystemtests, create_entity) {
 }
 
 TEST(entitysubsystemtests, signature_initialized_to_zero) {
-  EntitySystem<10> es;
+  EntityArray<10> es;
   auto e = es.create_entity();
   ASSERT_EQ(e, 0);
   auto s = es.get_signature(e);
@@ -20,18 +19,18 @@ TEST(entitysubsystemtests, signature_initialized_to_zero) {
 }
 
 TEST(entitysubsystemtests, create_entity_throw) {
-  EntitySystem<3> es;
+  EntityArray<3> es;
   auto e1 = es.create_entity();
   ASSERT_EQ(e1, 0);
   auto e2 = es.create_entity();
   ASSERT_EQ(e2, 1);
   auto e3 = es.create_entity();
   ASSERT_EQ(e3, 2);
-  ASSERT_THROW(es.create_entity(), std::runtime_error);
+  ASSERT_EQ(es.create_entity(), -1);
 }
 
 TEST(entitysubsystem_tests, set_signature) {
-  EntitySystem<10> es;
+  EntityArray<10> es;
   auto e = es.create_entity();
   ASSERT_EQ(es.get_signature(e), 0);
   es.set_signature(e, 10);
@@ -40,7 +39,7 @@ TEST(entitysubsystem_tests, set_signature) {
 }
 
 TEST(entitysubsystem_tests, amend_signature) {
-  EntitySystem<10> es;
+  EntityArray<10> es;
   auto e = es.create_entity();
   ASSERT_EQ(es.get_signature(e), 0);
   es.set_signature(e, 0x1);
@@ -53,7 +52,7 @@ TEST(entitysubsystem_tests, amend_signature) {
 }
 
 TEST(entitysubsystem_tests, erase_entity) {
-  EntitySystem<10> es;
+  EntityArray<10> es;
   auto e = es.create_entity();
   es.set_signature(e, 0b100);
   ASSERT_EQ(es.get_signature(e), 4);

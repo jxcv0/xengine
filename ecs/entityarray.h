@@ -1,45 +1,39 @@
 #ifndef ENTITY_H_
 #define ENTITY_H_
 
-#ifndef MAX_ENTITIES
-#define MAX_ENTITIES 256
-#endif
-
 #include <array>
 #include <cassert>
 #include <cstdint>
 #include <queue>
 #include <stdexcept>
 
-using EntityHandle = std::uint32_t;
-using Signature = std::uint16_t;
-
 /**
  * @brief Entity system
  */
-template <unsigned int N = MAX_ENTITIES>
-class EntitySystem {
+template <int N = 256>
+class EntityArray {
  public:
   /**
-   * @brief Construct an EntitySystem object. Populate the free list with
+   * @brief Construct an EntityArray object. Populate the free list with
    *        available entity ids that are indexes in the signatures array.
    */
-  EntitySystem() {
+  constexpr inline EntityArray() noexcept {
+    static_assert(N > 0);
     for (unsigned int i = 0; i < N; i++) {
       m_free_list.push(i);
     }
   }
 
-  ~EntitySystem() = default;
+  ~EntityArray() = default;
 
   /**
    * @brief Create an entity.
    *
    * @return A new entity handle.
    */
-  EntityHandle create_entity() {
+  int create_entity() noexcept {
     if (m_free_list.empty()) {
-      throw std::runtime_error("maximum number of entities reached");
+      return -1;
     }
     auto e = m_free_list.front();
     m_free_list.pop();
@@ -52,8 +46,8 @@ class EntitySystem {
    * @param e The entity handle.
    * @return The signature of the entity.
    */
-  Signature get_signature(EntityHandle e) {
-    assert(e < N);
+  int get_signature(int e) const noexcept {
+    assert(static_cast<unsigned int>(e) < N);
     return m_signatures[e];
   }
 
@@ -63,7 +57,7 @@ class EntitySystem {
    * @param e The handle of the entity.
    * @param s The new signature to assign to the entity.
    */
-  void set_signature(EntityHandle e, Signature s) { m_signatures[e] = s; }
+  void set_signature(int e, int s) noexcept { m_signatures[e] = s; }
 
   /**
    * @brief Bitwise AND an entity's signature and a new signature.
@@ -71,7 +65,7 @@ class EntitySystem {
    * @param e The handle of the entity.
    * @param s The signature to combine.
    */
-  void amend_signature(EntityHandle e, Signature s) { m_signatures[e] &= s; }
+  void amend_signature(int e, int s) noexcept { m_signatures[e] &= s; }
 
   /**
    * @brief Erase and entity. Put it's handle onto the free list and set it's
@@ -79,14 +73,14 @@ class EntitySystem {
    *
    * @param e The entity to erase.
    */
-  void erase_entity(EntityHandle e) {
-    m_signatures[e] = 0;
+  void erase_entity(int e) noexcept {
+    m_signatures[e] = 0;  // reset signature
     m_free_list.push(e);
   }
 
  private:
-  std::queue<EntityHandle> m_free_list;
-  std::array<Signature, N> m_signatures{0};
+  std::queue<int> m_free_list;
+  int m_signatures[N] = {0};
 };
 
 #endif  // ENTITY_H_

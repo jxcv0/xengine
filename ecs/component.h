@@ -5,8 +5,6 @@
 #define MAX_COMPONENTS 16
 #endif
 
-#include "entity.h"
-
 /**
  * @brief Base class for ComponentArray declaring the erase function.
  */
@@ -19,7 +17,7 @@ class ComponentArrayBase {
    *
    * @param e The handle of the entity that to erase.
    */
-  virtual void erase_entity(EntityHandle e) = 0;
+  virtual void erase_entity(int e) = 0;
 };
 
 /**
@@ -29,10 +27,10 @@ class ComponentArrayBase {
  *
  *        note: Lessons learned. Simpler is better. Iterators are B.S.
  */
-template <typename ComponentType, unsigned int N = MAX_ENTITIES>
+template <typename ComponentType, int N>
 class ComponentArray : public ComponentArrayBase {
  public:
-  ComponentArray() = default;
+  ComponentArray() { static_assert(N > 0); }
   virtual ~ComponentArray() = default;
 
   /**
@@ -41,7 +39,7 @@ class ComponentArray : public ComponentArrayBase {
    * @param e The entity to assign.
    * @param c The component to assign to the entity.
    */
-  void assign(EntityHandle e, ComponentType c) {
+  void assign(int e, ComponentType c) {
     m_map[m_num_components].m_handle = e;
     m_map[m_num_components].m_index = m_num_components;
     m_components[m_num_components] = c;
@@ -53,7 +51,7 @@ class ComponentArray : public ComponentArrayBase {
    *
    * @param e The enity to erase.
    */
-  void erase_entity(EntityHandle e) override {
+  void erase_entity(int e) override {
     for (unsigned int i = 0; i < N; i++) {
       if (m_map[i].m_handle == e) {
         m_map[i].m_index = -1;  // AKA not in use
@@ -68,7 +66,7 @@ class ComponentArray : public ComponentArrayBase {
    * @return A pointer to the component stored in the array. If the component
    * is not found then nullptr is returned.
    */
-  ComponentType* get_component(EntityHandle e) {
+  ComponentType* get_component(int e) {
     for (unsigned int i = 0; i < N; i++) {
       if (m_map[i].m_handle == e) {
         int index = m_map[i].m_index;
@@ -82,7 +80,7 @@ class ComponentArray : public ComponentArrayBase {
 
  private:
   struct {
-    EntityHandle m_handle;
+    int m_handle;
     int m_index = -1;
   } m_map[N];
 
