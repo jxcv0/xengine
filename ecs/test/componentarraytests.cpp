@@ -1,6 +1,9 @@
-#include <component.h>
-#include <entity.h>
 #include <gtest/gtest.h>
+
+#include "entityarray.h"
+
+#define COMPONENTARRAY_TEST
+#include "componentarray.h"
 
 #include <stdexcept>
 
@@ -9,18 +12,22 @@ struct MockComponent {
 };
 
 TEST(componentarraytests, assign) {
-  EntitySystem<10> es;
+  EntityArray<10> es;
   auto e = es.create_entity();
   MockComponent m;
   m.m_id = 42;
 
-  ComponentArray<MockComponent> a;
-  a.assign(e, m);
-  ASSERT_EQ(m.m_id, a.get_component(e)->m_id);
+  ComponentArray<MockComponent> ca;
+  ASSERT_EQ(ca.m_num_components, 0);
+  ca.assign(e, m);
+  ASSERT_EQ(ca.m_num_components, 1);
+  ASSERT_EQ(ca.m_map[0].m_handle, e);
+  ASSERT_EQ(ca.m_map[0].m_index, 0);
+  ASSERT_EQ(m.m_id, ca.get_component(e)->m_id);
 }
 
 TEST(componentarraytests, erase_entity) {
-  EntitySystem<10> es;
+  EntityArray<10> es;
   auto e = es.create_entity();
 
   float f = 0.33435f;
