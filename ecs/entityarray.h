@@ -30,6 +30,11 @@ class EntityArray {
 
   ~EntityArray() = default;
 
+  /**
+   * @brief Get the number of entities in use.
+   *
+   * @return The number of entities in use.
+   */
   auto count() const { return (N - m_free_list.size()); }
 
   /**
@@ -46,6 +51,13 @@ class EntityArray {
     return e;
   }
 
+  /**
+   * @brief Check if an entity has a component.
+   *
+   * @brief e The entity id.
+   * @brief c The component id.
+   * @return true if the entity has the component, otherwise false.
+   */
   bool has_component(EntityId e, ComponentId c) const noexcept {
     auto archetype = m_signatures[e];
     if ((archetype & c) != 0) {
