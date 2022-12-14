@@ -3,9 +3,9 @@
 #include "entityarray.h"
 
 #define COMPONENTARRAY_TEST
-#include "componentarray.h"
-
 #include <stdexcept>
+
+#include "componentarray.h"
 
 struct MockComponent {
   int m_id;

@@ -7,6 +7,10 @@
 #include <queue>
 #include <stdexcept>
 
+#include "components.h"
+
+using EntityId = int;
+
 /**
  * @brief Entity system
  */
@@ -26,6 +30,8 @@ class EntityArray {
 
   ~EntityArray() = default;
 
+  auto count() const { return (N - m_free_list.size()); }
+
   /**
    * @brief Create an entity.
    *
@@ -40,24 +46,13 @@ class EntityArray {
     return e;
   }
 
-  /**
-   * @brief Get an entities signature by it's handle.
-   *
-   * @param e The entity handle.
-   * @return The signature of the entity.
-   */
-  int get_signature(int e) const noexcept {
-    assert(static_cast<unsigned int>(e) < N);
-    return m_signatures[e];
+  bool has_component(EntityId e, ComponentId c) const noexcept {
+    auto archetype = m_signatures[e];
+    if ((archetype & c) != 0) {
+      return true;
+    }
+    return false;
   }
-
-  /**
-   * @brief Set the signature of an entity.
-   *
-   * @param e The handle of the entity.
-   * @param s The new signature to assign to the entity.
-   */
-  void set_signature(int e, int s) noexcept { m_signatures[e] = s; }
 
   /**
    * @brief Bitwise AND an entity's signature and a new signature.
@@ -65,7 +60,7 @@ class EntityArray {
    * @param e The handle of the entity.
    * @param s The signature to combine.
    */
-  void amend_signature(int e, int s) noexcept { m_signatures[e] &= s; }
+  void add_component(int e, int s) noexcept { m_signatures[e] |= s; }
 
   /**
    * @brief Erase and entity. Put it's handle onto the free list and set it's

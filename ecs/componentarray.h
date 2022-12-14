@@ -1,5 +1,11 @@
-#ifndef COMPONENT_H_
-#define COMPONENT_H_
+#ifndef COMPONENTARRAY_H_
+#define COMPONENTARRAY_H_
+
+#include "components.h"
+
+class Archetype {
+  ComponentId m_type;
+}
 
 /**
  * @brief Base class for ComponentArray declaring the erase function.
@@ -36,7 +42,7 @@ class ComponentArray : public ComponentArrayBase {
    * @param c The component to assign to the entity.
    */
   int assign(int e, ComponentType c) {
-    if (m_components == N) {
+    if (m_num_components == N) {
       return -1;
     }
     m_map[m_num_components].m_handle = e;
@@ -90,4 +96,4 @@ class ComponentArray : public ComponentArrayBase {
   int m_num_components = 0;
 };
 
-#endif  // COMPONENT_H_
+#endif  // COMPONENTARRAY_H_

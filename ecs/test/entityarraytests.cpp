@@ -4,9 +4,12 @@
 
 TEST(entitysubsystemtests, create_entity) {
   EntityArray es;
+  ASSERT_EQ(es.count(), 0);
   auto e1 = es.create_entity();
+  ASSERT_EQ(es.count(), 1);
   ASSERT_EQ(e1, 0);
   auto e2 = es.create_entity();
+  ASSERT_EQ(es.count(), 2);
   ASSERT_EQ(e2, 1);
 }
 
@@ -14,8 +17,7 @@ TEST(entitysubsystemtests, signature_initialized_to_zero) {
   EntityArray<10> es;
   auto e = es.create_entity();
   ASSERT_EQ(e, 0);
-  auto s = es.get_signature(e);
-  ASSERT_EQ(s, 0);
+  ASSERT_FALSE(es.has_component(e, 0)); // 0 & 0
 }
 
 TEST(entitysubsystemtests, create_entity_throw) {
@@ -27,35 +29,33 @@ TEST(entitysubsystemtests, create_entity_throw) {
   auto e3 = es.create_entity();
   ASSERT_EQ(e3, 2);
   ASSERT_EQ(es.create_entity(), -1);
+  ASSERT_EQ(e3, 2);
 }
 
 TEST(entitysubsystem_tests, set_signature) {
   EntityArray<10> es;
   auto e = es.create_entity();
-  ASSERT_EQ(es.get_signature(e), 0);
-  es.set_signature(e, 10);
-  auto s = es.get_signature(e);
-  ASSERT_EQ(s, 10);
+  es.add_component(e, 10);
+  ASSERT_TRUE(es.has_component(e, 10));
 }
 
 TEST(entitysubsystem_tests, amend_signature) {
   EntityArray<10> es;
   auto e = es.create_entity();
-  ASSERT_EQ(es.get_signature(e), 0);
-  es.set_signature(e, 0x1);
-  auto s = es.get_signature(e);
-  ASSERT_EQ(s, 1);
-  es.amend_signature(e, 0x2);
-  s = es.get_signature(e);
-  ASSERT_EQ(s, (0b10 & s));
-  ASSERT_EQ(s, (0b1 & s));
+  es.add_component(e, 0b1);
+  ASSERT_TRUE(es.has_component(e, 1));  // test for all
+  es.add_component(e, 0b10);
+  ASSERT_TRUE(es.has_component(e, 0b10));
+  ASSERT_TRUE(es.has_component(e, 0b1));
 }
 
 TEST(entitysubsystem_tests, erase_entity) {
   EntityArray<10> es;
   auto e = es.create_entity();
-  es.set_signature(e, 0b100);
-  ASSERT_EQ(es.get_signature(e), 4);
+  es.add_component(e, 0b100);
+  ASSERT_TRUE(es.has_component(e, 4));
+  ASSERT_EQ(es.count(), 1);
   es.erase_entity(e);
-  ASSERT_EQ(es.get_signature(e), 0);
+  ASSERT_FALSE(es.has_component(e, 0));
+  ASSERT_EQ(es.count(), 0);
 }
