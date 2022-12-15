@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <cstdint>
+#include <iterator>
 
 #include "componentarray.h"
 
@@ -12,6 +13,8 @@ struct A {
 
 struct B {
   const static int id = 2;
+  B() { i = -42; }
+  int i = 0;
 };
 
 struct C {
@@ -33,5 +36,8 @@ TEST(archetypetest, default_construction) {
   void *p = std::malloc(size);
   Archetype<A, B, C> a(p);
   ASSERT_EQ(static_cast<A *>(p)->i, 42);
+  auto addr = reinterpret_cast<uintptr_t>(p);
+  auto b = reinterpret_cast<B *>(addr + sizeof(A));
+  ASSERT_EQ(b->i, -42);
   std::free(p);
 }
