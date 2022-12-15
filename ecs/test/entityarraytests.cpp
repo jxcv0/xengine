@@ -17,7 +17,7 @@ TEST(entitysubsystemtests, signature_initialized_to_zero) {
   EntityArray<10> es;
   auto e = es.create_entity();
   ASSERT_EQ(e, 0);
-  ASSERT_FALSE(es.has_component(e, 0)); // 0 & 0
+  ASSERT_FALSE(es.has_component(e, 0));  // 0 & 0
 }
 
 TEST(entitysubsystemtests, create_entity_throw) {

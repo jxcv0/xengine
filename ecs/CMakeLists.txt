@@ -9,7 +9,6 @@ set(
   HEADERS
     entityarray.h
     componentarray.h
-    components.h
     coordinator.h
 )
 

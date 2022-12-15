@@ -22,6 +22,7 @@ class Mesh {
   };
 
  public:
+  const static int id = (1 << 0);
   /**
    * @brief Load mesh data from an obj file.
    *

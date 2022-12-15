@@ -35,7 +35,7 @@ class EntityArray {
    *
    * @return The number of entities in use.
    */
-  auto count() const { return (N - m_free_list.size()); }
+  constexpr inline auto count() const { return (N - m_free_list.size()); }
 
   /**
    * @brief Create an entity.
@@ -58,7 +58,7 @@ class EntityArray {
    * @brief c The component id.
    * @return true if the entity has the component, otherwise false.
    */
-  bool has_component(EntityId e, ComponentId c) const noexcept {
+  constexpr bool has_component(EntityId e, ComponentId c) const noexcept {
     auto archetype = m_signatures[e];
     if ((archetype & c) != 0) {
       return true;
@@ -72,7 +72,9 @@ class EntityArray {
    * @param e The handle of the entity.
    * @param s The signature to combine.
    */
-  void add_component(int e, int s) noexcept { m_signatures[e] |= s; }
+  constexpr inline void add_component(int e, int s) noexcept {
+    m_signatures[e] |= s;
+  }
 
   /**
    * @brief Erase and entity. Put it's handle onto the free list and set it's
@@ -80,7 +82,7 @@ class EntityArray {
    *
    * @param e The entity to erase.
    */
-  void erase_entity(int e) noexcept {
+  constexpr void erase_entity(int e) noexcept {
     m_signatures[e] = 0;  // reset signature
     m_free_list.push(e);
   }
