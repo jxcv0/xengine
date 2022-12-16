@@ -1,8 +1,10 @@
 #ifndef ARCHETYPEARRAY_H_
 #define ARCHETYPEARRAY_H_
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <type_traits>
 #include <unordered_map>
 #include <vector>
@@ -31,6 +33,11 @@ class Archetype {
           addr += sizeof(Components);
         }(),
         ...);
+  }
+
+  constexpr friend auto operator==(const Archetype<Components...> &a1,
+                                   const Archetype<Components...> &a2) {
+    return a1.m_data == a2.m_data;
   }
 
   /**
@@ -134,8 +141,12 @@ class ArchetypeArray : public ArchetypeArrayBase {
    *
    * @param e The entity to remove.
    */
-  void remove_entity(int e) override { /* TODO */
-    (void)e;
+  void remove_entity(int e) override {
+    auto index = m_entity_to_index[e];
+    auto archetype = m_components[index];
+    m_entity_to_index.erase(e);
+    m_components.erase(
+        std::find(m_components.cbegin(), m_components.cend(), archetype));
   }
 
   /**

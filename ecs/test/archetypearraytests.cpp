@@ -60,7 +60,7 @@ TEST(archetypetest, set_component) {
   ASSERT_EQ(a.i, 15);
 }
 
-TEST(archetypearraytests, add_entity) {
+TEST(archetypearraytests, add_erase_entity) {
   ArchetypeArray<A, B, C> a;
   // auto c = a.get_component<A>(12); // segfault
   // ASSERT_EQ(c->i, 42);
@@ -68,6 +68,8 @@ TEST(archetypearraytests, add_entity) {
   auto c = a.get_component<A>(12);
   c = a.get_component<A>(12);
   ASSERT_EQ(c->i, 42);
+  a.remove_entity(12);
+  c = a.get_component<A>(12);
 }
 
 TEST(archetypearraytests, set_component) {
