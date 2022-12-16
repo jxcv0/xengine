@@ -129,6 +129,11 @@ class ArchetypeArray : public ArchetypeArrayBase {
     m_components.emplace_back();
   }
 
+  /**
+   * @brief Remove an entity and its components from the array.
+   *
+   * @param e The entity to remove.
+   */
   void remove_entity(int e) override { /* TODO */
     (void)e;
   }
@@ -147,6 +152,13 @@ class ArchetypeArray : public ArchetypeArrayBase {
     return archetype->template get_component<T>();
   }
 
+  /**
+   * @brief Set the value of a component assigned to an entity.
+   *
+   * @tparam T The type of the component.
+   * @param e The id of the entity to which belongs the component.
+   * @param component The value to assign.
+   */
   template <typename T>
   void set_component(const int e, const T component) {
     auto c = get_component<T>(e);

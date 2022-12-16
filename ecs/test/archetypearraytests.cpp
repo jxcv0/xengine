@@ -69,3 +69,13 @@ TEST(archetypearraytests, add_entity) {
   c = a.get_component<A>(12);
   ASSERT_EQ(c->i, 42);
 }
+
+TEST(archetypearraytests, set_component) {
+  A component;
+  component.i = 15;
+  ArchetypeArray<A, B, C> a;
+  a.add_entity(12);
+  a.set_component(12, component);
+  ASSERT_EQ(component.i, 15);
+  ASSERT_EQ(a.get_component<A>(12)->i, 15);
+}
