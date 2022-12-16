@@ -18,6 +18,7 @@ TEST(ecstests, sd) {
   entities.add_components(e, archetypes.id());
   archetypes.add_entity(e);
   archetypes.set_component(e, a);
+
   ASSERT_EQ(archetypes.get_component<A>(e)->i, 42);
   ASSERT_TRUE(entities.has_component(e, 1));
 }

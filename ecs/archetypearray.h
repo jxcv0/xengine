@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <exception>
 #include <type_traits>
 #include <unordered_map>
 #include <vector>
@@ -135,7 +136,8 @@ class ArchetypeArray : public ArchetypeArrayBase {
   int id() const noexcept override { return Archetype<Components...>::id(); }
 
   /**
-   * @brief Register an entity with this array.
+   * @brief Register an entity with this array. The Components are default
+   *        constructed.
    *
    * @param e The entity id.
    */
@@ -148,22 +150,24 @@ class ArchetypeArray : public ArchetypeArrayBase {
    * @brief Remove an entity and its components from the array.
    *
    * @param e The entity to remove.
+   * @throws Exception if there is no entity e in this table.
    */
   void remove_entity(int e) override {
-      (void) e;
-      // TODO
+    auto index = m_entity_to_index.at(e);
+    m_entity_to_index.erase(e);
+    m_components.erase(m_components.begin() + index);
   }
 
   /**
    * @brief Get a pointer to the component with type T that is assigned to the
-   *        entity id e
+   *        entity id e.
    *
    * @tparam T The type of the component to fetch.
    * @param e The entity to which the components are assigned to.
    */
   template <typename T>
   T *get_component(int e) {
-    auto index = m_entity_to_index[e];
+    auto index = m_entity_to_index.at(e);
     auto archetype = &m_components[index];
     return archetype->template get_component<T>();
   }
