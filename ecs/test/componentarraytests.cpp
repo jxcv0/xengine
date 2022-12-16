@@ -25,34 +25,19 @@ struct C {
 
 TEST(archetypetest, size) {
   auto size = sizeof(A) + sizeof(B) + sizeof(C);
-  void *p = std::malloc(size);
-  Archetype<A, B, C> a(p);
+  Archetype<A, B, C> a;
   ASSERT_EQ(a.id(), 1 | 2 | 3);
   ASSERT_EQ(a.count(), 3);
   ASSERT_EQ(a.size(), size);
-  std::free(p);
-}
-
-TEST(archetypetest, default_construction) {
-  auto size = sizeof(A) + sizeof(B) + sizeof(C);
-  void *p = std::malloc(size);
-  Archetype<A, B, C> a(p);
-  ASSERT_EQ(static_cast<A *>(p)->i, 42);
-  auto addr = reinterpret_cast<uintptr_t>(p);
-  auto b = reinterpret_cast<B *>(addr + sizeof(A));
-  ASSERT_EQ(b->i, -42);
-  std::free(p);
+  ASSERT_EQ(a.size() + sizeof(int), sizeof(Archetype<A, B, C>));
 }
 
 TEST(archetypetest, get) {
-  auto size = sizeof(A) + sizeof(B) + sizeof(C);
-  void *p = std::malloc(size);
-  Archetype<A, B, C> arch(p);
+  Archetype<A, B, C> arch;
   auto a = get_component<A>(arch);
   auto b = get_component<B>(arch);
   auto c = get_component<C>(arch);
   ASSERT_EQ(a->i, 42);
   ASSERT_EQ(b->i, -42);
   ASSERT_EQ(c->i, 10);
-  std::free(p);
 }
