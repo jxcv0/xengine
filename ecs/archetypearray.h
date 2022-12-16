@@ -35,9 +35,17 @@ class Archetype {
         ...);
   }
 
+  /**
+   * @brief Compare two archetypes.
+   *
+   * @param a1 The first archetype.
+   * @param a2 The second archetype.
+   * @return true if the components in both are the same.
+   */
   constexpr friend auto operator==(const Archetype<Components...> &a1,
                                    const Archetype<Components...> &a2) {
-    return a1.m_data == a2.m_data;
+    return (... &&
+            (a1.get_component<Components>() == a2.get_component<Components>()));
   }
 
   /**
@@ -72,7 +80,7 @@ class Archetype {
    *         If no component is found then nullptr is returned.
    */
   template <typename T>
-  constexpr auto get_component() {
+  constexpr auto get_component() const {
     auto addr = reinterpret_cast<uintptr_t>(&m_data[0]);
     T *t = nullptr;
     (
@@ -142,11 +150,8 @@ class ArchetypeArray : public ArchetypeArrayBase {
    * @param e The entity to remove.
    */
   void remove_entity(int e) override {
-    auto index = m_entity_to_index[e];
-    auto archetype = m_components[index];
-    m_entity_to_index.erase(e);
-    m_components.erase(
-        std::find(m_components.cbegin(), m_components.cend(), archetype));
+      (void) e;
+      // TODO
   }
 
   /**
