@@ -5,14 +5,13 @@
 #include <cstdlib>
 #include <cstring>
 #include <filesystem>
-#include <limits>
 
 #include "vec2.h"
 #include "vec3.h"
 
 /**
  * @brief Stored mesh data. This class is used to load and
- *        unload from a file using an allocator supplied to it.
+ *        unload from a file.
  */
 class Mesh {
   struct Vertex {

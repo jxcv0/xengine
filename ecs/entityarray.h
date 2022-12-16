@@ -7,10 +7,6 @@
 #include <queue>
 #include <stdexcept>
 
-#include "components.h"
-
-using EntityId = int;
-
 /**
  * @brief Entity system
  */
@@ -58,7 +54,7 @@ class EntityArray {
    * @brief c The component id.
    * @return true if the entity has the component, otherwise false.
    */
-  constexpr bool has_component(EntityId e, ComponentId c) const noexcept {
+  constexpr bool has_component(int e, int c) const noexcept {
     auto archetype = m_signatures[e];
     if ((archetype & c) != 0) {
       return true;
@@ -67,7 +63,7 @@ class EntityArray {
   }
 
   /**
-   * @brief Bitwise AND an entity's signature and a new signature.
+   * @brief Bitwise OR an entity's signature and a new signature.
    *
    * @param e The handle of the entity.
    * @param s The signature to combine.

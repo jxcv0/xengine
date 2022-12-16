@@ -8,7 +8,7 @@ set(
 set(
   HEADERS
     entityarray.h
-    componentarray.h
+    archetypearray.h
     coordinator.h
 )
 
