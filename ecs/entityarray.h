@@ -68,7 +68,7 @@ class EntityArray {
    * @param e The handle of the entity.
    * @param s The signature to combine.
    */
-  constexpr inline void add_component(int e, int s) noexcept {
+  constexpr inline void add_components(int e, int s) noexcept {
     m_signatures[e] |= s;
   }
 

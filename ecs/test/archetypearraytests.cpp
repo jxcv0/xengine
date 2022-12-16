@@ -43,8 +43,9 @@ TEST(archetypetest, get_component) {
   auto b = arch.get_component<B>();
   auto c = arch.get_component<C>();
   auto d = arch.get_component<D>();
-  (void)d;
   ASSERT_EQ(a->i, 42);
+  a->i = 10;
+  ASSERT_EQ(arch.get_component<A>()->i, 10);
   ASSERT_EQ(b->i, -42);
   ASSERT_EQ(c->i, 10);
   ASSERT_EQ(d, nullptr);
@@ -59,7 +60,12 @@ TEST(archetypetest, set_component) {
   ASSERT_EQ(a.i, 15);
 }
 
-TEST(archetypearraytests, add) {
-  ArchetypeArray<A, B, C> aa;
-  ASSERT_EQ(aa.id(), 1 | 2 | 3);
+TEST(archetypearraytests, add_entity) {
+  ArchetypeArray<A, B, C> a;
+  // auto c = a.get_component<A>(12); // segfault
+  // ASSERT_EQ(c->i, 42);
+  a.add_entity(12);
+  auto c = a.get_component<A>(12);
+  c = a.get_component<A>(12);
+  ASSERT_EQ(c->i, 42);
 }

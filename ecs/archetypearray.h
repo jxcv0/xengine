@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <type_traits>
+#include <unordered_map>
 #include <vector>
 
 /**
@@ -97,19 +98,64 @@ class Archetype {
 };
 
 /**
+ * @brief Base class for ArchetypeArray.
+ */
+class ArchetypeArrayBase {
+ public:
+  virtual ~ArchetypeArrayBase(){};
+  virtual int id() const noexcept = 0;
+  virtual void add_entity(const int e) = 0;
+  virtual void remove_entity(const int e) = 0;
+};
+
+/**
  * @brief Contiguous archetype storage.
  *
  * @tparam Components The component types to be stored in this Archetype.
  */
 template <typename... Components>
-class ArchetypeArray {
+class ArchetypeArray : public ArchetypeArrayBase {
  public:
-  constexpr static auto inline id() noexcept {
-    return Archetype<Components...>::id();
+  virtual ~ArchetypeArray(){};
+  int id() const noexcept override { return Archetype<Components...>::id(); }
+
+  /**
+   * @brief Register an entity with this array.
+   *
+   * @param e The entity id.
+   */
+  void add_entity(const int e) override {
+    m_entity_to_index[e] = m_components.size();
+    m_components.emplace_back();
+  }
+
+  void remove_entity(int e) override { /* TODO */
+    (void)e;
+  }
+
+  /**
+   * @brief Get a pointer to the component with type T that is assigned to the
+   *        entity id e
+   *
+   * @tparam T The type of the component to fetch.
+   * @param e The entity to which the components are assigned to.
+   */
+  template <typename T>
+  T *get_component(int e) {
+    auto index = m_entity_to_index[e];
+    auto archetype = &m_components[index];
+    return archetype->template get_component<T>();
+  }
+
+  template <typename T>
+  void set_component(const int e, const T component) {
+    auto c = get_component<T>(e);
+    *c = component;
   }
 
  private:
   std::vector<Archetype<Components...>> m_components;  // TODO
+  std::unordered_map<int, int> m_entity_to_index;
 };
 
 #endif  // ARCHETYPEARRAY_H_

@@ -35,16 +35,16 @@ TEST(entitysubsystemtests, create_entity_throw) {
 TEST(entitysubsystem_tests, set_signature) {
   EntityArray<10> es;
   auto e = es.create_entity();
-  es.add_component(e, 10);
+  es.add_components(e, 10);
   ASSERT_TRUE(es.has_component(e, 10));
 }
 
 TEST(entitysubsystem_tests, amend_signature) {
   EntityArray<10> es;
   auto e = es.create_entity();
-  es.add_component(e, 0b1);
+  es.add_components(e, 0b1);
   ASSERT_TRUE(es.has_component(e, 1));  // test for all
-  es.add_component(e, 0b10);
+  es.add_components(e, 0b10);
   ASSERT_TRUE(es.has_component(e, 0b10));
   ASSERT_TRUE(es.has_component(e, 0b1));
 }
@@ -52,7 +52,7 @@ TEST(entitysubsystem_tests, amend_signature) {
 TEST(entitysubsystem_tests, erase_entity) {
   EntityArray<10> es;
   auto e = es.create_entity();
-  es.add_component(e, 0b100);
+  es.add_components(e, 0b100);
   ASSERT_TRUE(es.has_component(e, 4));
   ASSERT_EQ(es.count(), 1);
   es.erase_entity(e);
