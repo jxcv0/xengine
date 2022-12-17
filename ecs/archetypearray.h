@@ -1,11 +1,7 @@
 #ifndef ARCHETYPEARRAY_H_
 #define ARCHETYPEARRAY_H_
 
-#include <algorithm>
-#include <cstddef>
 #include <cstdint>
-#include <cstring>
-#include <exception>
 #include <type_traits>
 #include <unordered_map>
 #include <vector>
@@ -132,6 +128,41 @@ class ArchetypeArrayBase {
 template <typename... Components>
 class ArchetypeArray : public ArchetypeArrayBase {
  public:
+  using archetype = Archetype<Components...>;
+  /**
+   * @brief Iterator for iterating though array archetype components.
+   *
+   * @tparam Component The type of the components to iterate.
+   */
+  template <typename Component>
+  class Iterator {
+   public:
+    using difference_type = std::ptrdiff_t;
+    using value_type = Component;
+    using pointer = Component *;
+    using reference = Component &;
+    using iterator_catergory = std::forward_iterator_tag;
+
+    Iterator(pointer p) : m_ptr(p) {}
+
+    reference operator*() const { return *m_ptr; };
+
+    pointer operator->() { return m_ptr; };
+
+    Iterator<Component> &operator++() { m_ptr += sizeof(archetype); }
+
+    friend bool operator==(const Iterator &a, const Iterator &b) {
+      return a.m_ptr == b.m_ptr;
+    };
+
+    friend bool operator!=(const Iterator &a, const Iterator &b) {
+      return a.m_ptr != b.m_ptr;
+    };
+
+   private:
+    pointer m_ptr;
+  };
+
   virtual ~ArchetypeArray(){};
   int id() const noexcept override { return Archetype<Components...>::id(); }
 
@@ -185,8 +216,14 @@ class ArchetypeArray : public ArchetypeArrayBase {
     *c = component;
   }
 
+  template <typename Component>
+  auto begin() {
+    auto p = m_components.begin()->template get_component<Component>();
+    return Iterator<Component>(p);
+  }
+
  private:
-  std::vector<Archetype<Components...>> m_components;  // TODO
+  std::vector<archetype> m_components;  // TODO
   std::unordered_map<int, int> m_entity_to_index;
 };
 

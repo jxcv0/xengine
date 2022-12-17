@@ -80,3 +80,8 @@ TEST(archetypearraytests, set_component) {
   ASSERT_EQ(component.i, 15);
   ASSERT_EQ(a.get_component<A>(12)->i, 15);
 }
+
+TEST(archetypearraytests, iterator_tests) {
+  ArchetypeArray<A, B, C> arch;
+  ASSERT_EQ(arch.begin<B>()->i, -42);
+}

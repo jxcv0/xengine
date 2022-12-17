@@ -1,6 +1,7 @@
 #ifndef COORDINATOR_H_
 #define COORDINATOR_H_
 
+#include <concepts>
 #include <vector>
 
 #include "archetypearray.h"
