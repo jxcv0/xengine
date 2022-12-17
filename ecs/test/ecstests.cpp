@@ -2,6 +2,7 @@
 
 #include "archetypearray.h"
 #include "entityarray.h"
+#include "gtest/gtest.h"
 #include "threadpool.h"
 
 ThreadPool tp(4);
@@ -34,6 +35,16 @@ struct B {
 struct C {
   static const int id = 2;
   int i = 120;
+};
+
+class Task_SumInA {
+ public:
+  template <typename... Components>
+  Task_SumInA(ArchetypeArray<Components...>& archetype) {}
+
+  virtual ~Task_SumInA() {}
+
+ private:
 };
 
 TEST(ecstests, threadpool) {

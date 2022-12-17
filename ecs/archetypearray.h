@@ -1,7 +1,9 @@
 #ifndef ARCHETYPEARRAY_H_
 #define ARCHETYPEARRAY_H_
 
+#include <cstddef>
 #include <cstdint>
+#include <iterator>
 #include <type_traits>
 #include <unordered_map>
 #include <vector>
@@ -129,39 +131,6 @@ template <typename... Components>
 class ArchetypeArray : public ArchetypeArrayBase {
  public:
   using archetype = Archetype<Components...>;
-  /**
-   * @brief Iterator for iterating though array archetype components.
-   *
-   * @tparam Component The type of the components to iterate.
-   */
-  template <typename Component>
-  class Iterator {
-   public:
-    using difference_type = std::ptrdiff_t;
-    using value_type = Component;
-    using pointer = Component *;
-    using reference = Component &;
-    using iterator_catergory = std::forward_iterator_tag;
-
-    Iterator(pointer p) : m_ptr(p) {}
-
-    reference operator*() const { return *m_ptr; };
-
-    pointer operator->() { return m_ptr; };
-
-    Iterator<Component> &operator++() { m_ptr += sizeof(archetype); }
-
-    friend bool operator==(const Iterator &a, const Iterator &b) {
-      return a.m_ptr == b.m_ptr;
-    };
-
-    friend bool operator!=(const Iterator &a, const Iterator &b) {
-      return a.m_ptr != b.m_ptr;
-    };
-
-   private:
-    pointer m_ptr;
-  };
 
   virtual ~ArchetypeArray(){};
   int id() const noexcept override { return Archetype<Components...>::id(); }
@@ -195,6 +164,7 @@ class ArchetypeArray : public ArchetypeArrayBase {
    *
    * @tparam T The type of the component to fetch.
    * @param e The entity to which the components are assigned to.
+   * @return A pointer to the component or nullptr if no component is found.
    */
   template <typename T>
   T *get_component(int e) {
@@ -217,9 +187,30 @@ class ArchetypeArray : public ArchetypeArrayBase {
   }
 
   template <typename Component>
+  struct Iterator {
+    using iterator_category = std::forward_iterator_tag;
+    using pointer = Component *;
+    using reference = Component &;
+    using difference_type = std::ptrdiff_t;
+    using value_type = Component;
+    Iterator(pointer p) : m_ptr(p) {}
+
+    pointer operator->() { return m_ptr; }
+
+   private:
+    pointer m_ptr;
+  };
+
+  template <typename Component>
   auto begin() {
-    auto p = m_components.begin()->template get_component<Component>();
-    return Iterator<Component>(p);
+    return Iterator<Component>(
+        m_components.begin()->template get_component<Component>());
+  }
+
+  template <typename Component>
+  auto end() {
+    return Iterator<Component>(
+        m_components.end()->template get_component<Component>());
   }
 
  private:
