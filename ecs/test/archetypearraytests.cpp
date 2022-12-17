@@ -82,11 +82,18 @@ TEST(archetypearraytests, set_component) {
 }
 
 TEST(archetypearraytests, iterator) {
-  A component;
-  component.i = 15;
   ArchetypeArray<A, B, C> a;
-  a.add_entity(12);
-  a.set_component(12, component);
-  ASSERT_EQ(component.i, 15);
-  ASSERT_EQ(a.begin<A>()->i, 15);
+  for (int i = 1; i < 11; i++) {
+    A component;
+    component.i = i * 2;
+    a.add_entity(i);
+    a.set_component(i, component);
+  }
+
+  int i = 1;
+  for (auto iter = a.begin(); iter != a.end(); iter++) {
+    auto c = iter->get_component<A>();
+    ASSERT_EQ(c->i, i * 2);
+    i++;
+  }
 }

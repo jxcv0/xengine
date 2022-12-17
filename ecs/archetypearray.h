@@ -79,7 +79,7 @@ class Archetype {
    *         If no component is found then nullptr is returned.
    */
   template <typename T>
-  constexpr auto get_component() const {
+  constexpr T *get_component() const {
     auto addr = reinterpret_cast<uintptr_t>(&m_data[0]);
     T *t = nullptr;
     (
@@ -186,32 +186,19 @@ class ArchetypeArray : public ArchetypeArrayBase {
     *c = component;
   }
 
-  template <typename Component>
-  struct Iterator {
-    using iterator_category = std::forward_iterator_tag;
-    using pointer = Component *;
-    using reference = Component &;
-    using difference_type = std::ptrdiff_t;
-    using value_type = Component;
-    Iterator(pointer p) : m_ptr(p) {}
+  /**
+   * @brief Get a begin iterator to the components in the array.
+   *
+   * @return The iterator.
+   */
+  auto begin() { return m_components.begin(); }
 
-    pointer operator->() { return m_ptr; }
-
-   private:
-    pointer m_ptr;
-  };
-
-  template <typename Component>
-  auto begin() {
-    return Iterator<Component>(
-        m_components.begin()->template get_component<Component>());
-  }
-
-  template <typename Component>
-  auto end() {
-    return Iterator<Component>(
-        m_components.end()->template get_component<Component>());
-  }
+  /**
+   * @brief Get an end iterator to the components in the array.
+   *
+   * @return The iterator.
+   */
+  auto end() { return m_components.end(); }
 
  private:
   std::vector<archetype> m_components;  // TODO
