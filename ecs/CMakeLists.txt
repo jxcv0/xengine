@@ -9,7 +9,7 @@ set(
   HEADERS
     entityarray.h
     archetypearray.h
-    coordinator.h
+    ecs.h
 )
 
 add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})
