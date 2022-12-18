@@ -14,20 +14,6 @@ struct A {
   int i = 0;
 };
 
-TEST(ecstests, add) {
-  A a;
-  a.i = 42;
-  EntityArray<8> entities;
-  ArchetypeArray<A> archetypes;
-
-  auto e = entities.create_entity();
-  entities.add_components(e, archetypes.id());
-  archetypes.add_entity(e);
-  archetypes.set_component(e, a);
-
-  ASSERT_EQ(archetypes.get_component<A>(e)->i, 42);
-  ASSERT_TRUE(entities.has_component(e, 1));
-}
 
 struct B {
   static const int id = 2;
@@ -35,7 +21,7 @@ struct B {
 };
 
 struct C {
-  static const int id = 2;
+  static const int id = 3;
   int i = 120;
 };
 
@@ -51,7 +37,9 @@ class Task_SumInA : public Task {
   void process() override {
     for (auto& archetype : m_arch) {
       auto a_component = archetype.template get_component<A>();
-      std::cout << a_component->i << "\n";
+      auto b_component = archetype.template get_component<B>();
+      auto c_component = archetype.template get_component<C>();
+      a_component->i = b_component->i + c_component->i;
     }
     m_promise.set_value();
   }
@@ -63,16 +51,32 @@ class Task_SumInA : public Task {
   std::promise<void> m_promise;
 };
 
-TEST(ecstests, threadpool) {
+TEST(ecstests, add) {
+  A a;
+  a.i = 42;
   EntityArray<8> entities;
   ArchetypeArray<A> archetypes;
 
   auto e = entities.create_entity();
   entities.add_components(e, archetypes.id());
   archetypes.add_entity(e);
+  archetypes.set_component(e, a);
 
-  Task_SumInA<A> task(archetypes);
+  ASSERT_EQ(archetypes.get_component<A>(e)->i, 42);
+  ASSERT_TRUE(entities.has_component(e, 1));
+}
+
+TEST(ecstests, threadpool) {
+  EntityArray<8> entities;
+  ArchetypeArray<A, B, C> archetypes;
+
+  auto e = entities.create_entity();
+  entities.add_components(e, archetypes.id());
+  archetypes.add_entity(e);
+
+  Task_SumInA<A, B, C> task(archetypes);
   auto fut = task.get_future();
   tp.schedule_task(&task);
   fut.get();
+  ASSERT_EQ(archetypes.get_component<A>(e)->i, 133);
 }
