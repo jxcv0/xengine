@@ -10,6 +10,10 @@ class Add : public Task {
     m_done.store(true);
   }
 
+  int id() override {
+    return 0;
+  }
+
   auto get_result() {
     while (!m_done) {
     }  // yuck
