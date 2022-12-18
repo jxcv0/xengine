@@ -55,11 +55,6 @@ class ThreadPool {
     }
   }
 
-  void stop() {
-    std::lock_guard lk(m_mutex);
-    m_should_run = false;
-  }
-
   /**
    * @brief Add a task to the task buffer.
    *        TODO - launch policy?
