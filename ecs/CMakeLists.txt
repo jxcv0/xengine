@@ -7,6 +7,8 @@ set(
 
 set(
   HEADERS
+    constants.h
+    component.h
     entityarray.h
     archetype.h
     archetypearray.h

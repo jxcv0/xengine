@@ -1,12 +1,12 @@
 #ifndef ARCHETYPEARRAY_H_
 #define ARCHETYPEARRAY_H_
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
+#include <queue>
 #include <type_traits>
-#include <unordered_map>
-#include <vector>
 
 /**
  * @brief Stores contiguously heterogenious components.
@@ -16,6 +16,7 @@
 template <typename... Components>
 class Archetype {
  public:
+  Archetype() = default;
   /**
    * @brief Construct an Archetype object.
    *
@@ -84,20 +85,21 @@ class Archetype {
    * @return A pointer to the archetype if one with the correct id is found.
    *         If no component is found then nullptr is returned.
    */
-  template <typename T>
-  constexpr T *get_component() const {
+  template <typename Component>
+  constexpr Component &get_component() const {
+    static_assert((std::is_same_v<Component, Components> || ...));
     auto addr = reinterpret_cast<uintptr_t>(&m_data[0]);
-    T *t = nullptr;
+    Component *c = nullptr;
     (
         [&] {
           auto p = reinterpret_cast<Components *>(addr);
-          if (T::id == Components::id) {
-            t = reinterpret_cast<T *>(p);
+          if (Component::id == Components::id) {
+            c = reinterpret_cast<Component *>(p);
           }
           addr += sizeof(Components);
         }(),
         ...);
-    return t;
+    return *c;
   }
 
   /**
@@ -109,12 +111,13 @@ class Archetype {
    */
   template <typename T>
   constexpr void set_component(const T &component) {
-    auto t = get_component<T>();
-    *t = component;
+    get_component<T>() = component;
   }
 
+  int entity() const noexcept { return m_entity_id; }
+
  private:
-  int m_entity_id;
+  int m_entity_id = 0;
   char m_data[(... + sizeof(Components))];
 };
 
@@ -139,8 +142,11 @@ class ArchetypeArray : public ArchetypeArrayBase {
  public:
   using archetype = Archetype<Components...>;
 
-  ArchetypeArray(std::size_t n) : m_max_components(n), m_num_components(0) {
-    mp_components = new archetype[m_num_components];
+  ArchetypeArray(unsigned int n) : m_max_components(n) {
+    for (unsigned int i = 0; i < m_max_components; i++) {
+      m_free_list.push(i);
+    }
+    mp_components = new archetype[m_max_components];
   }
 
   virtual ~ArchetypeArray() { delete[] mp_components; }
@@ -154,10 +160,11 @@ class ArchetypeArray : public ArchetypeArrayBase {
    * @param e The entity id.
    */
   constexpr int add_entity(const int e) noexcept override {
-    if (m_num_components == m_max_components) {
+    if (!m_free_list.empty()) {
       return -1;
     }
-    mp_components[m_num_components++] = archetype(e);
+    mp_components[m_free_list.front()] = archetype(e);
+    m_free_list.pop();
     return 0;
   }
 
@@ -167,8 +174,10 @@ class ArchetypeArray : public ArchetypeArrayBase {
    * @param e The entity to remove.
    * @throws Exception if there is no entity e in this table.
    */
-  constexpr void remove_entity(int e) override {
-
+  constexpr void remove_entity(const int e) noexcept override {
+    if (find(e) != nullptr) {
+      m_free_list.push(e);
+    }
   }
 
   /**
@@ -180,7 +189,11 @@ class ArchetypeArray : public ArchetypeArrayBase {
    * @return A pointer to the component or nullptr if no component is found.
    */
   template <typename Component>
-  Component *get_component(int e) {}
+  Component &get_component(const int e) {
+    static_assert((std::is_same_v<Component, Components> || ...));
+    assert(find(e) != nullptr);  // entity id is not in array
+    return find(e)->template get_component<Component>();
+  }
 
   /**
    * @brief Set the value of a component assigned to an entity.
@@ -191,28 +204,77 @@ class ArchetypeArray : public ArchetypeArrayBase {
    */
   template <typename T>
   void set_component(const int e, const T component) {
-    auto c = get_component<T>(e);
-    *c = component;
+    get_component<T>(e) = component;
   }
 
-  /**
-   * @brief Get a begin iterator to the components in the array.
-   *
-   * @return The iterator.
-   */
-  auto begin() { return m_components.begin(); }
+  constexpr auto size() const noexcept {
+    return m_max_components - m_free_list.size();
+  }
 
-  /**
-   * @brief Get an end iterator to the components in the array.
-   *
-   * @return The iterator.
-   */
-  auto end() { return m_components.end(); }
+  template <typename Component>
+  class Iterator {
+   public:
+    using iter = Iterator<Component>;
+    using value_type = Component;
+    using pointer = Component *;
+    using reference = Component &;
+    using difference_type = std::ptrdiff_t;
+    using iterator_category = std::forward_iterator_tag;
+
+    constexpr inline explicit Iterator(archetype *p) {
+      mp_ptr = &p->template get_component<Component>();
+    }
+
+    constexpr inline pointer operator->() { return mp_ptr; }
+
+    constexpr inline reference operator*() { return *mp_ptr; }
+
+    constexpr friend bool operator==(const iter &it1, const iter &it2) {
+      return it1.mp_ptr == it2.mp_ptr;
+    }
+
+    constexpr friend bool operator!=(const iter &it1, const iter &it2) {
+      return it1.mp_ptr != it2.mp_ptr;
+    }
+
+    constexpr inline iter &operator++() {
+      mp_ptr += sizeof(archetype);
+      return *this;
+    }
+
+    constexpr inline iter operator++(int) {
+      auto tmp = *this;
+      operator++();
+      return tmp;
+    }
+
+   private:
+    pointer mp_ptr;
+  };
+
+  template <typename Component>
+  auto begin() {
+    return Iterator<Component>(&mp_components[0]);
+  }
+
+  template <typename Component>
+  auto end() {
+    return Iterator<Component>(&mp_components[size()]);
+  }
 
  private:
-  unsigned int m_num_components;
+  archetype *find(const int e) const noexcept {
+    for (unsigned int i = 0; i < size(); i++) {
+      if (mp_components[i].entity() == e) {
+        return &mp_components[i];
+      }
+    }
+    return nullptr;
+  }
+
   unsigned int m_max_components;
-  archetype *mp_components;  // TODO
+  std::queue<int> m_free_list;
+  archetype *mp_components;
 };
 
 #endif  // ARCHETYPEARRAY_H_

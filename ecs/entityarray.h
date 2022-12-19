@@ -19,7 +19,7 @@ class EntityArray {
    */
   constexpr inline EntityArray() noexcept {
     static_assert(N > 0);
-    for (unsigned int i = 0; i < N; i++) {
+    for (unsigned int i = 1; i <= N; i++) {  // 0 is not a valid id
       m_free_list.push(i);
     }
   }
