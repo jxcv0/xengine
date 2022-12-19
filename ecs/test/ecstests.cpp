@@ -14,7 +14,6 @@ struct A {
   int i = 0;
 };
 
-
 struct B {
   static const int id = 2;
   int i = 13;

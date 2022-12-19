@@ -1,20 +1,17 @@
-#include <future>
 #include <gtest/gtest.h>
 #include <threadpool.h>
+
+#include <future>
 
 class Add : public Task {
  public:
   Add(int a, int b) : m_a(a), m_b(b) {}
 
-  void process() override {
-    m_result.set_value(m_a + m_b);
-  }
+  void process() override { m_result.set_value(m_a + m_b); }
 
   int id() override { return 0; }
 
-  auto get_future() {
-    return m_result.get_future();
-  }
+  auto get_future() { return m_result.get_future(); }
 
  private:
   int m_a;

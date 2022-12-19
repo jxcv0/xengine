@@ -23,9 +23,13 @@ struct C {
   int i = 10;
 };
 
-TEST(archetypetest, size_and_count) {
+struct D {
+  const static int id = 4;
+};
+
+TEST(archetypetests, size_and_count) {
   auto size = sizeof(A) + sizeof(B) + sizeof(C);
-  Archetype<A, B, C> a;
+  Archetype<A, B, C> a(1);
   ASSERT_EQ(a.id(), 1 | 2 | 3);
   ASSERT_EQ(decltype(a)::id(), 1 | 2 | 3);
   ASSERT_EQ(a.count(), 3);
@@ -33,12 +37,8 @@ TEST(archetypetest, size_and_count) {
   ASSERT_EQ(a.size(), sizeof(Archetype<A, B, C>));
 }
 
-struct D {
-  const static int id = 4;
-};
-
-TEST(archetypetest, get_component) {
-  Archetype<A, B, C> arch;
+TEST(archetypetests, get_component) {
+  Archetype<A, B, C> arch(1);
   auto a = arch.get_component<A>();
   auto b = arch.get_component<B>();
   auto c = arch.get_component<C>();
@@ -51,10 +51,10 @@ TEST(archetypetest, get_component) {
   ASSERT_EQ(d, nullptr);
 }
 
-TEST(archetypetest, set_component) {
+TEST(archetypetests, set_component) {
   A a;
   a.i = 15;
-  Archetype<A> arch;
+  Archetype<A> arch(1);
   arch.set_component(a);
   ASSERT_EQ(arch.get_component<A>()->i, 15);
   ASSERT_EQ(a.i, 15);

@@ -8,6 +8,7 @@ set(
 set(
   HEADERS
     entityarray.h
+    archetype.h
     archetypearray.h
     ecs.h
 )

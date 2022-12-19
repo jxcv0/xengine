@@ -22,7 +22,7 @@ class Archetype {
    * @param mem The memory block to store the components in. mem is assumed to
    *            be large enough to store one of each component.
    */
-  constexpr explicit inline Archetype() noexcept {
+  constexpr explicit inline Archetype(int id) noexcept : m_entity_id(id) {
     static_assert((Components::id > ...));  // templates must be in order
     auto addr = reinterpret_cast<uintptr_t>(m_data);
     (
@@ -33,6 +33,12 @@ class Archetype {
         }(),
         ...);
   }
+
+  Archetype(const Archetype<Components...> &) = default;
+  Archetype(Archetype<Components...> &&) = default;
+  Archetype<Components...> &operator=(const Archetype<Components...> &) =
+      default;
+  ~Archetype() = default;
 
   /**
    * @brief Compare two archetypes.
@@ -108,6 +114,7 @@ class Archetype {
   }
 
  private:
+  int m_entity_id;
   char m_data[(... + sizeof(Components))];
 };
 
@@ -117,9 +124,9 @@ class Archetype {
 class ArchetypeArrayBase {
  public:
   virtual ~ArchetypeArrayBase(){};
-  virtual int id() const noexcept = 0;
-  virtual void add_entity(const int e) = 0;
-  virtual void remove_entity(const int e) = 0;
+  constexpr virtual int id() const noexcept = 0;
+  constexpr virtual int add_entity(const int e) noexcept = 0;
+  constexpr virtual void remove_entity(const int e) noexcept = 0;
 };
 
 /**
@@ -132,7 +139,12 @@ class ArchetypeArray : public ArchetypeArrayBase {
  public:
   using archetype = Archetype<Components...>;
 
-  virtual ~ArchetypeArray(){};
+  ArchetypeArray(std::size_t n) : m_max_components(n), m_num_components(0) {
+    mp_components = new archetype[m_num_components];
+  }
+
+  virtual ~ArchetypeArray() { delete[] mp_components; }
+
   int id() const noexcept override { return Archetype<Components...>::id(); }
 
   /**
@@ -141,9 +153,12 @@ class ArchetypeArray : public ArchetypeArrayBase {
    *
    * @param e The entity id.
    */
-  void add_entity(const int e) override {
-    m_entity_to_index[e] = m_components.size();
-    m_components.emplace_back();
+  constexpr int add_entity(const int e) noexcept override {
+    if (m_num_components == m_max_components) {
+      return -1;
+    }
+    mp_components[m_num_components++] = archetype(e);
+    return 0;
   }
 
   /**
@@ -152,10 +167,8 @@ class ArchetypeArray : public ArchetypeArrayBase {
    * @param e The entity to remove.
    * @throws Exception if there is no entity e in this table.
    */
-  void remove_entity(int e) override {
-    auto index = m_entity_to_index.at(e);
-    m_entity_to_index.erase(e);
-    m_components.erase(m_components.begin() + index);
+  constexpr void remove_entity(int e) override {
+
   }
 
   /**
@@ -166,12 +179,8 @@ class ArchetypeArray : public ArchetypeArrayBase {
    * @param e The entity to which the components are assigned to.
    * @return A pointer to the component or nullptr if no component is found.
    */
-  template <typename T>
-  T *get_component(int e) {
-    auto index = m_entity_to_index.at(e);
-    auto archetype = &m_components[index];
-    return archetype->template get_component<T>();
-  }
+  template <typename Component>
+  Component *get_component(int e) {}
 
   /**
    * @brief Set the value of a component assigned to an entity.
@@ -201,8 +210,9 @@ class ArchetypeArray : public ArchetypeArrayBase {
   auto end() { return m_components.end(); }
 
  private:
-  std::vector<archetype> m_components;  // TODO
-  std::unordered_map<int, int> m_entity_to_index;
+  unsigned int m_num_components;
+  unsigned int m_max_components;
+  archetype *mp_components;  // TODO
 };
 
 #endif  // ARCHETYPEARRAY_H_

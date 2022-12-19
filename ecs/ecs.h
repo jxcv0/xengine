@@ -10,11 +10,10 @@
 
 class ECS {
  public:
-  
  private:
   EntityArray<128> m_entities;
   std::vector<ArchetypeArrayBase *> m_archetype_arrays;
-  std::vector<Task*> m_tasks;
+  std::vector<Task *> m_tasks;
 };
 
-#endif // ECS_H_
+#endif  // ECS_H_
