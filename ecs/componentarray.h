@@ -5,67 +5,71 @@
 
 #include "constants.h"
 
-namespace xen {
-
+/**
+ * @brief Contiguous storage for components accessed by entity id. For
+ * simplicity, entities may have only entry in the array.
+ */
 template <typename ComponentType>
 class ComponentArray {
-  static constexpr int NOT_IN_USE = -1;
-
  public:
-  constexpr inline ComponentArray() noexcept {
-    for (int i = 0; i < MAX_ENTITIES; i++) {
-      m_map[i] = -1;
-    }
-  }
-
   constexpr int assign(const entity_id id) noexcept {
-    if (m_map[id] == NOT_IN_USE && id < MAX_ENTITIES &&
-        m_num_components != MAX_ENTITIES) {
-      m_map[id] = m_num_components;
+    if (id_is_valid(id) && m_num_components != MAX_ENTITIES &&
+        id_to_index(id) == -1) {
+      m_entity_ids[m_num_components++] = id;
       return 0;
     }
     return -1;
   }
 
-  constexpr int erase(const entity_id id) noexcept {
-    if (m_map[id] != NOT_IN_USE && id < MAX_ENTITIES && m_num_components != 0) {
-      int index = m_map[id];
-      if (index != m_num_components) {
-        // if the deleted is not last we swap
-        m_components[index] = m_components[m_num_components];
-        m_map[index_to_id(index)] = index;
-        m_map[id] = NOT_IN_USE;
-        m_num_components--;
-      } else {
-        // if it is last then we can just remove it
-        m_map[id] = NOT_IN_USE;
-        m_num_components--;
+  constexpr void erase(const entity_id id) noexcept {
+    int index_to_delete = id_to_index(id);
+    if (id_is_valid(id) && m_num_components != 0 && index_to_delete != -1) {
+      int last_id = m_entity_ids[m_num_components - 1];
+
+      if (id != last_id) {
+        // if the component is not last in the array we swap
+        m_entity_ids[index_to_delete] = m_entity_ids[m_num_components - 1];
+        m_components[index_to_delete] = m_components[m_num_components - 1];
       }
-      return 0;
+      m_num_components--;
     }
-    return -1;
   }
 
-  constexpr ComponentType *get(const entity_id id) const noexcept {
-    if (m_map[id] != NOT_IN_USE) {
-      return m_components[m_map[id]];
+  constexpr ComponentType *get(const entity_id id) noexcept {
+    int index = id_to_index(id);
+    if (index != -1) {
+      return &m_components[index];
     }
     return nullptr;
   }
 
- private:
-  constexpr int index_to_id(const int index) const noexcept {
-    for (int i = 0; i < m_num_components; i++) {
-      if (m_map[i] == index) return i;
+  constexpr int set(const entity_id id, ComponentType c) noexcept {
+    if (id_is_valid(id) && m_num_components != MAX_COMPONENTS &&
+        id_to_index(id) != -1) {
+      int index = id_to_index(id);
+      m_components[index] = c;
+      return 0;
     }
     return -1;
   }
 
-  int m_map[MAX_ENTITIES];
+ private:
+  int id_to_index(const entity_id id) {
+    for (int i = 0; i < m_num_components; i++) {
+      if (m_entity_ids[i] == id) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  constexpr inline bool id_is_valid(const entity_id id) {
+    return (id < MAX_ENTITIES && id > 0);
+  }
+
   int m_num_components = 0;
+  int m_entity_ids[MAX_ENTITIES];
   ComponentType m_components[MAX_ENTITIES];
 };
-
-}  // namespace xen
 
 #endif  // COMPONENTARRAY_H_
