@@ -69,9 +69,9 @@ class Shader {
    * @param uniform_name The name of the uniform.
    * @param value The value to set the uniform to.
    */
-  void set_uniform(const char *uniform_name, const Vec2 &value) {
+  void set_uniform(const char *uniform_name, const Vec2 *value) {
     glUniform2fv(glGetUniformLocation(m_id, uniform_name), 1,
-                 value.value_ptr());
+                 value->value_ptr());
   }
 
   /**
@@ -80,9 +80,9 @@ class Shader {
    * @param uniform_name The name of the uniform.
    * @param value The value to set the uniform to.
    */
-  void set_uniform(const char *uniform_name, const Vec3 &value) {
+  void set_uniform(const char *uniform_name, const Vec3 *value) {
     glUniform3fv(glGetUniformLocation(m_id, uniform_name), 1,
-                 value.value_ptr());
+                 value->value_ptr());
   }
 
   /**
@@ -91,9 +91,9 @@ class Shader {
    * @param uniform_name The name of the uniform.
    * @param value The value to set the uniform to.
    */
-  void set_uniform(const char *uniform_name, const Vec4 &value) {
+  void set_uniform(const char *uniform_name, const Vec4 *value) {
     glUniform4fv(glGetUniformLocation(m_id, uniform_name), 1,
-                 value.value_ptr());
+                 value->value_ptr());
   }
 
   /**
@@ -102,9 +102,9 @@ class Shader {
    * @param uniform_name The name of the uniform.
    * @param value The value to set the uniform to.
    */
-  void set_uniform(const char *uniform_name, const Mat4 &value) {
+  void set_uniform(const char *uniform_name, const Mat4 *value) {
     auto loc = glGetUniformLocation(m_id, uniform_name);
-    glUniformMatrix4fv(loc, 1, GL_FALSE, value.value_ptr());
+    glUniformMatrix4fv(loc, 1, GL_FALSE, value->value_ptr());
   }
 
  private:

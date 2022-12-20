@@ -1,3 +1,5 @@
+#include <math.h>
+
 #include <iostream>
 
 #include "camera.h"
@@ -24,7 +26,6 @@ Camera camera;
 
 EntityArray<MAX_ENTITIES> entities;
 ComponentArray<Mesh> mesh_components;
-ComponentArray<Mat4> rotation_components;  // rotate then translate (SRT)
 ComponentArray<Vec3> translation_components;
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
@@ -43,28 +44,36 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
   // entity
   entity_id id = entities.create();
   mesh_components.assign(id);
-  rotation_components.assign(id);
   translation_components.assign(id);
 
-  rotation_components.set(
-      id, lin::rotate(Mat4(1), Vec3(1, 0, 0), lin::radians(-55)));
   translation_components.set(id, Vec3(0, 0, 0));
 
   Mat4 model_matrix = lin::translate(Mat4(1), *translation_components.get(id));
-  model_matrix = lin::rotate(model_matrix, Vec3(1, 0, 0), lin::radians(-55));
+  model_matrix = lin::rotate(model_matrix, Vec3(1, 0.8, 0), lin::radians(-55));
 
   mesh_components.get(id)->load("assets/models/cube/cube.obj");
   mesh_components.get(id)->gen_buffers();
 
   shader.use();
-  shader.set_uniform("projection", projection_matrix);
+  shader.set_uniform("projection", &projection_matrix);
+
+  Vec3 light_pos(1, 1, 1);
+  Vec3 light_color(1, 1, 1);
+  Vec3 object_color(1, 0.5, 0.31);
 
   while (!window.should_close()) {
     window.clear_buffers();
     glClearColor(0.2, 0.3, 0.3, 1);
 
-    shader.set_uniform("model", model_matrix);
-    shader.set_uniform("view", camera.view_matrix());
+    // transforms
+    shader.set_uniform("model", &model_matrix);
+    Mat4 view_matrix = camera.view_matrix();
+    shader.set_uniform("view", &view_matrix);
+
+    // lighting
+    shader.set_uniform("light_pos", &light_pos);
+    shader.set_uniform("light_color", &light_color);
+    shader.set_uniform("obj_color", &object_color);
 
     mesh_components.get(id)->draw();
 
