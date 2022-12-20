@@ -8,8 +8,7 @@
 #include <thread>
 #include <vector>
 
-#define L1CLS 64  // TODO move this elsewhere
-#define MAX_TASKS 8
+#define MAX_TASKS 32
 
 struct Task {
   virtual ~Task() = default;
@@ -35,7 +34,7 @@ class ThreadPool {
    *
    * @param nthread The number of worker threads.
    */
-  ThreadPool(int nthreads) : m_should_run(true), m_index(0) {
+  ThreadPool(int nthreads) : m_should_run(true), m_num_tasks(0) {
     m_worker_threads.reserve(nthreads);
     for (auto i = 0; i < nthreads; i++) {
       m_worker_threads.emplace_back(std::thread(&ThreadPool::run, this));
@@ -64,9 +63,14 @@ class ThreadPool {
    */
   void schedule_task(Task *t) {
     std::unique_lock lk(m_mutex);
-    m_cv.wait(lk, [this] { return m_index < MAX_TASKS; });
-    m_tasks[m_index++] = t;
+    m_cv.wait(lk, [this] { return m_num_tasks < MAX_TASKS; });
+    m_tasks[m_num_tasks++] = t;
     m_cv.notify_one();
+  }
+
+  void wait() {
+    std::unique_lock lk(m_mutex);
+    m_cv.wait(lk, [this] { return m_num_tasks == 0; });
   }
 
  private:
@@ -76,11 +80,12 @@ class ThreadPool {
   void run() {
     for (;;) {
       std::unique_lock lk(m_mutex);
-      m_cv.wait(lk, [this] { return m_index != 0 || m_should_run == false; });
+      m_cv.wait(lk,
+                [this] { return m_num_tasks != 0 || m_should_run == false; });
       if (m_should_run == false) {
         return;
       }
-      auto task = m_tasks[--m_index];
+      auto task = m_tasks[--m_num_tasks];
       lk.unlock();
       m_cv.notify_one();
       task->process();
@@ -88,7 +93,7 @@ class ThreadPool {
   };
 
   bool m_should_run;
-  unsigned int m_index;
+  unsigned int m_num_tasks;
   Task *m_tasks[MAX_TASKS];
   std::vector<std::thread> m_worker_threads;
   std::mutex m_mutex;

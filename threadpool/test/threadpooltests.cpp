@@ -48,4 +48,6 @@ TEST(threadpooltests, threadpool) {
   ASSERT_EQ(result.get(), 36);
   result = add6.get_future();
   ASSERT_EQ(result.get(), 37);
+
+  tp.wait();
 }
