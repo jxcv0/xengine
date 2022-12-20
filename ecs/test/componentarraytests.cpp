@@ -1,5 +1,6 @@
-#include <cmath>
 #include <gtest/gtest.h>
+
+#include <cmath>
 
 #include "componentarray.h"
 #include "constants.h"

@@ -12,6 +12,13 @@
 template <typename ComponentType>
 class ComponentArray {
  public:
+  /**
+   * @brief Register an entity id with the array. If successful, the id can be
+   * used to access a component in the array.
+   *
+   * @param id The entity id to register.
+   * @return 0 on success, -1 on failure.
+   */
   constexpr int assign(const entity_id id) noexcept {
     if (id_is_valid(id) && m_num_components != MAX_ENTITIES &&
         id_to_index(id) == -1) {
@@ -21,6 +28,12 @@ class ComponentArray {
     return -1;
   }
 
+  /**
+   * @brief Remove an entity id from the array. After removal, the id can no
+   * longer be used to access a component in the array.
+   *
+   * @param id The entity id to erase.
+   */
   constexpr void erase(const entity_id id) noexcept {
     int index_to_delete = id_to_index(id);
     if (id_is_valid(id) && m_num_components != 0 && index_to_delete != -1) {
@@ -35,6 +48,12 @@ class ComponentArray {
     }
   }
 
+  /**
+   * @brief Access a component belonging to an entity id.
+   *
+   * @param id The entity id.
+   * @return If successful, a pointer to the component. Otherwise nullptr.
+   */
   constexpr ComponentType *get(const entity_id id) noexcept {
     int index = id_to_index(id);
     if (index != -1) {
@@ -43,6 +62,13 @@ class ComponentArray {
     return nullptr;
   }
 
+  /**
+   * @brief Set an entities component to a value. The component must be copy
+   * assignable.
+   * @param id The entity id.
+   * @param c The new component value.
+   * @return 0 on success, -1 on failure.
+   */
   constexpr int set(const entity_id id, ComponentType c) noexcept {
     if (id_is_valid(id) && m_num_components != MAX_COMPONENTS &&
         id_to_index(id) != -1) {
