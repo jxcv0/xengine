@@ -28,10 +28,6 @@ ComponentArray<Mesh> mesh_components;
 ComponentArray<Vec3> translation_components;
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-  glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
   Window window(window_width, window_height, "xengine");
   window.set_cursor_position_callback(on_mouse);
 
@@ -50,7 +46,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
   Mat4 model_matrix = lin::translate(Mat4(1), *translation_components.get(id));
   model_matrix = lin::rotate(model_matrix, Vec3(1, 0.8, 0), lin::radians(-55));
 
-  mesh_components.get(id)->load("assets/models/cube/cube.obj");
+  mesh_components.get(id)->load("assets/models/cyborg/cyborg.obj");
   mesh_components.get(id)->gen_buffers();
 
   shader.use();

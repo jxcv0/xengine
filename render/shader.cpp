@@ -4,6 +4,9 @@
 #include <fstream>
 #include <sstream>
 
+/**
+ * ----------------------------------------------------------------------------
+ */
 static inline void check_compile(int id) {
   GLint success;
   char infoLog[1024];
@@ -14,6 +17,9 @@ static inline void check_compile(int id) {
   }
 }
 
+/**
+ * ----------------------------------------------------------------------------
+ */
 static inline void check_link(int id) {
   GLint success;
   char infoLog[1024];
@@ -24,6 +30,9 @@ static inline void check_link(int id) {
   }
 }
 
+/**
+ * ----------------------------------------------------------------------------
+ */
 Shader ShaderUtils::load(const std::filesystem::path &vert_path,
                          const std::filesystem::path &frag_path) {
   std::ifstream vert_stream(vert_path);

@@ -26,11 +26,14 @@ class ECS {
     return -1;
   }
 
+  /**
+   * @brief Schedule all tasks then wait for completion.
+   */
   void update() {
     for (int i = 0; i < m_num_systems; i++) {
       m_threadpool.schedule_task(m_systems[i]);
     }
-    // wait_for_t
+    m_threadpool.wait();
   }
 
  private:

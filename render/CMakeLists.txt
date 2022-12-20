@@ -3,6 +3,7 @@ project(render)
 
 set(
   SOURCES
+    window.cpp
     shader.cpp
     checkerr.cpp
 )

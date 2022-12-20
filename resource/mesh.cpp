@@ -1,12 +1,12 @@
 #include "mesh.h"
 
+#include <glad.h>
 #include <unistd.h>
 
 #include <array>
 #include <cstddef>
 #include <cstdlib>
 
-#include "glad.h"
 #include "mmapfile.h"
 #include "vec2.h"
 #include "vec3.h"

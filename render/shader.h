@@ -7,8 +7,8 @@
 #include <sstream>
 #include <stdexcept>
 
-#ifndef OPENGL_LIBS
-#define OPENGL_LIBS
+#ifndef GLAD_INCLUDED
+#define GLAD_INCLUDED
 #include <glad.h>
 #endif
 
