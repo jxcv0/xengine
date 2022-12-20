@@ -2,6 +2,9 @@
 
 #include "camera.h"
 #include "checkerr.h"
+#include "componentarray.h"
+#include "constants.h"
+#include "entityarray.h"
 #include "lin.h"
 #include "mat4.h"
 #include "mesh.h"
@@ -19,6 +22,11 @@ bool first_mouse = true;
 
 Camera camera;
 
+EntityArray<MAX_ENTITIES> entities;
+ComponentArray<Mesh> mesh_components;
+ComponentArray<Mat4> rotation_components;  // rotate then translate (SRT)
+ComponentArray<Vec3> translation_components;
+
 int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
@@ -31,23 +39,34 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
       ShaderUtils::load("render/glsl/uber.vert", "render/glsl/uber.frag");
 
   auto projection_matrix = window.projection_matrix(60);
-  auto model_matrix = lin::rotate(Mat4(1), Vec3(1, 0, 0), lin::radians(-55));
 
-  Mesh mesh;
-  mesh.load("assets/models/cube/cube.obj");
-  mesh.gen_buffers();
+  // entity
+  entity_id id = entities.create();
+  mesh_components.assign(id);
+  rotation_components.assign(id);
+  translation_components.assign(id);
+
+  rotation_components.set(
+      id, lin::rotate(Mat4(1), Vec3(1, 0, 0), lin::radians(-55)));
+  translation_components.set(id, Vec3(0, 0, 0));
+
+  Mat4 model_matrix = lin::translate(Mat4(1), *translation_components.get(id));
+  model_matrix = lin::rotate(model_matrix, Vec3(1, 0, 0), lin::radians(-55));
+
+  mesh_components.get(id)->load("assets/models/cube/cube.obj");
+  mesh_components.get(id)->gen_buffers();
 
   shader.use();
   shader.set_uniform("projection", projection_matrix);
-  shader.set_uniform("model", model_matrix);
 
   while (!window.should_close()) {
     window.clear_buffers();
     glClearColor(0.2, 0.3, 0.3, 1);
 
+    shader.set_uniform("model", model_matrix);
     shader.set_uniform("view", camera.view_matrix());
 
-    mesh.draw();
+    mesh_components.get(id)->draw();
 
     window.swap_buffers();
     window.poll_events();

@@ -7,6 +7,8 @@
 #include <queue>
 #include <stdexcept>
 
+#include "constants.h"
+
 /**
  * @brief Entity system
  */
@@ -24,8 +26,6 @@ class EntityArray {
     }
   }
 
-  ~EntityArray() = default;
-
   /**
    * @brief Get the number of entities in use.
    *
@@ -38,7 +38,7 @@ class EntityArray {
    *
    * @return A new entity handle.
    */
-  int create_entity() noexcept {
+  entity_id create() noexcept {
     if (m_free_list.empty()) {
       return -1;
     }
@@ -54,7 +54,7 @@ class EntityArray {
    * @brief c The component id.
    * @return true if the entity has the component, otherwise false.
    */
-  constexpr bool has_component(int e, int c) const noexcept {
+  constexpr bool has_component(entity_id e, int c) const noexcept {
     auto archetype = m_signatures[e];
     if ((archetype & c) != 0) {
       return true;
@@ -68,7 +68,7 @@ class EntityArray {
    * @param e The handle of the entity.
    * @param s The signature to combine.
    */
-  constexpr inline void add_components(int e, int s) noexcept {
+  constexpr inline void add_components(entity_id e, int s) noexcept {
     m_signatures[e] |= s;
   }
 
@@ -78,7 +78,7 @@ class EntityArray {
    *
    * @param e The entity to erase.
    */
-  constexpr void erase_entity(int e) noexcept {
+  constexpr void erase(entity_id e) noexcept {
     m_signatures[e] = 0;  // reset signature
     m_free_list.push(e);
   }
