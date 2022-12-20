@@ -14,14 +14,14 @@ TEST(entitysubsystemtests, create) {
 }
 
 TEST(entitysubsystemtests, signature_initialized_to_zero) {
-  EntityArray<10> es;
+  EntityArray es;
   auto e = es.create();
   ASSERT_EQ(e, 0);
   ASSERT_FALSE(es.has_component(e, 0));  // 0 & 0
 }
 
 TEST(entitysubsystemtests, create_entity_throw) {
-  EntityArray<3> es;
+  EntityArray es;
   auto e1 = es.create();
   ASSERT_EQ(e1, 0);
   auto e2 = es.create();
@@ -33,14 +33,14 @@ TEST(entitysubsystemtests, create_entity_throw) {
 }
 
 TEST(entitysubsystem_tests, set_signature) {
-  EntityArray<10> es;
+  EntityArray es;
   auto e = es.create();
   es.add_components(e, 10);
   ASSERT_TRUE(es.has_component(e, 10));
 }
 
 TEST(entitysubsystem_tests, amend_signature) {
-  EntityArray<10> es;
+  EntityArray es;
   auto e = es.create();
   es.add_components(e, 0b1);
   ASSERT_TRUE(es.has_component(e, 1));  // test for all
@@ -50,7 +50,7 @@ TEST(entitysubsystem_tests, amend_signature) {
 }
 
 TEST(entitysubsystem_tests, erase_entity) {
-  EntityArray<10> es;
+  EntityArray es;
   auto e = es.create();
   es.add_components(e, 0b100);
   ASSERT_TRUE(es.has_component(e, 4));

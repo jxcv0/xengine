@@ -9,13 +9,13 @@
 
 #ifndef OPENGL_LIBS
 #define OPENGL_LIBS
-#include "glad.h"
+#include <glad.h>
 #endif
 
-#include <mat4.h>
-#include <vec2.h>
-#include <vec3.h>
-#include <vec4.h>
+#include "mat4.h"
+#include "vec2.h"
+#include "vec3.h"
+#include "vec4.h"
 
 /**
  * @brief A GLSL Shader.
@@ -23,9 +23,16 @@
 class Shader {
  public:
   /**
+   * @brief Component id
+   */
+  const static int component_id = 0b10;
+
+  Shader() = default;
+
+  /**
    * @brief Construct a shader from a program id.
    */
-  explicit Shader(unsigned int id) : m_id(id){};
+  Shader(unsigned int id) : m_id(id){};
 
   /**
    * @brief Installs the program object as part of current rendering state.

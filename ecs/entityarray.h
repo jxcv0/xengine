@@ -12,16 +12,14 @@
 /**
  * @brief Entity system
  */
-template <int N = 256>
 class EntityArray {
  public:
   /**
    * @brief Construct an EntityArray object. Populate the free list with
    *        available entity ids that are indexes in the signatures array.
    */
-  constexpr inline EntityArray() noexcept {
-    static_assert(N > 0);
-    for (unsigned int i = 1; i <= N; i++) {  // 0 is not a valid id
+  EntityArray() noexcept {
+    for (unsigned int i = 1; i <= MAX_ENTITIES; i++) {  // 0 is not a valid id
       m_free_list.push(i);
     }
   }
@@ -31,7 +29,7 @@ class EntityArray {
    *
    * @return The number of entities in use.
    */
-  constexpr inline auto count() const { return (N - m_free_list.size()); }
+  auto count() const { return (MAX_ENTITIES - m_free_list.size()); }
 
   /**
    * @brief Create an entity.
@@ -78,14 +76,14 @@ class EntityArray {
    *
    * @param e The entity to erase.
    */
-  constexpr void erase(entity_id e) noexcept {
+  void erase(entity_id e) noexcept {
     m_signatures[e] = 0;  // reset signature
     m_free_list.push(e);
   }
 
  private:
   std::queue<int> m_free_list;
-  int m_signatures[N] = {0};
+  int m_signatures[MAX_ENTITIES] = {0};
 };
 
 #endif  // ENTITY_H_

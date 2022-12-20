@@ -5,7 +5,6 @@
 #include "camera.h"
 #include "checkerr.h"
 #include "componentarray.h"
-#include "constants.h"
 #include "entityarray.h"
 #include "lin.h"
 #include "mat4.h"
@@ -24,7 +23,7 @@ bool first_mouse = true;
 
 Camera camera;
 
-EntityArray<MAX_ENTITIES> entities;
+EntityArray entities;
 ComponentArray<Mesh> mesh_components;
 ComponentArray<Vec3> translation_components;
 

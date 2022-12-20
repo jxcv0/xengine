@@ -1,7 +1,6 @@
 link_libraries(ecs GTest::gtest_main)
 
 add_executable(entityarraytests entityarraytests.cpp)
-add_executable(componenttests componenttests.cpp)
 add_executable(componentarraytests componentarraytests.cpp)
 add_executable(archetypetests archetypetests.cpp)
 add_executable(archetypearraytests archetypearraytests.cpp)
@@ -9,7 +8,6 @@ add_executable(ecstests ecstests.cpp)
 
 include(GoogleTest)
 gtest_discover_tests(entityarraytests)
-gtest_discover_tests(componenttests)
 gtest_discover_tests(componentarraytests)
 gtest_discover_tests(archetypetests)
 gtest_discover_tests(archetypearraytests)
