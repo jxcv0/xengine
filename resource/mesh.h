@@ -24,31 +24,28 @@ class Mesh {
   /**
    * @brief Component id
    */
-  const static int component_id = 0b1;
 
   /**
    * @brief Load mesh data from an obj file.
    *
-   * @tparam Alloc The allocator class type to use to allocate mesh memory.
    * @param filepath The filepath to load data from.
-   * @param alloc A reference to the allocator to use.
    */
   void load(const std::filesystem::path &filepath);
 
   /**
-   * @brief Unload the memory used by the Mesh
-   *
-   * @tparam Del The type of the deleter class.
-   * @param deleter The deleter class used to free the memory.
+   * @brief Unload the memory used by the Mesh.
    */
-  void unload() { delete[] mp_vertices; }
+  void unload() {
+    delete[] mp_vertices;
+    mp_vertices = nullptr;
+  }
 
   /**
    * @brief Check if the Mesh is currently storing data.
    *
    * @return bool true if this Mesh points to usable memory.
    */
-  auto loaded() { return mp_vertices != nullptr; }
+  bool loaded() const noexcept { return mp_vertices != nullptr; }
 
   /**
    * @brief Generate gl buffers for this mesh.

@@ -22,11 +22,6 @@
  */
 class Shader {
  public:
-  /**
-   * @brief Component id
-   */
-  const static int component_id = 0b10;
-
   Shader() = default;
 
   /**

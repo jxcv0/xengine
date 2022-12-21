@@ -9,11 +9,6 @@
 using entity_id = int;
 
 /**
- * @brief Entity archetype bitmask;
- */
-using entity_archetype = int;
-
-/**
  * @brief Max total number of entities.
  */
 constexpr const int MAX_ENTITIES = 4096;

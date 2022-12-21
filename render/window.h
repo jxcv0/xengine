@@ -4,7 +4,6 @@
 #include <cstdint>
 
 #include "mat4.h"
-#include "vec2.h"
 
 #ifndef GLAD_INCLUDED
 #define GLAD_INCLUDED

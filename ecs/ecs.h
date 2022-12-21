@@ -6,9 +6,6 @@
 #include "componentarray.h"
 #include "constants.h"
 #include "entityarray.h"
-#include "mat4.h"
-#include "mesh.h"
-#include "shader.h"
 #include "threadpool.h"
 
 /**
@@ -16,7 +13,7 @@
  */
 class ECS {
  public:
-  ECS() : m_threadpool(4), m_num_systems(0) {}
+  ECS() : m_threadpool(4), m_num_systems(0), m_num_component_arrays(0) {}
 
   int register_system(Task *system) {
     if (m_num_systems != MAX_SYSTEMS) {
@@ -26,27 +23,34 @@ class ECS {
     return -1;
   }
 
-  /**
-   * @brief Schedule all tasks then wait for completion.
-   */
+  int register_component(ComponentArrayBase *arr) {
+    if (m_num_component_arrays != MAX_COMPONENTS) {
+      m_component_arrays[m_num_component_arrays++] = arr;
+      return 0;
+    }
+    return -1;
+  }
+
   void update() {
     for (int i = 0; i < m_num_systems; i++) {
       m_threadpool.schedule_task(m_systems[i]);
     }
-    m_threadpool.wait();
+    // m_threadpool.wait();
   }
 
  private:
   EntityArray m_entities;
 
-  // TODO should these be registerable
-  ComponentArray<Mesh> m_meshes;
-  ComponentArray<Mat4> m_translations;  // model matrices
-  ComponentArray<Shader> m_shaders;
-
   ThreadPool m_threadpool;
   int m_num_systems;
   Task *m_systems[MAX_SYSTEMS];
+
+  int m_num_component_arrays;
+  ComponentArrayBase *m_component_arrays[MAX_COMPONENTS];
 };
+
+// mesh
+// translation
+// shader
 
 #endif  // ECS_H_

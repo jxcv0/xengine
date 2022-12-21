@@ -5,13 +5,59 @@
 
 #include "constants.h"
 
+class ComponentArrayBase {
+  virtual int component_id() const noexcept;
+  virtual int size() const noexcept;
+};
+
 /**
  * @brief Contiguous storage for components accessed by entity id. For
  * simplicity, entities may have only entry in the array.
  */
 template <typename ComponentType>
-class ComponentArray {
+class ComponentArray : public ComponentArrayBase {
+  /**
+   * @breif Component Array iterator.
+   */
+  class Iterator {
+   public:
+    Iterator(ComponentType *p) : m_ptr(p) {}
+
+    constexpr friend bool operator==(const Iterator &it1, const Iterator &it2) {
+      return it1.m_ptr == it2.m_ptr;
+    }
+
+    constexpr friend bool operator!=(const Iterator &it1, const Iterator &it2) {
+      return it1.m_ptr != it2.m_ptr;
+    }
+
+    constexpr inline ComponentType operator->() { return m_ptr; }
+
+    constexpr inline ComponentType &operator*() { return *m_ptr; }
+
+    constexpr Iterator &operator++() {
+      m_ptr += sizeof(ComponentType);
+      return *this;
+    }
+
+    constexpr Iterator operator++(int) {
+      Iterator &temp = *this;
+      operator++();
+      return temp;
+    }
+
+   private:
+    ComponentType *m_ptr;
+  };
+
  public:
+  /**
+   * @brief Get the unique id of the component.
+   *
+   * @return The integer id of the component type.
+   */
+  int component_id() const noexcept override { return ComponentType::component_id; }
+
   /**
    * @brief Register an entity id with the array. If successful, the id can be
    * used to access a component in the array.
@@ -78,6 +124,17 @@ class ComponentArray {
     }
     return -1;
   }
+
+  /**
+   * @brief Get the number of components in the array.
+   *
+   * @return The number of components in the array.
+   */
+  int size() const noexcept override { return m_num_components; }
+
+  Iterator begin() { return Iterator(&m_components[0]); }
+
+  Iterator end() { return Iterator(&m_components[m_num_components]); }
 
  private:
   int id_to_index(const entity_id id) {

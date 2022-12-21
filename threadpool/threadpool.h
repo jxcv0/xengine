@@ -13,7 +13,7 @@
 struct Task {
   virtual ~Task() = default;
   virtual void process() = 0;
-  virtual int id() = 0;  // for ecs
+  virtual int id() const = 0;  // for ecs
 };
 
 /**

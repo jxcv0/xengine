@@ -1,14 +1,15 @@
-#include <math.h>
-
 #include "camera.h"
 #include "checkerr.h"
 #include "componentarray.h"
+#include "components.h"
+#include "ecs.h"
 #include "entityarray.h"
 #include "input.h"
 #include "lin.h"
 #include "mat4.h"
 #include "mesh.h"
 #include "shader.h"
+#include "threadpool.h"
 #include "vec2.h"
 #include "vec3.h"
 #include "window.h"
@@ -18,11 +19,38 @@ constexpr auto window_height = 600;
 
 Camera camera(Vec3(0, 0, 3), window_width / 2.0f, window_height / 2.0f);
 
+ECS ecs;
 EntityArray entities;
-ComponentArray<Mesh> mesh_components;
-ComponentArray<Vec3> translation_components;
+ComponentArray<MeshComponent> mesh_components;
+ComponentArray<TransformationComponent> tranform_components;
+
+class DrawSystem : public Task {
+ public:
+  DrawSystem(ComponentArray<MeshComponent> *arr) : mp_arr(arr) {}
+
+  int id() const override { return MeshComponent::component_id; }
+
+  void process() override {
+    for (auto &component : *mp_arr) {
+      Mesh *mesh = &component.m_mesh;
+      if (!mesh->loaded()) {
+        mesh->load("assets/models/cyborg/cyborg.obj");
+        mesh->gen_buffers();
+      }
+      mesh->draw();
+    }
+  };
+
+ private:
+  ComponentArray<MeshComponent> *mp_arr;
+};
+
+DrawSystem draw_sys(&mesh_components);
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
+  ecs.register_component(&mesh_components);
+  ecs.register_system(&draw_sys);
+
   Window window(window_width, window_height, "xengine");
   Input input(&window);
 
@@ -34,15 +62,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
   // entity
   entity_id id = entities.create();
   mesh_components.assign(id);
-  translation_components.assign(id);
+  tranform_components.assign(id);
+  tranform_components.set(id, {Vec3(0, 0, 0), Mat4(1)});
 
-  translation_components.set(id, Vec3(0, 0, 0));
-
-  Mat4 model_matrix = lin::translate(Mat4(1), *translation_components.get(id));
+  Mat4 model_matrix =
+      lin::translate(Mat4(1), tranform_components.get(id)->m_position);
   model_matrix = lin::rotate(model_matrix, Vec3(1, 0.8, 0), lin::radians(-55));
-
-  mesh_components.get(id)->load("assets/models/cyborg/cyborg.obj");
-  mesh_components.get(id)->gen_buffers();
 
   shader.use();
   shader.set_uniform("projection", &projection_matrix);
@@ -69,7 +94,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
     shader.set_uniform("light_color", &light_color);
     shader.set_uniform("obj_color", &object_color);
 
-    mesh_components.get(id)->draw();
+    // mesh_components.get(id)->draw();
+    ecs.update();
 
     window.swap_buffers();
     window.poll_events();
