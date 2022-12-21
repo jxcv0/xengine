@@ -25,3 +25,9 @@ TEST(vec2tests, copy_construction) {
   ASSERT_FLOAT_EQ(other.y(), 0.833f);
   ASSERT_EQ(vec, other);
 }
+
+TEST(vec2tests, diff) {
+  Vec2 first(1, 2);
+  Vec2 second(4, 5);
+  ASSERT_EQ(first - second, Vec2(-3, -3));
+}

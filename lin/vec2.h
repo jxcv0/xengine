@@ -2,7 +2,6 @@
 #define VEC2_H_
 
 #include <cmath>
-#include <initializer_list>
 #include <ostream>
 
 /**
@@ -40,6 +39,16 @@ class Vec2 {
   }
 
   /**
+   * @breif Subtract a vec2 from this one.
+   *
+   * @param other The other Vec2.
+   * @return The difference between this and the other Vec2.
+   */
+  constexpr inline auto operator-(const Vec2& other) const noexcept {
+    return Vec2(m_data[0] - other.m_data[0], m_data[1] - other.m_data[1]);
+  }
+
+  /**
    * @brief Get the x component of the Vec2
    *
    * @return A floating point value.
@@ -53,6 +62,8 @@ class Vec2 {
    */
   constexpr inline auto y() const noexcept { return m_data[1]; }
 
+  /**
+   */
   friend std::ostream &operator<<(std::ostream &os, const Vec2 &v) {
     os << "{ " << v.m_data[0] << ", " << v.m_data[1] << " }";
     return os;
@@ -63,7 +74,7 @@ class Vec2 {
    *
    * @return A const pointer to the underlying array.
    */
-  const constexpr inline auto value_ptr() const noexcept { return &m_data[0]; }
+  constexpr inline auto value_ptr() const noexcept { return &m_data[0]; }
 
  private:
   float m_data[2] = {0};
