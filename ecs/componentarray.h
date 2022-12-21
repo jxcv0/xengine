@@ -6,8 +6,10 @@
 #include "constants.h"
 
 class ComponentArrayBase {
-  virtual int component_id() const noexcept;
-  virtual int size() const noexcept;
+ public:
+  virtual ~ComponentArrayBase() {}
+  virtual int component_id() const noexcept = 0;
+  virtual int size() const noexcept = 0;
 };
 
 /**
@@ -16,6 +18,7 @@ class ComponentArrayBase {
  */
 template <typename ComponentType>
 class ComponentArray : public ComponentArrayBase {
+ public:
   /**
    * @breif Component Array iterator.
    */
@@ -50,13 +53,15 @@ class ComponentArray : public ComponentArrayBase {
     ComponentType *m_ptr;
   };
 
- public:
+  virtual ~ComponentArray(){};
   /**
    * @brief Get the unique id of the component.
    *
    * @return The integer id of the component type.
    */
-  int component_id() const noexcept override { return ComponentType::component_id; }
+  int component_id() const noexcept override {
+    return ComponentType::component_id;
+  }
 
   /**
    * @brief Register an entity id with the array. If successful, the id can be
