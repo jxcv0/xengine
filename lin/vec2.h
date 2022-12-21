@@ -49,6 +49,16 @@ class Vec2 {
   }
 
   /**
+   * @brief Multiply the vector by a scalar.
+   *
+   * @param scalar The scalar.
+   */
+  constexpr inline void operator*=(const float scalar) noexcept {
+    m_data[0] *= scalar;
+    m_data[1] *= scalar;
+  }
+
+  /**
    * @breif Subtract a vec2 from this one.
    *
    * @param other The other Vec2.

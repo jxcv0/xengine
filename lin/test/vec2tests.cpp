@@ -31,3 +31,8 @@ TEST(vec2tests, diff) {
   Vec2 second(4, 5);
   ASSERT_EQ(first - second, Vec2(-3, -3));
 }
+
+TEST(vec2tests, scalar) {
+  Vec2 v(1, 2);
+  ASSERT_EQ(v * 2, Vec2(2, 4));
+}

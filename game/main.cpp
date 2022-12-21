@@ -15,8 +15,6 @@
 #include "vec3.h"
 #include "window.h"
 
-void on_mouse(GLFWwindow *window, double x, double y);
-
 constexpr auto window_width = 1080;
 constexpr auto window_height = 600;
 
@@ -53,10 +51,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
   Vec3 light_pos(1, 1, 1);
   Vec3 light_color(1, 1, 1);
   Vec3 object_color(1, 0.5, 0.31);
-  Vec2 last_cursor_pos(last_x, last_y);
+  Vec2 mouse_pos;
 
   while (!window.should_close()) {
-    cursor_pos = window.cursor_position();
+    mouse_pos = window.cursor_position();
+    camera.process_mouse_movement(&mouse_pos);
     window.clear_buffers();
     glClearColor(0.2, 0.3, 0.3, 1);
 
@@ -77,10 +76,4 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
   }
 
   return 0;
-}
-
-void on_mouse([[maybe_unused]] GLFWwindow *window, double x, double y) {
-  auto x_pos = static_cast<float>(x);
-  auto y_pos = static_cast<float>(y);
-  camera.process_mouse_movement(x_offset, y_offset);
 }

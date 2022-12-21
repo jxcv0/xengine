@@ -14,7 +14,7 @@ constexpr Vec3 GLOBAL_UP(0, 1, 0);
 class Camera {
  public:
   Camera(Vec3 start_pos, float mouse_start_x, float mouse_start_y)
-      : m_pos(start_pos) {}
+      : m_pos(start_pos), m_last_mouse_pos(mouse_start_x, mouse_start_y) {}
 
   /**
    * @brief Calculate a view matrix based on camera position.
@@ -30,7 +30,7 @@ class Camera {
    * @param y_offset Mouse movement offset in y.
    */
   void process_mouse_movement(const Vec2 *mouse_pos) {
-    if (m_first_movement) {
+    if (m_first_mouse_movement) {
       m_last_mouse_pos = *mouse_pos;
       m_first_mouse_movement = false;
     }
@@ -38,10 +38,10 @@ class Camera {
                 m_last_mouse_pos.y() - mouse_pos->y());
     m_last_mouse_pos = *mouse_pos;
 
-    x_offset *= m_mouse_sensetivity;
-    y_offset *= m_mouse_sensetivity;
-    m_yaw += x_offset;
-    m_pitch += y_offset;
+    offset *= m_mouse_sensetivity;
+
+    m_yaw += offset.x();
+    m_pitch += offset.y();
 
     if (m_pitch > 89.0f) {
       m_pitch = 89.0f;
@@ -49,10 +49,11 @@ class Camera {
       m_pitch = -89.0f;
     }
 
-    Vec3 temp_view(
-        std::cos(lin::radians(m_yaw)) * std::cos(lin::radians(m_pitch)),
-        std::sin(lin::radians(m_pitch)),
-        std::sin(lin::radians(m_yaw)) * std::cos(lin::radians(m_pitch)));
+    float yaw = lin::radians(m_yaw);
+    float pitch = lin::radians(m_pitch);
+
+    Vec3 temp_view(std::cos(yaw) * std::cos(pitch), std::sin(pitch),
+                   std::sin(yaw) * std::cos(pitch));
 
     m_view_dir = temp_view.normalize();
     m_right = (m_view_dir * GLOBAL_UP).normalize();
