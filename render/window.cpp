@@ -1,7 +1,10 @@
 #include "window.h"
 
+#include <GLFW/glfw3.h>
+
 #include "checkerr.h"
 #include "lin.h"
+#include "vec2.h"
 
 /**
  * ----------------------------------------------------------------------------
@@ -90,6 +93,17 @@ void Window::set_bg(float r, float g, float b, float a) {
  */
 void Window::clear_buffers() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+Vec2 Window::cursor_position() const noexcept {
+  double x_temp, y_temp;
+  glfwGetCursorPos(mp_window, &x_temp, &y_temp);
+  float x = static_cast<float>(x_temp);
+  float y = static_cast<float>(y_temp);
+  return Vec2(x, y);
 }
 
 /**

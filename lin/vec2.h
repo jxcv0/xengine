@@ -39,12 +39,22 @@ class Vec2 {
   }
 
   /**
+   * @brief Multiply the vector by a scalar.
+   *
+   * @param scalar The scalar.
+   * @return A new Vec2 scaled by the scalar.
+   */
+  constexpr inline Vec2 operator*(const float scalar) const noexcept {
+    return Vec2(m_data[0] * scalar, m_data[1] * scalar);
+  }
+
+  /**
    * @breif Subtract a vec2 from this one.
    *
    * @param other The other Vec2.
    * @return The difference between this and the other Vec2.
    */
-  constexpr inline auto operator-(const Vec2& other) const noexcept {
+  constexpr inline auto operator-(const Vec2 &other) const noexcept {
     return Vec2(m_data[0] - other.m_data[0], m_data[1] - other.m_data[1]);
   }
 

@@ -3,6 +3,7 @@
 
 #include "lin.h"
 #include "mat4.h"
+#include "vec2.h"
 #include "vec3.h"
 
 constexpr Vec3 GLOBAL_UP(0, 1, 0);
@@ -12,7 +13,8 @@ constexpr Vec3 GLOBAL_UP(0, 1, 0);
  */
 class Camera {
  public:
-  Camera() : m_pos(0, 0, 3) {}
+  Camera(Vec3 start_pos, float mouse_start_x, float mouse_start_y)
+      : m_pos(start_pos) {}
 
   /**
    * @brief Calculate a view matrix based on camera position.
@@ -27,7 +29,15 @@ class Camera {
    * @param x_offset Mouse movement offset in x.
    * @param y_offset Mouse movement offset in y.
    */
-  void process_mouse_movement(float x_offset, float y_offset) {
+  void process_mouse_movement(const Vec2 *mouse_pos) {
+    if (m_first_movement) {
+      m_last_mouse_pos = *mouse_pos;
+      m_first_mouse_movement = false;
+    }
+    Vec2 offset(mouse_pos->x() - m_last_mouse_pos.x(),
+                m_last_mouse_pos.y() - mouse_pos->y());
+    m_last_mouse_pos = *mouse_pos;
+
     x_offset *= m_mouse_sensetivity;
     y_offset *= m_mouse_sensetivity;
     m_yaw += x_offset;
@@ -58,6 +68,8 @@ class Camera {
   Vec3 m_view_dir;
   Vec3 m_up;
   Vec3 m_right;
+  bool m_first_mouse_movement;
+  Vec2 m_last_mouse_pos;
 };
 
 #endif  // CAMERA_H_

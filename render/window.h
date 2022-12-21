@@ -4,6 +4,7 @@
 #include <cstdint>
 
 #include "mat4.h"
+#include "vec2.h"
 
 #ifndef GLAD_INCLUDED
 #define GLAD_INCLUDED
@@ -59,14 +60,9 @@ class Window {
   void clear_buffers();
 
   /**
-   * @brief Set the cursor position callback.
-   *
-   * @param f The callback function
+   * @brief Get the cursor position from the window.
    */
-  template <typename F>
-  void set_cursor_position_callback(F f) {
-    glfwSetCursorPosCallback(mp_window, f);
-  }
+  Vec2 cursor_position() const noexcept;
 
   /**
    * @brief Calulate the projection matrix for the window.

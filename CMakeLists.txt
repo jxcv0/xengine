@@ -28,7 +28,7 @@ find_package(assimp REQUIRED)
 
 add_subdirectory(lib/glad)
 add_subdirectory(lib/stb)
-add_subdirectory(example)
+add_subdirectory(game)
 add_subdirectory(threadpool)
 add_subdirectory(memory)
 add_subdirectory(resource)

@@ -38,9 +38,12 @@ class ECS {
 
  private:
   EntityArray m_entities;
+
+  // TODO should these be registerable
   ComponentArray<Mesh> m_meshes;
   ComponentArray<Mat4> m_translations;  // model matrices
   ComponentArray<Shader> m_shaders;
+
   ThreadPool m_threadpool;
   int m_num_systems;
   Task *m_systems[MAX_SYSTEMS];
