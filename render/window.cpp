@@ -98,17 +98,6 @@ void Window::clear_buffers() {
 /**
  * ----------------------------------------------------------------------------
  */
-Vec2 Window::cursor_position() const noexcept {
-  double x_temp, y_temp;
-  glfwGetCursorPos(mp_window, &x_temp, &y_temp);
-  float x = static_cast<float>(x_temp);
-  float y = static_cast<float>(y_temp);
-  return Vec2(x, y);
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
 Mat4 Window::projection_matrix(const float fov) const noexcept {
   return lin::perspective(lin::radians(fov), ((float)m_width / (float)m_height),
                           0.1f, 100.0f);

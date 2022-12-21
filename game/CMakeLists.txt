@@ -3,4 +3,4 @@ project(game VERSION 0.1.0)
 
 add_executable(game main.cpp)
 
-target_link_libraries(game glad render resource ecs)
+target_link_libraries(game glad render input resource ecs)

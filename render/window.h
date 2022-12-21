@@ -17,6 +17,7 @@
  */
 class Window {
  public:
+  friend class Input;
   /**
    * @brief Create and display a window with a width, height and name.
    *        Also initialize OpenGL context and debug logging.
@@ -60,22 +61,14 @@ class Window {
   void clear_buffers();
 
   /**
-   * @brief Get the cursor position from the window.
-   */
-  Vec2 cursor_position() const noexcept;
-
-  /**
    * @brief Calulate the projection matrix for the window.
    */
   Mat4 projection_matrix(const float fov) const noexcept;
-
-  void update_input() {}
 
  private:
   float m_width;
   float m_height;
   GLFWwindow *mp_window;
-  int m_input_buffer;
 };
 
 #endif  // MAINWINDOW_H_

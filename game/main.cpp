@@ -1,12 +1,10 @@
 #include <math.h>
 
-#include <iostream>
-#include <type_traits>
-
 #include "camera.h"
 #include "checkerr.h"
 #include "componentarray.h"
 #include "entityarray.h"
+#include "input.h"
 #include "lin.h"
 #include "mat4.h"
 #include "mesh.h"
@@ -26,6 +24,7 @@ ComponentArray<Vec3> translation_components;
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
   Window window(window_width, window_height, "xengine");
+  Input input(&window);
 
   auto shader =
       ShaderUtils::load("render/glsl/uber.vert", "render/glsl/uber.frag");
@@ -54,8 +53,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
   Vec2 mouse_pos;
 
   while (!window.should_close()) {
-    mouse_pos = window.cursor_position();
+    mouse_pos = input.poll_cursor_pos();
     camera.process_mouse_movement(&mouse_pos);
+
     window.clear_buffers();
     glClearColor(0.2, 0.3, 0.3, 1);
 
