@@ -19,41 +19,11 @@ class ComponentArrayBase {
 template <typename ComponentType>
 class ComponentArray : public ComponentArrayBase {
  public:
-  /**
-   * @breif Component Array iterator.
-   */
-  class Iterator {
-   public:
-    Iterator(ComponentType *p) : m_ptr(p) {}
 
-    constexpr friend bool operator==(const Iterator &it1, const Iterator &it2) {
-      return it1.m_ptr == it2.m_ptr;
-    }
-
-    constexpr friend bool operator!=(const Iterator &it1, const Iterator &it2) {
-      return it1.m_ptr != it2.m_ptr;
-    }
-
-    constexpr inline ComponentType operator->() { return m_ptr; }
-
-    constexpr inline ComponentType &operator*() { return *m_ptr; }
-
-    constexpr Iterator &operator++() {
-      m_ptr += sizeof(ComponentType);
-      return *this;
-    }
-
-    constexpr Iterator operator++(int) {
-      Iterator &temp = *this;
-      operator++();
-      return temp;
-    }
-
-   private:
-    ComponentType *m_ptr;
-  };
+  ComponentArray() : m_num_components(0) {}
 
   virtual ~ComponentArray(){};
+
   /**
    * @brief Get the unique id of the component.
    *
@@ -137,9 +107,9 @@ class ComponentArray : public ComponentArrayBase {
    */
   int size() const noexcept override { return m_num_components; }
 
-  Iterator begin() { return Iterator(&m_components[0]); }
-
-  Iterator end() { return Iterator(&m_components[m_num_components]); }
+  ComponentType *operator[](int i) {
+    return m_components[i];
+  }
 
  private:
   int id_to_index(const entity_id id) {
@@ -155,7 +125,7 @@ class ComponentArray : public ComponentArrayBase {
     return (id < MAX_ENTITIES && id > 0);
   }
 
-  int m_num_components = 0;
+  int m_num_components;
   int m_entity_ids[MAX_ENTITIES];
   ComponentType m_components[MAX_ENTITIES];
 };

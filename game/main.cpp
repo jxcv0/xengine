@@ -24,6 +24,7 @@ EntityArray entities;
 ComponentArray<MeshComponent> mesh_components;
 ComponentArray<TransformationComponent> tranform_components;
 
+// *** this should be done in dedicated render thread
 class DrawSystem : public Task {
  public:
   DrawSystem(ComponentArray<MeshComponent> *arr) : mp_arr(arr) {}

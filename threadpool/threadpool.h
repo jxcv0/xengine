@@ -52,6 +52,7 @@ class ThreadPool {
       m_cv.notify_all();
       thread.join();
     }
+    wait();
   }
 
   /**
