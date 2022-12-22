@@ -1,11 +1,7 @@
 #ifndef ENTITY_H_
 #define ENTITY_H_
 
-#include <array>
-#include <cassert>
-#include <cstdint>
 #include <queue>
-#include <stdexcept>
 
 #include "constants.h"
 

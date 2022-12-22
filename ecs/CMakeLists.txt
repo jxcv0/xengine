@@ -9,7 +9,6 @@ set(
   HEADERS
     constants.h
     entityarray.h
-    components.h
     componentarray.h
     archetype.h
     archetypearray.h

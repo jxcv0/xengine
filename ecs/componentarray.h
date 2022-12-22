@@ -1,34 +1,23 @@
 #ifndef COMPONENTARRAY_H_
 #define COMPONENTARRAY_H_
 
-#include <cstdint>
-
 #include "constants.h"
-
-class ComponentArrayBase {
- public:
-  virtual ~ComponentArrayBase() {}
-  virtual int component_id() const = 0;
-  virtual int size() const = 0;
-};
 
 /**
  * @brief Contiguous storage for components accessed by entity id. For
  * simplicity, entities may have only entry in the array.
  */
 template <typename ComponentType>
-class ComponentArray : public ComponentArrayBase {
+class ComponentArray {
  public:
   ComponentArray() : m_num_components(0) {}
-
-  virtual ~ComponentArray(){};
 
   /**
    * @brief Get the unique id of the component.
    *
    * @return The integer id of the component type.
    */
-  int component_id() const override { return ComponentType::component_id; }
+  int component_id() const { return ComponentType::component_id; }
 
   /**
    * @brief Register an entity id with the array. If successful, the id can be
@@ -102,7 +91,7 @@ class ComponentArray : public ComponentArrayBase {
    *
    * @return The number of components in the array.
    */
-  int size() const override { return m_num_components; }
+  int size() const { return m_num_components; }
 
   /**
    * @brief Access components by index instead of entity.

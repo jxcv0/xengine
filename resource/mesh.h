@@ -24,6 +24,7 @@ class Mesh {
   /**
    * @brief Component id
    */
+  const static int component_id = (1 << 0);
 
   /**
    * @brief Load mesh data from an obj file.

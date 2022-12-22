@@ -1,53 +1,23 @@
 #include <gtest/gtest.h>
-#include <threadpool.h>
+#include <pthread.h>
 
-#include <future>
+#include "threadpool.h"
 
-class Add : public Task {
- public:
-  Add(int a, int b) : m_a(a), m_b(b) {}
+pthread_mutex_t lock;
+int counter = 0;
 
-  void process() override { m_result.set_value(m_a + m_b); }
+void add_one(void *arg) {
+  pthread_mutex_lock(&lock);
+  int *c = static_cast<int *>(arg);
+  *c = *c + 1;
+  pthread_mutex_unlock(&lock);
+}
 
-  int id() override { return 0; }
-
-  auto get_future() { return m_result.get_future(); }
-
- private:
-  int m_a;
-  int m_b;
-  std::promise<int> m_result;
-};
-
-TEST(threadpooltests, threadpool) {
-  ThreadPool tp(4);
-
-  Add add1(1, 31);
-  Add add2(2, 31);
-  Add add3(3, 31);
-  Add add4(4, 31);
-  Add add5(5, 31);
-  Add add6(6, 31);
-
-  tp.schedule_task(&add1);
-  tp.schedule_task(&add2);
-  tp.schedule_task(&add3);
-  tp.schedule_task(&add4);
-  tp.schedule_task(&add5);
-  tp.schedule_task(&add6);
-
-  auto result = add1.get_future();
-  ASSERT_EQ(result.get(), 32);
-  result = add2.get_future();
-  ASSERT_EQ(result.get(), 33);
-  result = add3.get_future();
-  ASSERT_EQ(result.get(), 34);
-  result = add4.get_future();
-  ASSERT_EQ(result.get(), 35);
-  result = add5.get_future();
-  ASSERT_EQ(result.get(), 36);
-  result = add6.get_future();
-  ASSERT_EQ(result.get(), 37);
-
-  tp.wait();
+TEST(threadpooltests, test) {
+  threadpool::init();
+  for (int i = 0; i < 1000; i++) {
+    threadpool::schedule_task(add_one, &counter);
+  }
+  threadpool::stop();
+  ASSERT_EQ(counter, 1000);
 }

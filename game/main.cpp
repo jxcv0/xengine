@@ -1,7 +1,6 @@
 #include "camera.h"
 #include "checkerr.h"
 #include "componentarray.h"
-#include "components.h"
 #include "entityarray.h"
 #include "input.h"
 #include "lin.h"
@@ -18,9 +17,15 @@ constexpr auto window_height = 600;
 
 Camera camera(Vec3(0, 0, 3), window_width / 2.0f, window_height / 2.0f);
 
+struct Transform {
+  static const int component_id = (1 << 1);
+  Vec3 m_pos;
+  Mat4 m_matrix;
+};
+
 EntityArray entities;
-ComponentArray<MeshComponent> mesh_components;
-ComponentArray<TransformationComponent> tranform_components;
+ComponentArray<Mesh> mesh_components;
+ComponentArray<Transform> tranform_components;
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
   Window window(window_width, window_height, "xengine");
@@ -35,13 +40,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
   entity_id id = entities.create();
   mesh_components.assign(id);
   tranform_components.assign(id);
-  tranform_components.set(id, {Vec3(0, 0, 0), Mat4(1)});
+  tranform_components.get(id)->m_matrix = Mat4(1);
+  tranform_components.get(id)->m_pos = Vec3(0, 0, 3);
 
-  mesh_components.get(id)->m_mesh.load("assets/models/cube/cube.obj");
-  mesh_components.get(id)->m_mesh.gen_buffers();
+  mesh_components.get(id)->load("assets/models/cube/cube.obj");
+  mesh_components.get(id)->gen_buffers();
 
   Mat4 model_matrix =
-      lin::translate(Mat4(1), tranform_components.get(id)->m_position);
+      lin::translate(Mat4(1), tranform_components.get(id)->m_pos);
   model_matrix = lin::rotate(model_matrix, Vec3(1, 0.8, 0), lin::radians(-55));
 
   shader.use();
@@ -70,7 +76,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
     shader.set_uniform("obj_color", &object_color);
 
     // mesh_components.get(id)->draw();
-    mesh_components.get(id)->m_mesh.draw();
+    mesh_components.get(id)->draw();
 
     window.swap_buffers();
     window.poll_events();
