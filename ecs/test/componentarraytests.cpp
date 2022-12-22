@@ -1,11 +1,10 @@
 #include <gtest/gtest.h>
 
-#include <cmath>
-
 #include "componentarray.h"
 #include "constants.h"
 
 struct Component {
+  static const int component_id = 12;
   int m_id = 0;
   float m_constant = 0;
 };

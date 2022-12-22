@@ -8,8 +8,8 @@
 class ComponentArrayBase {
  public:
   virtual ~ComponentArrayBase() {}
-  virtual int component_id() const noexcept = 0;
-  virtual int size() const noexcept = 0;
+  virtual int component_id() const = 0;
+  virtual int size() const = 0;
 };
 
 /**
@@ -19,7 +19,6 @@ class ComponentArrayBase {
 template <typename ComponentType>
 class ComponentArray : public ComponentArrayBase {
  public:
-
   ComponentArray() : m_num_components(0) {}
 
   virtual ~ComponentArray(){};
@@ -29,9 +28,7 @@ class ComponentArray : public ComponentArrayBase {
    *
    * @return The integer id of the component type.
    */
-  int component_id() const noexcept override {
-    return ComponentType::component_id;
-  }
+  int component_id() const override { return ComponentType::component_id; }
 
   /**
    * @brief Register an entity id with the array. If successful, the id can be
@@ -40,7 +37,7 @@ class ComponentArray : public ComponentArrayBase {
    * @param id The entity id to register.
    * @return 0 on success, -1 on failure.
    */
-  constexpr int assign(const entity_id id) noexcept {
+  constexpr int assign(const entity_id id) {
     if (id_is_valid(id) && m_num_components != MAX_ENTITIES &&
         id_to_index(id) == -1) {
       m_entity_ids[m_num_components++] = id;
@@ -55,7 +52,7 @@ class ComponentArray : public ComponentArrayBase {
    *
    * @param id The entity id to erase.
    */
-  constexpr void erase(const entity_id id) noexcept {
+  constexpr void erase(const entity_id id) {
     int index_to_delete = id_to_index(id);
     if (id_is_valid(id) && m_num_components != 0 && index_to_delete != -1) {
       int last_id = m_entity_ids[m_num_components - 1];
@@ -75,7 +72,7 @@ class ComponentArray : public ComponentArrayBase {
    * @param id The entity id.
    * @return If successful, a pointer to the component. Otherwise nullptr.
    */
-  constexpr ComponentType *get(const entity_id id) noexcept {
+  constexpr ComponentType *get(const entity_id id) {
     int index = id_to_index(id);
     if (index != -1) {
       return &m_components[index];
@@ -90,7 +87,7 @@ class ComponentArray : public ComponentArrayBase {
    * @param c The new component value.
    * @return 0 on success, -1 on failure.
    */
-  constexpr int set(const entity_id id, ComponentType c) noexcept {
+  constexpr int set(const entity_id id, ComponentType c) {
     if (id_is_valid(id) && m_num_components != MAX_COMPONENTS &&
         id_to_index(id) != -1) {
       int index = id_to_index(id);
@@ -105,11 +102,23 @@ class ComponentArray : public ComponentArrayBase {
    *
    * @return The number of components in the array.
    */
-  int size() const noexcept override { return m_num_components; }
+  int size() const override { return m_num_components; }
 
-  ComponentType *operator[](int i) {
-    return m_components[i];
-  }
+  /**
+   * @brief Access components by index instead of entity.
+   *
+   * @param i The index.
+   * @return A copy of the data at index i.
+   */
+  ComponentType operator[](int i) const { return m_components[i]; }
+
+  /**
+   * @brief Access components by index instead of entity.
+   *
+   * @param i The index.
+   * @return A referemce to the data at index i.
+   */
+  ComponentType &operator[](int i) { return m_components[i]; }
 
  private:
   int id_to_index(const entity_id id) {

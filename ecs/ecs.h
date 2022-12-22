@@ -1,8 +1,6 @@
 #ifndef ECS_H_
 #define ECS_H_
 
-#include <cassert>
-
 #include "componentarray.h"
 #include "constants.h"
 #include "entityarray.h"
@@ -32,7 +30,7 @@ class ECS {
     for (int i = 0; i < m_num_systems; i++) {
       m_threadpool.schedule_task(m_systems[i]);
     }
-    m_threadpool.wait(); // TODO a smarter way of coordinating
+    m_threadpool.wait();  // TODO a smarter way of coordinating
   }
 
   template <typename ComponentType>
