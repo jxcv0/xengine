@@ -2,7 +2,6 @@
 #include "checkerr.h"
 #include "componentarray.h"
 #include "components.h"
-#include "ecs.h"
 #include "entityarray.h"
 #include "input.h"
 #include "lin.h"
@@ -19,39 +18,11 @@ constexpr auto window_height = 600;
 
 Camera camera(Vec3(0, 0, 3), window_width / 2.0f, window_height / 2.0f);
 
-ECS ecs;
 EntityArray entities;
 ComponentArray<MeshComponent> mesh_components;
 ComponentArray<TransformationComponent> tranform_components;
 
-// *** this should be done in dedicated render thread
-class DrawSystem : public Task {
- public:
-  DrawSystem(ComponentArray<MeshComponent> *arr) : mp_arr(arr) {}
-
-  int id() const override { return MeshComponent::component_id; }
-
-  void process() override {
-    for (auto &component : *mp_arr) {
-      Mesh *mesh = &component.m_mesh;
-      if (!mesh->loaded()) {
-        mesh->load("assets/models/cyborg/cyborg.obj");
-        mesh->gen_buffers();
-      }
-      mesh->draw();
-    }
-  };
-
- private:
-  ComponentArray<MeshComponent> *mp_arr;
-};
-
-DrawSystem draw_sys(&mesh_components);
-
 int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
-  ecs.register_component(&mesh_components);
-  ecs.register_system(&draw_sys);
-
   Window window(window_width, window_height, "xengine");
   Input input(&window);
 
@@ -65,6 +36,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
   mesh_components.assign(id);
   tranform_components.assign(id);
   tranform_components.set(id, {Vec3(0, 0, 0), Mat4(1)});
+
+  mesh_components.get(id)->m_mesh.load("assets/models/cube/cube.obj");
+  mesh_components.get(id)->m_mesh.gen_buffers();
 
   Mat4 model_matrix =
       lin::translate(Mat4(1), tranform_components.get(id)->m_position);
@@ -96,7 +70,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
     shader.set_uniform("obj_color", &object_color);
 
     // mesh_components.get(id)->draw();
-    ecs.update();
+    mesh_components.get(id)->m_mesh.draw();
 
     window.swap_buffers();
     window.poll_events();
