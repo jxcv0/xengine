@@ -4,7 +4,7 @@
 #define TASK_BUFFER_SIZE 32
 #define NUM_THREADS 6
 
-typedef void (*task_fp)(void *);
+typedef void (*task_fp)(void);
 
 namespace threadpool {
 /**
@@ -19,10 +19,8 @@ void stop();
 
 /**
  * @breif Schedule a task to be completed in another thread.
- *
- * @param task_fp The task to schedule.
  */
-void schedule_task(task_fp fp, void *arg);
+void schedule_task(task_fp fp);
 
 }  // namespace threadpool
 

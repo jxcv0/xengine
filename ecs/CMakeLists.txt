@@ -3,6 +3,7 @@ project(ecs)
 
 set(
   SOURCES
+    tasks.cpp
 )
 
 set(
@@ -10,11 +11,13 @@ set(
     constants.h
     entityarray.h
     componentarray.h
+    components.h
+    tasks.h
 )
 
 add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PUBLIC .)
 set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
-target_link_libraries(ecs threadpool lin resource render)
+target_link_libraries(ecs threadpool lin resource render input)
 
 add_subdirectory(test)
