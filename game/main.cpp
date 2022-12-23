@@ -41,10 +41,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
   mesh_components.assign(id);
   tranform_components.assign(id);
   tranform_components.get(id)->m_matrix = Mat4(1);
-  tranform_components.get(id)->m_pos = Vec3(0, 0, 3);
+  tranform_components.get(id)->m_pos = Vec3(0, 0, 0);
 
-  mesh_components.get(id)->load("assets/models/cube/cube.obj");
-  mesh_components.get(id)->gen_buffers();
+  mesh_components.set(id, load_mesh("assets/models/cube/cube.obj"));
+  gen_mesh_buffers(mesh_components.get(id));
 
   Mat4 model_matrix =
       lin::translate(Mat4(1), tranform_components.get(id)->m_pos);
@@ -76,7 +76,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
     shader.set_uniform("obj_color", &object_color);
 
     // mesh_components.get(id)->draw();
-    mesh_components.get(id)->draw();
+    draw_mesh(mesh_components.get(id));
 
     window.swap_buffers();
     window.poll_events();

@@ -144,6 +144,7 @@ Mesh load_mesh(const char *filepath) {
   }
 
   // TODO a fast way of detecting duplicate indices for ebo
+  // TODO collect data on how big these files usually are
   mesh.mp_vertices = new Mesh::Vertex[mesh.m_num_vertices];
 
   for (unsigned int i = 0; i < mesh.m_num_vertices; i++) {

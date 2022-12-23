@@ -1,11 +1,6 @@
 #ifndef MESH_H_
 #define MESH_H_
 
-#include <cstdint>
-#include <cstdlib>
-#include <cstring>
-#include <filesystem>
-
 #include "vec2.h"
 #include "vec3.h"
 
@@ -67,6 +62,6 @@ void gen_mesh_buffers(Mesh *mesh);
 /**
  * @brief Render primitives from array data.
  */
-void draw_mesh(Mesh &mesh);
+void draw_mesh(Mesh *mesh);
 
 #endif  // MESH_H_
