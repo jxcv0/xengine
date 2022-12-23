@@ -30,7 +30,7 @@ class MmapFile {
    *
    * @param filepath The filepath to the file to open.
    */
-  MmapFile(const std::filesystem::path& filepath) noexcept;
+  MmapFile(const char* filepath) noexcept;
 
   /**
    * @brief Destructor. Unmap the memory address.

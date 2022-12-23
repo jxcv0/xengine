@@ -13,54 +13,18 @@
  * @brief Stored mesh data. This class is used to load and
  *        unload from a file.
  */
-class Mesh {
+struct Mesh {
+  /**
+   * @brief Component id
+   */
+  const static int component_id = (1 << 0);
+
   struct Vertex {
     Vec3 m_position;
     Vec3 m_normal;
     Vec2 m_tex_coord;
   };
 
- public:
-  /**
-   * @brief Component id
-   */
-  const static int component_id = (1 << 0);
-
-  /**
-   * @brief Load mesh data from an obj file.
-   *
-   * @param filepath The filepath to load data from.
-   */
-  void load(const std::filesystem::path &filepath);
-
-  /**
-   * @brief Unload the memory used by the Mesh.
-   */
-  void unload() {
-    delete[] mp_vertices;
-    mp_vertices = nullptr;
-  }
-
-  /**
-   * @brief Check if the Mesh is currently storing data.
-   *
-   * @return bool true if this Mesh points to usable memory.
-   */
-  bool loaded() const noexcept { return mp_vertices != nullptr; }
-
-  /**
-   * @brief Generate gl buffers for this mesh.
-   */
-  void gen_buffers();
-
-  /**
-   * @brief Render primitives from array data.
-   */
-  void draw();
-
-#ifndef MESH_GTEST
- private:
-#endif
   struct Index {
     unsigned int m_position_idx;
     unsigned int m_tex_coord_idx;
@@ -73,15 +37,36 @@ class Mesh {
     }
   };
 
-  Vec3 parse_vec3(const std::string_view &sv);
-  Vec2 parse_vec2(const std::string_view &sv);
-  Index parse_index(const std::string_view &sv);
-
+  // TODO Move these to other component. along with draw func
   unsigned int m_vbo;
   unsigned int m_vao;
-  // unsigned int m_ebo; // TODO worth it?
   unsigned int m_num_vertices = 0;
   Vertex *mp_vertices = nullptr;
 };
+
+/**
+ * @brief Load mesh data from an obj file.
+ *
+ * @param filepath The filepath to load data from.
+ */
+Mesh load_mesh(const char *filepath);
+
+/**
+ * @brief Unload the memory used by the Mesh.
+ */
+void unload_mesh(Mesh *mesh) {
+  delete[] mesh->mp_vertices;
+  mesh->mp_vertices = nullptr;
+}
+
+/**
+ * @brief Generate gl buffers for this mesh.
+ */
+void gen_mesh_buffers(Mesh *mesh);
+
+/**
+ * @brief Render primitives from array data.
+ */
+void draw_mesh(Mesh &mesh);
 
 #endif  // MESH_H_

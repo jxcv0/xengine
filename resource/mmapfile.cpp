@@ -1,8 +1,8 @@
 #include "mmapfile.h"
 
-MmapFile::MmapFile(const std::filesystem::path& filepath) noexcept {
+MmapFile::MmapFile(const char *filepath) noexcept {
   mp_addr = nullptr;
-  auto fd = open(filepath.c_str(), O_RDWR);
+  auto fd = open(filepath, O_RDWR);
   // if (fd == -1) { return; }
   m_len = lseek(fd, 0, SEEK_END);
   lseek(fd, 0, SEEK_SET);
