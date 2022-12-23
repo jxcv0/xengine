@@ -17,15 +17,14 @@ constexpr auto window_height = 600;
 
 Camera camera(Vec3(0, 0, 3), window_width / 2.0f, window_height / 2.0f);
 
-struct Transform {
+struct Position {
   static const int component_id = (1 << 1);
   Vec3 m_pos;
-  Mat4 m_matrix;
 };
 
 EntityArray entities;
 ComponentArray<Mesh> mesh_components;
-ComponentArray<Transform> tranform_components;
+ComponentArray<Position> tranform_components;
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
   Window window(window_width, window_height, "xengine");
@@ -40,7 +39,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
   entity_id id = entities.create();
   mesh_components.assign(id);
   tranform_components.assign(id);
-  tranform_components.get(id)->m_matrix = Mat4(1);
   tranform_components.get(id)->m_pos = Vec3(0, 0, 0);
 
   mesh_components.set(id, load_mesh("assets/models/cube/cube.obj"));
@@ -48,7 +46,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
 
   Mat4 model_matrix =
       lin::translate(Mat4(1), tranform_components.get(id)->m_pos);
-  model_matrix = lin::rotate(model_matrix, Vec3(1, 0.8, 0), lin::radians(-55));
 
   shader.use();
   shader.set_uniform("projection", &projection_matrix);

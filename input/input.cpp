@@ -1,10 +1,11 @@
 #include "input.h"
 
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
+
 #include "vec2.h"
 
-bool Input::poll_key(const int key, const int state) const noexcept {
-  return (glfwGetKey(mp_window, key) == state);
-};
+int Input::poll_key(const int key) const { return glfwGetKey(mp_window, key); };
 
 Vec2 Input::poll_cursor_pos() const noexcept {
   double x_temp, y_temp;

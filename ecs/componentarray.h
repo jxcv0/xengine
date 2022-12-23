@@ -110,6 +110,7 @@ class ComponentArray {
   ComponentType &operator[](int i) { return m_components[i]; }
 
  private:
+  // TODO is non linear faster
   int id_to_index(const entity_id id) {
     for (int i = 0; i < m_num_components; i++) {
       if (m_entity_ids[i] == id) {

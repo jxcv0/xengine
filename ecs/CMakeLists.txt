@@ -10,9 +10,6 @@ set(
     constants.h
     entityarray.h
     componentarray.h
-    archetype.h
-    archetypearray.h
-    ecs.h
 )
 
 add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})

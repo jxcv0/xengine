@@ -1,9 +1,6 @@
 #ifndef INPUT_H_
 #define INPUT_H_
 
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-
 #include "vec2.h"
 #include "window.h"
 
@@ -30,11 +27,9 @@ class Input {
    * @brief get the last state of a key.
    *
    * @param key The key.
-   * @param state The state.
-   * @return true if the last state of the key is the same as state, otherwise
-   * false.
+   * @return The last state of the key
    */
-  bool poll_key(const int key, const int state) const noexcept;
+  int poll_key(const int key) const;
 
  private:
   GLFWwindow *mp_window;
