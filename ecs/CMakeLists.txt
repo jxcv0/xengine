@@ -3,7 +3,6 @@ project(ecs)
 
 set(
   SOURCES
-    tasks.cpp
 )
 
 set(
@@ -11,8 +10,6 @@ set(
     constants.h
     entityarray.h
     componentarray.h
-    components.h
-    tasks.h
 )
 
 add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})

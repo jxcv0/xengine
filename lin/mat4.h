@@ -1,7 +1,6 @@
 #ifndef MAT4_H_
 #define MAT4_H_
 
-#include <cassert>
 #include <cmath>
 #include <initializer_list>
 #include <iostream>
@@ -14,7 +13,12 @@
  */
 class Mat4 {
  public:
-  Mat4() = default;
+  constexpr inline Mat4() noexcept {
+    m_data[0][0] = 1;
+    m_data[1][1] = 1;
+    m_data[2][2] = 1;
+    m_data[3][3] = 1;
+  }
 
   /**
    * @brief Construct a matrix with a value in the identity positihons.
@@ -84,7 +88,6 @@ class Mat4 {
    * @return The column at index i.
    */
   constexpr inline Vec4 col(std::size_t i) const noexcept {
-    assert(i < 4);
     return Vec4(m_data[0][i], m_data[1][i], m_data[2][i], m_data[3][i]);
   }
 

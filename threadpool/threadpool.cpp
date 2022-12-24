@@ -21,8 +21,11 @@ struct {
   pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
 } sync;
 
+// struct {
 task_fp tasks[TASK_BUFFER_SIZE];
 int num_tasks = 0;
+// move to sync struct?
+// } task_stack;
 
 /**
  * ----------------------------------------------------------------------------

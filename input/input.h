@@ -5,6 +5,11 @@
 #include "window.h"
 
 /**
+ * @brief Input handler component functions.
+ */
+typedef void(*input_handler_fp)(void);
+
+/**
  * @brief Get input from a window.
  */
 class Input {
