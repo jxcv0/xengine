@@ -2,9 +2,10 @@
 
 #include <GLFW/glfw3.h>
 
+#include <cassert>
+
 #include "checkerr.h"
 #include "lin.h"
-#include <cassert>
 
 /**
  * ----------------------------------------------------------------------------
