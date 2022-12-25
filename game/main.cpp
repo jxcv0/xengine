@@ -11,6 +11,7 @@
 #include "vec2.h"
 #include "vec3.h"
 #include "window.h"
+#include <pthread.h>
 // #include <omp.h>
 
 GLFWwindow *window;
@@ -26,14 +27,16 @@ ComponentArray<Mesh> meshes;
 ComponentArray<Mat4> transformations;
 ComponentArray<input_handler_fp> input_handlers;  // input handler functions
 
-// move the camera with wasd and update mouse input
+// move the fps camera with wasd and update mouse input
 void handle_player_input() {
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-    camera.m_pos += camera.m_view_dir * 0.2f;
+    Vec3 forward = GLOBAL_UP * camera.m_right;
+    camera.m_pos += forward * 0.2f;
   }
 
   if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-    camera.m_pos -= camera.m_view_dir * 0.2f;
+    Vec3 forward = GLOBAL_UP * camera.m_right;
+    camera.m_pos -= forward * 0.2f;
   }
 
   if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
@@ -67,11 +70,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
   glUseProgram(shader);
   set_uniform(shader, "projection", &projection_matrix);
 
-  Vec3 light_pos(1, 1, 1);
+  Vec3 light_pos(2, 3, 2);
   Vec3 light_color(1, 1, 1);
   Vec3 object_color(1, 0.5, 0.31);
 
-  camera.m_pos = Vec3(0, 0, 3);
+  camera.m_pos = Vec3(0, 1.86, 3);
   camera.m_last_mouse_pos = Vec2(window_width / 2.0f, window_height / 2.0f);
 
   while (!glfwWindowShouldClose(window)) {

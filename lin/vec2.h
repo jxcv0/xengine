@@ -1,7 +1,6 @@
 #ifndef VEC2_H_
 #define VEC2_H_
 
-#include <cmath>
 #include <ostream>
 
 /**

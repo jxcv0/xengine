@@ -1,7 +1,6 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <sstream>
