@@ -33,8 +33,7 @@ static inline void check_link(int id) {
 /**
  * ----------------------------------------------------------------------------
  */
-Shader ShaderUtils::load(const std::filesystem::path &vert_path,
-                         const std::filesystem::path &frag_path) {
+shader_id load_shader(const char *vert_path, const char *frag_path) {
   std::ifstream vert_stream(vert_path);
   std::ifstream frag_stream(frag_path);
 
@@ -75,6 +74,5 @@ Shader ShaderUtils::load(const std::filesystem::path &vert_path,
   glDeleteShader(vert_id);
   glDeleteShader(frag_id);
 
-  Shader shader(program_id);
-  return shader;
+  return program_id;
 }
