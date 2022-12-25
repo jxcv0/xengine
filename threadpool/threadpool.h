@@ -18,6 +18,11 @@ void init();
 void stop();
 
 /**
+ * @brief Block untill current tasks are complete.
+ */
+void wait();
+
+/**
  * @breif Schedule a task to be completed in another thread.
  */
 void schedule_task(task_fp fp);

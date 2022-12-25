@@ -1,3 +1,5 @@
+#include <GLFW/glfw3.h>
+
 #include "camera.h"
 #include "checkerr.h"
 #include "componentarray.h"
@@ -29,8 +31,22 @@ void load_meshes() {
   }
 }
 
+// move the camera with wasd
 void handle_player_input() {
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+    camera.m_pos -= camera.m_view_dir * 0.2f;
+  }
+
+  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+    camera.m_pos += camera.m_view_dir * 0.2f;
+  }
+
+  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+    camera.m_pos -= camera.m_right * 0.2f;
+  }
+
+  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+    camera.m_pos += camera.m_right * 0.2f;
   }
 }
 
@@ -66,6 +82,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
   while (!glfwWindowShouldClose(window)) {
     mouse_pos = poll_cursor_pos(window);
     process_mouse_movement(&camera, &mouse_pos);
+    handle_player_input();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.2, 0.3, 0.3, 1);
@@ -73,6 +90,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
     // transforms
     Mat4 view_matrix = lin::look_at(
         camera.m_pos, camera.m_pos + camera.m_view_dir, camera.m_up);
+
     shader.set_uniform("model", transformations.get(id));
     shader.set_uniform("view", &view_matrix);
 

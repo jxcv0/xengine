@@ -9,11 +9,11 @@
  */
 typedef void (*input_handler_fp)(void);
 
-  /**
-   * @brief Get the current cursor position.
-   *
-   * @return a Vec2 position.
-   */
+/**
+ * @brief Get the current cursor position.
+ *
+ * @return a Vec2 position.
+ */
 Vec2 poll_cursor_pos(GLFWwindow *window);
 
 /**

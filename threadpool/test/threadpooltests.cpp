@@ -20,3 +20,15 @@ TEST(threadpooltests, test) {
   threadpool::stop();
   ASSERT_EQ(counter, 1000);
 }
+
+TEST(threadpooltests, wait) {
+  threadpool::init();
+  for (int i = 0; i < 1000; i++) {
+    threadpool::schedule_task(add_one);
+    std::cout << "loop\n";
+  }
+  threadpool::wait();
+  std::cout << "wait\n";
+  threadpool::stop();
+  ASSERT_EQ(counter, 1000);
+}
