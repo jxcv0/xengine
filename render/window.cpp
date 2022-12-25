@@ -4,6 +4,60 @@
 
 #include "checkerr.h"
 #include "lin.h"
+#include <cassert>
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+void create_window(GLFWwindow **window, const float width, const float height,
+                   const char *name) {
+  glfwInit();
+
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
+
+  *window = glfwCreateWindow(width, height, name, nullptr, nullptr);
+
+  if (*window == nullptr) {
+    perror("window: unable to create window");
+    glfwTerminate();
+    return;
+  }
+
+  glfwMakeContextCurrent(*window);
+  glfwSetFramebufferSizeCallback(
+      *window, []([[maybe_unused]] GLFWwindow *window, int width, int height) {
+        glViewport(0, 0, width, height);
+      });
+
+  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+    perror("glad: unable to load opengl");
+    glfwTerminate();
+    return;
+  }
+
+  int flags;
+  glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+  if (flags & GL_CONTEXT_FLAG_DEBUG_BIT) {
+    glEnable(GL_DEBUG_OUTPUT);
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    glDebugMessageCallback(gl_debug_output, nullptr);
+    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr,
+                          GL_TRUE);
+  }
+
+  glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+  // depth testing
+  glEnable(GL_DEPTH_TEST);
+  glDepthFunc(GL_LESS);
+
+  // face culling
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_BACK);
+}
 
 /**
  * ----------------------------------------------------------------------------

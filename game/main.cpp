@@ -11,31 +11,35 @@
 #include "vec2.h"
 #include "vec3.h"
 #include "window.h"
+#include <cassert>
 
 constexpr auto window_width = 1080;
 constexpr auto window_height = 600;
+GLFWwindow *window;
 
 Camera camera(Vec3(0, 0, 3), window_width / 2.0f, window_height / 2.0f);
 
 EntityArray entities;
 ComponentArray<Mesh> meshes;
 ComponentArray<Mat4> transformations;
-ComponentArray<input_handler_fp> input_handlers; // input handler functions
+ComponentArray<input_handler_fp> input_handlers;  // input handler functions
 
 void load_meshes() {
   for (int i = 0; i < meshes.size(); i++) {
-      // load
+    // load
   }
 }
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
-  Window window(window_width, window_height, "xengine");
-  Input input(&window);
+  create_window(&window, window_width, window_height, "game");
+  Input input(window);
 
   auto shader =
       ShaderUtils::load("render/glsl/uber.vert", "render/glsl/uber.frag");
 
-  auto projection_matrix = window.projection_matrix(60);
+  auto projection_matrix = lin::perspective(
+      lin::radians(60), ((float)window_width / (float)window_height), 0.1f,
+      100.0f);
 
   // entity
   entity_id id = entities.create();
@@ -53,16 +57,16 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
   Vec3 object_color(1, 0.5, 0.31);
   Vec2 mouse_pos;
 
-  while (!window.should_close()) {
+  while (!glfwWindowShouldClose(window)) {
     mouse_pos = input.poll_cursor_pos();
     camera.process_mouse_movement(&mouse_pos);
 
-    window.clear_buffers();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.2, 0.3, 0.3, 1);
 
     // transforms
-    shader.set_uniform("model", transformations.get(id));
     Mat4 view_matrix = camera.view_matrix();
+    shader.set_uniform("model", transformations.get(id));
     shader.set_uniform("view", &view_matrix);
 
     // lighting
@@ -73,9 +77,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
     // mesh_components.get(id)->draw();
     draw_mesh(meshes.get(id));
 
-    window.swap_buffers();
-    window.poll_events();
+    glfwSwapBuffers(window);
+    glfwPollEvents();
   }
+
+  glfwDestroyWindow(window);
+  glfwTerminate();
 
   return 0;
 }

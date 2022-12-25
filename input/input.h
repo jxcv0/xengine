@@ -7,7 +7,7 @@
 /**
  * @brief Input handler component functions.
  */
-typedef void(*input_handler_fp)(void);
+typedef void (*input_handler_fp)(void);
 
 /**
  * @brief Get input from a window.
@@ -20,6 +20,7 @@ class Input {
    * @param w Pointer to the window to get input from.
    */
   explicit Input(const Window *w) noexcept : mp_window(w->mp_window) {}
+  explicit Input(GLFWwindow *w) noexcept : mp_window(w) {}
 
   /**
    * @brief Get the current cursor position.

@@ -1,8 +1,6 @@
 #ifndef MAINWINDOW_H_
 #define MAINWINDOW_H_
 
-#include <cstdint>
-
 #include "mat4.h"
 
 #ifndef GLAD_INCLUDED
@@ -10,6 +8,14 @@
 #include <glad.h>
 #endif
 #include <GLFW/glfw3.h>
+
+/**
+ * @brief Create window and correct OpenGl context.
+ *
+ * @param window A pointer to a GLFWwindow.
+ */
+void create_window(GLFWwindow **window, const float width, const float height,
+                   const char *name);
 
 /**
  * @brief Wraps a GLFWWindow* in an raii class.
