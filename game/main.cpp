@@ -1,5 +1,3 @@
-#include <GLFW/glfw3.h>
-
 #include "camera.h"
 #include "checkerr.h"
 #include "componentarray.h"
@@ -19,17 +17,19 @@ constexpr auto window_width = 1080;
 constexpr auto window_height = 600;
 
 Camera camera;
+Mat4 view_matrix;
 
 EntityArray entities;
 ComponentArray<Mesh> meshes;
 ComponentArray<Mat4> transformations;
 ComponentArray<input_handler_fp> input_handlers;  // input handler functions
 
-void load_meshes() {
-  for (int i = 0; i < meshes.size(); i++) {
-    // load
-  }
+void update_view_matrix() {
+  view_matrix =
+      lin::look_at(camera.m_pos, camera.m_pos + camera.m_view_dir, camera.m_up);
 }
+
+void print() { std::cout << "here\n"; }
 
 // move the camera with wasd
 void handle_player_input() {
@@ -52,6 +52,7 @@ void handle_player_input() {
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
   create_window(&window, window_width, window_height, "game");
+  threadpool::init();
 
   auto shader =
       ShaderUtils::load("render/glsl/uber.vert", "render/glsl/uber.frag");
@@ -82,15 +83,15 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
   while (!glfwWindowShouldClose(window)) {
     mouse_pos = poll_cursor_pos(window);
     process_mouse_movement(&camera, &mouse_pos);
-    handle_player_input();
+
+    threadpool::schedule_task(handle_player_input);
+    threadpool::schedule_task(update_view_matrix);
+    threadpool::wait();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.2, 0.3, 0.3, 1);
 
     // transforms
-    Mat4 view_matrix = lin::look_at(
-        camera.m_pos, camera.m_pos + camera.m_view_dir, camera.m_up);
-
     shader.set_uniform("model", transformations.get(id));
     shader.set_uniform("view", &view_matrix);
 
@@ -108,6 +109,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
 
   glfwDestroyWindow(window);
   glfwTerminate();
+
+  threadpool::stop();
 
   return 0;
 }

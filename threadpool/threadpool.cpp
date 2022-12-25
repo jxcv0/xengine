@@ -42,7 +42,7 @@ static void *worker_loop([[maybe_unused]] void *arg) {
 
     task_fp t = tp.tasks[--tp.num_tasks];
     pthread_mutex_unlock(&tp.mutex);
-    pthread_cond_signal(&tp.cond);
+    pthread_cond_broadcast(&tp.cond);
     t();
   }
   pthread_mutex_unlock(&tp.mutex);
@@ -98,5 +98,5 @@ void threadpool::schedule_task(task_fp fp) {
   }
 
   pthread_mutex_unlock(&tp.mutex);
-  pthread_cond_signal(&tp.cond);
+  pthread_cond_broadcast(&tp.cond);
 }
