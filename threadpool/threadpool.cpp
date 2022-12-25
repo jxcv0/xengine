@@ -92,10 +92,11 @@ void threadpool::schedule_task(task_fp fp) {
   while (tp.num_tasks == TASK_BUFFER_SIZE && tp.run == true) {
     pthread_cond_wait(&tp.cond, &tp.mutex);
   }
-  if (!tp.run) {
-    return;
+
+  if (tp.run) {
+    tp.tasks[tp.num_tasks++] = fp;
   }
-  tp.tasks[tp.num_tasks++] = fp;
+
   pthread_mutex_unlock(&tp.mutex);
   pthread_cond_signal(&tp.cond);
 }
