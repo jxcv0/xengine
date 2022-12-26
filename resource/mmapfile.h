@@ -7,9 +7,20 @@ extern "C" {
 
 #include <stddef.h>
 
+/**
+ * @brief Memory mapped file data;
+ */
 struct mmapfile {
   void *mp_addr;
   size_t m_size;
+};
+
+/**
+ * @brief A line of text. Basically a string.
+ */
+struct line {
+  char *mp_start;
+  size_t m_len;
 };
 
 /**
@@ -25,7 +36,7 @@ struct mmapfile map_file(const char *filepath);
  *
  * @param m A pointer to the mmapfile structure.
  */
-void unmap_file(struct mmapfile *m);
+void unmap_file(struct mmapfile *mapped_file);
 
 #ifdef __cplusplus
 }

@@ -20,4 +20,6 @@ struct mmapfile map_file(const char* filepath) {
   return result;
 }
 
-void unmap_file(struct mmapfile* m) { munmap(m->mp_addr, m->m_size); }
+void unmap_file(struct mmapfile* mmapped_file) {
+  munmap(mmapped_file->mp_addr, mmapped_file->m_size);
+}
