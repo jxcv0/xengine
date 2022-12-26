@@ -2,8 +2,7 @@
 #define LIN_H_
 
 #include <cmath>
-#include <functional>
-#include <type_traits>
+
 // #include <numbers>
 
 #include "mat4.h"

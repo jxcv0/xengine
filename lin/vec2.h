@@ -3,6 +3,10 @@
 
 #include <ostream>
 
+struct vec2 {
+  float m_data[2];
+};
+
 /**
  * @brief A 2 dimensional vector.
  */

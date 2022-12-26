@@ -64,7 +64,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
   meshes.assign(cube_entity);
   transformations.assign(cube_entity);
 
-  meshes.set(cube_entity, load_mesh("assets/models/cube/cube.obj"));
+  meshes.set(cube_entity, load_mesh("assets/models/female_base/female_base.obj"));
   gen_mesh_buffers(meshes.get(cube_entity));
 
   glUseProgram(shader);

@@ -73,7 +73,9 @@ Mesh::Index parse_index(const std::string_view &sv) {
  * ----------------------------------------------------------------------------
  */
 Mesh load_mesh(const char *filepath) {
+  (void) filepath;
   Mesh mesh;
+  /*
   using size_type = std::string_view::size_type;
 
   const MmapFile file(filepath);
@@ -153,7 +155,7 @@ Mesh load_mesh(const char *filepath) {
     mesh.mp_vertices[i].m_normal = normals[index.m_normal_idx];
     mesh.mp_vertices[i].m_tex_coord = tex_coords[index.m_tex_coord_idx];
   }
-
+  */
   return mesh;
 }
 
