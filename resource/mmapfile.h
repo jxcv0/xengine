@@ -38,17 +38,6 @@ struct mmapfile mmapfile_map(const char *filepath);
  */
 void mmapfile_unmap(struct mmapfile *mapped_file);
 
-/**
- * @brief Find the next occurence of a character in a memory mapped file
- * starting at position pos.
- *
- * @param mapped_file A pointer to the mmapfile structure.
- * @param pos The starting index of the search.
- * @param c The character to search for.
- * @return A string structure.
- */
-struct string mmapfile_find(struct mmapfile *mapped_file, size_t pos, char c);
-
 #ifdef __cplusplus
 }
 #endif

@@ -5,7 +5,7 @@ set(
   SOURCES
     mmapfile.c
     texture.cpp
-    mesh.cpp
+    mesh.c
 )
 
 set(
