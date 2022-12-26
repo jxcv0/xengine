@@ -18,7 +18,7 @@ struct mmapfile {
 /**
  * @brief A line of text. Basically a string.
  */
-struct line {
+struct string {
   char *mp_start;
   size_t m_len;
 };
@@ -29,14 +29,25 @@ struct line {
  * @param filepath The path to the file to open.
  * @return struct mmapfile.
  */
-struct mmapfile map_file(const char *filepath);
+struct mmapfile mmapfile_map(const char *filepath);
 
 /**
  * @brief Unmap a memory mapped file.
  *
  * @param m A pointer to the mmapfile structure.
  */
-void unmap_file(struct mmapfile *mapped_file);
+void mmapfile_unmap(struct mmapfile *mapped_file);
+
+/**
+ * @brief Find the next occurence of a character in a memory mapped file
+ * starting at position pos.
+ *
+ * @param mapped_file A pointer to the mmapfile structure.
+ * @param pos The starting index of the search.
+ * @param c The character to search for.
+ * @return A string structure.
+ */
+struct string mmapfile_find(struct mmapfile *mapped_file, size_t pos, char c);
 
 #ifdef __cplusplus
 }
