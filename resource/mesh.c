@@ -1,13 +1,11 @@
 #include "mesh.h"
 
 #include <glad.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <assimp/cimport.h>
-#include <assimp/postprocess.h>
-#include <assimp/scene.h>
 
 #include "mmapfile.h"
 
@@ -76,10 +74,10 @@ Mesh::Index parse_index(const std::string_view &sv) {
 }
  */
 
-ssize_t get_line(const struct mmapfile *file, const ssize_t pos) {
-  for (size_t i = 0; i < file->m_size - pos; i++) {
-    char c = ((char *)file->mp_addr)[pos];
-    if (c == '\n' || c == '\r') {
+static ssize_t next_token(const struct mmapfile *file, const ssize_t pos) {
+  for (size_t i = pos; i < file->m_size; i++) {
+    char c = ((char *)file->mp_addr)[i];
+    if (c == ' ' || c == '\n') {
       return i;
     }
   }
@@ -93,29 +91,17 @@ struct mesh mesh_load(const char *filepath) {
   const struct mmapfile file = mmapfile_map(filepath);
   struct mesh mesh = {0};
 
-  size_t num_lines = 0;
-  for (size_t i = 0; i < file.m_size; i++) {
-    char c = ((char *)file.mp_addr)[i];
-    if (c == '\n') {
-      num_lines++;
-    }
+  ssize_t curr = 0;
+  ssize_t prev = 0;
+  while ((curr = next_token(&file, prev)) != -1) {
+    size_t lsize = curr - prev;
+    char tok[lsize + 1];
+    strncpy(tok, &((char *)file.mp_addr)[prev], lsize);
+    tok[lsize] = '\0';
+    prev = curr + 1;
+    printf("%s\n", tok);
   }
 
-  size_t eols[num_lines + 1];
-  num_lines = 0;
-  eols[num_lines++] = 0;
-  for (size_t i = 0; i < file.m_size; i++) {
-    char c = ((char *)file.mp_addr)[i];
-    if (c == '\n') {
-      eols[num_lines++] = i;
-    }
-  }
-
-  for (size_t i = 0; i < num_lines; i++) {
-    printf("%ld ", eols[i]);
-  }
-
-  /*
   // count up how much memory to allocate.
   unsigned int num_positions = 0;
   unsigned int num_tex_coords = 0;
@@ -178,48 +164,45 @@ struct mesh mesh_load(const char *filepath) {
   }
 
   mmapfile_unmap(file);
-  */
-  return mesh;
+  * / return mesh;
 }
 
 /**
  * ----------------------------------------------------------------------------
  */
 void mesh_unload(struct mesh *mesh) {
-  free(mesh->mp_vertices);
-  mesh->mp_vertices = NULL;
+  (void)mesh;
+  // free(mesh->mp_vertices);
+  // mesh->mp_vertices = NULL;
 }
 
 /**
  * ----------------------------------------------------------------------------
  */
 void gen_mesh_buffers(struct mesh *mesh) {
-  glGenBuffers(1, &mesh->m_vbo);
-  // glGenBuffers(1, &m_ebo);
-  glGenVertexArrays(1, &mesh->m_vao);
-  glBindVertexArray(mesh->m_vao);
-
-  glBindBuffer(GL_ARRAY_BUFFER, mesh->m_vbo);
-  glBufferData(GL_ARRAY_BUFFER, mesh->m_num_vertices * sizeof(struct vertex),
-               (void *)(mesh->mp_vertices), GL_DYNAMIC_DRAW);
-
+  (void)mesh;
   /*
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
-               GL_DYNAMIC_DRAW);
-  */
+glGenBuffers(1, &mesh->m_vbo);
+// glGenBuffers(1, &m_ebo);
+glGenVertexArrays(1, &mesh->m_vao);
+glBindVertexArray(mesh->m_vao);
 
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-                        (void *)(0));
-  glEnableVertexAttribArray(0);
+glBindBuffer(GL_ARRAY_BUFFER, mesh->m_vbo);
+glBufferData(GL_ARRAY_BUFFER, mesh->m_num_vertices * sizeof(struct vertex),
+             (void *)(mesh->mp_vertices), GL_DYNAMIC_DRAW);
 
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-                        (void *)(offsetof(struct vertex, m_normal)));
-  glEnableVertexAttribArray(1);
+glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
+                      (void *)(0));
+glEnableVertexAttribArray(0);
 
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-                        (void *)(offsetof(struct vertex, m_tex_coord)));
-  glEnableVertexAttribArray(2);
+glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
+                      (void *)(offsetof(struct vertex, m_normal)));
+glEnableVertexAttribArray(1);
+
+glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
+                      (void *)(offsetof(struct vertex, m_tex_coord)));
+glEnableVertexAttribArray(2);
+*/
 }
 
 /**
