@@ -64,11 +64,13 @@ void parse_index(struct index *index, const char *line, const size_t len) {
   ssize_t curr = 0;
   ssize_t prev = 0;
   while ((curr = find_char(' ', prev, line, len)) != -1) {
-    ssize_t new_len = curr - prev;
+    size_t new_len = curr - prev;
+
     char str[new_len + 1];
-    strncpy(str, &line[len - new_len], new_len);
+    strncpy(str, &line[prev], new_len);
     str[new_len] = '\0';
     printf("%s\n", str);
+
     prev = curr + 1;
   }
 }
