@@ -30,6 +30,8 @@ struct mesh {
 /**
  * @brief Load mesh data from an obj file.
  *
+ * TODO material parsing
+ *
  * @param filepath The filepath to load data from.
  * @return A mesh structure containing the data.
  */

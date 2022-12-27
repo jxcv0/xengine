@@ -1,6 +1,7 @@
 #include "mesh.h"
 
 #include <glad.h>
+#include <immintrin.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,6 +9,9 @@
 #include <unistd.h>
 
 #include "mmapfile.h"
+
+typedef float vec3[3];
+typedef float vec2[2];
 
 struct index {
   unsigned int m_position_idx;
@@ -17,18 +21,16 @@ struct index {
 
 /**
  * ----------------------------------------------------------------------------
-Vec3 parse_vec3(const std::string_view &sv) {
-  const char *p = sv.data();
-  char *end;
-  float result[3];
-  int i = 0;
-  for (float f = std::strtof(p, &end); p != end; f = strtof(p, &end)) {
-    result[i++] = f;
-    p = end;
-  }
-  return Vec3(result[0], result[1], result[2]);
-}
  */
+void parse_v(float *v, const char *line) {
+  const char *p = &line[2];
+  char *end;
+  v[0] = strtof(p, &end);
+  p = end;
+  v[1] = strtof(p, &end);
+  p = end;
+  v[2] = strtof(p, &end);
+}
 
 /**
  * ----------------------------------------------------------------------------
@@ -77,7 +79,7 @@ Mesh::Index parse_index(const std::string_view &sv) {
 static ssize_t next_token(const struct mmapfile *file, const ssize_t pos) {
   for (size_t i = pos; i < file->m_size; i++) {
     char c = ((char *)file->mp_addr)[i];
-    if (c == ' ' || c == '\n') {
+    if (c == '\n') {
       return i;
     }
   }
@@ -91,71 +93,64 @@ struct mesh mesh_load(const char *filepath) {
   const struct mmapfile file = mmapfile_map(filepath);
   struct mesh mesh = {0};
 
+  size_t v_count = 0;
+  size_t vt_count = 0;
+  size_t vn_count = 0;
+  size_t f_count = 0;
+
+  // count up how much memory to allocate.
   ssize_t curr = 0;
   ssize_t prev = 0;
   while ((curr = next_token(&file, prev)) != -1) {
-    size_t lsize = curr - prev;
-    char tok[lsize + 1];
-    strncpy(tok, &((char *)file.mp_addr)[prev], lsize);
-    tok[lsize] = '\0';
+    char *lineptr = &((char *)file.mp_addr)[prev];
+    if (strncmp(lineptr, "v ", 2) == 0) {
+      v_count++;
+    } else if (strncmp(lineptr, "vt ", 3) == 0) {
+      vt_count++;
+    } else if (strncmp(lineptr, "vn ", 3) == 0) {
+      vn_count++;
+    } else if (strncmp(lineptr, "f ", 2) == 0) {
+      f_count += 3;  // 3 faces per line
+    }
     prev = curr + 1;
-    printf("%s\n", tok);
   }
 
-  // count up how much memory to allocate.
-  unsigned int num_positions = 0;
-  unsigned int num_tex_coords = 0;
-  unsigned int num_normals = 0;
+  vec3 positions[v_count];
+  vec2 tex_coords[vt_count];
+  vec3 normals[vn_count];
+  struct vertex vertices[f_count * 3];
 
-  size_t num_vertices = 0;
+  (void)tex_coords;
+  (void)normals;
+  (void)vertices;
 
-  // count up how much memory is requred before copying
-
-  float positions[num_positions];
-  float normals[num_normals];
-  float tex_coords[num_tex_coords];
-  struct index indices[num_vertices];
-
-  num_positions = 0;
-  num_tex_coords = 0;
-  num_normals = 0;
-  mesh.m_num_vertices = 0;
+  v_count = 0;
+  vt_count = 0;
+  vn_count = 0;
+  f_count = 0;
 
   curr = 0;
   prev = 0;
-  while ((curr = view.find('\n', prev)) != std::string_view::npos) {
-    auto len = curr - prev + 1;
-    auto line = view.substr(prev, len);
-    prev += len;
-
-    if ("v " == line.substr(0, 2)) {
-      positions[num_positions++] = parse_vec3(line.substr(2));
-    } else if ("vt " == line.substr(0, 3)) {
-      tex_coords[num_tex_coords++] = parse_vec2(line.substr(3));
-    } else if ("vn " == line.substr(0, 3)) {
-      normals[num_normals++] = parse_vec3(line.substr(3));
-    } else if ("f " == line.substr(0, 2)) {
-      auto f_line = line.substr(2);
-      size_type f_curr = 0;
-      size_type f_prev = 0;
-      // delim by spaces
-      while ((f_curr = f_line.find(" ", f_prev)) != std::string_view::npos) {
-        auto f_len = f_curr - f_prev;
-        auto face_tok = f_line.substr(f_prev, f_len);
-        indices[mesh.m_num_vertices++] = parse_index(face_tok);
-        f_prev += f_len + 1;
-      }
-      // do last token
-      indices[mesh.m_num_vertices++] =
-          parse_index(f_line.substr(f_prev, f_line.size() - f_prev - 1));
+  while ((curr = next_token(&file, prev)) != -1) {
+    // size_t len = curr - prev;
+    char *lineptr = &((char *)file.mp_addr)[prev];
+    if (strncmp(lineptr, "v ", 2) == 0) {
+      parse_v(positions[v_count++], lineptr);
+    } else if (strncmp(lineptr, "vt ", 3) == 0) {
+      vt_count++;
+    } else if (strncmp(lineptr, "vn ", 3) == 0) {
+      vn_count++;
+    } else if (strncmp(lineptr, "f ", 2) == 0) {
+      f_count += 3;  // 3 faces per line
     }
-    // TODO mtl parsing here
+    prev = curr + 1;
   }
 
-  // TODO a fast way of detecting duplicate indices for ebo
-  // TODO collect data on how big these files usually are
-  mesh.mp_vertices = new Mesh::Vertex[mesh.m_num_vertices];
+  for (size_t i = 0; i < v_count; i++) {
+    printf("%f, %f, %f\n", positions[i][0], positions[i][1], positions[i][2]);
+  }
 
+  /**
   for (unsigned int i = 0; i < mesh.m_num_vertices; i++) {
     auto index = indices[i];
     mesh.mp_vertices[i].m_position = positions[index.m_position_idx];
@@ -164,7 +159,8 @@ struct mesh mesh_load(const char *filepath) {
   }
 
   mmapfile_unmap(file);
-  * / return mesh;
+  */
+  return mesh;
 }
 
 /**
