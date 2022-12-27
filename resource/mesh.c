@@ -45,7 +45,9 @@ void parse_vec2(float *v, const char *line) {
 
 /**
  * ----------------------------------------------------------------------------
-Mesh::Index parse_index(const std::string_view &sv) {
+ */
+void parse_index(struct index *index, const char *line) {
+    /*
   using size_type = std::string_view::size_type;
   size_type curr = 0;
   size_type prev = 0;
@@ -69,10 +71,13 @@ Mesh::Index parse_index(const std::string_view &sv) {
   index.m_normal_idx = std::atoi(normal_index.data()) - 1;
 
   return index;
+  */
 }
- */
 
-static ssize_t next_token(const struct mmapfile *file, const ssize_t pos) {
+/**
+ * ----------------------------------------------------------------------------
+ */
+static ssize_t get_line(const struct mmapfile *file, const ssize_t pos) {
   for (size_t i = pos; i < file->m_size; i++) {
     char c = ((char *)file->mp_addr)[i];
     if (c == '\n') {
@@ -97,7 +102,7 @@ struct mesh mesh_load(const char *filepath) {
   // count up how much memory to allocate.
   ssize_t curr = 0;
   ssize_t prev = 0;
-  while ((curr = next_token(&file, prev)) != -1) {
+  while ((curr = get_line(&file, prev)) != -1) {
     char *lineptr = &((char *)file.mp_addr)[prev];
     if (strncmp(lineptr, "v ", 2) == 0) {
       v_count++;
@@ -125,7 +130,7 @@ struct mesh mesh_load(const char *filepath) {
 
   curr = 0;
   prev = 0;
-  while ((curr = next_token(&file, prev)) != -1) {
+  while ((curr = get_line(&file, prev)) != -1) {
     // size_t len = curr - prev;
     char *lineptr = &((char *)file.mp_addr)[prev];
     if (strncmp(lineptr, "v ", 2) == 0) {
