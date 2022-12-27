@@ -1,7 +1,7 @@
 #include "mesh.h"
 
 #include <glad.h>
-#include <immintrin.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,6 +18,19 @@ struct index {
   unsigned int m_tex_coord_idx;
   unsigned int m_normal_idx;
 };
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+static ssize_t find_char(const char c, const size_t pos, const char *s,
+                         const size_t len) {
+  for (size_t i = pos; i < len; i++) {
+    if (s[i] == c) {
+      return i;
+    }
+  }
+  return -1;
+}
 
 /**
  * ----------------------------------------------------------------------------
@@ -46,32 +59,18 @@ void parse_vec2(float *v, const char *line) {
 /**
  * ----------------------------------------------------------------------------
  */
-void parse_index(struct index *index, const char *line) {
-    /*
-  using size_type = std::string_view::size_type;
-  size_type curr = 0;
-  size_type prev = 0;
-
-  Mesh::Index index;
-  curr = sv.find('/', prev);
-  auto len = curr - prev;
-  auto pos_index = sv.substr(prev, len);
-  index.m_position_idx = std::atoi(pos_index.data()) - 1;
-  prev += len + 1;
-
-  curr = sv.find('/', prev);
-  len = curr - prev;
-  auto tex_coords_index = sv.substr(prev, len);
-  index.m_tex_coord_idx = std::atoi(tex_coords_index.data()) - 1;
-  prev += len + 1;
-
-  curr = sv.find('/', sv.size() - prev);
-  len = curr - prev;
-  auto normal_index = sv.substr(prev, len);
-  index.m_normal_idx = std::atoi(normal_index.data()) - 1;
-
-  return index;
-  */
+void parse_index(struct index *index, const char *line, const size_t len) {
+  (void)index;
+  ssize_t curr = 0;
+  ssize_t prev = 0;
+  while ((curr = find_char(' ', prev, line, len)) != -1) {
+    ssize_t new_len = curr - prev;
+    char str[new_len + 1];
+    strncpy(str, &line[len - new_len], new_len);
+    str[new_len] = '\0';
+    printf("%s\n", str);
+    prev = curr + 1;
+  }
 }
 
 /**
@@ -119,6 +118,7 @@ struct mesh mesh_load(const char *filepath) {
   vec3 positions[v_count];
   vec2 tex_coords[vt_count];
   vec3 normals[vn_count];
+  struct index indices[f_count * 3];
   struct vertex vertices[f_count * 3];
 
   (void)vertices;
@@ -131,7 +131,6 @@ struct mesh mesh_load(const char *filepath) {
   curr = 0;
   prev = 0;
   while ((curr = get_line(&file, prev)) != -1) {
-    // size_t len = curr - prev;
     char *lineptr = &((char *)file.mp_addr)[prev];
     if (strncmp(lineptr, "v ", 2) == 0) {
       parse_vec3(positions[v_count++], &lineptr[2]);
@@ -143,11 +142,14 @@ struct mesh mesh_load(const char *filepath) {
       parse_vec3(normals[vn_count++], &lineptr[3]);
 
     } else if (strncmp(lineptr, "f ", 2) == 0) {
+      size_t len = curr - prev;
+      parse_index(indices, &lineptr[2], len);
       f_count += 3;  // 3 faces per line
     }
     prev = curr + 1;
   }
 
+  /*
   for (size_t i = 0; i < v_count; i++) {
     printf("v %f, %f, %f\n", positions[i][0], positions[i][1], positions[i][2]);
   }
@@ -159,6 +161,7 @@ struct mesh mesh_load(const char *filepath) {
   for (size_t i = 0; i < vn_count; i++) {
     printf("vn %f, %f, %f\n", normals[i][0], normals[i][1], normals[i][2]);
   }
+  */
 
   /**
   for (unsigned int i = 0; i < mesh.m_num_vertices; i++) {
