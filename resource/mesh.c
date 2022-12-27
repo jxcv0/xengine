@@ -22,8 +22,8 @@ struct index {
 /**
  * ----------------------------------------------------------------------------
  */
-void parse_v(float *v, const char *line) {
-  const char *p = &line[2];
+void parse_vec3(float *v, const char *line) {
+  const char *p = line;
   char *end;
   v[0] = strtof(p, &end);
   p = end;
@@ -34,18 +34,14 @@ void parse_v(float *v, const char *line) {
 
 /**
  * ----------------------------------------------------------------------------
-Vec2 parse_vec2(const std::string_view &sv) {
-  const char *p = sv.data();
-  char *end;
-  float result[2];
-  int i = 0;
-  for (float f = std::strtof(p, &end); p != end; f = strtof(p, &end)) {
-    result[i++] = f;
-    p = end;
-  }
-  return Vec2(result[0], result[1]);
-}
  */
+void parse_vec2(float *v, const char *line) {
+  const char *p = line;
+  char *end;
+  v[0] = strtof(p, &end);
+  p = end;
+  v[1] = strtof(p, &end);
+}
 
 /**
  * ----------------------------------------------------------------------------
@@ -90,7 +86,7 @@ static ssize_t next_token(const struct mmapfile *file, const ssize_t pos) {
  * ----------------------------------------------------------------------------
  */
 struct mesh mesh_load(const char *filepath) {
-  const struct mmapfile file = mmapfile_map(filepath);
+  struct mmapfile file = mmapfile_map(filepath);
   struct mesh mesh = {0};
 
   size_t v_count = 0;
@@ -120,8 +116,6 @@ struct mesh mesh_load(const char *filepath) {
   vec3 normals[vn_count];
   struct vertex vertices[f_count * 3];
 
-  (void)tex_coords;
-  (void)normals;
   (void)vertices;
 
   v_count = 0;
@@ -135,11 +129,14 @@ struct mesh mesh_load(const char *filepath) {
     // size_t len = curr - prev;
     char *lineptr = &((char *)file.mp_addr)[prev];
     if (strncmp(lineptr, "v ", 2) == 0) {
-      parse_v(positions[v_count++], lineptr);
+      parse_vec3(positions[v_count++], &lineptr[2]);
+
     } else if (strncmp(lineptr, "vt ", 3) == 0) {
-      vt_count++;
+      parse_vec2(tex_coords[vt_count++], &lineptr[3]);
+
     } else if (strncmp(lineptr, "vn ", 3) == 0) {
-      vn_count++;
+      parse_vec3(normals[vn_count++], &lineptr[3]);
+
     } else if (strncmp(lineptr, "f ", 2) == 0) {
       f_count += 3;  // 3 faces per line
     }
@@ -147,7 +144,15 @@ struct mesh mesh_load(const char *filepath) {
   }
 
   for (size_t i = 0; i < v_count; i++) {
-    printf("%f, %f, %f\n", positions[i][0], positions[i][1], positions[i][2]);
+    printf("v %f, %f, %f\n", positions[i][0], positions[i][1], positions[i][2]);
+  }
+
+  for (size_t i = 0; i < vt_count; i++) {
+    printf("vt %f, %f\n", tex_coords[i][0], tex_coords[i][1]);
+  }
+
+  for (size_t i = 0; i < vn_count; i++) {
+    printf("vn %f, %f, %f\n", normals[i][0], normals[i][1], normals[i][2]);
   }
 
   /**
@@ -158,8 +163,8 @@ struct mesh mesh_load(const char *filepath) {
     mesh.mp_vertices[i].m_tex_coord = tex_coords[index.m_tex_coord_idx];
   }
 
-  mmapfile_unmap(file);
   */
+  mmapfile_unmap(&file);
   return mesh;
 }
 
