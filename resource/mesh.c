@@ -22,10 +22,11 @@ struct index {
 /**
  * ----------------------------------------------------------------------------
  */
-static ssize_t find_char(const char c, const size_t pos, const char *s,
-                         const size_t len) {
+static ssize_t find_delim(const char c, const size_t pos, const char *s,
+                          const size_t len) {
   for (size_t i = pos; i < len; i++) {
-    if (s[i] == c) {
+    char ch = s[i];
+    if (ch == c || ch == '\n') {
       return i;
     }
   }
@@ -56,6 +57,14 @@ void parse_vec2(float *v, const char *line) {
   v[1] = strtof(p, &end);
 }
 
+void print(const char *s, const ssize_t begin, const size_t end) {
+  ssize_t len = end - begin;
+  char ss[len + 1];
+  strncpy(ss, &s[begin], len);
+  ss[len] = '\0';
+  printf("%s| ", ss);
+}
+
 /**
  * ----------------------------------------------------------------------------
  */
@@ -63,16 +72,18 @@ void parse_index(struct index *index, const char *line, const size_t len) {
   (void)index;
   ssize_t curr = 0;
   ssize_t prev = 0;
-  while ((curr = find_char(' ', prev, line, len)) != -1) {
-    size_t new_len = curr - prev;
 
-    char str[new_len + 1];
-    strncpy(str, &line[prev], new_len);
-    str[new_len] = '\0';
-    printf("%s\n", str);
+  curr = find_delim(' ', prev, line, len);
+  print(line, prev, curr);
+  prev = curr + 1;
 
-    prev = curr + 1;
-  }
+  curr = find_delim(' ', prev, line, len);
+  print(line, prev, curr);
+  prev = curr + 1;
+
+  curr = find_delim('\n', prev, line, len);
+  print(line, prev, curr);
+  printf("\n");
 }
 
 /**
