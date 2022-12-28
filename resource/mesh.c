@@ -68,21 +68,42 @@ void print(const char *s, const ssize_t begin, const size_t end) {
 /**
  * ----------------------------------------------------------------------------
  */
-void parse_index(struct index *index, const char *line, const size_t len) {
+void parse_index(struct index *index, const char* tok, const size_t len) {
+  (void) index;
+  ssize_t curr = 0;
+  ssize_t prev = 0;
+
+  curr = find_delim('/', prev, tok, len);
+  print(tok, prev, curr);
+  prev = curr + 1;
+
+  curr = find_delim('/', prev, tok, len);
+  print(tok, prev, curr);
+  prev = curr + 1;
+
+  // curr = find_delim(' ', prev, tok, len);
+  print(tok, prev, len);
+  printf("\n");
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+void parse_face(struct index *index, const char *line, const size_t len) {
   (void)index;
   ssize_t curr = 0;
   ssize_t prev = 0;
 
   curr = find_delim(' ', prev, line, len);
-  print(line, prev, curr);
+  parse_index(index, &line[prev], curr - prev);
   prev = curr + 1;
 
   curr = find_delim(' ', prev, line, len);
-  print(line, prev, curr);
+  parse_index(index, &line[prev], curr - prev);
   prev = curr + 1;
 
   curr = find_delim('\n', prev, line, len);
-  print(line, prev, curr);
+  parse_index(index, &line[prev], curr - prev);
   printf("\n");
 }
 
@@ -156,7 +177,7 @@ struct mesh mesh_load(const char *filepath) {
 
     } else if (strncmp(lineptr, "f ", 2) == 0) {
       size_t len = curr - prev;
-      parse_index(indices, &lineptr[2], len);
+      parse_face(indices, &lineptr[2], len);
       f_count += 3;  // 3 faces per line
     }
     prev = curr + 1;
