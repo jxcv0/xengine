@@ -16,11 +16,11 @@ TEST(meshtests, mesh) {
   ASSERT_FLOAT_EQ(mesh.mp_vertices[n].m_position[1], 1);
   ASSERT_FLOAT_EQ(mesh.mp_vertices[n].m_position[2], -1);
 
-  /*
-  ASSERT_EQ(mesh.mp_vertices[0].m_tex_coord, Vec2(1, 0.333333));
-  ASSERT_EQ(mesh.mp_vertices[mesh.m_num_vertices - 1].m_tex_coord,
-            Vec2(0, 0.666667));
-            */
+  ASSERT_FLOAT_EQ(mesh.mp_vertices[0].m_tex_coord[0], 1);
+  ASSERT_FLOAT_EQ(mesh.mp_vertices[0].m_tex_coord[1], 0.333333);
+
+  ASSERT_FLOAT_EQ(mesh.mp_vertices[n].m_tex_coord[0], 0);
+  ASSERT_FLOAT_EQ(mesh.mp_vertices[n].m_tex_coord[1], 0.666667);
 
   ASSERT_FLOAT_EQ(mesh.mp_vertices[0].m_normal[0], 0);
   ASSERT_FLOAT_EQ(mesh.mp_vertices[0].m_normal[1], -1);
