@@ -8,21 +8,11 @@
 
 #include "mmapfile.h"
 
-typedef float vec3[3];
-typedef float vec2[2];
-
 struct index {
   size_t m_position_idx;
   size_t m_tex_coord_idx;
   size_t m_normal_idx;
 };
-
-struct vertex {
-  vec3 m_positions;
-  vec2 m_tex_coord;
-  vec3 m_normal;
-};
-
 /**
  * ----------------------------------------------------------------------------
  */
@@ -81,14 +71,14 @@ static void parse_index(struct index *index, const char *tok,
   ssize_t prev = 0;
 
   curr = find_delim('/', prev, tok, len);
-  index->m_position_idx = strntoul(&tok[prev], curr - prev);
+  index->m_position_idx = strntoul(&tok[prev], curr - prev) - 1;
   prev = curr + 1;
 
   curr = find_delim('/', prev, tok, len);
-  index->m_tex_coord_idx = strntoul(&tok[prev], curr - prev);
+  index->m_tex_coord_idx = strntoul(&tok[prev], curr - prev) - 1;
   prev = curr + 1;
 
-  index->m_normal_idx = strntoul(&tok[prev], len - prev);
+  index->m_normal_idx = strntoul(&tok[prev], len - prev) - 1;
 }
 
 /**
@@ -183,32 +173,36 @@ struct mesh mesh_load(const char *filepath) {
     prev = curr + 1;
   }
 
-  struct vertex vertices[f_count];
+  
+  struct mesh mesh = {0};
+  mesh.mp_vertices = malloc(f_count * sizeof(struct vertex));
+  mesh.m_num_vertices = f_count;
 
   for (size_t i = 0; i < f_count; i++) {
-    struct index *index = &indices[i];
+    struct index index = indices[i];
 
-    for (int i = 0; i < 3; i++) {
-      vertices[i].m_positions[i] = positions[index->m_position_idx][i];
+    for (int j = 0; j < 3; j++) {
+      mesh.mp_vertices[i].m_position[j] = positions[index.m_position_idx][j];
     }
 
-    for (int i = 0; i < 2; i++) {
-      vertices[i].m_tex_coord[i] = tex_coords[index->m_position_idx][i];
+    for (int j = 0; j < 2; j++) {
+      mesh.mp_vertices[i].m_tex_coord[j] = tex_coords[index.m_tex_coord_idx][j];
     }
 
-    for (int i = 0; i < 2; i++) {
-      vertices[i].m_normal[i] = tex_coords[index->m_normal_idx][i];
+    for (int j = 0; j < 3; j++) {
+      mesh.mp_vertices[i].m_normal[j] = tex_coords[index.m_normal_idx][j];
     }
   }
 
-  struct mesh mesh = {0};
+  /*
+#ifndef MESH_GTEST
   glGenBuffers(1, &mesh.m_vbo);
   glGenVertexArrays(1, &mesh.m_vao);
   glBindVertexArray(mesh.m_vao);
 
   glBindBuffer(GL_ARRAY_BUFFER, mesh.m_vbo);
   glBufferData(GL_ARRAY_BUFFER, mesh.m_num_vertices * sizeof(struct vertex),
-               (void *)(vertices), GL_DYNAMIC_DRAW);
+               (void *)(mesh.mp_vertices), GL_DYNAMIC_DRAW);
 
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
                         (void *)(0));
@@ -221,6 +215,8 @@ struct mesh mesh_load(const char *filepath) {
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
                         (void *)(offsetof(struct vertex, m_tex_coord)));
   glEnableVertexAttribArray(2);
+#endif
+*/
 
   mmapfile_unmap(&file);
   return mesh;
@@ -230,15 +226,14 @@ struct mesh mesh_load(const char *filepath) {
  * ----------------------------------------------------------------------------
  */
 void mesh_unload(struct mesh *mesh) {
-  (void)mesh;
-  // free(mesh->mp_vertices);
+  free(mesh->mp_vertices);
   // mesh->mp_vertices = NULL;
 }
 
 /**
  * ----------------------------------------------------------------------------
  */
-void draw_mesh(struct mesh *mesh) {
+void mesh_draw(struct mesh *mesh) {
   glBindVertexArray(mesh->m_vao);
   glDrawArrays(GL_TRIANGLES, 0, mesh->m_num_vertices);
   /*

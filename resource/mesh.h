@@ -7,6 +7,15 @@ extern "C" {
 
 #include <stddef.h>
 
+typedef float vec3[3];
+typedef float vec2[2];
+
+struct vertex {
+  vec3 m_position;
+  vec2 m_tex_coord;
+  vec3 m_normal;
+};
+
 /**
  * @brief Stored mesh data. This class is used to load and
  *        unload from a file.
@@ -15,6 +24,7 @@ struct mesh {
   unsigned int m_vbo;
   unsigned int m_vao;
   size_t m_num_vertices;
+  struct vertex *mp_vertices;
 };
 
 /**

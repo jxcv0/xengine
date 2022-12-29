@@ -23,7 +23,7 @@ Vec2 mouse_pos;
 Mat4 view_matrix;
 
 EntityArray entities;
-ComponentArray<Mesh> meshes;
+ComponentArray<struct mesh> meshes;
 ComponentArray<Mat4> transformations;
 ComponentArray<input_handler_fp> input_handlers;  // input handler functions
 
@@ -64,9 +64,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
   meshes.assign(cube_entity);
   transformations.assign(cube_entity);
 
-  meshes.set(cube_entity, load_mesh("assets/models/female_base/female_base.obj"));
-  gen_mesh_buffers(meshes.get(cube_entity));
-
+  meshes.set(cube_entity, mesh_load("assets/models/female_base/female_base.obj"));
   glUseProgram(shader);
   set_uniform(shader, "projection", &projection_matrix);
 
@@ -96,7 +94,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
     set_uniform(shader, "obj_color", &object_color);
 
     // mesh_components.get(id)->draw();
-    draw_mesh(meshes.get(cube_entity));
+    mesh_draw(meshes.get(cube_entity));
 
     glfwSwapBuffers(window);
     glfwPollEvents();
