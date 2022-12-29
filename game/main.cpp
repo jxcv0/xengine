@@ -65,6 +65,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
   transformations.assign(cube_entity);
 
   meshes.set(cube_entity, mesh_load("assets/models/female_base/female_base.obj"));
+  mesh_buffer(meshes.get(cube_entity));
+
   glUseProgram(shader);
   set_uniform(shader, "projection", &projection_matrix);
 
@@ -77,8 +79,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
 
   while (!glfwWindowShouldClose(window)) {
     mouse_pos = poll_cursor_pos(window);
+    std::cout << camera.m_pos << camera.m_view_dir << "\n";
 
-    // TODO these are dependant
     handle_player_input();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

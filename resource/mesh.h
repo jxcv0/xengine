@@ -45,6 +45,13 @@ struct mesh mesh_load(const char *filepath);
 void mesh_unload(struct mesh *mesh);
 
 /**
+ * @brief Generate GL buffers.
+ *
+ * @param mesh The mesh structure.
+ */
+void mesh_buffer(struct mesh *mesh);
+
+/**
  * @brief Render primitives from array data.
  *
  * @param mesh A pointer to the mesh structure.

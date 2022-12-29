@@ -173,7 +173,6 @@ struct mesh mesh_load(const char *filepath) {
     prev = curr + 1;
   }
 
-  
   struct mesh mesh = {0};
   mesh.mp_vertices = malloc(f_count * sizeof(struct vertex));
   mesh.m_num_vertices = f_count;
@@ -194,30 +193,6 @@ struct mesh mesh_load(const char *filepath) {
     }
   }
 
-  /*
-#ifndef MESH_GTEST
-  glGenBuffers(1, &mesh.m_vbo);
-  glGenVertexArrays(1, &mesh.m_vao);
-  glBindVertexArray(mesh.m_vao);
-
-  glBindBuffer(GL_ARRAY_BUFFER, mesh.m_vbo);
-  glBufferData(GL_ARRAY_BUFFER, mesh.m_num_vertices * sizeof(struct vertex),
-               (void *)(mesh.mp_vertices), GL_DYNAMIC_DRAW);
-
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-                        (void *)(0));
-  glEnableVertexAttribArray(0);
-
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-                        (void *)(offsetof(struct vertex, m_normal)));
-  glEnableVertexAttribArray(1);
-
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-                        (void *)(offsetof(struct vertex, m_tex_coord)));
-  glEnableVertexAttribArray(2);
-#endif
-*/
-
   mmapfile_unmap(&file);
   return mesh;
 }
@@ -228,6 +203,31 @@ struct mesh mesh_load(const char *filepath) {
 void mesh_unload(struct mesh *mesh) {
   free(mesh->mp_vertices);
   // mesh->mp_vertices = NULL;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+void mesh_buffer(struct mesh *mesh) {
+  glGenBuffers(1, &mesh->m_vbo);
+  glGenVertexArrays(1, &mesh->m_vao);
+  glBindVertexArray(mesh->m_vao);
+
+  glBindBuffer(GL_ARRAY_BUFFER, mesh->m_vbo);
+  glBufferData(GL_ARRAY_BUFFER, mesh->m_num_vertices * sizeof(struct vertex),
+               (void *)(mesh->mp_vertices), GL_DYNAMIC_DRAW);
+
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
+                        (void *)(offsetof(struct vertex, m_position)));
+  glEnableVertexAttribArray(0);
+
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
+                        (void *)(offsetof(struct vertex, m_tex_coord)));
+  glEnableVertexAttribArray(1);
+
+  glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
+                        (void *)(offsetof(struct vertex, m_normal)));
+  glEnableVertexAttribArray(2);
 }
 
 /**
