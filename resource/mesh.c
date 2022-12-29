@@ -190,7 +190,7 @@ struct mesh mesh_load(const char *filepath) {
     }
 
     for (int j = 0; j < 3; j++) {
-      mesh.mp_vertices[i].m_normal[j] = tex_coords[index.m_normal_idx][j];
+      mesh.mp_vertices[i].m_normal[j] = normals[index.m_normal_idx][j];
     }
   }
 
