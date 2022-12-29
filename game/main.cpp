@@ -51,10 +51,11 @@ void handle_player_input() {
       lin::look_at(camera.m_pos, camera.m_pos + camera.m_view_dir, camera.m_up);
 }
 
+// main
 int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
   create_window(&window, window_width, window_height, "game");
 
-  auto shader = load_shader("render/glsl/uber.vert", "render/glsl/uber.frag");
+  shader_t shader = shader_load("render/glsl/uber.vert", "render/glsl/uber.frag");
 
   auto projection_matrix = lin::perspective(
       lin::radians(60), ((float)window_width / (float)window_height), 0.1f,
@@ -79,7 +80,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
 
   while (!glfwWindowShouldClose(window)) {
     mouse_pos = poll_cursor_pos(window);
-    std::cout << camera.m_pos << camera.m_view_dir << "\n";
 
     handle_player_input();
 
@@ -95,7 +95,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
     set_uniform(shader, "light_color", &light_color);
     set_uniform(shader, "obj_color", &object_color);
 
-    // mesh_components.get(id)->draw();
     mesh_draw(meshes.get(cube_entity));
 
     glfwSwapBuffers(window);

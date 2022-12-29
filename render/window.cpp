@@ -2,10 +2,18 @@
 
 #include <GLFW/glfw3.h>
 
-#include <cassert>
+#include <stdio.h>
 
 #include "checkerr.h"
 #include "lin.h"
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+static void size_callback([[maybe_unused]] GLFWwindow *window, int width,
+                          int height) {
+  glViewport(0, 0, width, height);
+}
 
 /**
  * ----------------------------------------------------------------------------
@@ -28,10 +36,7 @@ void create_window(GLFWwindow **window, const float width, const float height,
   }
 
   glfwMakeContextCurrent(*window);
-  glfwSetFramebufferSizeCallback(
-      *window, []([[maybe_unused]] GLFWwindow *window, int width, int height) {
-        glViewport(0, 0, width, height);
-      });
+  glfwSetFramebufferSizeCallback(*window, size_callback);
 
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
     perror("glad: unable to load opengl");

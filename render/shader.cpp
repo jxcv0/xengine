@@ -33,7 +33,7 @@ static inline void check_link(int id) {
 /**
  * ----------------------------------------------------------------------------
  */
-shader_id load_shader(const char *vert_path, const char *frag_path) {
+shader_t shader_load(const char *vert_path, const char *frag_path) {
   std::ifstream vert_stream(vert_path);
   std::ifstream frag_stream(frag_path);
 
