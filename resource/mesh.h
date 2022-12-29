@@ -8,15 +8,6 @@ extern "C" {
 #include <stddef.h>
 
 /**
- * @brief Positiion, normal and texture coordinate vectors.
- */
-struct vertex {
-  float m_positions[3];
-  float m_normal[3];
-  float m_tex_coord[2];
-};
-
-/**
  * @brief Stored mesh data. This class is used to load and
  *        unload from a file.
  */
@@ -24,7 +15,6 @@ struct mesh {
   unsigned int m_vbo;
   unsigned int m_vao;
   size_t m_num_vertices;
-  // struct vertex *mp_vertices;
 };
 
 /**
@@ -43,13 +33,6 @@ struct mesh mesh_load(const char *filepath);
  * @param mesh A pointer to the mesh to unload.
  */
 void mesh_unload(struct mesh *mesh);
-
-/**
- * @brief Generate gl buffers for a mesh.
- *
- * @param mesh A pointer to the mesh structure.
- */
-void mesh_gen_buffers(struct mesh *mesh);
 
 /**
  * @brief Render primitives from array data.

@@ -1,12 +1,10 @@
 #include "mesh.h"
 
 #include <glad.h>
-#include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 #include "mmapfile.h"
 
@@ -14,9 +12,15 @@ typedef float vec3[3];
 typedef float vec2[2];
 
 struct index {
-  unsigned int m_position_idx;
-  unsigned int m_tex_coord_idx;
-  unsigned int m_normal_idx;
+  size_t m_position_idx;
+  size_t m_tex_coord_idx;
+  size_t m_normal_idx;
+};
+
+struct vertex {
+  vec3 m_positions;
+  vec2 m_tex_coord;
+  vec3 m_normal;
 };
 
 /**
@@ -36,7 +40,7 @@ static ssize_t find_delim(const char c, const size_t pos, const char *s,
 /**
  * ----------------------------------------------------------------------------
  */
-void parse_vec3(float *v, const char *line) {
+static void parse_vec3(float *v, const char *line) {
   const char *p = line;
   char *end;
   v[0] = strtof(p, &end);
@@ -49,7 +53,7 @@ void parse_vec3(float *v, const char *line) {
 /**
  * ----------------------------------------------------------------------------
  */
-void parse_vec2(float *v, const char *line) {
+static void parse_vec2(float *v, const char *line) {
   const char *p = line;
   char *end;
   v[0] = strtof(p, &end);
@@ -57,54 +61,54 @@ void parse_vec2(float *v, const char *line) {
   v[1] = strtof(p, &end);
 }
 
-void print(const char *s, const ssize_t begin, const size_t end) {
-  ssize_t len = end - begin;
-  char ss[len + 1];
-  strncpy(ss, &s[begin], len);
-  ss[len] = '\0';
-  printf("%s| ", ss);
+/**
+ * ----------------------------------------------------------------------------
+ */
+static size_t strntoul(const char *str, size_t n) {
+  size_t res = 0;
+  for (size_t i = 0; i < n; i++) {
+    res = (res * 10) + (str[i] - '0');
+  }
+  return res;
 }
 
 /**
  * ----------------------------------------------------------------------------
  */
-void parse_index(struct index *index, const char* tok, const size_t len) {
-  (void) index;
+static void parse_index(struct index *index, const char *tok,
+                        const size_t len) {
   ssize_t curr = 0;
   ssize_t prev = 0;
 
   curr = find_delim('/', prev, tok, len);
-  print(tok, prev, curr);
+  index->m_position_idx = strntoul(&tok[prev], curr - prev);
   prev = curr + 1;
 
   curr = find_delim('/', prev, tok, len);
-  print(tok, prev, curr);
+  index->m_tex_coord_idx = strntoul(&tok[prev], curr - prev);
   prev = curr + 1;
 
-  // curr = find_delim(' ', prev, tok, len);
-  print(tok, prev, len);
-  printf("\n");
+  index->m_normal_idx = strntoul(&tok[prev], len - prev);
 }
 
 /**
  * ----------------------------------------------------------------------------
  */
-void parse_face(struct index *index, const char *line, const size_t len) {
-  (void)index;
+static void parse_face(struct index *index, const char *line,
+                       const size_t len) {
   ssize_t curr = 0;
   ssize_t prev = 0;
 
   curr = find_delim(' ', prev, line, len);
-  parse_index(index, &line[prev], curr - prev);
+  parse_index(&index[0], &line[prev], curr - prev);
   prev = curr + 1;
 
   curr = find_delim(' ', prev, line, len);
-  parse_index(index, &line[prev], curr - prev);
+  parse_index(&index[1], &line[prev], curr - prev);
   prev = curr + 1;
 
   curr = find_delim('\n', prev, line, len);
-  parse_index(index, &line[prev], curr - prev);
-  printf("\n");
+  parse_index(&index[2], &line[prev], curr - prev);
 }
 
 /**
@@ -125,7 +129,6 @@ static ssize_t get_line(const struct mmapfile *file, const ssize_t pos) {
  */
 struct mesh mesh_load(const char *filepath) {
   struct mmapfile file = mmapfile_map(filepath);
-  struct mesh mesh = {0};
 
   size_t v_count = 0;
   size_t vt_count = 0;
@@ -152,10 +155,7 @@ struct mesh mesh_load(const char *filepath) {
   vec3 positions[v_count];
   vec2 tex_coords[vt_count];
   vec3 normals[vn_count];
-  struct index indices[f_count * 3];
-  struct vertex vertices[f_count * 3];
-
-  (void)vertices;
+  struct index indices[f_count];
 
   v_count = 0;
   vt_count = 0;
@@ -177,35 +177,51 @@ struct mesh mesh_load(const char *filepath) {
 
     } else if (strncmp(lineptr, "f ", 2) == 0) {
       size_t len = curr - prev;
-      parse_face(indices, &lineptr[2], len);
-      f_count += 3;  // 3 faces per line
+      parse_face(&indices[f_count], &lineptr[2], len);
+      f_count += 3;
     }
     prev = curr + 1;
   }
 
-  /*
-  for (size_t i = 0; i < v_count; i++) {
-    printf("v %f, %f, %f\n", positions[i][0], positions[i][1], positions[i][2]);
+  struct vertex vertices[f_count];
+
+  for (size_t i = 0; i < f_count; i++) {
+    struct index *index = &indices[i];
+
+    for (int i = 0; i < 3; i++) {
+      vertices[i].m_positions[i] = positions[index->m_position_idx][i];
+    }
+
+    for (int i = 0; i < 2; i++) {
+      vertices[i].m_tex_coord[i] = tex_coords[index->m_position_idx][i];
+    }
+
+    for (int i = 0; i < 2; i++) {
+      vertices[i].m_normal[i] = tex_coords[index->m_normal_idx][i];
+    }
   }
 
-  for (size_t i = 0; i < vt_count; i++) {
-    printf("vt %f, %f\n", tex_coords[i][0], tex_coords[i][1]);
-  }
+  struct mesh mesh = {0};
+  glGenBuffers(1, &mesh.m_vbo);
+  glGenVertexArrays(1, &mesh.m_vao);
+  glBindVertexArray(mesh.m_vao);
 
-  for (size_t i = 0; i < vn_count; i++) {
-    printf("vn %f, %f, %f\n", normals[i][0], normals[i][1], normals[i][2]);
-  }
-  */
+  glBindBuffer(GL_ARRAY_BUFFER, mesh.m_vbo);
+  glBufferData(GL_ARRAY_BUFFER, mesh.m_num_vertices * sizeof(struct vertex),
+               (void *)(vertices), GL_DYNAMIC_DRAW);
 
-  /**
-  for (unsigned int i = 0; i < mesh.m_num_vertices; i++) {
-    auto index = indices[i];
-    mesh.mp_vertices[i].m_position = positions[index.m_position_idx];
-    mesh.mp_vertices[i].m_normal = normals[index.m_normal_idx];
-    mesh.mp_vertices[i].m_tex_coord = tex_coords[index.m_tex_coord_idx];
-  }
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
+                        (void *)(0));
+  glEnableVertexAttribArray(0);
 
-  */
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
+                        (void *)(offsetof(struct vertex, m_normal)));
+  glEnableVertexAttribArray(1);
+
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
+                        (void *)(offsetof(struct vertex, m_tex_coord)));
+  glEnableVertexAttribArray(2);
+
   mmapfile_unmap(&file);
   return mesh;
 }
@@ -217,35 +233,6 @@ void mesh_unload(struct mesh *mesh) {
   (void)mesh;
   // free(mesh->mp_vertices);
   // mesh->mp_vertices = NULL;
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-void gen_mesh_buffers(struct mesh *mesh) {
-  (void)mesh;
-  /*
-glGenBuffers(1, &mesh->m_vbo);
-// glGenBuffers(1, &m_ebo);
-glGenVertexArrays(1, &mesh->m_vao);
-glBindVertexArray(mesh->m_vao);
-
-glBindBuffer(GL_ARRAY_BUFFER, mesh->m_vbo);
-glBufferData(GL_ARRAY_BUFFER, mesh->m_num_vertices * sizeof(struct vertex),
-             (void *)(mesh->mp_vertices), GL_DYNAMIC_DRAW);
-
-glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-                      (void *)(0));
-glEnableVertexAttribArray(0);
-
-glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-                      (void *)(offsetof(struct vertex, m_normal)));
-glEnableVertexAttribArray(1);
-
-glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-                      (void *)(offsetof(struct vertex, m_tex_coord)));
-glEnableVertexAttribArray(2);
-*/
 }
 
 /**
