@@ -32,7 +32,16 @@ void normalize_vf3(vec3 vec);
  * @param v1 The first vec3.
  * @param v2 The second vec3.
  */
-void cross_vec3(vec3 dest, vec3 v1, vec3 v2);
+void cross_vec3(vec3 dest, const vec3 v1, const vec3 v2);
+
+/**
+ * @brief Get the dot product of 2 vec3's.
+ *
+ * @param v1 The first vec3.
+ * @param v2 The second vec3.
+ * @return The dot product of v1 and v2.
+ */
+float dot_vec3(const vec3 v1, const vec3 v2);
 
 /**
  * @brief Create perspective matrix.
