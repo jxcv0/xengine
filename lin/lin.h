@@ -11,6 +11,14 @@ typedef float mat4[4][4];
 typedef float vec3[3];
 
 /**
+ * @brief Convert an angle from degrees to radians. Not exact.
+ *
+ * @param degrees The angle in degrees.
+ * @return A floating point representing the angle in radians.
+ */
+float radians(const float degrees);
+
+/**
  * @brief Normalize a vec3.
  *
  * @param vec The vec3 to normalize.
@@ -18,12 +26,13 @@ typedef float vec3[3];
 void normalize_vf3(vec3 vec);
 
 /**
- * @brief Convert an angle from degrees to radians. Not exact.
+ * @brief Cross 2 vec3's.
  *
- * @param degrees The angle in degrees.
- * @return A floating point representing the angle in radians.
+ * @param dest The vec3 to store the result.
+ * @param v1 The first vec3.
+ * @param v2 The second vec3.
  */
-float radians(const float degrees);
+void cross_vec3(vec3 dest, vec3 v1, vec3 v2);
 
 /**
  * @brief Create perspective matrix.

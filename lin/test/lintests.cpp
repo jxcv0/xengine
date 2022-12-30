@@ -14,6 +14,24 @@ TEST(lintests, normalize_vf3) {
   ASSERT_FLOAT_EQ(v[2], -0.4866642633922876f);
 }
 
+TEST(lintests, cross_vec3) {
+  vec3 dest = {0};
+  vec3 v1 = {1.0f, 2.0f, 3.0f};
+  vec3 v2 = {1.0f, 5.0f, 7.0f};
+  cross_vec3(dest, v1, v2);
+  ASSERT_FLOAT_EQ(dest[0], -1.0f);
+  ASSERT_FLOAT_EQ(dest[1], -4.0f);
+  ASSERT_FLOAT_EQ(dest[2], 3.0f);
+}
+
+/*
+TEST(vec3test, dot) {
+  Vec3 v1(1.0f, -3.2f, 0.0f);
+  Vec3 v2(5.4f, 3.2f, -5.0f);
+  ASSERT_FLOAT_EQ(dot(v1, v2), -4.84);
+}
+*/
+
 TEST(lintests, perspective) {
   mat4 m = {{0}};
   perspective(m, radians(45.0f), (800.0f / 600.0f), 0.1f, 100.0f);

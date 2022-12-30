@@ -5,6 +5,11 @@
 /**
  * ----------------------------------------------------------------------------
  */
+float radians(const float degrees) { return degrees * (M_PI / 180.0f); }
+
+/**
+ * ----------------------------------------------------------------------------
+ */
 void normalize_vf3(vec3 vec) {
   float l = sqrt((vec[0] * vec[0]) + (vec[1] * vec[1]) + (vec[2] * vec[2]));
   vec[0] /= l;
@@ -15,7 +20,11 @@ void normalize_vf3(vec3 vec) {
 /**
  * ----------------------------------------------------------------------------
  */
-float radians(const float degrees) { return degrees * (M_PI / 180.0f); }
+void cross_vec3(vec3 dest, vec3 v1, vec3 v2) {
+  dest[0] = (v1[1] * v2[2]) - (v1[2] * v2[1]);
+  dest[1] = (v1[2] * v2[0]) - (v1[0] * v2[2]);
+  dest[2] = (v1[0] * v2[1]) - (v1[1] * v2[0]);
+}
 
 /**
  * ----------------------------------------------------------------------------
@@ -40,7 +49,13 @@ void look_at(mat4 mat, const vec3 eye, const vec3 ctr, const vec3 up) {
   (void)ctr;
   (void)up;
   /*
-auto f = (ctr - eye).normalize();
+vec3 f = {
+  ctr[0] - eye[0],
+  ctr[1] - eye[1],
+  ctr[2] - eye[2]
+};
+normalize_vf3(f);
+
 auto s = (f * up).normalize();
 auto u = s * f;
 
@@ -60,6 +75,5 @@ mat[2][2] = -f[2];
 mat[3][0] = -dot(s, eye);
 mat[3][1] = -dot(u, eye);
 mat[3][2] = dot(f, eye);
-
 */
 }
