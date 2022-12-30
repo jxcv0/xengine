@@ -5,6 +5,30 @@ TEST(lintests, radians) {
   ASSERT_FLOAT_EQ(radians(3.122f), 0.054489179f);
 }
 
+TEST(lintests, identity_mat4) {
+  mat4 m;
+  identity_mat4(m);
+  ASSERT_FLOAT_EQ(m[0][0], 1);
+  ASSERT_FLOAT_EQ(m[0][1], 0);
+  ASSERT_FLOAT_EQ(m[0][2], 0);
+  ASSERT_FLOAT_EQ(m[0][3], 0);
+
+  ASSERT_FLOAT_EQ(m[1][0], 0);
+  ASSERT_FLOAT_EQ(m[1][1], 1);
+  ASSERT_FLOAT_EQ(m[1][2], 0);
+  ASSERT_FLOAT_EQ(m[1][3], 0);
+
+  ASSERT_FLOAT_EQ(m[2][0], 0);
+  ASSERT_FLOAT_EQ(m[2][1], 0);
+  ASSERT_FLOAT_EQ(m[2][2], 1);
+  ASSERT_FLOAT_EQ(m[2][3], 0);
+
+  ASSERT_FLOAT_EQ(m[3][0], 0);
+  ASSERT_FLOAT_EQ(m[3][1], 0);
+  ASSERT_FLOAT_EQ(m[3][2], 0);
+  ASSERT_FLOAT_EQ(m[3][3], 1);
+}
+
 TEST(lintests, normalize_vf3) {
   vec3 v = {5, 2, -3};
   normalize_vf3(v);
@@ -82,28 +106,30 @@ TEST(lintests, rotate) {
   ASSERT_FLOAT_EQ(r[3][2], 0.0f);
   ASSERT_FLOAT_EQ(r[3][3], 1.0f);
 }
+*/
 
 TEST(lintests, look_at) {
-  Vec3 eye(3.0f, 3.0f, 3.0f);
-  Vec3 ctr(1.0f, 0.0f, 1.0f);
-  Vec3 up(0.0f, 1.0f, 0.0f);
+  vec3 eye = {3.0f, 3.0f, 3.0f};
+  vec3 ctr = {1.0f, 0.0f, 1.0f};
+  vec3 c = {eye[0] + ctr[0], eye[1] + ctr[1], eye[2] + ctr[2]};
+  vec3 up = {0.0f, 1.0f, 0.0f};
+  mat4 m = {{0}};
 
-  auto a = lin::look_at(eye, eye + ctr, up);
-  ASSERT_FLOAT_EQ(a[0][0], -0.707107f);
-  ASSERT_FLOAT_EQ(a[0][1], 0.0f);
-  ASSERT_FLOAT_EQ(a[0][2], -0.707107f);
-  ASSERT_FLOAT_EQ(a[0][3], 0.0f);
-  ASSERT_FLOAT_EQ(a[1][0], 0.0f);
-  ASSERT_FLOAT_EQ(a[1][1], 1.0f);
-  ASSERT_FLOAT_EQ(a[1][2], -0.0f);
-  ASSERT_FLOAT_EQ(a[1][3], 0.0f);
-  ASSERT_FLOAT_EQ(a[2][0], 0.707107f);
-  ASSERT_FLOAT_EQ(a[2][1], -0.0f);
-  ASSERT_FLOAT_EQ(a[2][2], -0.707107f);
-  ASSERT_FLOAT_EQ(a[2][3], 0.0f);
-  ASSERT_FLOAT_EQ(a[3][0], -0.0f);
-  ASSERT_FLOAT_EQ(a[3][1], -3.0f);
-  ASSERT_FLOAT_EQ(a[3][2], 4.24264f);
-  ASSERT_FLOAT_EQ(a[3][3], 1.0f);
+  look_at(m, eye, c, up);
+  ASSERT_FLOAT_EQ(m[0][0], -0.707107f);
+  ASSERT_FLOAT_EQ(m[0][1], 0.0f);
+  ASSERT_FLOAT_EQ(m[0][2], -0.707107f);
+  ASSERT_FLOAT_EQ(m[0][3], 0.0f);
+  ASSERT_FLOAT_EQ(m[1][0], 0.0f);
+  ASSERT_FLOAT_EQ(m[1][1], 1.0f);
+  ASSERT_FLOAT_EQ(m[1][2], -0.0f);
+  ASSERT_FLOAT_EQ(m[1][3], 0.0f);
+  ASSERT_FLOAT_EQ(m[2][0], 0.707107f);
+  ASSERT_FLOAT_EQ(m[2][1], -0.0f);
+  ASSERT_FLOAT_EQ(m[2][2], -0.707107f);
+  ASSERT_FLOAT_EQ(m[2][3], 0.0f);
+  ASSERT_FLOAT_EQ(m[3][0], -0.0f);
+  ASSERT_FLOAT_EQ(m[3][1], -3.0f);
+  ASSERT_FLOAT_EQ(m[3][2], 4.24264f);
+  ASSERT_FLOAT_EQ(m[3][3], 1.0f);
 }
-*/

@@ -19,6 +19,13 @@ typedef float vec3[3];
 float radians(const float degrees);
 
 /**
+ * @brief Make a mat4 into an identity matrix.
+ *
+ * @param m The mat4.
+ */
+void identity_mat4(mat4 m);
+
+/**
  * @brief Normalize a vec3.
  *
  * @param vec The vec3 to normalize.
