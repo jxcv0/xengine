@@ -2,7 +2,16 @@
 #include <lin.h>
 
 TEST(lintests, radians) {
-    ASSERT_FLOAT_EQ(radians(3.122f), 0.054489179f);
+  ASSERT_FLOAT_EQ(radians(3.122f), 0.054489179f);
+}
+
+TEST(lintests, normalize_vf3) {
+  vec3 v = {5, 2, -3};
+  normalize_vf3(v);
+
+  ASSERT_FLOAT_EQ(v[0],  0.8111071056538127f);
+  ASSERT_FLOAT_EQ(v[1],  0.3244428422615251f);
+  ASSERT_FLOAT_EQ(v[2], -0.4866642633922876f);
 }
 
 TEST(lintests, perspective) {

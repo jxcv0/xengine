@@ -8,8 +8,14 @@ extern "C" {
 #include <math.h>
 
 typedef float mat4[4][4];
+typedef float vec3[3];
 
-void print_mat4(const mat4 mat);
+/**
+ * @brief Normalize a vec3.
+ *
+ * @param vec The vec3 to normalize.
+ */
+void normalize_vf3(vec3 vec);
 
 /**
  * @brief Convert an angle from degrees to radians. Not exact.
@@ -31,39 +37,16 @@ float radians(const float degrees);
 void perspective(mat4 mat, const float fov, const float aspect_ratio,
                  const float near, const float far);
 
-// /**
-//  * @brief Create a view matrix.
-//  *
-//  * @param eye The direction of the view.
-//  * @param ctr The position of the view.
-//  * @param up The up direction of the view.
-//  * @return A view matrix.
-//  */
-// inline Mat4 look_at(const Vec3 &eye, const Vec3 &ctr, const Vec3 &up) {
-//   auto f = (ctr - eye).normalize();
-//   auto s = (f * up).normalize();
-//   auto u = s * f;
-//
-//   Mat4 mat(1.0f);
-//   mat[0][0] = s[0];
-//   mat[1][0] = s[1];
-//   mat[2][0] = s[2];
-//
-//   mat[0][1] = u[0];
-//   mat[1][1] = u[1];
-//   mat[2][1] = u[2];
-//
-//   mat[0][2] = -f[0];
-//   mat[1][2] = -f[1];
-//   mat[2][2] = -f[2];
-//
-//   mat[3][0] = -dot(s, eye);
-//   mat[3][1] = -dot(u, eye);
-//   mat[3][2] = dot(f, eye);
-//
-//   return mat;
-// }
-//
+/**
+ * @brief Create a view matrix.
+ *
+ * @param eye The direction of the view.
+ * @param ctr The position of the view.
+ * @param up The up direction of the view.
+ * @return A view matrix.
+ */
+void look_at(mat4 mat, const vec3 eye, const vec3 ctr, const vec3 up);
+
 // /**
 //  * @brief Create a translation matrix.
 //  *

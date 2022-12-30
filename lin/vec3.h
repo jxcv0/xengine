@@ -1,8 +1,6 @@
 #ifndef VEC3_H_
 #define VEC3_H_
 
-#include <cmath>
-#include <initializer_list>
 #include <ostream>
 
 /**
