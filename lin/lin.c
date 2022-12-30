@@ -104,3 +104,12 @@ void look_at(mat4 mat, const vec3 eye, const vec3 ctr, const vec3 up) {
   mat[3][1] = -dot_vec3(u, eye);
   mat[3][2] = dot_vec3(f, eye);
 }
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+void translate(mat4 m, const vec3 v) {
+  m[3][0] += v[0];
+  m[3][1] += v[1];
+  m[3][2] += v[2];
+}

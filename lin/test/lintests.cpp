@@ -79,14 +79,18 @@ TEST(lintests, perspective) {
   ASSERT_FLOAT_EQ(m[3][3], 0.0f);
 }
 
-/*
 TEST(lintests, translate) {
-  auto t = lin::translate(Mat4(1.0f), Vec3(0.1f, 0.1f, 0.1f));
-  ASSERT_FLOAT_EQ(t[3][0], 0.1f);
-  ASSERT_FLOAT_EQ(t[3][1], 0.1f);
-  ASSERT_FLOAT_EQ(t[3][2], 0.1f);
+  mat4 m;
+  identity_mat4(m);
+  vec3 v = {0.1f, 0.1f, 0.1f};
+  translate(m, v);
+
+  ASSERT_FLOAT_EQ(m[3][0], 0.1f);
+  ASSERT_FLOAT_EQ(m[3][1], 0.1f);
+  ASSERT_FLOAT_EQ(m[3][2], 0.1f);
 }
 
+/*
 TEST(lintests, rotate) {
   auto r = lin::rotate(Mat4(1.0f), Vec3(0.0f, 1.0f, 0.0f), lin::radians(30.0f));
   ASSERT_FLOAT_EQ(r[0][0], 0.86602539f);

@@ -72,21 +72,14 @@ void perspective(mat4 mat, const float fov, const float aspect_ratio,
  */
 void look_at(mat4 mat, const vec3 eye, const vec3 ctr, const vec3 up);
 
-// /**
-//  * @brief Create a translation matrix.
-//  *
-//  * TODO check this is correct
-//  * @param v The translation vector.
-//  * @return A translation matrix.
-//  */
-// constexpr Mat4 translate(const Mat4 &m, const Vec3 &v) {
-//   Mat4 result(m);
-//   result[3][0] += v[0];
-//   result[3][1] += v[1];
-//   result[3][2] += v[2];
-//   return result;
-// }
-//
+/**
+ * @brief Translate a mat4 by a vec3.
+ *
+ * @param m The matrix to translate.
+ * @param v The translation vector.
+ */
+void translate(mat4 m, const vec3 v);
+
 // /**
 //  * @brief Rotate a matrix about a vector.
 //  *
