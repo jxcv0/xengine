@@ -4,7 +4,6 @@ project(resource)
 set(
   SOURCES
     mmapfile.c
-    texture.cpp
     mesh.c
 )
 
@@ -16,7 +15,7 @@ set(
     texture.h
 )
 
-add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})
+add_library(${PROJECT_NAME} STATIC ${HEADERS} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PUBLIC .)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC memory render glad lin stb_image)
