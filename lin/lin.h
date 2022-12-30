@@ -9,6 +9,7 @@ extern "C" {
 
 typedef float mat4[4][4];
 typedef float vec3[3];
+typedef float vec4[4];
 
 /**
  * @brief Convert an angle from degrees to radians. Not exact.
@@ -30,16 +31,7 @@ void identity_mat4(mat4 m);
  *
  * @param vec The vec3 to normalize.
  */
-void normalize_vf3(vec3 vec);
-
-/**
- * @brief Cross 2 vec3's.
- *
- * @param dest The vec3 to store the result.
- * @param v1 The first vec3.
- * @param v2 The second vec3.
- */
-void cross_vec3(vec3 dest, const vec3 v1, const vec3 v2);
+void normalize_vec3(vec3 vec);
 
 /**
  * @brief Get the dot product of 2 vec3's.
@@ -49,6 +41,24 @@ void cross_vec3(vec3 dest, const vec3 v1, const vec3 v2);
  * @return The dot product of v1 and v2.
  */
 float dot_vec3(const vec3 v1, const vec3 v2);
+
+/**
+ * @brief Get the dot product of 2 vec4's
+ *
+ * @param v1 The first vec4.
+ * @param v2 The second vec4.
+ * @return The dot product of v1 and v2.
+ */
+float dot_vec4(const vec4 v1, const vec4 v2);
+
+/**
+ * @brief Cross 2 vec3's.
+ *
+ * @param dest The vec3 to store the result.
+ * @param v1 The first vec3.
+ * @param v2 The second vec3.
+ */
+void cross_vec3(vec3 dest, const vec3 v1, const vec3 v2);
 
 /**
  * @brief Create perspective matrix.
@@ -80,43 +90,43 @@ void look_at(mat4 mat, const vec3 eye, const vec3 ctr, const vec3 up);
  */
 void translate(mat4 m, const vec3 v);
 
-// /**
-//  * @brief Rotate a matrix about a vector.
-//  *
-//  * @param m The matrix to apply the rotation to.
-//  * @param axis The axis of the rotation.
-//  * @param angle The rotation angle in degrees.
-//  * @return A rotation matrix.
-//  */
-// inline Mat4 rotate(const Mat4 &m, const Vec3 &v, float angle) {
-//   const auto a = angle;
-//   const auto c = std::cos(a);
-//   const auto s = std::sin(a);
-//
-//   Mat4 result;
-//   Vec3 axis = v.normalize();
-//
-//   result[0][0] = c + (1.0f - c) * axis.x() * axis.x();
-//   result[0][1] = (1.0f - c) * axis.x() * axis.y() + s * axis.z();
-//   result[0][2] = (1.0f - c) * axis.x() * axis.z() - s * axis.y();
-//   result[0][3] = 0.0f;
-//
-//   result[1][0] = (1.0f - c) * axis.y() * axis.x() - s * axis.z();
-//   result[1][1] = c + (1.0f - c) * axis.y() * axis.y();
-//   result[1][2] = (1.0f - c) * axis.y() * axis.z() + s * axis.x();
-//   result[1][3] = 0.0f;
-//
-//   result[2][0] = (1.0f - c) * axis.z() * axis.x() + s * axis.y();
-//   result[2][1] = (1.0f - c) * axis.z() * axis.y() - s * axis.x();
-//   result[2][2] = c + (1.0f - c) * axis.z() * axis.z();
-//   result[2][3] = 0.0f;
-//
-//   result[3][0] = 0.0f;
-//   result[3][1] = 0.0f;
-//   result[3][2] = 0.0f;
-//   result[3][3] = 1.0f;
-//   return m * result;
-// }
+/**
+ * @brief Rotate a transformation matrix.
+ *
+ * @param m The matrix to apply the rotation to.
+ * @param axis The axis of the rotation.
+ * @param angle The rotation angle in degrees.
+ * @return A rotation matrix.
+void rotate(mat4 m, vec3 axis, const float angle) {
+
+  const auto a = angle;
+  const auto c = cos(a);
+  const auto s = sin(a);
+
+  normalize_vec3(axis);
+
+  result[0][0] = c + (1.0f - c) * axis.x() * axis.x();
+  result[0][1] = (1.0f - c) * axis.x() * axis.y() + s * axis.z();
+  result[0][2] = (1.0f - c) * axis.x() * axis.z() - s * axis.y();
+  result[0][3] = 0.0f;
+
+  result[1][0] = (1.0f - c) * axis.y() * axis.x() - s * axis.z();
+  result[1][1] = c + (1.0f - c) * axis.y() * axis.y();
+  result[1][2] = (1.0f - c) * axis.y() * axis.z() + s * axis.x();
+  result[1][3] = 0.0f;
+
+  result[2][0] = (1.0f - c) * axis.z() * axis.x() + s * axis.y();
+  result[2][1] = (1.0f - c) * axis.z() * axis.y() - s * axis.x();
+  result[2][2] = c + (1.0f - c) * axis.z() * axis.z();
+  result[2][3] = 0.0f;
+
+  result[3][0] = 0.0f;
+  result[3][1] = 0.0f;
+  result[3][2] = 0.0f;
+  result[3][3] = 1.0f;
+  return m * result;
+}
+ */
 
 #ifdef __cplusplus
 }

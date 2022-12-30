@@ -29,9 +29,9 @@ TEST(lintests, identity_mat4) {
   ASSERT_FLOAT_EQ(m[3][3], 1);
 }
 
-TEST(lintests, normalize_vf3) {
+TEST(lintests, normalize_vec3) {
   vec3 v = {5, 2, -3};
-  normalize_vf3(v);
+  normalize_vec3(v);
 
   ASSERT_FLOAT_EQ(v[0],  0.8111071056538127f);
   ASSERT_FLOAT_EQ(v[1],  0.3244428422615251f);
@@ -48,10 +48,16 @@ TEST(lintests, cross_vec3) {
   ASSERT_FLOAT_EQ(dest[2], 3.0f);
 }
 
-TEST(vec3test, dot) {
+TEST(lintests, dot_vec3) {
   vec3 v1 = {1.0f, -3.2f, 0.0f};
   vec3 v2 = {5.4f, 3.2f, -5.0f};
   ASSERT_FLOAT_EQ(dot_vec3(v1, v2), -4.84);
+}
+
+TEST(lintests, dot_vec4) {
+  vec4 v1 = {1.0f, -3.2f, 0.0f, 1.0f};
+  vec4 v2 = {5.4f, 3.2f, -5.0f, -0.5f};
+  ASSERT_FLOAT_EQ(dot_vec4(v1, v2), -5.34);
 }
 
 TEST(lintests, perspective) {

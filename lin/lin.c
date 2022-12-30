@@ -35,13 +35,26 @@ void identity_mat4(mat4 m) {
 /**
  * ----------------------------------------------------------------------------
  */
-void normalize_vf3(vec3 vec) {
+void normalize_vec3(vec3 vec) {
   float l = sqrt((vec[0] * vec[0]) + (vec[1] * vec[1]) + (vec[2] * vec[2]));
   vec[0] /= l;
   vec[1] /= l;
   vec[2] /= l;
 }
 
+/**
+ * ----------------------------------------------------------------------------
+ */
+float dot_vec3(const vec3 v1, const vec3 v2) {
+  return (v1[0] * v2[0]) + (v1[1] * v2[1]) + (v1[2] * v2[2]);
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+float dot_vec4(const vec4 v1, const vec4 v2) {
+  return (v1[0] * v2[0]) + (v1[1] * v2[1]) + (v1[2] * v2[2]) + (v1[3] * v2[3]);
+}
 /**
  * ----------------------------------------------------------------------------
  */
@@ -54,8 +67,10 @@ void cross_vec3(vec3 dest, const vec3 v1, const vec3 v2) {
 /**
  * ----------------------------------------------------------------------------
  */
-float dot_vec3(const vec3 v1, const vec3 v2) {
-  return (v1[0] * v2[0]) + (v1[1] * v2[1]) + (v1[2] * v2[2]);
+void cross_mat4(mat4 dest, const mat4 m1, const mat4 m2) {
+  (void)dest;
+  (void)m1;
+  (void)m2;
 }
 
 /**
@@ -77,11 +92,11 @@ void perspective(mat4 mat, const float fov, const float aspect_ratio,
  */
 void look_at(mat4 mat, const vec3 eye, const vec3 ctr, const vec3 up) {
   vec3 f = {ctr[0] - eye[0], ctr[1] - eye[1], ctr[2] - eye[2]};
-  normalize_vf3(f);
+  normalize_vec3(f);
 
   vec3 s;
   cross_vec3(s, f, up);
-  normalize_vf3(s);
+  normalize_vec3(s);
 
   vec3 u;
   cross_vec3(u, s, f);
