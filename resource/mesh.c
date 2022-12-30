@@ -142,10 +142,18 @@ struct mesh mesh_load(const char *filepath) {
     prev = curr + 1;
   }
 
-  vec3 positions[v_count];
-  vec2 tex_coords[vt_count];
-  vec3 normals[vn_count];
-  struct index indices[f_count];
+  size_t positions_size = sizeof(vec3) * v_count;
+  size_t tex_coords_size = sizeof(vec2) * vt_count;
+  size_t normals_size = sizeof(vec3) * vn_count;
+  size_t indices_size = sizeof(struct index) * f_count;
+  size_t mem_size = positions_size + tex_coords_size + normals_size + indices_size;
+  void *temp_mem = malloc(mem_size);
+  
+  vec3 *positions = (vec3 *)(temp_mem);
+  vec2 *tex_coords = (vec2 *)(temp_mem + positions_size);
+  vec3 *normals = (vec3 *)(temp_mem + positions_size + tex_coords_size);
+  struct index *indices =
+      (struct index *)(temp_mem + positions_size + tex_coords_size + normals_size);
 
   v_count = 0;
   vt_count = 0;
@@ -193,6 +201,7 @@ struct mesh mesh_load(const char *filepath) {
     }
   }
 
+  free(temp_mem);
   mmapfile_unmap(&file);
   return mesh;
 }
