@@ -1,12 +1,15 @@
 #ifndef LIN_H_
 #define LIN_H_
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include <math.h>
+
+typedef float mat4[4][4];
+
+void print_mat4(const mat4 mat);
 
 /**
  * @brief Convert an angle from degrees to radians. Not exact.
@@ -16,27 +19,18 @@ extern "C" {
  */
 float radians(const float degrees);
 
-// /**
-//  * @brief Create perspective matrix.
-//  *
-//  * @param fov The field of view in degrees.
-//  * @param near The near clip distance.
-//  * @param far The far clip distance.
-//  * @param aspect_ratio The aspect ratio of the frustum
-//  */
-// constexpr Mat4 perspective(const float fov, const float aspect_ratio,
-//                            const float near, const float far) {
-//   const auto t = std::tan(fov / 2.0f);
-// 
-//   Mat4 result(0.0f);
-//   result[0][0] = 1.0f / (aspect_ratio * t);
-//   result[1][1] = 1.0f / t;
-//   result[2][2] = -(far + near) / (far - near);
-//   result[2][3] = -1.0f;
-//   result[3][2] = -(2.0f * far * near) / (far - near);
-//   return result;
-// }
-// 
+/**
+ * @brief Create perspective matrix.
+ *
+ * @param mat The float[16] to store the resutlting matrix in.
+ * @param fov The field of view in degrees.
+ * @param near The near clip distance.
+ * @param far The far clip distance.
+ * @param aspect_ratio The aspect ratio of the frustum
+ */
+void perspective(mat4 mat, const float fov, const float aspect_ratio,
+                 const float near, const float far);
+
 // /**
 //  * @brief Create a view matrix.
 //  *
@@ -49,27 +43,27 @@ float radians(const float degrees);
 //   auto f = (ctr - eye).normalize();
 //   auto s = (f * up).normalize();
 //   auto u = s * f;
-// 
+//
 //   Mat4 mat(1.0f);
 //   mat[0][0] = s[0];
 //   mat[1][0] = s[1];
 //   mat[2][0] = s[2];
-// 
+//
 //   mat[0][1] = u[0];
 //   mat[1][1] = u[1];
 //   mat[2][1] = u[2];
-// 
+//
 //   mat[0][2] = -f[0];
 //   mat[1][2] = -f[1];
 //   mat[2][2] = -f[2];
-// 
+//
 //   mat[3][0] = -dot(s, eye);
 //   mat[3][1] = -dot(u, eye);
 //   mat[3][2] = dot(f, eye);
-// 
+//
 //   return mat;
 // }
-// 
+//
 // /**
 //  * @brief Create a translation matrix.
 //  *
@@ -84,7 +78,7 @@ float radians(const float degrees);
 //   result[3][2] += v[2];
 //   return result;
 // }
-// 
+//
 // /**
 //  * @brief Rotate a matrix about a vector.
 //  *
@@ -97,25 +91,25 @@ float radians(const float degrees);
 //   const auto a = angle;
 //   const auto c = std::cos(a);
 //   const auto s = std::sin(a);
-// 
+//
 //   Mat4 result;
 //   Vec3 axis = v.normalize();
-// 
+//
 //   result[0][0] = c + (1.0f - c) * axis.x() * axis.x();
 //   result[0][1] = (1.0f - c) * axis.x() * axis.y() + s * axis.z();
 //   result[0][2] = (1.0f - c) * axis.x() * axis.z() - s * axis.y();
 //   result[0][3] = 0.0f;
-// 
+//
 //   result[1][0] = (1.0f - c) * axis.y() * axis.x() - s * axis.z();
 //   result[1][1] = c + (1.0f - c) * axis.y() * axis.y();
 //   result[1][2] = (1.0f - c) * axis.y() * axis.z() + s * axis.x();
 //   result[1][3] = 0.0f;
-// 
+//
 //   result[2][0] = (1.0f - c) * axis.z() * axis.x() + s * axis.y();
 //   result[2][1] = (1.0f - c) * axis.z() * axis.y() - s * axis.x();
 //   result[2][2] = c + (1.0f - c) * axis.z() * axis.z();
 //   result[2][3] = 0.0f;
-// 
+//
 //   result[3][0] = 0.0f;
 //   result[3][1] = 0.0f;
 //   result[3][2] = 0.0f;

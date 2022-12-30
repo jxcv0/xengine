@@ -54,7 +54,8 @@ void shader_set_uniform_2fv(shader_t id, const char *uniform_name,
  * @param uniform_name The name of the uniform.
  * @param value The value to set the uniform to.
  */
-void shader_set_uniform_3fv(shader_t id, const char *uniform_name, const Vec3 *value) {
+void shader_set_uniform_3fv(shader_t id, const char *uniform_name,
+                            const Vec3 *value) {
   glUniform3fv(glGetUniformLocation(id, uniform_name), 1, value->value_ptr());
 }
 
