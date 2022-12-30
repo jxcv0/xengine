@@ -86,8 +86,7 @@ void set_uniform(shader_t id, const char *uniform_name, const Vec4 *value) {
  * @param uniform_name The name of the uniform.
  * @param value The value to set the uniform to.
  */
-void set_uniform(shader_t shader, const char *uniform_name,
-                 const Mat4 *value) {
+void set_uniform(shader_t shader, const char *uniform_name, const Mat4 *value) {
   auto loc = glGetUniformLocation(shader, uniform_name);
   glUniformMatrix4fv(loc, 1, GL_FALSE, value->value_ptr());
 }

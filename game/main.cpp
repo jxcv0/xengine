@@ -65,7 +65,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
   meshes.assign(cube_entity);
   transformations.assign(cube_entity);
 
-  meshes.set(cube_entity, mesh_load("assets/models/female_base/female_base.obj"));
+  meshes.set(cube_entity, mesh_load("assets/models/cube/cube.obj"));
   mesh_buffer(meshes.get(cube_entity));
 
   glUseProgram(shader);
@@ -100,6 +100,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
+
+  mesh_unload(meshes.get(cube_entity));
 
   glfwDestroyWindow(window);
   glfwTerminate();
