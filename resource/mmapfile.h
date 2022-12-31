@@ -1,72 +1,45 @@
 #ifndef MMAPFILE_H_
 #define MMAPFILE_H_
 
-#include <fcntl.h>
-#include <sched.h>
-#include <sys/mman.h>
-#include <unistd.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#include <cmath>
-#include <cstddef>
-#include <cstdint>
-#include <cstdio>
-#include <cstring>
-#include <filesystem>
-#include <iostream>
-#include <ostream>
-#include <string_view>
+#include <stddef.h>
 
 /**
- * @brief Memory mapped RAII class. Opens a file and maps it to a memory
- * address.
+ * @brief Memory mapped file data;
  */
-class MmapFile {
- public:
-  /**
-   * @brief Construct an MmapFile using a filepath. Once the mapping is
-   *        successful, the file is closed. If initialization fails the
-   *        instances address is set to nullptr. Validity can be queried with
-   *        MmapFile::valid.
-   *
-   * @param filepath The filepath to the file to open.
-   */
-  MmapFile(const char* filepath) noexcept;
-
-  /**
-   * @brief Destructor. Unmap the memory address.
-   */
-  ~MmapFile();
-
-  /**
-   * @brief Print the contents of the address.
-   */
-  friend std::ostream& operator<<(std::ostream& os, const MmapFile& mmf) {
-    auto c = static_cast<char*>(mmf.mp_addr);
-    for (std::size_t i = 0; i < mmf.m_len; i++) {
-      os << c[i];
-    }
-    return os;
-  }
-
-  /**
-   * @brief Check that the memory address is valid.
-   *
-   * @return boolean True if address is not nullptr.
-   */
-  inline auto valid() const { return mp_addr != nullptr; }
-
-  /**
-   * @brief Get a string view into the file.
-   *
-   * @return a std::string view that points to the mapped memory.
-   */
-  auto view() const {
-    return std::string_view(static_cast<char*>(mp_addr), m_len);
-  }
-
- private:
-  void* mp_addr;
-  std::size_t m_len;
+struct mmapfile {
+  void *mp_addr;
+  size_t m_size;
 };
+
+/**
+ * @brief A line of text. Basically a string.
+ */
+struct string {
+  char *mp_start;
+  size_t m_len;
+};
+
+/**
+ * @brief Create a memory mapped file.
+ *
+ * @param filepath The path to the file to open.
+ * @return struct mmapfile.
+ */
+struct mmapfile mmapfile_map(const char *filepath);
+
+/**
+ * @brief Unmap a memory mapped file.
+ *
+ * @param m A pointer to the mmapfile structure.
+ */
+void mmapfile_unmap(struct mmapfile *mapped_file);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // MMAPFILE_H_

@@ -1,9 +1,9 @@
 #version 460 core
 out vec4 frag_color;
 
+in vec3 pos;
 in vec2 tex_coord;
 in vec3 normal;
-in vec3 pos;
 
 uniform vec3 light_pos;
 uniform vec3 light_color;

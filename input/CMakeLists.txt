@@ -3,7 +3,7 @@ project(input)
 
 set(
   SOURCES
-    input.cpp
+    input.c
 )
 
 set(
