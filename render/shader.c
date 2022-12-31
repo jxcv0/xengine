@@ -7,9 +7,60 @@
 /**
  * ----------------------------------------------------------------------------
  */
+void shader_set_uniform_1i(shader_t id, const char *uniform_name,
+                           const int value) {
+  glUniform1i(glGetUniformLocation(id, uniform_name), value);
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+void shader_set_uniform_1f(shader_t id, const char *uniform_name,
+                           const float value) {
+  glUniform1f(glGetUniformLocation(id, uniform_name), value);
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+void shader_set_uniform_2fv(shader_t id, const char *uniform_name,
+                            const vec2 value) {
+  glUniform2fv(glGetUniformLocation(id, uniform_name), 1, value);
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+void shader_set_uniform_3fv(shader_t id, const char *uniform_name,
+                            const vec3 value) {
+  glUniform3fv(glGetUniformLocation(id, uniform_name), 1, value);
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+void shader_set_uniform_4fv(shader_t id, const char *uniform_name,
+                            const vec4 value) {
+  glUniform4fv(glGetUniformLocation(id, uniform_name), 1, value);
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+void shader_set_uniform_m4fv(shader_t shader, const char *uniform_name,
+                             const mat4 value) {
+  int loc = glGetUniformLocation(shader, uniform_name);
+  glUniformMatrix4fv(loc, 1, GL_FALSE, &value[0][0]);
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
 static char *load_file_into_mem(const char *filepath) {
   FILE *file = fopen(filepath, "r");
-  if (file == NULL) { return NULL; }
+  if (file == NULL) {
+    return NULL;
+  }
   fseek(file, 0, SEEK_END);
   size_t filesize = ftell(file);
   char *buff = malloc(filesize);
@@ -49,8 +100,8 @@ static void check_link(int id) {
  * ----------------------------------------------------------------------------
  */
 shader_t shader_load(const char *vert_path, const char *frag_path) {
-  char* v = load_file_into_mem(vert_path);
-  char* f = load_file_into_mem(frag_path);
+  char *v = load_file_into_mem(vert_path);
+  char *f = load_file_into_mem(frag_path);
   const char *vert_file = v;
   const char *frag_file = f;
 
