@@ -1,14 +1,12 @@
 #ifndef MESH_H_
 #define MESH_H_
 
+#include <stddef.h>
+#include "lin.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <stddef.h>
-
-typedef float vec3[3];
-typedef float vec2[2];
 
 struct vertex {
   vec3 m_position;
