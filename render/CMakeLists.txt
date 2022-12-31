@@ -3,8 +3,8 @@ project(render)
 
 set(
   SOURCES
-    window.cpp
-    shader.cpp
+    window.c
+    shader.c
     checkerr.c
 )
 

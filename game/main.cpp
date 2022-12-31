@@ -5,11 +5,8 @@
 #include "entityarray.h"
 #include "input.h"
 #include "lin.h"
-#include "mat4.h"
 #include "mesh.h"
 #include "shader.h"
-#include "vec2.h"
-#include "vec3.h"
 #include "window.h"
 #include <pthread.h>
 // #include <omp.h>
@@ -19,8 +16,8 @@ constexpr auto window_width = 1080;
 constexpr auto window_height = 600;
 
 Camera camera;
-Vec2 mouse_pos;
-Mat4 view_matrix;
+Vec3 mouse_pos;
+mat4 view_matrix;
 
 EntityArray entities;
 ComponentArray<struct mesh> meshes;

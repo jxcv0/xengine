@@ -8,10 +8,6 @@ set(
 
 set(
   HEADERS
-    # vec2.h
-    # vec3.h
-    # vec4.h
-    # mat4.h
     lin.h
 )
 
