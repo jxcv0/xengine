@@ -1,32 +1,47 @@
 #include "shader.h"
 
-#include <exception>
-#include <fstream>
-#include <sstream>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 /**
  * ----------------------------------------------------------------------------
  */
-static inline void check_compile(int id) {
+static char *load_file_into_mem(const char *filepath) {
+  FILE *file = fopen(filepath, "r");
+  if (file == NULL) { return NULL; }
+  fseek(file, 0, SEEK_END);
+  size_t filesize = ftell(file);
+  char *buff = malloc(filesize);
+  fseek(file, 0, SEEK_SET);
+  fread(buff, filesize, 1, file);
+  fclose(file);
+  return buff;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+static void check_compile(int id) {
   GLint success;
   char infoLog[1024];
   glGetShaderiv(id, GL_COMPILE_STATUS, &success);
   if (!success) {
     glGetShaderInfoLog(id, 1024, NULL, infoLog);
-    throw std::runtime_error(infoLog);
+    printf("%s\n", infoLog);
   }
 }
 
 /**
  * ----------------------------------------------------------------------------
  */
-static inline void check_link(int id) {
+static void check_link(int id) {
   GLint success;
   char infoLog[1024];
   glGetProgramiv(id, GL_LINK_STATUS, &success);
   if (!success) {
     glGetProgramInfoLog(id, 1024, NULL, infoLog);
-    throw std::runtime_error(infoLog);
+    printf("%s\n", infoLog);
   }
 }
 
@@ -34,37 +49,22 @@ static inline void check_link(int id) {
  * ----------------------------------------------------------------------------
  */
 shader_t shader_load(const char *vert_path, const char *frag_path) {
-  std::ifstream vert_stream(vert_path);
-  std::ifstream frag_stream(frag_path);
+  char* v = load_file_into_mem(vert_path);
+  char* f = load_file_into_mem(frag_path);
+  const char *vert_file = v;
+  const char *frag_file = f;
 
-  std::stringstream vert_ss;
-  std::stringstream frag_ss;
-
-  vert_ss << vert_stream.rdbuf();
-  frag_ss << frag_stream.rdbuf();
-
-  auto vert = vert_ss.str();
-  auto frag = frag_ss.str();
-
-  const char *vert_code_cstr = vert.c_str();
-  const char *frag_code_cstr = frag.c_str();
-
-  unsigned int vert_id;
-  unsigned int frag_id;
-
-  vert_id = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vert_id, 1, &vert_code_cstr, nullptr);
+  unsigned int vert_id = glCreateShader(GL_VERTEX_SHADER);
+  glShaderSource(vert_id, 1, &vert_file, NULL);
   glCompileShader(vert_id);
-
   check_compile(vert_id);
 
-  frag_id = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(frag_id, 1, &frag_code_cstr, nullptr);
+  unsigned int frag_id = glCreateShader(GL_FRAGMENT_SHADER);
+  glShaderSource(frag_id, 1, &frag_file, NULL);
   glCompileShader(frag_id);
-
   check_compile(frag_id);
 
-  auto program_id = glCreateProgram();
+  unsigned int program_id = glCreateProgram();
   glAttachShader(program_id, vert_id);
   glAttachShader(program_id, frag_id);
   glLinkProgram(program_id);
@@ -73,6 +73,9 @@ shader_t shader_load(const char *vert_path, const char *frag_path) {
 
   glDeleteShader(vert_id);
   glDeleteShader(frag_id);
+
+  free(v);
+  free(f);
 
   return program_id;
 }
