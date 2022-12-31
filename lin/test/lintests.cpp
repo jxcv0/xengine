@@ -128,27 +128,29 @@ TEST(lintests, translate) {
   ASSERT_FLOAT_EQ(m[3][2], 0.1f);
 }
 
-/*
 TEST(lintests, rotate) {
-  auto r = lin::rotate(Mat4(1.0f), Vec3(0.0f, 1.0f, 0.0f), lin::radians(30.0f));
-  ASSERT_FLOAT_EQ(r[0][0], 0.86602539f);
-  ASSERT_FLOAT_EQ(r[0][1], 0.0f);
-  ASSERT_FLOAT_EQ(r[0][2], -0.5f);
-  ASSERT_FLOAT_EQ(r[0][3], 0.0f);
-  ASSERT_FLOAT_EQ(r[1][0], 0.0f);
-  ASSERT_FLOAT_EQ(r[1][1], 1.0f);
-  ASSERT_FLOAT_EQ(r[1][2], 0.0f);
-  ASSERT_FLOAT_EQ(r[1][3], 0.0f);
-  ASSERT_FLOAT_EQ(r[2][0], 0.5f);
-  ASSERT_FLOAT_EQ(r[2][1], 0.0f);
-  ASSERT_FLOAT_EQ(r[2][2], 0.86602539f);
-  ASSERT_FLOAT_EQ(r[2][3], 0.0f);
-  ASSERT_FLOAT_EQ(r[3][0], 0.0f);
-  ASSERT_FLOAT_EQ(r[3][1], 0.0f);
-  ASSERT_FLOAT_EQ(r[3][2], 0.0f);
-  ASSERT_FLOAT_EQ(r[3][3], 1.0f);
+  mat4 dest = {{0}};
+  mat4 m = {{0}};
+  identity_mat4(m);
+  vec3 v = {0.0f, 1.0f, 0.0f};
+  rotate(dest, m, v, radians(30.0f));
+  ASSERT_FLOAT_EQ(dest[0][0], 0.86602539f);
+  ASSERT_FLOAT_EQ(dest[0][1], 0.0f);
+  ASSERT_FLOAT_EQ(dest[0][2], -0.5f);
+  ASSERT_FLOAT_EQ(dest[0][3], 0.0f);
+  ASSERT_FLOAT_EQ(dest[1][0], 0.0f);
+  ASSERT_FLOAT_EQ(dest[1][1], 1.0f);
+  ASSERT_FLOAT_EQ(dest[1][2], 0.0f);
+  ASSERT_FLOAT_EQ(dest[1][3], 0.0f);
+  ASSERT_FLOAT_EQ(dest[2][0], 0.5f);
+  ASSERT_FLOAT_EQ(dest[2][1], 0.0f);
+  ASSERT_FLOAT_EQ(dest[2][2], 0.86602539f);
+  ASSERT_FLOAT_EQ(dest[2][3], 0.0f);
+  ASSERT_FLOAT_EQ(dest[3][0], 0.0f);
+  ASSERT_FLOAT_EQ(dest[3][1], 0.0f);
+  ASSERT_FLOAT_EQ(dest[3][2], 0.0f);
+  ASSERT_FLOAT_EQ(dest[3][3], 1.0f);
 }
-*/
 
 TEST(lintests, look_at) {
   vec3 eye = {3.0f, 3.0f, 3.0f};

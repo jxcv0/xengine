@@ -165,35 +165,32 @@ void translate(mat4 m, const vec3 v) {
   m[3][2] += v[2];
 }
 
-void rotate(mat4 m, vec3 axis, const float angle) {
-  (void)m;
-  (void)axis;
-  (void)angle;
-  /*
-    const auto a = angle;
-    const auto c = cos(a);
-    const auto s = sin(a);
+void rotate(mat4 dest, const mat4 m, vec3 axis, const float angle) {
+    const float c = cos(angle);
+    const float s = sin(angle);
 
     normalize_vec3(axis);
 
-    result[0][0] = c + (1.0f - c) * axis.x() * axis.x();
-    result[0][1] = (1.0f - c) * axis.x() * axis.y() + s * axis.z();
-    result[0][2] = (1.0f - c) * axis.x() * axis.z() - s * axis.y();
-    result[0][3] = 0.0f;
+    mat4 rot = {0};
+    rot[0][0] = c + (1.0f - c) * axis[0] * axis[0];
+    rot[0][1] = (1.0f - c) * axis[0] * axis[1] + s * axis[2];
+    rot[0][2] = (1.0f - c) * axis[0] * axis[2] - s * axis[1];
+    rot[0][3] = 0.0f;
 
-    result[1][0] = (1.0f - c) * axis.y() * axis.x() - s * axis.z();
-    result[1][1] = c + (1.0f - c) * axis.y() * axis.y();
-    result[1][2] = (1.0f - c) * axis.y() * axis.z() + s * axis.x();
-    result[1][3] = 0.0f;
+    rot[1][0] = (1.0f - c) * axis[1] * axis[0] - s * axis[2];
+    rot[1][1] = c + (1.0f - c) * axis[1] * axis[1];
+    rot[1][2] = (1.0f - c) * axis[1] * axis[2] + s * axis[0];
+    rot[1][3] = 0.0f;
 
-    result[2][0] = (1.0f - c) * axis.z() * axis.x() + s * axis.y();
-    result[2][1] = (1.0f - c) * axis.z() * axis.y() - s * axis.x();
-    result[2][2] = c + (1.0f - c) * axis.z() * axis.z();
-    result[2][3] = 0.0f;
+    rot[2][0] = (1.0f - c) * axis[2] * axis[0] + s * axis[1];
+    rot[2][1] = (1.0f - c) * axis[2] * axis[1] - s * axis[0];
+    rot[2][2] = c + (1.0f - c) * axis[2] * axis[2];
+    rot[2][3] = 0.0f;
 
-    result[3][0] = 0.0f;
-    result[3][1] = 0.0f;
-    result[3][2] = 0.0f;
-    result[3][3] = 1.0f;
-    */
+    rot[3][0] = 0.0f;
+    rot[3][1] = 0.0f;
+    rot[3][2] = 0.0f;
+    rot[3][3] = 1.0f;
+
+    product_mat4(dest, m, rot);
 }
