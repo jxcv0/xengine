@@ -7,10 +7,8 @@ void process_mouse_movement(struct camera *camera, const vec2 mouse_pos) {
     camera->m_first_mouse_movement = false;
   }
 
-  vec2 offset = {
-      mouse_pos[0] - camera->m_last_mouse_pos[0],
-      camera->m_last_mouse_pos[1]- mouse_pos[1]
-  };
+  vec2 offset = {mouse_pos[0] - camera->m_last_mouse_pos[0],
+                 camera->m_last_mouse_pos[1] - mouse_pos[1]};
 
   camera->m_last_mouse_pos[0] = mouse_pos[0];
   camera->m_last_mouse_pos[1] = mouse_pos[1];
@@ -30,11 +28,7 @@ void process_mouse_movement(struct camera *camera, const vec2 mouse_pos) {
   float yaw = radians(camera->m_yaw);
   float pitch = radians(camera->m_pitch);
 
-  vec3 temp_view = {
-      cos(yaw) * cos(pitch),
-      sin(pitch),
-      sin(yaw) * cos(pitch)
-  };
+  vec3 temp_view = {cos(yaw) * cos(pitch), sin(pitch), sin(yaw) * cos(pitch)};
 
   normalize_vec3(temp_view);
   camera->m_view_dir[0] = temp_view[0];

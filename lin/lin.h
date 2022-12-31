@@ -85,6 +85,7 @@ void perspective(mat4 mat, const float fov, const float aspect_ratio,
 /**
  * @brief Create a view matrix.
  *
+ * @param mat The matrix to store the result in.
  * @param eye The direction of the view.
  * @param ctr The position of the view.
  * @param up The up direction of the view.
@@ -110,36 +111,6 @@ void translate(mat4 m, const vec3 v);
  * @return A rotation matrix.
  */
 void rotate(mat4 dest, const mat4 m, vec3 axis, const float angle);
-/*
-
-const auto a = angle;
-const auto c = cos(a);
-const auto s = sin(a);
-
-normalize_vec3(axis);
-
-result[0][0] = c + (1.0f - c) * axis.x() * axis.x();
-result[0][1] = (1.0f - c) * axis.x() * axis.y() + s * axis.z();
-result[0][2] = (1.0f - c) * axis.x() * axis.z() - s * axis.y();
-result[0][3] = 0.0f;
-
-result[1][0] = (1.0f - c) * axis.y() * axis.x() - s * axis.z();
-result[1][1] = c + (1.0f - c) * axis.y() * axis.y();
-result[1][2] = (1.0f - c) * axis.y() * axis.z() + s * axis.x();
-result[1][3] = 0.0f;
-
-result[2][0] = (1.0f - c) * axis.z() * axis.x() + s * axis.y();
-result[2][1] = (1.0f - c) * axis.z() * axis.y() - s * axis.x();
-result[2][2] = c + (1.0f - c) * axis.z() * axis.z();
-result[2][3] = 0.0f;
-
-result[3][0] = 0.0f;
-result[3][1] = 0.0f;
-result[3][2] = 0.0f;
-result[3][3] = 1.0f;
-return m * result;
-}
-*/
 
 #ifdef __cplusplus
 }
