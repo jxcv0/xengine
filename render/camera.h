@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-const vec3 GLOBAL_UP = {0, 1, 0};
+extern const vec3 GLOBAL_UP;
 
 /**
  * @brief Camera class for calculating view matrix.
@@ -22,8 +22,8 @@ struct camera {
   vec3 m_view_dir;
   vec3 m_up;
   vec3 m_right;
-  bool m_first_mouse_movement;
   vec2 m_last_mouse_pos;
+  bool m_first_mouse_movement;
 };
 
 /**

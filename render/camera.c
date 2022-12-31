@@ -1,5 +1,7 @@
 #include "camera.h"
 
+const vec3 GLOBAL_UP = {0, 1, 0};
+
 void process_mouse_movement(struct camera *camera, const vec2 mouse_pos) {
   if (camera->m_first_mouse_movement) {
     camera->m_last_mouse_pos[0] = mouse_pos[0];
@@ -36,7 +38,7 @@ void process_mouse_movement(struct camera *camera, const vec2 mouse_pos) {
   camera->m_view_dir[2] = temp_view[2];
 
   cross_vec3(camera->m_right, camera->m_view_dir, GLOBAL_UP);
-  cross_vec3(camera->m_up, camera->m_right, GLOBAL_UP);
+  cross_vec3(camera->m_up, camera->m_right, camera->m_view_dir);
   normalize_vec3(camera->m_right);
   normalize_vec3(camera->m_up);
 }

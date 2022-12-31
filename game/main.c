@@ -1,26 +1,34 @@
+#include <pthread.h>
+#include <stdbool.h>
+#include <stdio.h>
+
 #include "camera.h"
 #include "checkerr.h"
-#include "componentarray.h"
-#include "constants.h"
-#include "entityarray.h"
 #include "input.h"
 #include "lin.h"
 #include "mesh.h"
 #include "shader.h"
 #include "window.h"
-#include <pthread.h>
-// #include <omp.h>
+
+extern const vec3 GLOBAL_UP;
+
+void print_mat4(const char *name, const mat4 m) {
+  printf("mat4: %s {\n", name);
+  for (int i = 0; i < 4; i++) {
+    printf("%f, %f, %f, %f\n", m[i][0], m[i][1], m[i][2], m[i][3]);
+  }
+  printf("}\n");
+}
 
 GLFWwindow *window;
-constexpr auto window_width = 1080;
-constexpr auto window_height = 600;
+const float window_width = 1080;
+const float window_height = 600;
 
-struct camera camera;
+struct camera camera = {.m_mouse_sensetivity = 0.3, .m_movement_speed = 0.5};
+
 vec3 mouse_pos;
-mat4 view_matrix;
-
-EntityArray entities;
-ComponentArray<struct mesh> meshes;
+mat4 projection_matrix = {0};
+mat4 view_matrix = {0};
 
 // move the fps camera with wasd and update mouse input
 void handle_player_input() {
@@ -53,30 +61,28 @@ void handle_player_input() {
   }
 
   process_mouse_movement(&camera, mouse_pos);
-  vec3 temp = {
-    camera.m_pos[0] + camera.m_view_dir[0],
-    camera.m_pos[1] + camera.m_view_dir[1],
-    camera.m_pos[2] + camera.m_view_dir[2]
-  };
+  vec3 ctr = {camera.m_pos[0] + camera.m_view_dir[0],
+              camera.m_pos[1] + camera.m_view_dir[1],
+              camera.m_pos[2] + camera.m_view_dir[2]};
 
-  look_at(view_matrix, camera.m_pos, temp, camera.m_up);
+  look_at(view_matrix, camera.m_pos, ctr, camera.m_up);
 }
 
 // main
-int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
+int main(int argc, char const *argv[]) {
+  (void)argc;
+  (void)argv;
   create_window(&window, window_width, window_height, "game");
 
-  shader_t shader = shader_load("render/glsl/uber.vert", "render/glsl/uber.frag");
+  shader_t shader =
+      shader_load("render/glsl/uber.vert", "render/glsl/uber.frag");
 
-  mat4 projection_matrix;
   perspective(projection_matrix, radians(60),
-              ((float)window_width / (float)window_height), 0.1f, 100.0f); 
+              ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
-  entity_id cube_entity = entities.create();
-  meshes.assign(cube_entity);
-
-  meshes.set(cube_entity, mesh_load("assets/models/female_base/female_base.obj"));
-  mesh_buffer(meshes.get(cube_entity));
+  struct mesh cube_mesh =
+      mesh_load("assets/models/female_base/female_base.obj");
+  mesh_buffer(&cube_mesh);
 
   glUseProgram(shader);
   shader_set_uniform_m4fv(shader, "projection", projection_matrix);
@@ -110,13 +116,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const *argv[]) {
     shader_set_uniform_3fv(shader, "light_color", light_color);
     shader_set_uniform_3fv(shader, "obj_color", object_color);
 
-    mesh_draw(meshes.get(cube_entity));
+    mesh_draw(&cube_mesh);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
 
-  mesh_unload(meshes.get(cube_entity));
+  mesh_unload(&cube_mesh);
 
   glfwDestroyWindow(window);
   glfwTerminate();
