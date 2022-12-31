@@ -3,7 +3,7 @@ project(xengine VERSION 0.1.0)
 
 set(CMAKE_BUILD_TYPE debug)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
-add_compile_options(-Wall -Wextra -Werror -fopenmp)
+add_compile_options(-O3 -Wall -Wextra -Werror -fopenmp)
 
 enable_testing()
 

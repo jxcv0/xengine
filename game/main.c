@@ -1,9 +1,10 @@
+#include <glad.h>
+#include <GLFW/glfw3.h>
 #include <pthread.h>
 #include <stdbool.h>
 #include <stdio.h>
 
 #include "camera.h"
-#include "checkerr.h"
 #include "input.h"
 #include "lin.h"
 #include "mesh.h"
@@ -60,7 +61,6 @@ void handle_player_input() {
     camera.m_pos[2] += camera.m_right[2] * 0.2f;
   }
 
-  process_mouse_movement(&camera, mouse_pos);
   vec3 ctr = {camera.m_pos[0] + camera.m_view_dir[0],
               camera.m_pos[1] + camera.m_view_dir[1],
               camera.m_pos[2] + camera.m_view_dir[2]};
@@ -99,7 +99,12 @@ int main(int argc, char const *argv[]) {
   camera.m_last_mouse_pos[1] = window_height / 2.0f;
 
   while (!glfwWindowShouldClose(window)) {
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+      glfwSetWindowShouldClose(window, true);
+    }
+
     input_poll_cursor_pos(mouse_pos, window);
+    process_mouse_movement(&camera, mouse_pos);
     handle_player_input();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

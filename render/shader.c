@@ -65,7 +65,8 @@ static char *load_file_into_mem(const char *filepath) {
   size_t filesize = ftell(file);
   char *buff = malloc(filesize);
   fseek(file, 0, SEEK_SET);
-  fread(buff, filesize, 1, file);
+  size_t nread = fread(buff, filesize, 1, file);
+  (void) nread;
   fclose(file);
   return buff;
 }
