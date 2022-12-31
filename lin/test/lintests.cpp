@@ -48,6 +48,38 @@ TEST(lintests, cross_vec3) {
   ASSERT_FLOAT_EQ(dest[2], 3.0f);
 }
 
+TEST(lintests, product_mat4) {
+  mat4 m1 = {{0}};
+  mat4 m2 = {{0}};
+
+  float x = 0.0f;
+  for (auto i = 0; i < 4; i++) {
+    for (auto j = 0; j < 4; j++) {
+      m1[i][j] = x;
+      m2[i][j] = x;
+      x += 1.0f;
+    }
+  }
+  mat4 result = {{0}};
+  product_mat4(result, m1, m2);
+  ASSERT_FLOAT_EQ(result[0][0], 56.0f);
+  ASSERT_FLOAT_EQ(result[0][1], 62.0f);
+  ASSERT_FLOAT_EQ(result[0][2], 68.0f);
+  ASSERT_FLOAT_EQ(result[0][3], 74.0f);
+  ASSERT_FLOAT_EQ(result[1][0], 152.0f);
+  ASSERT_FLOAT_EQ(result[1][1], 174.0f);
+  ASSERT_FLOAT_EQ(result[1][2], 196.0f);
+  ASSERT_FLOAT_EQ(result[1][3], 218.0f);
+  ASSERT_FLOAT_EQ(result[2][0], 248.0f);
+  ASSERT_FLOAT_EQ(result[2][1], 286.0f);
+  ASSERT_FLOAT_EQ(result[2][2], 324.0f);
+  ASSERT_FLOAT_EQ(result[2][3], 362.0f);
+  ASSERT_FLOAT_EQ(result[3][0], 344.0f);
+  ASSERT_FLOAT_EQ(result[3][1], 398.0f);
+  ASSERT_FLOAT_EQ(result[3][2], 452.0f);
+  ASSERT_FLOAT_EQ(result[3][3], 506.0);
+}
+
 TEST(lintests, dot_vec3) {
   vec3 v1 = {1.0f, -3.2f, 0.0f};
   vec3 v2 = {5.4f, 3.2f, -5.0f};

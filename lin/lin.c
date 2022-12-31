@@ -5,7 +5,7 @@
 /**
  * ----------------------------------------------------------------------------
  */
-static void col(const unsigned int c, vec4 v, const mat4 m) {
+static void col_mat4(const unsigned int c, vec4 v, const mat4 m) {
   v[0] = m[0][c];
   v[1] = m[1][c];
   v[2] = m[2][c];
@@ -77,10 +77,36 @@ void cross_vec3(vec3 dest, const vec3 v1, const vec3 v2) {
 /**
  * ----------------------------------------------------------------------------
  */
-void cross_mat4(mat4 dest, const mat4 m1, const mat4 m2) {
-  (void)dest;
-  (void)m1;
-  (void)m2;
+void product_mat4(mat4 dest, const mat4 m1, const mat4 m2) {
+  vec4 col0 = {0};
+  vec4 col1 = {0};
+  vec4 col2 = {0};
+  vec4 col3 = {0};
+
+  col_mat4(0, col0, m2);
+  col_mat4(1, col1, m2);
+  col_mat4(2, col2, m2);
+  col_mat4(3, col3, m2);
+
+  dest[0][0] = dot_vec4(m1[0], col0);
+  dest[0][1] = dot_vec4(m1[0], col1);
+  dest[0][2] = dot_vec4(m1[0], col2);
+  dest[0][3] = dot_vec4(m1[0], col3);
+
+  dest[1][0] = dot_vec4(m1[1], col0);
+  dest[1][1] = dot_vec4(m1[1], col1);
+  dest[1][2] = dot_vec4(m1[1], col2);
+  dest[1][3] = dot_vec4(m1[1], col3);
+
+  dest[2][0] = dot_vec4(m1[2], col0);
+  dest[2][1] = dot_vec4(m1[2], col1);
+  dest[2][2] = dot_vec4(m1[2], col2);
+  dest[2][3] = dot_vec4(m1[2], col3);
+
+  dest[3][0] = dot_vec4(m1[3], col0);
+  dest[3][1] = dot_vec4(m1[3], col1);
+  dest[3][2] = dot_vec4(m1[3], col2);
+  dest[3][3] = dot_vec4(m1[3], col3);
 }
 
 /**
@@ -137,4 +163,37 @@ void translate(mat4 m, const vec3 v) {
   m[3][0] += v[0];
   m[3][1] += v[1];
   m[3][2] += v[2];
+}
+
+void rotate(mat4 m, vec3 axis, const float angle) {
+  (void)m;
+  (void)axis;
+  (void)angle;
+  /*
+    const auto a = angle;
+    const auto c = cos(a);
+    const auto s = sin(a);
+
+    normalize_vec3(axis);
+
+    result[0][0] = c + (1.0f - c) * axis.x() * axis.x();
+    result[0][1] = (1.0f - c) * axis.x() * axis.y() + s * axis.z();
+    result[0][2] = (1.0f - c) * axis.x() * axis.z() - s * axis.y();
+    result[0][3] = 0.0f;
+
+    result[1][0] = (1.0f - c) * axis.y() * axis.x() - s * axis.z();
+    result[1][1] = c + (1.0f - c) * axis.y() * axis.y();
+    result[1][2] = (1.0f - c) * axis.y() * axis.z() + s * axis.x();
+    result[1][3] = 0.0f;
+
+    result[2][0] = (1.0f - c) * axis.z() * axis.x() + s * axis.y();
+    result[2][1] = (1.0f - c) * axis.z() * axis.y() - s * axis.x();
+    result[2][2] = c + (1.0f - c) * axis.z() * axis.z();
+    result[2][3] = 0.0f;
+
+    result[3][0] = 0.0f;
+    result[3][1] = 0.0f;
+    result[3][2] = 0.0f;
+    result[3][3] = 1.0f;
+    */
 }

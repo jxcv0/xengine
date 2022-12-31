@@ -61,6 +61,15 @@ float dot_vec4(const vec4 v1, const vec4 v2);
 void cross_vec3(vec3 dest, const vec3 v1, const vec3 v2);
 
 /**
+ * @brief Multiply 2 mat4's.
+ *
+ * @param dest The mat4 to store the result.
+ * @param m1 The first mat4.
+ * @param m2 The second mat4.
+ */
+void product_mat4(mat4 dest, const mat4 m1, const mat4 m2);
+
+/**
  * @brief Create perspective matrix.
  *
  * @param mat The float[16] to store the resutlting matrix in.
@@ -97,36 +106,38 @@ void translate(mat4 m, const vec3 v);
  * @param axis The axis of the rotation.
  * @param angle The rotation angle in degrees.
  * @return A rotation matrix.
-void rotate(mat4 m, vec3 axis, const float angle) {
-
-  const auto a = angle;
-  const auto c = cos(a);
-  const auto s = sin(a);
-
-  normalize_vec3(axis);
-
-  result[0][0] = c + (1.0f - c) * axis.x() * axis.x();
-  result[0][1] = (1.0f - c) * axis.x() * axis.y() + s * axis.z();
-  result[0][2] = (1.0f - c) * axis.x() * axis.z() - s * axis.y();
-  result[0][3] = 0.0f;
-
-  result[1][0] = (1.0f - c) * axis.y() * axis.x() - s * axis.z();
-  result[1][1] = c + (1.0f - c) * axis.y() * axis.y();
-  result[1][2] = (1.0f - c) * axis.y() * axis.z() + s * axis.x();
-  result[1][3] = 0.0f;
-
-  result[2][0] = (1.0f - c) * axis.z() * axis.x() + s * axis.y();
-  result[2][1] = (1.0f - c) * axis.z() * axis.y() - s * axis.x();
-  result[2][2] = c + (1.0f - c) * axis.z() * axis.z();
-  result[2][3] = 0.0f;
-
-  result[3][0] = 0.0f;
-  result[3][1] = 0.0f;
-  result[3][2] = 0.0f;
-  result[3][3] = 1.0f;
-  return m * result;
-}
  */
+void rotate(mat4 m, vec3 axis, const float angle);
+/*
+
+const auto a = angle;
+const auto c = cos(a);
+const auto s = sin(a);
+
+normalize_vec3(axis);
+
+result[0][0] = c + (1.0f - c) * axis.x() * axis.x();
+result[0][1] = (1.0f - c) * axis.x() * axis.y() + s * axis.z();
+result[0][2] = (1.0f - c) * axis.x() * axis.z() - s * axis.y();
+result[0][3] = 0.0f;
+
+result[1][0] = (1.0f - c) * axis.y() * axis.x() - s * axis.z();
+result[1][1] = c + (1.0f - c) * axis.y() * axis.y();
+result[1][2] = (1.0f - c) * axis.y() * axis.z() + s * axis.x();
+result[1][3] = 0.0f;
+
+result[2][0] = (1.0f - c) * axis.z() * axis.x() + s * axis.y();
+result[2][1] = (1.0f - c) * axis.z() * axis.y() - s * axis.x();
+result[2][2] = c + (1.0f - c) * axis.z() * axis.z();
+result[2][3] = 0.0f;
+
+result[3][0] = 0.0f;
+result[3][1] = 0.0f;
+result[3][2] = 0.0f;
+result[3][3] = 1.0f;
+return m * result;
+}
+*/
 
 #ifdef __cplusplus
 }
