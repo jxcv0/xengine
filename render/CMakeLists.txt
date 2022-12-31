@@ -6,6 +6,7 @@ set(
     window.c
     shader.c
     checkerr.c
+    camera.c
 )
 
 set(

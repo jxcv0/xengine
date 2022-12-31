@@ -1,8 +1,6 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include <stdbool.h>
-
 #include "lin.h"
 
 #ifndef GLAD_INCLUDED
