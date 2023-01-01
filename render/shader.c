@@ -63,11 +63,12 @@ static char *load_file_into_mem(const char *filepath) {
   }
   fseek(file, 0, SEEK_END);
   size_t filesize = ftell(file);
-  char *buff = malloc(filesize);
-  fseek(file, 0, SEEK_SET);
+  char *buff = malloc(filesize + 1); // + 1 for '\0'
+  rewind(file);
   size_t nread = fread(buff, filesize, 1, file);
-  (void) nread;
+  buff[nread] = '\0';
   fclose(file);
+  printf("%s\n", buff);
   return buff;
 }
 
@@ -103,6 +104,7 @@ static void check_link(int id) {
 shader_t shader_load(const char *vert_path, const char *frag_path) {
   char *v = load_file_into_mem(vert_path);
   char *f = load_file_into_mem(frag_path);
+
   const char *vert_file = v;
   const char *frag_file = f;
 
