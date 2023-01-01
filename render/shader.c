@@ -58,17 +58,16 @@ void shader_set_uniform_m4fv(shader_t shader, const char *uniform_name,
  */
 static char *load_file_into_mem(const char *filepath) {
   FILE *file = fopen(filepath, "r");
-  if (file == NULL) {
-    return NULL;
-  }
   fseek(file, 0, SEEK_END);
-  size_t filesize = ftell(file);
+  long filesize = ftell(file);
   char *buff = malloc(filesize + 1); // + 1 for '\0'
   rewind(file);
+
   size_t nread = fread(buff, filesize, 1, file);
-  buff[nread] = '\0';
+  (void) nread;
   fclose(file);
-  printf("%s\n", buff);
+  buff[filesize] = '\0';
+
   return buff;
 }
 
