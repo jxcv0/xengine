@@ -48,13 +48,9 @@ void handle_mouse_movement(GLFWwindow *w, double x, double y) {
 }
 
 // move the fps camera with wasd and update mouse input
-void handle_player_input(GLFWwindow *w, int key, int scancode, int action,
-                         int mods) {
-  (void)w;
-  (void)scancode;
-  (void)mods;
+void handle_keyboard_input(GLFWwindow *w) {
 
-  if (key == GLFW_KEY_W && action == GLFW_PRESS) {
+  if (glfwGetKey(w, GLFW_KEY_W) == GLFW_PRESS) {
     vec3 forward;
     cross_vec3(forward, GLOBAL_UP, camera.m_right);
     camera.m_pos[0] += forward[0] * 0.2f;
@@ -62,7 +58,7 @@ void handle_player_input(GLFWwindow *w, int key, int scancode, int action,
     camera.m_pos[2] += forward[2] * 0.2f;
   }
 
-  if (key == GLFW_KEY_S && action == GLFW_PRESS) {
+  if (glfwGetKey(w, GLFW_KEY_S) == GLFW_PRESS) {
     vec3 forward;
     cross_vec3(forward, GLOBAL_UP, camera.m_right);
     camera.m_pos[0] -= forward[0] * 0.2f;
@@ -70,13 +66,13 @@ void handle_player_input(GLFWwindow *w, int key, int scancode, int action,
     camera.m_pos[2] -= forward[2] * 0.2f;
   }
 
-  if (key == GLFW_KEY_A && action == GLFW_PRESS) {
+  if (glfwGetKey(w, GLFW_KEY_A) == GLFW_PRESS) {
     camera.m_pos[0] -= camera.m_right[0] * 0.2f;
     camera.m_pos[1] -= camera.m_right[1] * 0.2f;
     camera.m_pos[2] -= camera.m_right[2] * 0.2f;
   }
 
-  if (key == GLFW_KEY_D && action == GLFW_PRESS) {
+  if (glfwGetKey(w, GLFW_KEY_D) == GLFW_PRESS) {
     camera.m_pos[0] += camera.m_right[0] * 0.2f;
     camera.m_pos[1] += camera.m_right[1] * 0.2f;
     camera.m_pos[2] += camera.m_right[2] * 0.2f;
@@ -89,7 +85,6 @@ int main(int argc, char const *argv[]) {
   (void)argv;
   create_window(&window, window_width, window_height, "game");
   glfwSetCursorPosCallback(window, handle_mouse_movement);
-  glfwSetKeyCallback(window, handle_player_input);
 
   shader_t shader =
       shader_load("render/glsl/uber.vert", "render/glsl/uber.frag");
@@ -120,6 +115,7 @@ int main(int argc, char const *argv[]) {
       glfwSetWindowShouldClose(window, true);
     }
 
+    handle_keyboard_input(window);
     update_view_matrix();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
