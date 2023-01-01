@@ -1,9 +1,10 @@
-#include <glad.h>
-#include <GLFW/glfw3.h>
 #include <pthread.h>
 #include <stdbool.h>
 #include <stdio.h>
 
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
+#include "glad.h"
 #include "camera.h"
 #include "input.h"
 #include "lin.h"
@@ -27,40 +28,11 @@ const float window_height = 600;
 
 struct camera camera = {.m_mouse_sensetivity = 0.3, .m_movement_speed = 0.5};
 
-vec3 mouse_pos;
+vec2 mouse_pos;
 mat4 projection_matrix = {0};
 mat4 view_matrix = {0};
 
-// move the fps camera with wasd and update mouse input
-void handle_player_input() {
-  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-    vec3 forward;
-    cross_vec3(forward, GLOBAL_UP, camera.m_right);
-    camera.m_pos[0] += forward[0] * 0.2f;
-    camera.m_pos[1] += forward[1] * 0.2f;
-    camera.m_pos[2] += forward[2] * 0.2f;
-  }
-
-  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-    vec3 forward;
-    cross_vec3(forward, GLOBAL_UP, camera.m_right);
-    camera.m_pos[0] -= forward[0] * 0.2f;
-    camera.m_pos[1] -= forward[1] * 0.2f;
-    camera.m_pos[2] -= forward[2] * 0.2f;
-  }
-
-  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-    camera.m_pos[0] -= camera.m_right[0] * 0.2f;
-    camera.m_pos[1] -= camera.m_right[1] * 0.2f;
-    camera.m_pos[2] -= camera.m_right[2] * 0.2f;
-  }
-
-  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-    camera.m_pos[0] += camera.m_right[0] * 0.2f;
-    camera.m_pos[1] += camera.m_right[1] * 0.2f;
-    camera.m_pos[2] += camera.m_right[2] * 0.2f;
-  }
-
+void update_view_matrix() {
   vec3 ctr = {camera.m_pos[0] + camera.m_view_dir[0],
               camera.m_pos[1] + camera.m_view_dir[1],
               camera.m_pos[2] + camera.m_view_dir[2]};
@@ -68,11 +40,56 @@ void handle_player_input() {
   look_at(view_matrix, camera.m_pos, ctr, camera.m_up);
 }
 
+void handle_mouse_movement(GLFWwindow *w, double x, double y) {
+  (void)w;
+  mouse_pos[0] = (float)x;
+  mouse_pos[1] = (float)y;
+  process_mouse_movement(&camera, mouse_pos);
+}
+
+// move the fps camera with wasd and update mouse input
+void handle_player_input(GLFWwindow *w, int key, int scancode, int action,
+                         int mods) {
+  (void)w;
+  (void)scancode;
+  (void)mods;
+
+  if (key == GLFW_KEY_W && action == GLFW_PRESS) {
+    vec3 forward;
+    cross_vec3(forward, GLOBAL_UP, camera.m_right);
+    camera.m_pos[0] += forward[0] * 0.2f;
+    camera.m_pos[1] += forward[1] * 0.2f;
+    camera.m_pos[2] += forward[2] * 0.2f;
+  }
+
+  if (key == GLFW_KEY_S && action == GLFW_PRESS) {
+    vec3 forward;
+    cross_vec3(forward, GLOBAL_UP, camera.m_right);
+    camera.m_pos[0] -= forward[0] * 0.2f;
+    camera.m_pos[1] -= forward[1] * 0.2f;
+    camera.m_pos[2] -= forward[2] * 0.2f;
+  }
+
+  if (key == GLFW_KEY_A && action == GLFW_PRESS) {
+    camera.m_pos[0] -= camera.m_right[0] * 0.2f;
+    camera.m_pos[1] -= camera.m_right[1] * 0.2f;
+    camera.m_pos[2] -= camera.m_right[2] * 0.2f;
+  }
+
+  if (key == GLFW_KEY_D && action == GLFW_PRESS) {
+    camera.m_pos[0] += camera.m_right[0] * 0.2f;
+    camera.m_pos[1] += camera.m_right[1] * 0.2f;
+    camera.m_pos[2] += camera.m_right[2] * 0.2f;
+  }
+}
+
 // main
 int main(int argc, char const *argv[]) {
   (void)argc;
   (void)argv;
   create_window(&window, window_width, window_height, "game");
+  glfwSetCursorPosCallback(window, handle_mouse_movement);
+  glfwSetKeyCallback(window, handle_player_input);
 
   shader_t shader =
       shader_load("render/glsl/uber.vert", "render/glsl/uber.frag");
@@ -103,15 +120,14 @@ int main(int argc, char const *argv[]) {
       glfwSetWindowShouldClose(window, true);
     }
 
-    input_poll_cursor_pos(mouse_pos, window);
-    process_mouse_movement(&camera, mouse_pos);
-    handle_player_input();
+    update_view_matrix();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.2, 0.3, 0.3, 1);
 
     mat4 model;
     identity_mat4(model);
+
     // transforms
     shader_set_uniform_m4fv(shader, "model", model);
     shader_set_uniform_m4fv(shader, "view", view_matrix);

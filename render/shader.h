@@ -3,11 +3,6 @@
 
 #include "lin.h"
 
-#ifndef GLAD_INCLUDED
-#define GLAD_INCLUDED
-#include <glad.h>
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
