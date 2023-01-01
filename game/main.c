@@ -26,7 +26,7 @@ GLFWwindow *window;
 const float window_width = 1080;
 const float window_height = 600;
 
-struct camera camera = {.m_mouse_sensetivity = 0.3, .m_movement_speed = 0.5};
+struct camera camera = {.m_mouse_sensetivity = 0.3, .m_movement_speed = 0.1};
 
 vec2 mouse_pos;
 mat4 projection_matrix = {0};
@@ -49,33 +49,32 @@ void handle_mouse_movement(GLFWwindow *w, double x, double y) {
 
 // move the fps camera with wasd and update mouse input
 void handle_keyboard_input(GLFWwindow *w) {
-
   if (glfwGetKey(w, GLFW_KEY_W) == GLFW_PRESS) {
     vec3 forward;
     cross_vec3(forward, GLOBAL_UP, camera.m_right);
-    camera.m_pos[0] += forward[0] * 0.2f;
-    camera.m_pos[1] += forward[1] * 0.2f;
-    camera.m_pos[2] += forward[2] * 0.2f;
+    camera.m_pos[0] += forward[0] * camera.m_movement_speed;
+    camera.m_pos[1] += forward[1] * camera.m_movement_speed;
+    camera.m_pos[2] += forward[2] * camera.m_movement_speed;
   }
 
   if (glfwGetKey(w, GLFW_KEY_S) == GLFW_PRESS) {
     vec3 forward;
     cross_vec3(forward, GLOBAL_UP, camera.m_right);
-    camera.m_pos[0] -= forward[0] * 0.2f;
-    camera.m_pos[1] -= forward[1] * 0.2f;
-    camera.m_pos[2] -= forward[2] * 0.2f;
+    camera.m_pos[0] -= forward[0] * camera.m_movement_speed;
+    camera.m_pos[1] -= forward[1] * camera.m_movement_speed;
+    camera.m_pos[2] -= forward[2] * camera.m_movement_speed;
   }
 
   if (glfwGetKey(w, GLFW_KEY_A) == GLFW_PRESS) {
-    camera.m_pos[0] -= camera.m_right[0] * 0.2f;
-    camera.m_pos[1] -= camera.m_right[1] * 0.2f;
-    camera.m_pos[2] -= camera.m_right[2] * 0.2f;
+    camera.m_pos[0] -= camera.m_right[0] * camera.m_movement_speed;
+    camera.m_pos[1] -= camera.m_right[1] * camera.m_movement_speed;
+    camera.m_pos[2] -= camera.m_right[2] * camera.m_movement_speed;
   }
 
   if (glfwGetKey(w, GLFW_KEY_D) == GLFW_PRESS) {
-    camera.m_pos[0] += camera.m_right[0] * 0.2f;
-    camera.m_pos[1] += camera.m_right[1] * 0.2f;
-    camera.m_pos[2] += camera.m_right[2] * 0.2f;
+    camera.m_pos[0] += camera.m_right[0] * camera.m_movement_speed;
+    camera.m_pos[1] += camera.m_right[1] * camera.m_movement_speed;
+    camera.m_pos[2] += camera.m_right[2] * camera.m_movement_speed;
   }
 }
 
