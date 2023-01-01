@@ -7,6 +7,7 @@ set(
     shader.c
     checkerr.c
     camera.c
+    text.h
 )
 
 set(
@@ -15,6 +16,7 @@ set(
     shader.h
     checkerr.h
     camera.h
+    text.c
 )
 
 add_library(${PROJECT_NAME} STATIC ${HEADERS} ${SOURCES})

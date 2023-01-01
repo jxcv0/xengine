@@ -11,8 +11,8 @@
 #include "lin.h"
 #include "mesh.h"
 #include "shader.h"
-#include "window.h"
 #include "text.h"
+#include "window.h"
 
 extern const vec3 GLOBAL_UP;
 
@@ -90,7 +90,7 @@ int main(int argc, char const *argv[]) {
   shader_t shader =
       shader_load("render/glsl/uber.vert", "render/glsl/uber.frag");
 
-  text_load_ttf("");
+  text_load_ttf("assets/fonts/Consolas.ttf");
 
   perspective(projection_matrix, radians(60),
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
