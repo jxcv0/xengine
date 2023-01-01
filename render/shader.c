@@ -1,10 +1,10 @@
 #include "shader.h"
 
-#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "glad.h"
+#include "utils.h"
 
 /**
  * ----------------------------------------------------------------------------
@@ -53,25 +53,6 @@ void shader_set_uniform_m4fv(shader_t shader, const char *uniform_name,
                              const mat4 value) {
   int loc = glGetUniformLocation(shader, uniform_name);
   glUniformMatrix4fv(loc, 1, GL_FALSE, &value[0][0]);
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-static char *load_file_into_mem(const char *filepath) {
-  FILE *file = fopen(filepath, "r");
-  fseek(file, 0, SEEK_END);
-  long filesize = ftell(file);
-  char *buff = malloc(filesize + 1);  // + 1 for '\0'
-  rewind(file);
-
-  size_t nread = fread(buff, filesize, 1, file);
-  (void)nread;
-
-  fclose(file);
-  buff[filesize] = '\0';
-
-  return buff;
 }
 
 /**

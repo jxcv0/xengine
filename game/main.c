@@ -4,8 +4,9 @@
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
-#include "glad.h"
+
 #include "camera.h"
+#include "glad.h"
 #include "input.h"
 #include "lin.h"
 #include "mesh.h"
