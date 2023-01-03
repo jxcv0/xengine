@@ -143,6 +143,7 @@ int main(int argc, char const *argv[]) {
   }
 
   mesh_unload(&cube_mesh);
+  clean_up();
 
   glfwDestroyWindow(window);
   glfwTerminate();
