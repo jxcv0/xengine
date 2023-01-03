@@ -94,7 +94,6 @@ int main(int argc, char const *argv[]) {
   shader_t text_shader =
       shader_load("render/glsl/text.vert", "render/glsl/text.frag");
 
-
   perspective(projection_matrix, radians(60),
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
@@ -119,7 +118,6 @@ int main(int argc, char const *argv[]) {
   process_mouse_movement(&camera, mouse_pos);
 
   init_ttf("assets/fonts/Consolas.ttf");
-  vec2 text_pos = {100, 100};
 
   vec4 text_col = {1};
 
@@ -152,9 +150,8 @@ int main(int argc, char const *argv[]) {
     mesh_draw(&cube_mesh);
 
     const char *debug_text = "abcdefg";
-    render_text(text_shader, projection_matrix, text_pos, text_col,
-                debug_text, 7);
-
+    render_text(text_shader, projection_matrix, mouse_pos, text_col, debug_text,
+                7);
 
     glfwSwapBuffers(window);
     glfwPollEvents();

@@ -7,14 +7,65 @@
 #include "stb_truetype.h"
 #include "utils.h"
 
-struct character debug_chars[128];
-unsigned int vao;
-unsigned int vbo;
+unsigned int vbo, vao;
+unsigned int texture;
+stbtt_bakedchar baked_chars[96];
 
-// TODO use stbtt_BakeFontBitmap instead. This isnt working.
-/**
- * ----------------------------------------------------------------------------
- */
+void init_ttf(const char *filepath) {
+  unsigned char *ttf_buffer = load_file_into_mem_u(filepath);
+  unsigned char temp_buffer[1024 * 1024];
+  stbtt_BakeFontBitmap(ttf_buffer, 0, 64, temp_buffer, 1024, 1024, 32, 96,
+                       baked_chars);
+  glGenTextures(1, &texture);
+  glBindTexture(GL_TEXTURE_2D, texture);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, 1024, 1024, 0, GL_RED,
+               GL_UNSIGNED_BYTE, temp_buffer);
+
+  glGenBuffers(1, &vbo);
+  glGenVertexArrays(1, &vao);
+
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBindVertexArray(vao);
+
+  glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+}
+
+void render_text(const shader_t shader, const mat4 projection, vec2 position,
+                 const vec4 color, const char *txt, size_t n) {
+  glUseProgram(shader);
+  glBindTexture(GL_TEXTURE_2D, texture);
+  glBindVertexArray(vao);
+
+  shader_set_uniform_m4fv(shader, "projection", projection);
+  shader_set_uniform_4fv(shader, "text_color", color);
+
+  for (size_t i = 0; i < n; i++) {
+    char c = txt[i];
+    if (c >= 32) {
+      stbtt_aligned_quad quad;
+      stbtt_GetBakedQuad(baked_chars, 1024, 1024, c - 32, &position[0],
+                         &position[1], &quad, 1);
+
+      // TODO add position[0] to this then use projection matrix uniform
+      float vertices[6][4] = {{quad.x1, quad.y1, quad.s1, quad.s1},
+                              {quad.x1, quad.y0, quad.s1, quad.t0},
+                              {quad.x0, quad.y0, quad.s0, quad.t0},
+
+                              {quad.x1, quad.y1, quad.s1, quad.t1},
+                              {quad.x0, quad.y0, quad.s0, quad.t0},
+                              {quad.x0, quad.y1, quad.s0, quad.t1}};
+
+      glBindBuffer(GL_ARRAY_BUFFER, vbo);
+      glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+      glDrawArrays(GL_TRIANGLES, 0, 6);
+      // xpos += c.m_advance;
+    }
+  }
+}
+
+/*
 void init_ttf(const char *filepath) {
   unsigned char *tff_buffer = load_file_into_mem_u(filepath);
   if (tff_buffer == NULL) {
@@ -83,9 +134,6 @@ void init_ttf(const char *filepath) {
   glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
 }
 
-/**
- * ----------------------------------------------------------------------------
- */
 void render_text(const shader_t shader, const mat4 projection, vec2 position,
                  const vec4 color, const char *txt, size_t n) {
   glUseProgram(shader);
@@ -117,3 +165,4 @@ void render_text(const shader_t shader, const mat4 projection, vec2 position,
     xpos += c.m_advance;
   }
 }
+*/
