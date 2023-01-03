@@ -7,7 +7,6 @@
 #include "stb_truetype.h"
 #include "utils.h"
 
-float scale;
 struct character debug_chars[128];
 unsigned int vao;
 unsigned int vbo;
@@ -24,28 +23,34 @@ void init_ttf(const char *filepath) {
 
   stbtt_fontinfo info;
   if (stbtt_InitFont(&info, tff_buffer, 0)) {
+    // glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     int ascent, descent, line_gap;
     stbtt_GetFontVMetrics(&info, &ascent, &descent, &line_gap);
-    scale = stbtt_ScaleForPixelHeight(&info, 64);
+    float scale = stbtt_ScaleForPixelHeight(&info, 64);
 
     // first 128 utf8 codes
     for (int i = 0; i < 128; i++) {
       // TODO this can be made a lot faster by allocating temp buffer manually
       // with dimensions from functions below.
-      // stbtt_GetCodepointBitmapBox(&info, i, 1, 1, &x0, &y0, &x1, &y1);
-      // stbtt_MakeCodepointBitmap(&info, bmp_buff, x, y, adv_width,
 
       // get character width
       int adv_width;
       int left_side_bearing;
       stbtt_GetCodepointHMetrics(&info, i, &adv_width, &left_side_bearing);
 
+      int x0, y0, x1, y1;
+      stbtt_GetCodepointBitmapBox(&info, i, 1, 1, &x0, &y0, &x1, &y1);
+
+      int w = x1 - x0;
+      int h = y1 - y0;
+      unsigned char temp_buff[w * h];
+      stbtt_MakeCodepointBitmap(&info, temp_buff, w, h, w, scale, scale, i);
+
       // set up character with bitmap and dimensions
       struct character c = {0};
-      c.m_codepoint = i;
-      c.mp_bitmap =
-          stbtt_GetCodepointBitmap(&info, 1, 1, i, &c.m_bitmap_width,
-                                   &c.m_bitmap_height, &c.m_xoff, &c.m_yoff);
+      c.m_bitmap_width = w * scale;
+      c.m_bitmap_height = h * scale;
+      c.m_advance = adv_width * scale;
 
       // generate OpenGL texture
       glGenTextures(1, &c.m_texture_id);
@@ -53,7 +58,7 @@ void init_ttf(const char *filepath) {
 
       // using red channel
       glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, c.m_bitmap_width,
-                   c.m_bitmap_height, 0, GL_RED, GL_UNSIGNED_BYTE, c.mp_bitmap);
+                   c.m_bitmap_height, 0, GL_RED, GL_UNSIGNED_BYTE, temp_buff);
 
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -87,18 +92,19 @@ void render_text(const shader_t shader, const mat4 projection, vec2 position,
                  const vec4 color, const char *txt, size_t n) {
   glUseProgram(shader);
   glActiveTexture(GL_TEXTURE0);
-  glBindVertexArray(0);
+  glBindVertexArray(vao);
 
   shader_set_uniform_m4fv(shader, "projection", projection);
   shader_set_uniform_4fv(shader, "text_color", color);
 
+  float xpos = position[0];
+  float ypos = position[1];
+
   for (size_t i = 0; i < n; i++) {
     int code = txt[i];
     struct character c = debug_chars[code];
-    float xpos = position[0];
-    float ypos = position[1];
-    float w = (float)c.m_bitmap_width * scale;
-    float h = (float)c.m_bitmap_height * scale;
+    float w = c.m_bitmap_width;
+    float h = c.m_bitmap_height;
 
     float vertices[6][4] = {
         {xpos, ypos + h, 0.0f, 0.0f}, {xpos, ypos, 0.0f, 1.0f},
@@ -108,17 +114,8 @@ void render_text(const shader_t shader, const mat4 projection, vec2 position,
     glBindTexture(GL_TEXTURE_2D, c.m_texture_id);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-    glBindVertexArray(vao);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-    position[0] += (float)c.m_advance * scale;
-  }
-}
 
-/**
- * ----------------------------------------------------------------------------
- */
-void clean_up(void) {
-  for (int i = 0; i < 128; i++) {
-    stbtt_FreeBitmap(debug_chars[i].mp_bitmap, NULL);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    xpos += c.m_advance;
   }
 }
