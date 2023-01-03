@@ -11,6 +11,7 @@ struct character debug_chars[128];
 unsigned int vao;
 unsigned int vbo;
 
+// TODO use stbtt_BakeFontBitmap instead. This isnt working.
 /**
  * ----------------------------------------------------------------------------
  */
@@ -30,16 +31,13 @@ void init_ttf(const char *filepath) {
 
     // first 128 utf8 codes
     for (int i = 0; i < 128; i++) {
-      // TODO this can be made a lot faster by allocating temp buffer manually
-      // with dimensions from functions below.
-
       // get character width
       int adv_width;
       int left_side_bearing;
       stbtt_GetCodepointHMetrics(&info, i, &adv_width, &left_side_bearing);
 
       int x0, y0, x1, y1;
-      stbtt_GetCodepointBitmapBox(&info, i, 1, 1, &x0, &y0, &x1, &y1);
+      stbtt_GetCodepointBitmapBox(&info, i, scale, scale, &x0, &y0, &x1, &y1);
 
       int w = x1 - x0;
       int h = y1 - y0;
