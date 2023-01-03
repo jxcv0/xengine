@@ -3,16 +3,8 @@
 
 #include "lin.h"
 
-struct font_info {
-  int bitmap_width;
-  int bitmap_height;
-  int line_height;
-  float scale;
-  unsigned char *bitmap;
-};
+void init_ttf(const char* filepath);
 
-void text_load_ttf(const char* filepath);
-
-void text_debug(vec2 position, const char* str);
+void text_debug(vec2 position, const char* txt);
 
 #endif  // TEXT_H_
