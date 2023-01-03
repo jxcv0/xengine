@@ -99,7 +99,6 @@ void render_text(const shader_t shader, const mat4 projection, vec2 position,
     float ypos = position[1];
     float w = (float)c.m_bitmap_width * scale;
     float h = (float)c.m_bitmap_height * scale;
-    printf("%f %d\n", w, c.m_bitmap_width);
 
     float vertices[6][4] = {
         {xpos, ypos + h, 0.0f, 0.0f}, {xpos, ypos, 0.0f, 1.0f},

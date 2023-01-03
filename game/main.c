@@ -139,7 +139,9 @@ int main(int argc, char const *argv[]) {
     mat4 model;
     identity_mat4(model);
 
-    // TODO pass these as args to render function.
+    glUseProgram(shader);
+
+    // TODO pass these as args to render function along with glUseProgram
     // transforms
     shader_set_uniform_m4fv(shader, "model", model);
     shader_set_uniform_m4fv(shader, "view", view_matrix);
@@ -149,7 +151,6 @@ int main(int argc, char const *argv[]) {
     shader_set_uniform_3fv(shader, "light_color", light_color);
     shader_set_uniform_3fv(shader, "obj_color", object_color);
 
-    glUseProgram(shader);
     mesh_draw(&cube_mesh);
 
     glfwSwapBuffers(window);
