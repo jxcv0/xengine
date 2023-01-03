@@ -1,6 +1,8 @@
 #include <pthread.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
+#include <string.h>
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -89,8 +91,9 @@ int main(int argc, char const *argv[]) {
 
   shader_t shader =
       shader_load("render/glsl/uber.vert", "render/glsl/uber.frag");
+  shader_t text_shader =
+      shader_load("render/glsl/text.vert", "render/glsl/text.frag");
 
-  init_ttf("assets/fonts/Consolas.ttf");
 
   perspective(projection_matrix, radians(60),
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
@@ -113,6 +116,8 @@ int main(int argc, char const *argv[]) {
   camera.m_last_mouse_pos[0] = window_width / 2.0f;
   camera.m_last_mouse_pos[1] = window_height / 2.0f;
 
+  init_ttf("assets/fonts/Consolas.ttf");
+
   while (!glfwWindowShouldClose(window)) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
       glfwSetWindowShouldClose(window, true);
@@ -124,9 +129,17 @@ int main(int argc, char const *argv[]) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.2, 0.3, 0.3, 1);
 
+    vec2 text_pos = {0, 0};
+    vec4 text_col = {1};
+    const char *debug_text = "debug text";
+    size_t n = strlen(debug_text);
+    render_text(text_shader, projection_matrix, text_pos, text_col,
+                "debug text", n);
+
     mat4 model;
     identity_mat4(model);
 
+    // TODO pass these as args to render function.
     // transforms
     shader_set_uniform_m4fv(shader, "model", model);
     shader_set_uniform_m4fv(shader, "view", view_matrix);
@@ -136,6 +149,7 @@ int main(int argc, char const *argv[]) {
     shader_set_uniform_3fv(shader, "light_color", light_color);
     shader_set_uniform_3fv(shader, "obj_color", object_color);
 
+    glUseProgram(shader);
     mesh_draw(&cube_mesh);
 
     glfwSwapBuffers(window);

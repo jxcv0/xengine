@@ -8,6 +8,8 @@
 #include "utils.h"
 
 struct character debug_chars[128];
+unsigned int vao;
+unsigned int vbo;
 
 void init_ttf(const char *filepath) {
   unsigned char *tff_buffer = load_file_into_mem_u(filepath);
@@ -60,11 +62,46 @@ void init_ttf(const char *filepath) {
   }
 
   free(tff_buffer);
+
+  // gen quad for rendering characters
+  glGenVertexArrays(1, &vao);
+  glGenBuffers(GL_VERTEX_ARRAY, &vbo);
+
+  glBindVertexArray(vao);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+  glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
 }
 
-void text_debug(vec2 position, const char *txt) {
-  (void)position;
-  (void)txt;
+void render_text(const shader_t shader, const mat4 projection, vec2 position,
+                 const vec4 color, const char *txt, size_t n) {
+  glUseProgram(shader);
+  glActiveTexture(GL_TEXTURE0);
+  glBindVertexArray(0);
+  shader_set_uniform_m4fv(shader, "projection", projection);
+  shader_set_uniform_4fv(shader, "text_color", color);
+  for (size_t i = 0; i < n; i++) {
+    int code = txt[i];
+    struct character c = debug_chars[code];
+    float xpos = position[0];
+    float ypos = position[1];
+    float w = (float)c.m_bitmap_width;   // * scale
+    float h = (float)c.m_bitmap_height;  // * scale
+
+    float vertices[6][4] = {
+        {xpos, ypos + h, 0.0f, 0.0f}, {xpos, ypos, 0.0f, 1.0f},
+        {xpos + w, ypos, 1.0f, 1.0f}, {xpos, ypos + h, 0.0f, 0.0f},
+        {xpos + w, ypos, 1.0f, 1.0f}, {xpos + w, ypos + h, 1.0f, 0.0f}};
+
+    glBindTexture(GL_TEXTURE_2D, c.m_texture_id);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    position[0] += c.m_advance;  // * scale
+  }
 }
 
 void clean_up(void) {

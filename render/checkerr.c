@@ -64,13 +64,13 @@ void gl_debug_output(GLenum source, GLenum type, unsigned int id,
       printf("high severity: ");
       break;
     case GL_DEBUG_SEVERITY_MEDIUM:
-      printf("medium severity");
+      printf("medium severity: ");
       break;
     case GL_DEBUG_SEVERITY_LOW:
-      printf("low severity");
+      printf("low severity: ");
       break;
     case GL_DEBUG_SEVERITY_NOTIFICATION:
-      printf("notificatio");
+      printf("notification: ");
       break;
   }
 
