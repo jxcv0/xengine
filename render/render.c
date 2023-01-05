@@ -1,6 +1,7 @@
 #include "render.h"
 
 #include "glad.h"
+#include "light.h"
 
 /**
  * ----------------------------------------------------------------------------
@@ -30,11 +31,26 @@ void gen_mesh_buffers(struct mesh *mesh) {
 /**
  * ----------------------------------------------------------------------------
  */
-void draw_mesh(struct mesh *mesh) {
+void draw_mesh(const shader_t shader, const mat4 projection_matrix,
+               const mat4 view_matrix, const mat4 model_matrix,
+               struct light *light, const struct mesh *mesh) {
+  glUseProgram(shader);
+
+  // TODO init the shader on creation with projection matrix, it should never
+  // change
+  shader_set_uniform_m4fv(shader, "projection", projection_matrix);
+  shader_set_uniform_m4fv(shader, "model", model_matrix);
+  shader_set_uniform_m4fv(shader, "view", view_matrix);
+
+  // TODO best way to handle lights?
+  shader_set_uniform_3fv(shader, "light_pos", light->m_position);
+  shader_set_uniform_3fv(shader, "light_color", light->m_color);
+
+  // TODO this needs to be set with mtl data
+  // mesh->mp_material.m_color
+  vec3 mesh_color = {0.3, 0.5, 0.1};  // this is temporary
+  shader_set_uniform_3fv(shader, "obj_color", mesh_color);
+
   glBindVertexArray(mesh->m_vao);
   glDrawArrays(GL_TRIANGLES, 0, mesh->m_num_vertices);
-  /*
-  glDrawElements(GL_TRIANGLES, m_num_indices, GL_UNSIGNED_INT,
-                 static_cast<void *>(0));
-  */
 }

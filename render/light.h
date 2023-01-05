@@ -1,14 +1,14 @@
 #ifndef LIGHT_H_
 #define LIGHT_H_
 
-#include "vec3.h"
+#include "lin.h"
 
-struct Light {
-  Vec3 m_pos;
-  Vec3 m_col;
-  float m_const;
-  float m_lin;
-  float m_quad;
+struct light {
+  vec3 m_position;
+  vec4 m_color;
+  float m_constant;
+  float m_linear;
+  float m_quadratic;
 };
 
 #endif  // LIGHT_H_

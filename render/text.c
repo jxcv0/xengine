@@ -64,14 +64,13 @@ void render_text(const shader_t shader, const mat4 projection,
       stbtt_GetBakedQuad(baked_chars, 1024, 1024, c - 32, &xpos, &ypos, &quad,
                          1);
 
-      float vertices[6][4] = {
-          {quad.x1, quad.y1, quad.s1, quad.s1},
-          {quad.x1, quad.y0, quad.s1, quad.t0},
-          {quad.x0, quad.y0, quad.s0, quad.t0},
+      float vertices[6][4] = {{quad.x1, quad.y1, quad.s1, quad.s1},
+                              {quad.x1, quad.y0, quad.s1, quad.t0},
+                              {quad.x0, quad.y0, quad.s0, quad.t0},
 
-          {quad.x1, quad.y1, quad.s1, quad.t1},
-          {quad.x0, quad.y0, quad.s0, quad.t0},
-          {quad.x0, quad.y1, quad.s0, quad.t1}};
+                              {quad.x1, quad.y1, quad.s1, quad.t1},
+                              {quad.x0, quad.y0, quad.s0, quad.t0},
+                              {quad.x0, quad.y1, quad.s0, quad.t1}};
 
       /*
       for (int i = 0; i < 6; i++) {

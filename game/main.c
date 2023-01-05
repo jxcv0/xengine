@@ -110,10 +110,13 @@ int main(int argc, char const *argv[]) {
   glUseProgram(mesh_shader);
   shader_set_uniform_m4fv(mesh_shader, "projection", projection_matrix);
 
-  vec3 light_pos = {2, 3, 2};
-  vec3 light_color = {1, 1, 1};
-  vec3 mesh_color = {0.3, 0.5, 0.1};
-  vec3 floor_color = {1, 1, 1};
+  struct light light = {0};
+  light.m_color[0] = 1;
+  light.m_color[1] = 1;
+  light.m_color[2] = 1;
+  light.m_position[0] = 0;
+  light.m_position[1] = 1.86;
+  light.m_position[2] = 3;
 
   camera.m_pos[0] = 0;
   camera.m_pos[1] = 1.86;
@@ -142,24 +145,13 @@ int main(int argc, char const *argv[]) {
     mat4 model;
     identity_mat4(model);
 
-    glUseProgram(mesh_shader);
-
-    // TODO pass these as args to render function along with glUseProgram
-    // transforms
-    shader_set_uniform_m4fv(mesh_shader, "model", model);
-    shader_set_uniform_m4fv(mesh_shader, "view", view_matrix);
-
-    // lighting
-    shader_set_uniform_3fv(mesh_shader, "light_pos", light_pos);
-    shader_set_uniform_3fv(mesh_shader, "light_color", light_color);
-
     // TODO this needs to go to struct material as a member of mesh
-    shader_set_uniform_3fv(mesh_shader, "obj_color", mesh_color);
 
-    draw_mesh(&cube_mesh);
+    draw_mesh(mesh_shader, projection_matrix, view_matrix, model, &light,
+              &cube_mesh);
 
-    shader_set_uniform_3fv(mesh_shader, "obj_color", floor_color);
-    draw_mesh(&floor);
+    draw_mesh(mesh_shader, projection_matrix, view_matrix, model, &light,
+              &floor);
 
     vec2 text_pos = {window_width, window_height};
     const char *debug_text = "abcdefg";
