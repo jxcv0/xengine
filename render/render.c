@@ -5,7 +5,7 @@
 /**
  * ----------------------------------------------------------------------------
  */
-void mesh_buffer(struct mesh *mesh) {
+void gen_mesh_buffers(struct mesh *mesh) {
   glGenBuffers(1, &mesh->m_vbo);
   glGenVertexArrays(1, &mesh->m_vao);
   glBindVertexArray(mesh->m_vao);
@@ -30,7 +30,7 @@ void mesh_buffer(struct mesh *mesh) {
 /**
  * ----------------------------------------------------------------------------
  */
-void mesh_draw(struct mesh *mesh) {
+void draw_mesh(struct mesh *mesh) {
   glBindVertexArray(mesh->m_vao);
   glDrawArrays(GL_TRIANGLES, 0, mesh->m_num_vertices);
   /*

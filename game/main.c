@@ -104,15 +104,16 @@ int main(int argc, char const *argv[]) {
 
   struct mesh floor = mesh_load("assets/models/floor/floor.obj");
 
-  mesh_buffer(&cube_mesh);
-  mesh_buffer(&floor);
+  gen_mesh_buffers(&cube_mesh);
+  gen_mesh_buffers(&floor);
 
   glUseProgram(mesh_shader);
   shader_set_uniform_m4fv(mesh_shader, "projection", projection_matrix);
 
   vec3 light_pos = {2, 3, 2};
   vec3 light_color = {1, 1, 1};
-  vec3 object_color = {0.3, 0.5, 0.1};
+  vec3 mesh_color = {0.3, 0.5, 0.1};
+  vec3 floor_color = {1, 1, 1};
 
   camera.m_pos[0] = 0;
   camera.m_pos[1] = 1.86;
@@ -153,12 +154,14 @@ int main(int argc, char const *argv[]) {
     shader_set_uniform_3fv(mesh_shader, "light_color", light_color);
 
     // TODO this needs to go to struct material as a member of mesh
-    shader_set_uniform_3fv(mesh_shader, "obj_color", object_color);
+    shader_set_uniform_3fv(mesh_shader, "obj_color", mesh_color);
 
-    mesh_draw(&cube_mesh);
-    mesh_draw(&floor);
+    draw_mesh(&cube_mesh);
 
-    vec2 text_pos = {-100, -100};
+    shader_set_uniform_3fv(mesh_shader, "obj_color", floor_color);
+    draw_mesh(&floor);
+
+    vec2 text_pos = {window_width, window_height};
     const char *debug_text = "abcdefg";
     render_text(text_shader, projection_matrix, text_pos, text_col, debug_text,
                 7);

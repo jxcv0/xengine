@@ -9,6 +9,9 @@
 extern "C" {
 #endif
 
+/**
+ * @brief Vertex position and texture data.
+ */
 struct vertex {
   vec3 m_position;
   vec2 m_tex_coord;

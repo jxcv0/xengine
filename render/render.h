@@ -12,14 +12,14 @@ extern "C" {
  *
  * @param mesh The mesh structure.
  */
-void mesh_buffer(struct mesh *mesh);
+void gen_mesh_buffers(struct mesh *mesh);
 
 /**
  * @brief Render primitives from array data.
  *
  * @param mesh A pointer to the mesh structure.
  */
-void mesh_draw(struct mesh *mesh);
+void draw_mesh(struct mesh *mesh);
 
 #ifdef __cplusplus
 }

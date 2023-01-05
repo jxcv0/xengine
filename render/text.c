@@ -17,6 +17,8 @@ stbtt_bakedchar baked_chars[96];
 void init_ttf(const char *filepath) {
   unsigned char *ttf_buffer = load_file_into_mem_u(filepath);
   unsigned char temp_buffer[1024 * 1024];
+
+  // TODO stb recoments not using this
   stbtt_BakeFontBitmap(ttf_buffer, 0, 64, temp_buffer, 1024, 1024, 32, 96,
                        baked_chars);
   free(ttf_buffer);
@@ -50,26 +52,26 @@ void render_text(const shader_t shader, const mat4 projection,
   shader_set_uniform_m4fv(shader, "projection", projection);
   shader_set_uniform_4fv(shader, "text_color", color);
 
-  float xpos;
-  float ypos;
+  float xpos = position[0];
+  float ypos = position[1];
+
   for (size_t i = 0; i < n; i++) {
     char c = txt[i];
     if (c >= 32) {
       stbtt_aligned_quad quad;
+
+      // TODO stb recoments not using this
       stbtt_GetBakedQuad(baked_chars, 1024, 1024, c - 32, &xpos, &ypos, &quad,
                          1);
 
-      xpos += position[0];
-      ypos += position[1];
-
       float vertices[6][4] = {
-          {quad.x1 + xpos, quad.y1 + ypos, quad.s1, quad.s1},
-          {quad.x1 + xpos, quad.y0 + ypos, quad.s1, quad.t0},
-          {quad.x0 + xpos, quad.y0 + ypos, quad.s0, quad.t0},
+          {quad.x1, quad.y1, quad.s1, quad.s1},
+          {quad.x1, quad.y0, quad.s1, quad.t0},
+          {quad.x0, quad.y0, quad.s0, quad.t0},
 
-          {quad.x1 + xpos, quad.y1 + ypos, quad.s1, quad.t1},
-          {quad.x0 + xpos, quad.y0 + ypos, quad.s0, quad.t0},
-          {quad.x0 + xpos, quad.y1 + ypos, quad.s0, quad.t1}};
+          {quad.x1, quad.y1, quad.s1, quad.t1},
+          {quad.x0, quad.y0, quad.s0, quad.t0},
+          {quad.x0, quad.y1, quad.s0, quad.t1}};
 
       /*
       for (int i = 0; i < 6; i++) {
