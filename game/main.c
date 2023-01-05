@@ -12,6 +12,7 @@
 #include "input.h"
 #include "lin.h"
 #include "mesh.h"
+#include "render.h"
 #include "shader.h"
 #include "text.h"
 #include "window.h"
@@ -89,8 +90,9 @@ int main(int argc, char const *argv[]) {
   create_window(&window, window_width, window_height, "game");
   glfwSetCursorPosCallback(window, handle_mouse_movement);
 
-  shader_t shader =
+  shader_t mesh_shader =
       shader_load("render/glsl/uber.vert", "render/glsl/uber.frag");
+
   shader_t text_shader =
       shader_load("render/glsl/text.vert", "render/glsl/text.frag");
 
@@ -99,14 +101,18 @@ int main(int argc, char const *argv[]) {
 
   struct mesh cube_mesh =
       mesh_load("assets/models/female_base/female_base.obj");
-  mesh_buffer(&cube_mesh);
 
-  glUseProgram(shader);
-  shader_set_uniform_m4fv(shader, "projection", projection_matrix);
+  struct mesh floor = mesh_load("assets/models/floor/floor.obj");
+
+  mesh_buffer(&cube_mesh);
+  mesh_buffer(&floor);
+
+  glUseProgram(mesh_shader);
+  shader_set_uniform_m4fv(mesh_shader, "projection", projection_matrix);
 
   vec3 light_pos = {2, 3, 2};
   vec3 light_color = {1, 1, 1};
-  vec3 object_color = {1, 0.5, 0.31};
+  vec3 object_color = {0.3, 0.5, 0.1};
 
   camera.m_pos[0] = 0;
   camera.m_pos[1] = 1.86;
@@ -135,22 +141,26 @@ int main(int argc, char const *argv[]) {
     mat4 model;
     identity_mat4(model);
 
-    glUseProgram(shader);
+    glUseProgram(mesh_shader);
 
     // TODO pass these as args to render function along with glUseProgram
     // transforms
-    shader_set_uniform_m4fv(shader, "model", model);
-    shader_set_uniform_m4fv(shader, "view", view_matrix);
+    shader_set_uniform_m4fv(mesh_shader, "model", model);
+    shader_set_uniform_m4fv(mesh_shader, "view", view_matrix);
 
     // lighting
-    shader_set_uniform_3fv(shader, "light_pos", light_pos);
-    shader_set_uniform_3fv(shader, "light_color", light_color);
-    shader_set_uniform_3fv(shader, "obj_color", object_color);
+    shader_set_uniform_3fv(mesh_shader, "light_pos", light_pos);
+    shader_set_uniform_3fv(mesh_shader, "light_color", light_color);
+
+    // TODO this needs to go to struct material as a member of mesh
+    shader_set_uniform_3fv(mesh_shader, "obj_color", object_color);
 
     mesh_draw(&cube_mesh);
+    mesh_draw(&floor);
 
+    vec2 text_pos = {-100, -100};
     const char *debug_text = "abcdefg";
-    render_text(text_shader, projection_matrix, mouse_pos, text_col, debug_text,
+    render_text(text_shader, projection_matrix, text_pos, text_col, debug_text,
                 7);
 
     glfwSwapBuffers(window);
