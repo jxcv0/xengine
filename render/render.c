@@ -1,6 +1,7 @@
 #include "render.h"
 
 #include <stdio.h>
+
 #include "glad.h"
 #include "light.h"
 #include "mesh.h"

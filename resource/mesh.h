@@ -79,7 +79,8 @@ struct material load_material(const char *filepath);
  * @brief filepath The filepath to load from.
  * @brief The texture structure.
  */
-struct texture load_texture(const char *filepath);
+struct texture load_texture(const char *obj_filepath, const char *texture_filename,
+                            size_t len);
 
 /**
  * @brief Unload the memory used by the Mesh.

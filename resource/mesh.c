@@ -122,17 +122,33 @@ static ssize_t get_line(const struct mmapfile *file, const ssize_t pos) {
 /**
  * ----------------------------------------------------------------------------
  */
-struct texture load_texture(const char *filepath) {
+struct texture load_texture(const char *obj_filepath,
+                            const char *texture_filename, size_t len) {
   struct texture tex = {0};
+
+  // find the last '/'
+  char *last_slash = strrchr(obj_filepath, '/');
+  size_t dir_len = last_slash - obj_filepath + 1;
+  size_t texture_filepath_len = dir_len + len;
+
+  char texture_filepath[texture_filepath_len];
+  texture_filepath[texture_filepath_len] = 0;
+
+  strncpy(texture_filepath, obj_filepath, dir_len);
+  strncpy(&texture_filepath[dir_len], texture_filename, len);
+
+  printf("%s\n", texture_filepath);
+
   tex.mp_data =
-      stbi_load(filepath, &tex.m_width, &tex.m_width, &tex.m_num_channels, 0);
+      stbi_load(texture_filepath, &tex.m_width, &tex.m_width, &tex.m_num_channels, 0);
+  assert(tex.mp_data);
   return tex;
 }
 
 /**
  * ----------------------------------------------------------------------------
  */
-struct material load_material(const char *filepath) {
+struct material load_materials(const char *filepath) {
   // get the .mtl file
   size_t n = strlen(filepath);
   char mtl_filepath[n];
@@ -147,6 +163,7 @@ struct material load_material(const char *filepath) {
   // parse file
   struct mmapfile file = mmapfile_map(mtl_filepath);
   assert(file.mp_addr != NULL);
+
   struct material material = {0};
 
   ssize_t curr = 0;
@@ -167,13 +184,16 @@ struct material load_material(const char *filepath) {
       parse_vec3(material.m_specular_color, &lineptr[3]);
 
     } else if (strncmp(lineptr, "map_Kd ", 7) == 0) {
-      material.m_tex_diffuse = load_texture(&lineptr[7]);
+      size_t len = curr - prev;
+      material.m_tex_diffuse = load_texture(filepath, &lineptr[7], len - 7);
 
     } else if (strncmp(lineptr, "map_Bump ", 9) == 0) {
-      material.m_tex_normal = load_texture(&lineptr[7]);
+      size_t len = curr - prev;
+      material.m_tex_normal = load_texture(filepath, &lineptr[9], len - 9);
 
     } else if (strncmp(lineptr, "map_Ks ", 7) == 0) {
-      material.m_tex_specular = load_texture(&lineptr[7]);
+      size_t len = curr - prev;
+      material.m_tex_specular = load_texture(filepath, &lineptr[7], len - 7);
     }
 
     prev = curr + 1;
@@ -249,7 +269,7 @@ struct mesh load_mesh(const char *filepath) {
       parse_face(&indices[f_count], &lineptr[2], len);
       f_count += 3;
     } else if (strncmp(lineptr, "mtllib ", 6) == 0) {
-      load_material(filepath);
+      load_materials(filepath);
     }
     prev = curr + 1;
   }
