@@ -99,12 +99,12 @@ int main(int argc, char const *argv[]) {
   perspective(projection_matrix, radians(60),
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
-  struct mesh cube_mesh =
-      mesh_load("assets/models/female_base/female_base.obj");
+  struct mesh test_mesh =
+      mesh_load("assets/models/cyborg/cyborg.obj");
 
   struct mesh floor = mesh_load("assets/models/floor/floor.obj");
 
-  gen_mesh_buffers(&cube_mesh);
+  gen_mesh_buffers(&test_mesh);
   gen_mesh_buffers(&floor);
 
   glUseProgram(mesh_shader);
@@ -148,7 +148,7 @@ int main(int argc, char const *argv[]) {
     // TODO this needs to go to struct material as a member of mesh
 
     draw_mesh(mesh_shader, projection_matrix, view_matrix, model, &light,
-              &cube_mesh);
+              &test_mesh);
 
     draw_mesh(mesh_shader, projection_matrix, view_matrix, model, &light,
               &floor);
@@ -162,7 +162,7 @@ int main(int argc, char const *argv[]) {
     glfwPollEvents();
   }
 
-  mesh_unload(&cube_mesh);
+  mesh_unload(&test_mesh);
 
   glfwDestroyWindow(window);
   glfwTerminate();

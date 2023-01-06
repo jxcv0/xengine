@@ -4,11 +4,13 @@ project(utils)
 set(
   SOURCES
     utils.c
+    mmapfile.c
 )
 
 set(
   HEADERS
     utils.h
+    mmapfile.h
 )
 
 add_library(${PROJECT_NAME} STATIC ${HEADERS} ${SOURCES})

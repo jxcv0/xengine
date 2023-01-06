@@ -18,6 +18,12 @@ struct vertex {
   vec3 m_normal;
 };
 
+struct texture {
+};
+
+struct material {
+};
+
 /**
  * @brief Stored mesh data. This class is used to load and
  *        unload from a file.

@@ -138,6 +138,7 @@ struct mesh mesh_load(const char *filepath) {
       vn_count++;
     } else if (strncmp(lineptr, "f ", 2) == 0) {
       f_count += 3;  // 3 faces per line
+    } else if (strncmp(lineptr, "mtllib ", 6) == 0) {
     }
     prev = curr + 1;
   }

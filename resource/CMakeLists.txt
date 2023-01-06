@@ -3,21 +3,17 @@ project(resource)
 
 set(
   SOURCES
-    mmapfile.c
     mesh.c
 )
 
 set(
   HEADERS
-    mmapfile.h
     mesh.h
-    material.h
-    texture.h
 )
 
 add_library(${PROJECT_NAME} STATIC ${HEADERS} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PUBLIC .)
 
-target_link_libraries(${PROJECT_NAME} PUBLIC memory lin stb)
+target_link_libraries(${PROJECT_NAME} PUBLIC utils lin stb)
 
 add_subdirectory(test)
