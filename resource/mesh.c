@@ -170,7 +170,7 @@ struct material load_material(const char *filepath) {
       material.m_tex_diffuse = load_texture(&lineptr[7]);
 
     } else if (strncmp(lineptr, "map_Bump ", 9) == 0) {
-      material.m_tex_normal= load_texture(&lineptr[7]);
+      material.m_tex_normal = load_texture(&lineptr[7]);
 
     } else if (strncmp(lineptr, "map_Ks ", 7) == 0) {
       material.m_tex_specular = load_texture(&lineptr[7]);
@@ -284,5 +284,8 @@ struct mesh load_mesh(const char *filepath) {
  */
 void unload_mesh(struct mesh *mesh) {
   free(mesh->mp_vertices);
-  // mesh->mp_vertices = NULL;
+  // TODO this is temporary
+  stbi_image_free(mesh->m_material.m_tex_normal.mp_data);
+  stbi_image_free(mesh->m_material.m_tex_diffuse.mp_data);
+  stbi_image_free(mesh->m_material.m_tex_specular.mp_data);
 }

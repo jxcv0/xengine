@@ -18,6 +18,13 @@ extern "C" {
 void gen_mesh_buffers(struct mesh *mesh);
 
 /**
+ * @brief Generate GL texture buffers.
+ *
+ * @param material A pointer to the material structure.
+ */
+void gen_material_buffers(struct material *material);
+
+/**
  * @brief Render primitives from array data.
  *
  * @param mesh A pointer to the mesh structure.

@@ -19,6 +19,7 @@ struct vertex {
 };
 
 struct texture {
+  unsigned int m_texture_id;
   int m_width;
   int m_height;
   int m_num_channels;
