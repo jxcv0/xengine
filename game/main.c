@@ -14,7 +14,7 @@
 #include "mesh.h"
 #include "render.h"
 #include "shader.h"
-#include "text.h"
+// #include "text.h"
 #include "window.h"
 
 extern const vec3 GLOBAL_UP;
@@ -93,8 +93,8 @@ int main(int argc, char const *argv[]) {
   shader_t mesh_shader =
       shader_load("render/glsl/uber.vert", "render/glsl/uber.frag");
 
-  shader_t text_shader =
-      shader_load("render/glsl/text.vert", "render/glsl/text.frag");
+  // shader_t text_shader =
+      // shader_load("render/glsl/text.vert", "render/glsl/text.frag");
 
   perspective(projection_matrix, radians(60),
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
@@ -126,9 +126,9 @@ int main(int argc, char const *argv[]) {
   camera.m_yaw = 275;
   process_mouse_movement(&camera, mouse_pos);
 
-  init_ttf("assets/fonts/Consolas.ttf");
+  // init_ttf("assets/fonts/Consolas.ttf");
 
-  vec4 text_col = {1};
+  // vec4 text_col = {1};
 
   while (!glfwWindowShouldClose(window)) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -152,10 +152,10 @@ int main(int argc, char const *argv[]) {
     draw_mesh(mesh_shader, projection_matrix, view_matrix, model, &light,
               &floor);
 
-    vec2 text_pos = {window_width, window_height};
-    const char *debug_text = "abcdefg";
-    render_text(text_shader, projection_matrix, text_pos, text_col, debug_text,
-                7);
+    // vec2 text_pos = {window_width, window_height};
+    // const char *debug_text = "abcdefg";
+    // render_text(text_shader, projection_matrix, text_pos, text_col,
+    // debug_text, 7);
 
     glfwSwapBuffers(window);
     glfwPollEvents();

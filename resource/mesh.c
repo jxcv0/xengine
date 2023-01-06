@@ -124,31 +124,28 @@ static ssize_t get_line(const struct mmapfile *file, const ssize_t pos) {
  */
 struct texture load_texture(const char *obj_filepath,
                             const char *texture_filename, size_t len) {
-  struct texture tex = {0};
-
-  // find the last '/'
   char *last_slash = strrchr(obj_filepath, '/');
   size_t dir_len = last_slash - obj_filepath + 1;
   size_t texture_filepath_len = dir_len + len;
 
   char texture_filepath[texture_filepath_len];
-  texture_filepath[texture_filepath_len] = 0;
+  texture_filepath[texture_filepath_len] = '\0';
 
   strncpy(texture_filepath, obj_filepath, dir_len);
   strncpy(&texture_filepath[dir_len], texture_filename, len);
 
-  printf("%s\n", texture_filepath);
+  // printf("loading texture from %s\n", texture_filepath);
 
-  tex.mp_data =
-      stbi_load(texture_filepath, &tex.m_width, &tex.m_width, &tex.m_num_channels, 0);
-  assert(tex.mp_data);
+  struct texture tex = {0};
+  tex.mp_data = stbi_load(texture_filepath, &tex.m_width, &tex.m_width,
+                          &tex.m_num_channels, 0);
   return tex;
 }
 
 /**
  * ----------------------------------------------------------------------------
  */
-struct material load_materials(const char *filepath) {
+struct material load_material(const char *filepath) {
   // get the .mtl file
   size_t n = strlen(filepath);
   char mtl_filepath[n];
@@ -246,6 +243,7 @@ struct mesh load_mesh(const char *filepath) {
   struct index *indices = (struct index *)(temp_mem + positions_size +
                                            tex_coords_size + normals_size);
 
+  struct mesh mesh = {0};
   v_count = 0;
   vt_count = 0;
   vn_count = 0;
@@ -268,13 +266,12 @@ struct mesh load_mesh(const char *filepath) {
       size_t len = curr - prev;
       parse_face(&indices[f_count], &lineptr[2], len);
       f_count += 3;
-    } else if (strncmp(lineptr, "mtllib ", 6) == 0) {
-      load_materials(filepath);
+    } else if (strncmp(lineptr, "mtllib ", 7) == 0) {
+      mesh.m_material = load_material(filepath);
     }
     prev = curr + 1;
   }
 
-  struct mesh mesh = {0};
   mesh.mp_vertices = malloc(f_count * sizeof(struct vertex));
   mesh.m_num_vertices = f_count;
 

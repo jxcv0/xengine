@@ -1,5 +1,6 @@
 #include "render.h"
 
+#include <assert.h>
 #include <stdio.h>
 
 #include "glad.h"
@@ -38,19 +39,31 @@ void gen_mesh_buffers(struct mesh *mesh) {
  * ----------------------------------------------------------------------------
  */
 static void gen_texture_buffers(struct texture *texture) {
-  if (texture->mp_data != NULL) {
-    glGenTextures(1, &texture->m_texture_id);
-    glBindTexture(GL_TEXTURE_2D, texture->m_texture_id);
+  assert(texture->mp_data != NULL);
+  glGenTextures(1, &texture->m_texture_id);
+  glBindTexture(GL_TEXTURE_2D, texture->m_texture_id);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                    GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture->m_width, texture->m_height,
-                 0, GL_RGBA, GL_UNSIGNED_BYTE, texture->mp_data);
+  int format;
+  switch (texture->m_num_channels) {
+    case 1:
+      format = GL_RED;
+      break;
+    case 4:
+      format = GL_RGBA;
+      break;
+    default:
+      format = GL_RGB;
+      break;
   }
+
+  glTexImage2D(GL_TEXTURE_2D, 0, format, texture->m_width, texture->m_height, 0,
+               format, GL_UNSIGNED_BYTE, texture->mp_data);
+  glGenerateMipmap(GL_TEXTURE_2D);
 }
 
 /**
@@ -71,7 +84,8 @@ void draw_mesh(const shader_t shader, const mat4 projection_matrix,
   glUseProgram(shader);
 
   // TODO init the shader on creation with projection matrix, it should never
-  // change
+  // change.
+  // Also do these need to be set each time?
   shader_set_uniform_m4fv(shader, "projection", projection_matrix);
   shader_set_uniform_m4fv(shader, "model", model_matrix);
   shader_set_uniform_m4fv(shader, "view", view_matrix);
@@ -83,11 +97,10 @@ void draw_mesh(const shader_t shader, const mat4 projection_matrix,
   shader_set_uniform_3fv(shader, "m_diffuse_color",
                          mesh->m_material.m_diffuse_color);
 
+  shader_set_uniform_1i(shader, "diffuse_texture", 0);  // same as active tex
+
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, mesh->m_material.m_tex_diffuse.m_texture_id);
-
-  shader_set_uniform_1i(shader, "diffuse_texture",
-                        mesh->m_material.m_tex_diffuse.m_texture_id);
 
   glBindVertexArray(mesh->m_vao);
   glDrawArrays(GL_TRIANGLES, 0, mesh->m_num_vertices);

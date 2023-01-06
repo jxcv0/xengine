@@ -5,10 +5,12 @@ in vec3 pos;
 in vec2 tex_coord;
 in vec3 normal;
 
+// lights
 uniform vec3 light_pos;
 uniform vec3 light_color;
 uniform vec3 diffuse_color;
 
+// textures
 uniform sampler2D diffuse_texture;
 
 float ambient_strength = 0.1;
@@ -20,6 +22,6 @@ void main() {
   float diff = max(dot(normal, light_dir), 0.0);
   vec3 diffuse = diff * light_color * texture(diffuse_texture, tex_coord).rgb;
 
-  vec3 result = (ambient + diffuse) * diffuse_color;
+  vec3 result = (ambient + diffuse);
   frag_color = vec4(result, 1.0);
 }
