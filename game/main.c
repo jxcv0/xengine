@@ -99,10 +99,9 @@ int main(int argc, char const *argv[]) {
   perspective(projection_matrix, radians(60),
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
-  struct mesh test_mesh =
-      mesh_load("assets/models/cyborg/cyborg.obj");
+  struct mesh test_mesh = load_mesh("assets/models/cyborg/cyborg.obj");
 
-  struct mesh floor = mesh_load("assets/models/floor/floor.obj");
+  struct mesh floor = load_mesh("assets/models/floor/floor.obj");
 
   gen_mesh_buffers(&test_mesh);
   gen_mesh_buffers(&floor);
@@ -162,7 +161,8 @@ int main(int argc, char const *argv[]) {
     glfwPollEvents();
   }
 
-  mesh_unload(&test_mesh);
+  unload_mesh(&test_mesh);
+  unload_mesh(&floor);
 
   glfwDestroyWindow(window);
   glfwTerminate();

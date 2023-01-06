@@ -19,13 +19,30 @@ struct vertex {
 };
 
 struct texture {
-};
-
-struct material {
+  int m_width;
+  int m_height;
+  int m_num_channels;
+  unsigned char *mp_data;
 };
 
 /**
- * @brief Stored mesh data. This class is used to load and
+ * @brief Material data.
+ *
+ * TODO transparency d/Tr, opacity and emissiveness also?
+ *
+ */
+struct material {
+  float m_specular_exponent;      // Ns
+  vec3 m_ambient_color;           // Ka
+  vec3 m_diffuse_color;           // Kd
+  vec3 m_specular_color;          // Ks
+  struct texture m_tex_diffuse;   // map_kd
+  struct texture m_tex_normal;    // map_Bump / bump
+  struct texture m_tex_specular;  // map_Ks
+};
+
+/**
+ * @brief Mesh data. This class is used to load and
  *        unload from a file.
  */
 struct mesh {
@@ -33,6 +50,7 @@ struct mesh {
   unsigned int m_vao;
   size_t m_num_vertices;
   struct vertex *mp_vertices;
+  struct material m_material;
 };
 
 /**
@@ -43,14 +61,31 @@ struct mesh {
  * @param filepath The filepath to load data from.
  * @return A mesh structure containing the data.
  */
-struct mesh mesh_load(const char *filepath);
+struct mesh load_mesh(const char *filepath);
+
+/**
+ * @brief Load material data from an obj file. Only supports one material
+ * defenition
+ *
+ * @param obj_filepath.
+ * @return The material structure.
+ */
+struct material load_material(const char *filepath);
+
+/**
+ * @brief Load a texture into memory.
+ *
+ * @brief filepath The filepath to load from.
+ * @brief The texture structure.
+ */
+struct texture load_texture(const char *filepath);
 
 /**
  * @brief Unload the memory used by the Mesh.
  *
  * @param mesh A pointer to the mesh to unload.
  */
-void mesh_unload(struct mesh *mesh);
+void unload_mesh(struct mesh *mesh);
 
 #ifdef __cplusplus
 }
