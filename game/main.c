@@ -94,13 +94,12 @@ int main(int argc, char const *argv[]) {
       shader_load("render/glsl/uber.vert", "render/glsl/uber.frag");
 
   // shader_t text_shader =
-      // shader_load("render/glsl/text.vert", "render/glsl/text.frag");
+  // shader_load("render/glsl/text.vert", "render/glsl/text.frag");
 
   perspective(projection_matrix, radians(60),
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
   struct mesh test_mesh = load_mesh("assets/models/cyborg/cyborg.obj");
-
   struct mesh floor = load_mesh("assets/models/floor/floor.obj");
 
   gen_mesh_buffers(&test_mesh);

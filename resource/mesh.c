@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "mmapfile.h"
 #include "stb_image.h"
@@ -134,10 +135,9 @@ struct texture load_texture(const char *obj_filepath,
   strncpy(texture_filepath, obj_filepath, dir_len);
   strncpy(&texture_filepath[dir_len], texture_filename, len);
 
-  // printf("loading texture from %s\n", texture_filepath);
-
+  stbi_set_flip_vertically_on_load(true);
   struct texture tex = {0};
-  tex.mp_data = stbi_load(texture_filepath, &tex.m_width, &tex.m_width,
+  tex.mp_data = stbi_load(texture_filepath, &tex.m_width, &tex.m_height,
                           &tex.m_num_channels, 0);
   return tex;
 }
@@ -266,9 +266,11 @@ struct mesh load_mesh(const char *filepath) {
       size_t len = curr - prev;
       parse_face(&indices[f_count], &lineptr[2], len);
       f_count += 3;
+
     } else if (strncmp(lineptr, "mtllib ", 7) == 0) {
       mesh.m_material = load_material(filepath);
     }
+
     prev = curr + 1;
   }
 
