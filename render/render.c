@@ -74,7 +74,7 @@ static void gen_texture_buffers(struct texture *texture) {
 void gen_material_buffers(struct material *material) {
   gen_texture_buffers(&material->m_tex_diffuse);
   gen_texture_buffers(&material->m_tex_normal);
-  // gen_texture_buffers(&material->m_tex_specular);
+  gen_texture_buffers(&material->m_tex_specular);
 }
 
 /**
