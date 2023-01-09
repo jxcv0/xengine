@@ -1,12 +1,7 @@
 # XENGINE
 Game Engine
 
-## TODO
-### Decide components
-- Mesh
-- Material
-- Translation
-- Rotation
-- Animation
-- Audio
-- Input (Physics/Animation/Controller)
+## TODO's
+- deferred rendering
+- animation (editor tool or export from blender)
+- tangent/bitangent generation for normal maps

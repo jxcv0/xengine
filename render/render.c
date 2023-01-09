@@ -86,8 +86,8 @@ void draw_mesh(const shader_t shader, const mat4 projection_matrix,
                const struct mesh *mesh) {
   glUseProgram(shader);
 
-  // TODO init the shader on creation with projection matrix, it should never
-  // change.
+  // TODO Initialization of shader uniforms can be done when buffers are generated
+
   // Also do these need to be set each time?
   shader_set_uniform_m4fv(shader, "projection", projection_matrix);
   shader_set_uniform_m4fv(shader, "model", model_matrix);
@@ -104,12 +104,15 @@ void draw_mesh(const shader_t shader, const mat4 projection_matrix,
 
   shader_set_uniform_1i(shader, "diffuse_texture", 0);  // same as active tex
   shader_set_uniform_1i(shader, "specular_texture", 1);
-  // shader_set_uniform_1i(shader, "normal_texture", 2);
+  shader_set_uniform_1i(shader, "normal_texture", 2);
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, mesh->m_material.m_tex_diffuse.m_texture_id);
 
   glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, mesh->m_material.m_tex_specular.m_texture_id);
+
+  glActiveTexture(GL_TEXTURE2);
   glBindTexture(GL_TEXTURE_2D, mesh->m_material.m_tex_specular.m_texture_id);
 
   glBindVertexArray(mesh->m_vao);

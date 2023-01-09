@@ -16,8 +16,13 @@ uniform vec3 camera_pos;
 // textures
 uniform sampler2D diffuse_texture;
 uniform sampler2D specular_texture;
+uniform sampler2D normal_texture;
 
 void main() {
+  // normal map
+  normal = texture(normal_texture, tex_coord).rgb;
+  normal = normalize(normal * 2.0 - 1.0);
+
   vec3 light_dir = normalize(light_pos - pos);
 
   // ambient
