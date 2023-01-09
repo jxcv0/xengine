@@ -19,23 +19,22 @@
 
 extern const vec3 GLOBAL_UP;
 
-void print_mat4(const char *name, const mat4 m) {
-  printf("mat4: %s {\n", name);
-  for (int i = 0; i < 4; i++) {
-    printf("%f, %f, %f, %f\n", m[i][0], m[i][1], m[i][2], m[i][3]);
-  }
-  printf("}\n");
-}
-
 GLFWwindow *window;
-const float window_width = 1080;
-const float window_height = 600;
+float window_width = 1080;
+float window_height = 600;
 
 struct camera camera = {.m_mouse_sensetivity = 0.3, .m_movement_speed = 0.1};
 
 vec2 mouse_pos;
 mat4 projection_matrix = {0};
 mat4 view_matrix = {0};
+
+static void size_callback(GLFWwindow *window, int width, int height) {
+  (void)window;
+  window_width = (float)width;
+  window_height = (float)height;
+  glViewport(0, 0, width, height);
+}
 
 void update_view_matrix() {
   vec3 ctr = {camera.m_pos[0] + camera.m_view_dir[0],
@@ -88,7 +87,8 @@ void handle_keyboard_input(GLFWwindow *w) {
 int main(int argc, char const *argv[]) {
   (void)argc;
   (void)argv;
-  create_editor_window(&window, window_width, window_height, "game");
+  create_editor_window(&window, window_width, window_height, "rig");
+  glfwSetFramebufferSizeCallback(window, size_callback);
   // glfwSetCursorPosCallback(window, handle_mouse_movement);
 
   shader_t mesh_shader =
@@ -97,17 +97,12 @@ int main(int argc, char const *argv[]) {
   // shader_t text_shader =
   // shader_load("render/glsl/text.vert", "render/glsl/text.frag");
 
-  perspective(projection_matrix, radians(60),
-              ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
   struct mesh test_mesh = load_mesh("assets/models/cyborg/cyborg.obj");
   struct mesh floor = load_mesh("assets/models/floor/floor.obj");
 
   gen_mesh_buffers(&test_mesh);
   gen_mesh_buffers(&floor);
-
-  glUseProgram(mesh_shader);
-  shader_set_uniform_m4fv(mesh_shader, "projection", projection_matrix);
 
   struct light light = {0};
   light.m_color[0] = 1;
@@ -137,10 +132,8 @@ int main(int argc, char const *argv[]) {
   // vec4 text_col = {1};
 
   while (!glfwWindowShouldClose(window)) {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-      glfwSetWindowShouldClose(window, true);
-    }
-
+    perspective(projection_matrix, radians(60),
+                ((float)window_width / (float)window_height), 0.1f, 100.0f);
     update_view_matrix();
     process_mouse_movement(&camera, mouse_pos);
     handle_keyboard_input(window);

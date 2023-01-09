@@ -11,7 +11,7 @@
  * ----------------------------------------------------------------------------
  */
 static void size_callback(GLFWwindow *window, int width, int height) {
-  glfwSetWindowSize(window, width, height);
+  (void)window;
   glViewport(0, 0, width, height);
 }
 
@@ -78,6 +78,7 @@ void create_editor_window(GLFWwindow **window, const float width,
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
   glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+  // glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
   *window = glfwCreateWindow(width, height, name, NULL, NULL);
 
@@ -88,7 +89,6 @@ void create_editor_window(GLFWwindow **window, const float width,
   }
 
   glfwMakeContextCurrent(*window);
-  glfwSetFramebufferSizeCallback(*window, size_callback);
 
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
     perror("glad: unable to load opengl");
