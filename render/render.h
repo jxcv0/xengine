@@ -28,10 +28,12 @@ void gen_material_buffers(struct material *material);
  * @brief Render primitives from array data.
  *
  * @param mesh A pointer to the mesh structure.
+ * @param TODO
  */
 void draw_mesh(const shader_t shader, const mat4 projection_matrix,
                const mat4 view_matrix, const mat4 model_matrix,
-               struct light *light, const struct mesh *mesh);
+               const vec3 view_position, struct light *light,
+               const struct mesh *mesh);
 
 #ifdef __cplusplus
 }

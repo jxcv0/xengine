@@ -145,11 +145,11 @@ int main(int argc, char const *argv[]) {
 
     // TODO this needs to go to struct material as a member of mesh
 
-    draw_mesh(mesh_shader, projection_matrix, view_matrix, model, &light,
-              &test_mesh);
+    draw_mesh(mesh_shader, projection_matrix, view_matrix, model, camera.m_pos,
+              &light, &test_mesh);
 
-    draw_mesh(mesh_shader, projection_matrix, view_matrix, model, &light,
-              &floor);
+    draw_mesh(mesh_shader, projection_matrix, view_matrix, model, camera.m_pos,
+              &light, &floor);
 
     // vec2 text_pos = {window_width, window_height};
     // const char *debug_text = "abcdefg";

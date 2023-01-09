@@ -1,11 +1,11 @@
 #include "mesh.h"
 
 #include <assert.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
 
 #include "mmapfile.h"
 #include "stb_image.h"

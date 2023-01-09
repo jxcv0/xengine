@@ -5,6 +5,7 @@
 
 #include "glad.h"
 #include "light.h"
+#include "lin.h"
 #include "mesh.h"
 #include "shader.h"
 
@@ -72,7 +73,7 @@ static void gen_texture_buffers(struct texture *texture) {
  */
 void gen_material_buffers(struct material *material) {
   gen_texture_buffers(&material->m_tex_diffuse);
-  // gen_texture_buffers(&material->m_tex_normal);
+  gen_texture_buffers(&material->m_tex_normal);
   // gen_texture_buffers(&material->m_tex_specular);
 }
 
@@ -81,7 +82,8 @@ void gen_material_buffers(struct material *material) {
  */
 void draw_mesh(const shader_t shader, const mat4 projection_matrix,
                const mat4 view_matrix, const mat4 model_matrix,
-               struct light *light, const struct mesh *mesh) {
+               const vec3 view_position, struct light *light,
+               const struct mesh *mesh) {
   glUseProgram(shader);
 
   // TODO init the shader on creation with projection matrix, it should never
@@ -95,13 +97,20 @@ void draw_mesh(const shader_t shader, const mat4 projection_matrix,
   shader_set_uniform_3fv(shader, "light_pos", light->m_position);
   shader_set_uniform_3fv(shader, "light_color", light->m_color);
 
+  shader_set_uniform_3fv(shader, "camera_pos", view_position);
+
   shader_set_uniform_3fv(shader, "m_diffuse_color",
                          mesh->m_material.m_diffuse_color);
 
   shader_set_uniform_1i(shader, "diffuse_texture", 0);  // same as active tex
+  shader_set_uniform_1i(shader, "specular_texture", 1);
+  // shader_set_uniform_1i(shader, "normal_texture", 2);
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, mesh->m_material.m_tex_diffuse.m_texture_id);
+
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, mesh->m_material.m_tex_specular.m_texture_id);
 
   glBindVertexArray(mesh->m_vao);
   glDrawArrays(GL_TRIANGLES, 0, mesh->m_num_vertices);

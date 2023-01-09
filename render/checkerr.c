@@ -1,6 +1,7 @@
 #include "checkerr.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 void gl_debug_output(GLenum source, GLenum type, unsigned int id,
                      GLenum severity, GLsizei length, const char *message,
@@ -75,4 +76,5 @@ void gl_debug_output(GLenum source, GLenum type, unsigned int id,
   }
 
   printf("(%d): %s\n", id, message);
+  exit(EXIT_FAILURE);
 }

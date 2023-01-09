@@ -10,18 +10,32 @@ uniform vec3 light_pos;
 uniform vec3 light_color;
 uniform vec3 diffuse_color;
 
+// view position
+uniform vec3 camera_pos;
+
 // textures
 uniform sampler2D diffuse_texture;
-
-float ambient_strength = 0.1;
+uniform sampler2D specular_texture;
 
 void main() {
-  vec3 ambient = ambient_strength * light_color;
   vec3 light_dir = normalize(light_pos - pos);
 
-  float diff = max(dot(normal, light_dir), 0.0);
-  vec3 diffuse = diff * light_color * texture(diffuse_texture, tex_coord).rgb;
+  // ambient
+  vec3 ambient = light_color * vec3(texture(diffuse_texture, tex_coord));
 
-  vec3 result = (ambient + diffuse);
+  // diffuse
+  float diffuse_strength = max(dot(normal, light_dir), 0.0);
+  vec3 diffuse =
+      diffuse_strength * light_color * texture(diffuse_texture, tex_coord).rgb;
+
+  // specular
+  vec3 view_dir = normalize(camera_pos - pos);
+  vec3 reflect_dir = reflect(-light_dir, norm);
+  float specular_strength =
+      pow(max(dot(view_dir, reflect_dir), 0.0), 32); // TODO specular coeff
+  vec3 specular =
+      specular_strength * light_color * texture(specular_texture, tex_coord).rgb;
+
+  vec3 result = (ambient + diffuse + specular);
   frag_color = vec4(result, 1.0);
 }
