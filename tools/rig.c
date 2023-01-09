@@ -47,6 +47,7 @@ void update_view_matrix() {
 
 void handle_mouse_movement(GLFWwindow *w, double x, double y) {
   (void)w;
+  printf("%f, %f\n", camera.m_pitch, camera.m_yaw);
   mouse_pos[0] = (float)x;
   mouse_pos[1] = (float)y;
   process_mouse_movement(&camera, mouse_pos);
@@ -88,7 +89,7 @@ int main(int argc, char const *argv[]) {
   (void)argc;
   (void)argv;
   create_editor_window(&window, window_width, window_height, "game");
-  glfwSetCursorPosCallback(window, handle_mouse_movement);
+  // glfwSetCursorPosCallback(window, handle_mouse_movement);
 
   shader_t mesh_shader =
       shader_load("render/glsl/uber.vert", "render/glsl/uber.frag");
@@ -126,7 +127,10 @@ int main(int argc, char const *argv[]) {
   camera.m_last_mouse_pos[0] = window_width / 2.0f;
   camera.m_last_mouse_pos[1] = window_height / 2.0f;
   camera.m_yaw = 275;
+  camera.m_pitch = 90;
+  update_view_matrix();
   process_mouse_movement(&camera, mouse_pos);
+  handle_mouse_movement(window, mouse_pos[0], mouse_pos[1]);
 
   // init_ttf("assets/fonts/Consolas.ttf");
 
@@ -137,8 +141,9 @@ int main(int argc, char const *argv[]) {
       glfwSetWindowShouldClose(window, true);
     }
 
-    handle_keyboard_input(window);
     update_view_matrix();
+    process_mouse_movement(&camera, mouse_pos);
+    handle_keyboard_input(window);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.2, 0.3, 0.3, 1);
