@@ -21,6 +21,14 @@ extern "C" {
 void create_window(GLFWwindow **window, const float width, const float height,
                    const char *name);
 
+/**
+ * @brief Create window with usable mouse and correct OpenGl context. 
+ *
+ * @param window A pointer to a GLFWwindow.
+ */
+void create_editor_window(GLFWwindow **window, const float width,
+                          const float height, const char *name);
+
 #ifdef __cplusplus
 }
 #endif
