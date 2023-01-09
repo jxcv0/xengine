@@ -31,7 +31,7 @@ void main() {
 
   // lighting
   vec3 light_dir = normalize(l.m_position - pos);
-  float light_dist = length(light_dir);
+  float light_dist = length(l.m_position - pos);
   float light_att =
       1.0 /
       (l.m_constant + l.m_linear * light_dist + l.m_quadratic *
@@ -53,7 +53,7 @@ void main() {
   vec3 specular =
       specular_strength * l.m_color * texture(specular_texture, tex_coord).rgb;
 
-  vec3 result = (ambient + diffuse + specular);
+  vec3 result = (ambient + diffuse + specular) * light_att;
   frag_color = vec4(result, 1.0);
 }
 
