@@ -33,6 +33,7 @@ void gl_debug_output(GLenum source, GLenum type, unsigned int id,
   switch (type) {
     case GL_DEBUG_TYPE_ERROR:
       printf("error: ");
+      exit(EXIT_FAILURE);
       break;
     case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
       printf("deprecated behaviour: ");
@@ -76,5 +77,4 @@ void gl_debug_output(GLenum source, GLenum type, unsigned int id,
   }
 
   printf("(%d): %s\n", id, message);
-  exit(EXIT_FAILURE);
 }

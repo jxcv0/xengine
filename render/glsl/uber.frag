@@ -30,7 +30,7 @@ void main() {
 
   // specular
   vec3 view_dir = normalize(camera_pos - pos);
-  vec3 reflect_dir = reflect(-light_dir, norm);
+  vec3 reflect_dir = reflect(-light_dir, normal);
   float specular_strength =
       pow(max(dot(view_dir, reflect_dir), 0.0), 32); // TODO specular coeff
   vec3 specular =
