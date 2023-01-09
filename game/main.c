@@ -115,6 +115,9 @@ int main(int argc, char const *argv[]) {
   light.m_position[0] = 0;
   light.m_position[1] = 1.86;
   light.m_position[2] = 3;
+  light.m_constant = 1.0;
+  light.m_linear = 0.35;
+  light.m_quadratic = 0.44;
 
   camera.m_pos[0] = 0;
   camera.m_pos[1] = 1.86;

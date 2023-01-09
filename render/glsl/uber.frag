@@ -6,9 +6,15 @@ in vec2 tex_coord;
 in vec3 normal;
 
 // lights
-uniform vec3 light_pos;
-uniform vec3 light_color;
-uniform vec3 diffuse_color;
+struct light {
+  vec3 m_position;
+  vec3 m_color;
+  float m_constant;
+  float m_linear;
+  float m_quadratic;
+};
+
+uniform light l;
 
 // view position
 uniform vec3 camera_pos;
@@ -20,27 +26,34 @@ uniform sampler2D normal_texture;
 
 void main() {
   // normal map
-  normal = texture(normal_texture, tex_coord).rgb;
-  normal = normalize(normal * 2.0 - 1.0);
+  vec3 norm = texture(normal_texture, tex_coord).rgb;
+  norm = normalize(normal * 2.0 - 1.0);
 
-  vec3 light_dir = normalize(light_pos - pos);
+  // lighting
+  vec3 light_dir = normalize(l.m_position - pos);
+  float light_dist = length(light_dir);
+  float light_att =
+      1.0 /
+      (l.m_constant + l.m_linear * light_dist + l.m_quadratic *
+      (light_dist * light_dist));
 
   // ambient
-  vec3 ambient = light_color * vec3(texture(diffuse_texture, tex_coord));
+  vec3 ambient = l.m_color * vec3(texture(diffuse_texture, tex_coord));
 
   // diffuse
-  float diffuse_strength = max(dot(normal, light_dir), 0.0);
+  float diffuse_strength = max(dot(norm, light_dir), 0.0);
   vec3 diffuse =
-      diffuse_strength * light_color * texture(diffuse_texture, tex_coord).rgb;
+      diffuse_strength * l.m_color * texture(diffuse_texture, tex_coord).rgb;
 
   // specular
   vec3 view_dir = normalize(camera_pos - pos);
-  vec3 reflect_dir = reflect(-light_dir, normal);
+  vec3 reflect_dir = reflect(-light_dir, norm);
   float specular_strength =
       pow(max(dot(view_dir, reflect_dir), 0.0), 32); // TODO specular coeff
   vec3 specular =
-      specular_strength * light_color * texture(specular_texture, tex_coord).rgb;
+      specular_strength * l.m_color * texture(specular_texture, tex_coord).rgb;
 
   vec3 result = (ambient + diffuse + specular);
   frag_color = vec4(result, 1.0);
 }
+

@@ -5,7 +5,7 @@
 
 struct light {
   vec3 m_position;
-  vec4 m_color;
+  vec3 m_color;
   float m_constant;
   float m_linear;
   float m_quadratic;

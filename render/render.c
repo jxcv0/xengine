@@ -94,13 +94,16 @@ void draw_mesh(const shader_t shader, const mat4 projection_matrix,
   shader_set_uniform_m4fv(shader, "view", view_matrix);
 
   // TODO best way to handle lights?
-  shader_set_uniform_3fv(shader, "light_pos", light->m_position);
-  shader_set_uniform_3fv(shader, "light_color", light->m_color);
+  shader_set_uniform_3fv(shader, "l.m_position", light->m_position);
+  shader_set_uniform_3fv(shader, "l.m_color", light->m_color);
+  shader_set_uniform_1f(shader, "l.m_constant", light->m_constant);
+  shader_set_uniform_1f(shader, "l.m_linear", light->m_linear);
+  shader_set_uniform_1f(shader, "l.m_quadratic", light->m_quadratic);
 
   shader_set_uniform_3fv(shader, "camera_pos", view_position);
 
-  shader_set_uniform_3fv(shader, "m_diffuse_color",
-                         mesh->m_material.m_diffuse_color);
+  // shader_set_uniform_3fv(shader, "m_diffuse_color",
+                         // mesh->m_material.m_diffuse_color);
 
   shader_set_uniform_1i(shader, "diffuse_texture", 0);  // same as active tex
   shader_set_uniform_1i(shader, "specular_texture", 1);
