@@ -12,7 +12,7 @@
 /**
  * ----------------------------------------------------------------------------
  */
-void gen_mesh_buffers(struct mesh *mesh) {
+void gen_mesh_buffers(shader_t shader, struct mesh *mesh) {
   glGenBuffers(1, &mesh->m_vbo);
   glGenVertexArrays(1, &mesh->m_vao);
   glBindVertexArray(mesh->m_vao);
@@ -34,6 +34,14 @@ void gen_mesh_buffers(struct mesh *mesh) {
   glEnableVertexAttribArray(2);
 
   gen_material_buffers(&mesh->m_material);
+
+  /*
+  unsigned int ubo = glGetUniformBlockIndex(shader, "mesh");
+  if (ubo == GL_MAX_UNIFORM_BUFFER_BINDINGS) {
+    glGenBuffers(1, &ubo);
+    glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+  }
+  */
 }
 
 /**
@@ -86,7 +94,8 @@ void draw_mesh(const shader_t shader, const mat4 projection_matrix,
                const struct mesh *mesh) {
   glUseProgram(shader);
 
-  // TODO Initialization of shader uniforms can be done when buffers are generated
+  // TODO Initialization of shader uniforms can be done when buffers are
+  // generated with UBO
 
   // Also do these need to be set each time?
   shader_set_uniform_m4fv(shader, "projection", projection_matrix);
@@ -103,7 +112,7 @@ void draw_mesh(const shader_t shader, const mat4 projection_matrix,
   shader_set_uniform_3fv(shader, "camera_pos", view_position);
 
   // shader_set_uniform_3fv(shader, "m_diffuse_color",
-                         // mesh->m_material.m_diffuse_color);
+  // mesh->m_material.m_diffuse_color);
 
   shader_set_uniform_1i(shader, "diffuse_texture", 0);  // same as active tex
   shader_set_uniform_1i(shader, "specular_texture", 1);
