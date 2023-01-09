@@ -113,8 +113,8 @@ int main(int argc, char const *argv[]) {
   light.m_color[1] = 1;
   light.m_color[2] = 1;
   light.m_position[0] = 0;
-  light.m_position[1] = 1.86;
-  light.m_position[2] = 3;
+  light.m_position[1] = 2;
+  light.m_position[2] = 0;
   light.m_constant = 1.0;
   light.m_linear = 0.35;
   light.m_quadratic = 0.44;

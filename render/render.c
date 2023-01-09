@@ -12,7 +12,7 @@
 /**
  * ----------------------------------------------------------------------------
  */
-void gen_mesh_buffers(shader_t shader, struct mesh *mesh) {
+void gen_mesh_buffers(struct mesh *mesh) {
   glGenBuffers(1, &mesh->m_vbo);
   glGenVertexArrays(1, &mesh->m_vao);
   glBindVertexArray(mesh->m_vao);
