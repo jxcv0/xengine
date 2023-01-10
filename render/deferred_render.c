@@ -1,20 +1,23 @@
 #include "deferred_render.h"
 
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "glad.h"
+#include "lin.h"
+#include "mesh.h"
 #include "shader.h"
 
-unsigned int g_buffer;
-unsigned int rbo_depth;
-unsigned int g_pos;
-unsigned int g_norm;
-unsigned int g_tex;
+static unsigned int g_buffer;
+static unsigned int rbo_depth;
+static unsigned int g_pos;
+static unsigned int g_norm;
+static unsigned int g_tex;
 
-shader_t geom_shader;
-shader_t lighting_shader;
+static shader_t geom_shader;
+static shader_t lighting_shader;
 
 // TODO ubo for projection/view
 
@@ -68,9 +71,55 @@ void dr_init(const uint32_t scr_w, const uint32_t scr_h) {
   }
 
   geom_shader = shader_load("render/glsl/deferred_geom.vert",
-                       "render/glsl/deferred_geom.frag");
-  
+                            "render/glsl/deferred_geom.frag");
+
   lighting_shader = shader_load("render/glsl/deferred_light.vert",
-                       "render/glsl/deferred_light.frag");
+                                "render/glsl/deferred_light.frag");
 }
 
+/**
+ * ----------------------------------------------------------------------------
+ */
+void dr_geometry_pass(const mat4 projection, const mat4 view,
+                      const mat4 *model_matrices, const struct mesh *meshes,
+                      const uint32_t n, const vec3 view_pos) {
+  glClearColor(0, 0, 0, 1);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glBindFramebuffer(GL_FRAMEBUFFER, g_buffer);
+
+  glUseProgram(geom_shader);
+
+  // transforms
+  shader_set_uniform_m4fv(geom_shader, "projection", projection);
+  shader_set_uniform_m4fv(geom_shader, "view", view);
+
+  // camera position
+  shader_set_uniform_3fv(geom_shader, "view_pos", view_pos);
+
+  for (uint32_t i = 0; i < n; i++) {
+    shader_set_uniform_m4fv(geom_shader, "model", model_matrices[i]);
+
+    // textures
+    // TODO normal mapping possible?
+    shader_set_uniform_1i(geom_shader, "tex_diff", 0);
+    shader_set_uniform_1i(geom_shader, "tex_spec", 1);
+    // shader_set_uniform_1i(geom_shader, "tex_norm", 2);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D,
+                  meshes[i].m_material.m_tex_diffuse.m_texture_id);
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D,
+                  meshes[i].m_material.m_tex_specular.m_texture_id);
+
+    /*
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D,
+                  meshes[i].m_material.m_tex_normal.m_texture_id);
+    */
+
+    glBindVertexArray(meshes[i].m_vao);
+    glDrawArrays(GL_TRIANGLES, 0, meshes[i].m_num_vertices);
+  }
+}

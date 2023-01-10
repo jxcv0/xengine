@@ -10,6 +10,8 @@ in vec3 normal;
 uniform sampler2D tex_diff;
 uniform sampler2D dex_spec;
 
+// TODO normal map? does it fit in GL_RGBA16F?
+
 /**
  * Load data into G-Buffer.
  */
