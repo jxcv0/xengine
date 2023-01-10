@@ -9,6 +9,7 @@ set(
     camera.c
     text.c
     render.c
+    deferred_render.c
 )
 
 set(
@@ -19,6 +20,7 @@ set(
     camera.h
     text.h
     render.h
+    deferred_render.h
 )
 
 add_library(${PROJECT_NAME} STATIC ${HEADERS} ${SOURCES})

@@ -9,7 +9,6 @@
 
 #include "camera.h"
 #include "glad.h"
-#include "input.h"
 #include "lin.h"
 #include "mesh.h"
 #include "render.h"
@@ -96,7 +95,6 @@ int main(int argc, char const *argv[]) {
 
   // shader_t text_shader =
   // shader_load("render/glsl/text.vert", "render/glsl/text.frag");
-
 
   struct mesh test_mesh = load_mesh("assets/models/cyborg/cyborg.obj");
   struct mesh floor = load_mesh("assets/models/floor/floor.obj");

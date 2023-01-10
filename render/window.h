@@ -22,7 +22,7 @@ void create_window(GLFWwindow **window, const float width, const float height,
                    const char *name);
 
 /**
- * @brief Create window with usable mouse and correct OpenGl context. 
+ * @brief Create window with usable mouse and correct OpenGl context.
  *
  * @param window A pointer to a GLFWwindow.
  */
