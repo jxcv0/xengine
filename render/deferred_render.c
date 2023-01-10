@@ -14,6 +14,7 @@ unsigned int g_norm;
 unsigned int g_tex;
 
 shader_t geom_shader;
+shader_t lighting_shader;
 
 // TODO ubo for projection/view
 
@@ -68,5 +69,8 @@ void dr_init(const uint32_t scr_w, const uint32_t scr_h) {
 
   geom_shader = shader_load("render/glsl/deferred_geom.vert",
                        "render/glsl/deferred_geom.frag");
+  
+  lighting_shader = shader_load("render/glsl/deferred_light.vert",
+                       "render/glsl/deferred_light.frag");
 }
 

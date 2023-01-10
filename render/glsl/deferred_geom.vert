@@ -1,6 +1,6 @@
 #version 460 core
 layout (location = 0) out vec3 pos_in;
-layout (location = 1) out vec3 tex_in;
+layout (location = 1) out vec3 tex_coord_in;
 layout (location = 2) out vec3 norm_in;
 
 out vec3 frag_pos;
@@ -17,7 +17,7 @@ uniform mat4 model;
 void main() {
   vec4 world_pos = model * vec4(pos_in, 1.0);
   frag_pos = world_pos.xyz;
-  tex_coord = tex_in;
+  tex_coord = tex_coord_in;
 
   // normals must be in model space
   mat3 normal_matrix = transpose(inverse(mat3(model)));
