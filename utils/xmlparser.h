@@ -1,14 +1,16 @@
 #ifndef XMLPARSER_H
 #define XMLPARSER_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @brief Parse an xml file. The file is assumed to be a NULL terminated string.
+ * @brief Parse an xml file.
  */
-int xmlparser_parse(const char *file);
+int parse_xml(const char *file);
 
 #ifdef __cplusplus
 }

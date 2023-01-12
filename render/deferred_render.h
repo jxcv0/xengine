@@ -4,9 +4,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "light.h"
 #include "lin.h"
 #include "mesh.h"
-#include "light.h"
 
 /**
  * @brief Initialize the deferred renderer with a screen width and height in
@@ -31,6 +31,7 @@ void dr_geometry_pass(const mat4 projection, const mat4 view,
                       const uint32_t n, const vec3 view_pos);
 
 void dr_lighting_pass(const mat4 projection, const mat4 view,
-                      const struct light *lights, const uint32_t n, const vec3 view_pos);
+                      const struct light *lights, const uint32_t n,
+                      const vec3 view_pos);
 
 #endif  // DEFERRED_RENDER_H_

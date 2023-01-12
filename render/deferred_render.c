@@ -127,7 +127,12 @@ void dr_geometry_pass(const mat4 projection, const mat4 view,
 }
 
 void dr_lighting_pass(const mat4 projection, const mat4 view,
-                      const struct light *lights, const uint32_t n, const vec3 view_pos) {
+                      const struct light *lights, const uint32_t n,
+                      const vec3 view_pos) {
+  // TODO this is unfinished
+  (void) projection;
+  (void) view;
+
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   glUseProgram(lighting_shader);
