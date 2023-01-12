@@ -4,17 +4,19 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "glad.h"
+#include "light.h"
 #include "lin.h"
 #include "mesh.h"
 #include "shader.h"
 
-static unsigned int g_buffer;
-static unsigned int rbo_depth;
-static unsigned int g_pos;
-static unsigned int g_norm;
-static unsigned int g_tex;
+static uint32_t g_buffer;
+static uint32_t rbo_depth;
+static uint32_t g_pos;
+static uint32_t g_norm;
+static uint32_t g_tex;
 
 static shader_t geom_shader;
 static shader_t lighting_shader;
@@ -122,4 +124,48 @@ void dr_geometry_pass(const mat4 projection, const mat4 view,
     glBindVertexArray(meshes[i].m_vao);
     glDrawArrays(GL_TRIANGLES, 0, meshes[i].m_num_vertices);
   }
+}
+
+void dr_lighting_pass(const mat4 projection, const mat4 view,
+                      const struct light *lights, const uint32_t n, const vec3 view_pos) {
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  glUseProgram(lighting_shader);
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, g_pos);
+
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, g_norm);
+
+  glActiveTexture(GL_TEXTURE2);
+  glBindTexture(GL_TEXTURE_2D, g_tex);
+
+  char uniform_name[32] = "lights[";
+  const char *pos_suffix = "].m_position\0";
+  const char *col_suffix = "].m_color\0";
+  const char *const_suffix = "].m_constant\0";
+  const char *linear_suffix = "].m_linear\0";
+  const char *quadratic_suffix = "].m_quadratic\0";
+
+  for (uint32_t i = 0; i < n; i++) {
+    uniform_name[7] = i + '0';
+    // printf("%s\n", uniform_name);
+    strncpy(&uniform_name[8], pos_suffix, 13);
+    shader_set_uniform_3fv(lighting_shader, uniform_name, lights[i].m_position);
+
+    strncpy(&uniform_name[8], col_suffix, 9);
+    shader_set_uniform_3fv(lighting_shader, uniform_name, lights[i].m_color);
+
+    strncpy(&uniform_name[8], const_suffix, 13);
+    shader_set_uniform_1f(lighting_shader, uniform_name, lights[i].m_constant);
+
+    strncpy(&uniform_name[8], linear_suffix, 11);
+    shader_set_uniform_1f(lighting_shader, uniform_name, lights[i].m_constant);
+
+    strncpy(&uniform_name[8], quadratic_suffix, 14);
+    shader_set_uniform_1f(lighting_shader, uniform_name, lights[i].m_quadratic);
+  }
+
+  shader_set_uniform_3fv(lighting_shader, "view_pos", view_pos);
 }
