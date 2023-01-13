@@ -7,10 +7,7 @@
 extern "C" {
 #endif
 
-/**
- * @brief Parse an xml file.
- */
-int parse_xml(const char *file);
+char *find_xml_tag(const char *search_start, const char *tag);
 
 #ifdef __cplusplus
 }

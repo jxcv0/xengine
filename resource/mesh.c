@@ -203,7 +203,7 @@ struct material load_material(const char *filepath) {
 /**
  * ----------------------------------------------------------------------------
  */
-struct mesh load_mesh(const char *filepath) {
+static struct mesh load_mesh_from_wfobj(const char *filepath) {
   struct mmapfile file = mmapfile_map(filepath);
   assert(file.mp_addr != NULL);
 
@@ -295,6 +295,15 @@ struct mesh load_mesh(const char *filepath) {
 
   free(temp_mem);
   mmapfile_unmap(&file);
+  return mesh;
+}
+
+struct mesh load_mesh(const char *filepath) {
+  struct mesh mesh = {0};
+  char *ext = strchr(filepath, '.');
+  if (strcmp(ext, ".obj") == 0) {
+    mesh = load_mesh_from_wfobj(filepath);
+  }
   return mesh;
 }
 
