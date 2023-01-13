@@ -1,7 +1,14 @@
 #include "collada.h"
+#include "utils.h"
 
+#include <assert.h>
+#include <stdio.h>
 #include <stddef.h>
 #include <string.h>
+
+#define COLLADA_START "COLLADA"
+
+#define TAG_START '<'
 
 #define LIBRARY_GEOMETRIES_START "<library_geometries>"
 #define LIBRARY_GEOMETRIES_END "</library_geometries>"
@@ -15,23 +22,10 @@
 /**
  * ----------------------------------------------------------------------------
  */
-char *find_xml_tag_start(const char *search_start, const char *tag) {
-  return strstr(search_start, tag);
+void parse_collada_file(const char *file) {
+  char *tag_start = strchr(file, TAG_START);
+  while((tag_start = strchr(tag_start, TAG_START))) {
+    tag_start++;
+  }
 }
 
-/**
- * ----------------------------------------------------------------------------
- */
-char *find_xml_tag_end(const char *search_start, const char *tag) {
-  char *start = strstr(search_start, tag);
-  return start += strlen(tag);
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-char *find_geometry_elements(const char *file, char **start, char **end) {
-  *start = find_xml_tag_start(file, LIBRARY_GEOMETRIES_START);
-  *end = find_xml_tag_end(*start, LIBRARY_GEOMETRIES_END);
-  return *start;
-}

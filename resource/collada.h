@@ -5,7 +5,9 @@
 extern "C" {
 #endif
 
-char *find_geometry_elements(const char *file, char **start, char **end);
+void parse_collada_file(const char *filepath);
+
+char *find_next_tag_start(const char *haystack);
 
 #ifdef __cplusplus
 }
