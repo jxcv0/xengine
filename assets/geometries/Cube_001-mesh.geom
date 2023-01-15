@@ -1,0 +1,1 @@
+assets/geometries/Cube_001-mesh.geom

@@ -2,13 +2,31 @@
 #include <errno.h>
 #include <libxml/parser.h>
 #include <libxml/xmlstring.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
 #include "libxml/tree.h"
+#include "lin.h"
 #include "mesh.h"
+
+struct source {
+  float *mp_array; // only float supported
+  uint32_t m_count;
+  uint32_t m_accessor_count;
+  uint32_t m_accessor_stride;
+};
+
+/**
+ * @brief Creates a directory with RW USR mode unless the directory already
+ * exists.
+ *
+ * @param path The relative path to create the directory in.
+ * @return 0 on success. -1 on error.
+ */
+int make_dir(const char *path);
 
 /**
  * @brief Find the next occurrence of a node within the childeren of curr.
@@ -29,8 +47,7 @@ xmlNodePtr find_child(xmlNodePtr node, const char *name);
 void parse_geometries(xmlNodePtr node);
 
 /**
- * @brief Parse a single geometry element. Only geometries with mesh elements
- * are supported
+ * @brief Parse a single geometry element.
  *
  * @param id The string id property of the geometry.
  * @param node The <geometry> node.
@@ -38,13 +55,12 @@ void parse_geometries(xmlNodePtr node);
 void parse_geometry(const xmlChar *id, xmlNodePtr node);
 
 /**
- * @brief Creates a directory with RW USR mode unless the directory already
- * exists.
+ * @brief Parse a single mesh element.
  *
- * @param path The relative path to create the directory in.
- * @return 0 on success. -1 on error.
+ * @param node The <mesh> node.
+ * @return A mesh structure containing the data from the node.
  */
-int make_dir(const char *path);
+struct mesh parse_mesh(xmlNodePtr node);
 
 /**
  * ----------------------------------------------------------------------------
@@ -139,28 +155,50 @@ void parse_geometries(xmlNodePtr node) {
 void parse_geometry(const xmlChar *id, xmlNodePtr node) {
   char buf[128];
   sprintf(buf, "assets/geometries/%s.geom", id);
+  printf("writing to file %s\n", buf);
   FILE *file = fopen(buf, "w+");  // overwrite file
   if (file == NULL) {
     perror("fopen");
     return;
   }
 
-  // jump to mesh node
-  xmlNodePtr curr = find_child(node, "mesh");
-  if (curr == NULL) {
-    fprintf(stderr, "mesh node not found\n");
-    return;
+  xmlNodePtr curr = node->xmlChildrenNode;
+  while (curr != NULL) {
+    if (xmlStrcmp(curr->name, (const xmlChar *)"mesh") == 0) {
+      parse_mesh(curr);
+    }
+    curr = curr->next;
   }
 
-  curr = find_child(curr, "vertices");
-  if (curr == NULL) {
-    fprintf(stderr, "vertices node not found\n");
-    return;
-  }
+  // TODO other elements within geometry if required
 
   fwrite(buf, strlen(buf), 1, file);
 
-  // jump to source node.
-
   fclose(file);
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+struct mesh parse_mesh(xmlNodePtr node) {
+  struct mesh m = {0};
+
+  xmlNodePtr curr = node->xmlChildrenNode;
+  while (curr != NULL) {
+    if (xmlStrcmp(curr->name, (const xmlChar *)"source") == 0) {
+      // struct source parse_source();
+      // source tags
+      xmlNodePtr array_node = curr->xmlChildrenNode;
+      while (array_node != NULL) {
+        // get array
+
+        // get accessor
+        array_node = array_node->next;
+      }
+    } else if (xmlStrcmp(curr->name, (const xmlChar *)"vertices") == 0) {
+      // vertex tags
+    }
+    curr = curr->next;
+  }
+  return m;
 }
