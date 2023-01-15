@@ -4,13 +4,11 @@ project(resource)
 set(
   SOURCES
     mesh.c
-    collada.c
 )
 
 set(
   HEADERS
     mesh.h
-    collada.h
 )
 
 add_library(${PROJECT_NAME} STATIC ${HEADERS} ${SOURCES})
