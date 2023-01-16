@@ -1,4 +1,5 @@
 #include <asm-generic/errno-base.h>
+#include <assert.h>
 #include <errno.h>
 #include <libxml/parser.h>
 #include <libxml/xmlstring.h>
@@ -12,11 +13,14 @@
 #include "lin.h"
 #include "mesh.h"
 
-struct source {
-  float *mp_array; // only float supported
-  uint32_t m_count;
-  uint32_t m_accessor_count;
-  uint32_t m_accessor_stride;
+#define POSITIONS_INDEX 0
+#define NORMALS_INDEX 1
+#define TEXCOORDS_INDEX 2
+
+struct sources {
+  vec3 *positions;
+  vec3 *normals;
+  vec2 *tex_coords;
 };
 
 /**
@@ -62,6 +66,8 @@ void parse_geometry(const xmlChar *id, xmlNodePtr node);
  */
 struct mesh parse_mesh(xmlNodePtr node);
 
+void parse_source(xmlNodePtr node, struct sources *sources);
+
 /**
  * ----------------------------------------------------------------------------
  */
@@ -103,6 +109,7 @@ int main(int argc, char **argv) {
  */
 xmlNodePtr find_child(xmlNodePtr node, const char *name) {
   xmlNodePtr curr = node->xmlChildrenNode;
+  assert(curr);
   while (curr != NULL) {
     if (xmlStrcmp(curr->name, (const xmlChar *)name) == 0) {
       return curr;
@@ -118,7 +125,7 @@ xmlNodePtr find_child(xmlNodePtr node, const char *name) {
 int make_dir(const char *path) {
   const int mode = S_ISUID | S_IROTH | S_IWOTH | S_IEXEC | S_IRUSR | S_IWUSR |
                    S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP;
-  printf("creating: %s\n", path);
+  printf("attempting to make directory: %s\n", path);
   if (mkdir(path, mode) == -1) {
     if (errno == EEXIST) {
       printf("\tdirectory already exists\n\tcontinuing\n");
@@ -180,25 +187,53 @@ void parse_geometry(const xmlChar *id, xmlNodePtr node) {
 /**
  * ----------------------------------------------------------------------------
  */
+void parse_source(xmlNodePtr node, struct sources *sources) {
+  (void)sources;
+  xmlNodePtr float_array = find_child(node, "float_array");
+
+  xmlChar *count = xmlGetProp(float_array, (const xmlChar *)"count");
+  uint32_t offset = 0;
+  uint32_t stride = 1;
+
+  xmlNodePtr technique_node = find_child(node, "technique_common");
+  xmlNodePtr accessor_node = find_child(technique_node, "accessor"); 
+  xmlChar *accessor_offset = xmlGetProp(accessor_node, (const xmlChar *)"offset");
+  if (accessor_offset != NULL) {
+    printf("here\n");
+    offset = atoi((const char *)accessor_offset);
+  }
+
+  xmlChar *accessor_stride = xmlGetProp(accessor_node, (const xmlChar *)"stride");
+  if (accessor_stride != NULL) {
+    stride = atoi((const char *)accessor_stride);
+  }
+  printf("%d %d\n", stride, offset);
+
+  free(accessor_offset);
+  free(accessor_stride);
+  free(count);
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
 struct mesh parse_mesh(xmlNodePtr node) {
-  struct mesh m = {0};
+  struct mesh mesh = {0};
+  struct sources sources = {0};
 
   xmlNodePtr curr = node->xmlChildrenNode;
   while (curr != NULL) {
     if (xmlStrcmp(curr->name, (const xmlChar *)"source") == 0) {
-      // struct source parse_source();
-      // source tags
-      xmlNodePtr array_node = curr->xmlChildrenNode;
-      while (array_node != NULL) {
-        // get array
-
-        // get accessor
-        array_node = array_node->next;
-      }
-    } else if (xmlStrcmp(curr->name, (const xmlChar *)"vertices") == 0) {
-      // vertex tags
+      // source
+      parse_source(curr, &sources);
     }
     curr = curr->next;
   }
-  return m;
+
+  // find vertices;
+  xmlNodePtr vertices_node = find_child(node, "vertices");
+  if (vertices_node == NULL) {
+    fprintf(stderr, "unable to load mesh - no vertices element found\n");
+  }
+  return mesh;
 }
