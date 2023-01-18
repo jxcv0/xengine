@@ -1,4 +1,3 @@
-#include <asm-generic/errno-base.h>
 #include <assert.h>
 #include <errno.h>
 #include <libxml/parser.h>
@@ -17,11 +16,13 @@
 #define NORMALS_INDEX 1
 #define TEXCOORDS_INDEX 2
 
-struct sources {
-  vec3 *positions;
-  vec3 *normals;
-  vec2 *tex_coords;
-};
+struct mesh dest_mesh;
+// struct animation dest_anim[MAX_NUM_ANIMATIONS];
+// struct texture dest_tex;
+
+/**
+ *-----------------------------------------------------------------------------
+ */
 
 /**
  * @brief Creates a directory with RW USR mode unless the directory already
@@ -62,11 +63,10 @@ void parse_geometry(const xmlChar *id, xmlNodePtr node);
  * @brief Parse a single mesh element.
  *
  * @param node The <mesh> node.
- * @return A mesh structure containing the data from the node.
  */
-struct mesh parse_mesh(xmlNodePtr node);
+void parse_mesh(xmlNodePtr node);
 
-void parse_source(xmlNodePtr node, struct sources *sources);
+void parse_source(xmlNodePtr node, float *sources[3]);
 
 /**
  * ----------------------------------------------------------------------------
@@ -187,45 +187,15 @@ void parse_geometry(const xmlChar *id, xmlNodePtr node) {
 /**
  * ----------------------------------------------------------------------------
  */
-void parse_source(xmlNodePtr node, struct sources *sources) {
-  (void)sources;
-  xmlNodePtr float_array = find_child(node, "float_array");
-
-  xmlChar *count = xmlGetProp(float_array, (const xmlChar *)"count");
-  uint32_t offset = 0;
-  uint32_t stride = 1;
-
-  xmlNodePtr technique_node = find_child(node, "technique_common");
-  xmlNodePtr accessor_node = find_child(technique_node, "accessor"); 
-  xmlChar *accessor_offset = xmlGetProp(accessor_node, (const xmlChar *)"offset");
-  if (accessor_offset != NULL) {
-    printf("here\n");
-    offset = atoi((const char *)accessor_offset);
-  }
-
-  xmlChar *accessor_stride = xmlGetProp(accessor_node, (const xmlChar *)"stride");
-  if (accessor_stride != NULL) {
-    stride = atoi((const char *)accessor_stride);
-  }
-  printf("%d %d\n", stride, offset);
-
-  free(accessor_offset);
-  free(accessor_stride);
-  free(count);
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-struct mesh parse_mesh(xmlNodePtr node) {
+void parse_mesh(xmlNodePtr node) {
   struct mesh mesh = {0};
-  struct sources sources = {0};
+  float *sources[3];
 
   xmlNodePtr curr = node->xmlChildrenNode;
   while (curr != NULL) {
     if (xmlStrcmp(curr->name, (const xmlChar *)"source") == 0) {
       // source
-      parse_source(curr, &sources);
+      parse_source(curr, sources);
     }
     curr = curr->next;
   }
@@ -235,5 +205,49 @@ struct mesh parse_mesh(xmlNodePtr node) {
   if (vertices_node == NULL) {
     fprintf(stderr, "unable to load mesh - no vertices element found\n");
   }
-  return mesh;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+void parse_source(xmlNodePtr node, float *sources[3]) {
+  (void)sources;
+  // Take semantic from id instead of from <input>. This could be problematic
+  // when using different exporter.
+  
+  uint32_t dest = 0;
+  xmlChar *semantic = xmlGetProp(node, (const xmlChar *)"id");
+  if (xmlStrstr(semantic, (const xmlChar *)"positions") == 0) {
+    dest = POSITIONS_INDEX;
+  } else if (xmlStrstr(semantic, (const xmlChar *)"normals") == 0) {
+    dest = NORMALS_INDEX;
+  } else if (xmlStrstr(semantic, (const xmlChar *)"map") == 0) {
+    dest = TEXCOORDS_INDEX;
+  }
+
+  xmlNodePtr float_array = find_child(node, "float_array");
+  xmlChar *count = xmlGetProp(float_array, (const xmlChar *)"count");
+
+  sources[dest] = malloc(sizeof(float) * atoi((const char *)count));
+
+  uint32_t offset = 0;
+  uint32_t stride = 1;
+
+  xmlNodePtr technique_node = find_child(node, "technique_common");
+  xmlNodePtr accessor_node = find_child(technique_node, "accessor");
+  xmlChar *accessor_offset =
+      xmlGetProp(accessor_node, (const xmlChar *)"offset");
+  if (accessor_offset != NULL) {
+    offset = atoi((const char *)accessor_offset);
+  }
+
+  xmlChar *accessor_stride =
+      xmlGetProp(accessor_node, (const xmlChar *)"stride");
+  if (accessor_stride != NULL) {
+    stride = atoi((const char *)accessor_stride);
+  }
+
+  free(accessor_offset);
+  free(accessor_stride);
+  free(count);
 }
