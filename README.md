@@ -40,10 +40,12 @@ Game Engine
 
 ### Model Data Table
 | model_id | mesh_id |
+|----------|---------|
 Note - A model may have 1..\* meshes
 
 ### Texture Table
-| mesh_id | texture_id | 
+| mesh_id | texture_id |
+|---------|------------|
 
 ### Animation Group Table
 | model_id | animation_set_id |
