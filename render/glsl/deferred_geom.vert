@@ -1,11 +1,11 @@
 #version 460 core
 layout (location = 0) out vec3 pos_in;
-layout (location = 1) out vec3 tex_coord_in;
-layout (location = 2) out vec3 norm_in;
+layout (location = 1) out vec3 norm_in;
+layout (location = 2) out vec2 tex_coord_in;
 
 out vec3 frag_pos;
-out vec2 tex_coord;
 out vec3 normal;
+out vec2 tex_coord;
 
 uniform mat4 projection;
 uniform mat4 view;
@@ -23,5 +23,5 @@ void main() {
   mat3 normal_matrix = transpose(inverse(mat3(model)));
   normal = normal_matrix * normal;
 
-  gl_Position = projection * view * world_pos
+  gl_Position = projection * view * world_pos;
 }

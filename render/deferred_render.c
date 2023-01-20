@@ -39,7 +39,7 @@ void dr_init(const uint32_t scr_w, const uint32_t scr_h) {
 
   // normal color buffer
   glGenTextures(1, &g_norm);
-  glBindTexture(GL_TEXTURE_2D, g_pos);
+  glBindTexture(GL_TEXTURE_2D, g_norm);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16, scr_w, scr_h, 0, GL_RGBA, GL_FLOAT,
                NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -50,7 +50,7 @@ void dr_init(const uint32_t scr_w, const uint32_t scr_h) {
   // diffuse and specular color buffer
   glGenTextures(1, &g_tex);
   glBindTexture(GL_TEXTURE_2D, g_tex);
-  glTexImage2D(GL_TEXTURE, 0, GL_RGBA, scr_w, scr_h, 0, GL_RGBA,
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, scr_w, scr_h, 0, GL_RGBA,
                GL_UNSIGNED_BYTE, NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -68,7 +68,7 @@ void dr_init(const uint32_t scr_w, const uint32_t scr_h) {
   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
                             GL_RENDERBUFFER, rbo_depth);
   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-    printf("framebuffer incomplete\n");
+    fprintf(stderr, "framebuffer incomplete\n");
     exit(EXIT_FAILURE);
   }
 
@@ -102,7 +102,7 @@ void dr_geometry_pass(const mat4 projection, const mat4 view,
     shader_set_uniform_m4fv(geom_shader, "model", model_matrices[i]);
 
     // textures
-    // TODO normal mapping possible?
+    // TODO normal mapping: Need another buffer?
     shader_set_uniform_1i(geom_shader, "tex_diff", 0);
     shader_set_uniform_1i(geom_shader, "tex_spec", 1);
     // shader_set_uniform_1i(geom_shader, "tex_norm", 2);

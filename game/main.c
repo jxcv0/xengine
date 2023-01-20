@@ -1,3 +1,4 @@
+#include "deferred_render.h"
 #include <pthread.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -87,14 +88,13 @@ void handle_keyboard_input(GLFWwindow *w) {
 int main(int argc, char const *argv[]) {
   (void)argc;
   (void)argv;
+
   create_window(&window, window_width, window_height, "game");
+  dr_init(window_width, window_width);
   glfwSetCursorPosCallback(window, handle_mouse_movement);
 
   shader_t mesh_shader =
       shader_load("render/glsl/uber.vert", "render/glsl/uber.frag");
-
-  // shader_t text_shader =
-  // shader_load("render/glsl/text.vert", "render/glsl/text.frag");
 
   perspective(projection_matrix, radians(60),
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
@@ -146,18 +146,11 @@ int main(int argc, char const *argv[]) {
     mat4 model;
     identity_mat4(model);
 
-    // TODO this needs to go to struct material as a member of mesh
-
     draw_mesh(mesh_shader, projection_matrix, view_matrix, model, camera.m_pos,
               &light, &test_mesh);
 
     draw_mesh(mesh_shader, projection_matrix, view_matrix, model, camera.m_pos,
               &light, &floor);
-
-    // vec2 text_pos = {window_width, window_height};
-    // const char *debug_text = "abcdefg";
-    // render_text(text_shader, projection_matrix, text_pos, text_col,
-    // debug_text, 7);
 
     glfwSwapBuffers(window);
     glfwPollEvents();

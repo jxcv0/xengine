@@ -38,11 +38,6 @@ Game Engine
 | entity_id | bearing  |
 |-----------|----------|
 
-### Model Data Table
-| model_id | mesh_id |
-|----------|---------|
-Note - A model may have 1..\* meshes
-
 ### Texture Table
 | mesh_id | texture_id |
 |---------|------------|

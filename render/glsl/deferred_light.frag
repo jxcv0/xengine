@@ -16,18 +16,18 @@ struct light {
   float m_quadratic;
 };
 
-const int AMBIENT_STRENGTH = 0.1;
-const int NUM_LIGHTS 32;
-uniform light lighting[NUM_LIGHTS];
+const float AMBIENT_STRENGTH = 0.1;
+const int NUM_LIGHTS = 32;
+uniform light lights[NUM_LIGHTS];
 
 uniform vec3 view_pos;
 
 void main() {
   // fetch data from G-Buffer
-  vec3 frag_pos = texture(g_pos, tex_coord).rgb
-  vec3 g_normal = texture(g_norm, tex_coord).rgb
-  vec3 g_diffuse = texture(g_tex, tex_coord).rgb
-  vec3 g_specular = texture(g_tex, tex_coord).a
+  vec3 frag_pos = texture(g_pos, tex_coord).rgb;
+  vec3 g_normal = texture(g_norm, tex_coord).rgb;
+  vec3 g_diffuse = texture(g_tex, tex_coord).rgb;
+  float g_specular = texture(g_tex, tex_coord).a;
 
   vec3 lighting = g_diffuse * AMBIENT_STRENGTH;
   vec3 view_dir = normalize(view_pos - frag_pos);
@@ -45,7 +45,7 @@ void main() {
      * specular
      */
     vec3 half_dir = normalize(light_dir + view_dir);
-    float spec_str = pow(max(dot(normal, half_dir), 0.0) 16.0);
+    float spec_str = pow(max(dot(g_normal, half_dir), 0.0), 16.0);
     vec3 specular = lights[i].m_color * spec_str * g_specular;
 
     /**
