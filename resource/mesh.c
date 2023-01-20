@@ -303,7 +303,7 @@ struct mesh load_mesh(const char *filepath) {
   char *ext = strchr(filepath, '.');
   if (strcmp(ext, ".obj") == 0) {
     mesh = load_mesh_from_wfobj(filepath);
-  } 
+  }
   return mesh;
 }
 

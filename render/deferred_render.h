@@ -32,6 +32,6 @@ void dr_geometry_pass(const mat4 projection, const mat4 view,
 
 void dr_lighting_pass(const mat4 projection, const mat4 view,
                       const struct light *lights, const uint32_t n,
-                      const vec3 view_pos);
+                      const vec3 view_pos, const int scr_w, const int scr_h);
 
 #endif  // DEFERRED_RENDER_H_

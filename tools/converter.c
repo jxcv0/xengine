@@ -21,11 +21,11 @@
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 #include <assimp/types.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <string.h>
 
 #include "mesh.h"
@@ -40,7 +40,7 @@ struct vertex *out_vertices[MAX_MESHES] = {0};
 uint32_t *out_indices[MAX_MESHES] = {0};
 uint32_t out_num_vertices[MAX_MESHES] = {0};
 uint32_t out_num_indices[MAX_MESHES] = {0};
-bool out_has_textures[MAX_MESHES]; // could be bitmask
+bool out_has_textures[MAX_MESHES];  // could be bitmask
 char *out_texture_names[MAX_MESHES][MAX_TEXTURES];
 
 FILE *file;
@@ -82,17 +82,14 @@ int main(int argc, char *argv[]) {
   for (unsigned int i = 0; i < num_meshes; i++) {
     fprintf(file, "VERTICES %d\n", out_num_vertices[i]);
     for (unsigned int j = 0; j < out_num_vertices[i]; j++) {
-      fprintf(file, "%f %f %f %f %f %f %f %f\n",
-          out_vertices[i][j].m_position[0],
-          out_vertices[i][j].m_position[1],
-          out_vertices[i][j].m_position[2],
+      fprintf(
+          file, "%f %f %f %f %f %f %f %f\n", out_vertices[i][j].m_position[0],
+          out_vertices[i][j].m_position[1], out_vertices[i][j].m_position[2],
 
-          out_vertices[i][j].m_normal[0],
-          out_vertices[i][j].m_normal[1],
+          out_vertices[i][j].m_normal[0], out_vertices[i][j].m_normal[1],
           out_vertices[i][j].m_normal[2],
 
-          out_vertices[i][j].m_tex_coord[0],
-          out_vertices[i][j].m_tex_coord[1]);
+          out_vertices[i][j].m_tex_coord[0], out_vertices[i][j].m_tex_coord[1]);
     }
 
     fprintf(file, "INDICES %d\n", out_num_indices[i]);

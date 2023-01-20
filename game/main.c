@@ -1,9 +1,11 @@
-#include "deferred_render.h"
 #include <pthread.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+
+#include "deferred_render.h"
+#include "light.h"
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -15,8 +17,9 @@
 #include "mesh.h"
 #include "render.h"
 #include "shader.h"
-// #include "text.h"
 #include "window.h"
+
+#define MAX_MESHES 64
 
 extern const vec3 GLOBAL_UP;
 
@@ -33,7 +36,6 @@ const float window_width = 1080;
 const float window_height = 600;
 
 struct camera camera = {.m_mouse_sensetivity = 0.3, .m_movement_speed = 0.1};
-
 vec2 mouse_pos;
 mat4 projection_matrix = {0};
 mat4 view_matrix = {0};
@@ -93,9 +95,6 @@ int main(int argc, char const *argv[]) {
   dr_init(window_width, window_width);
   glfwSetCursorPosCallback(window, handle_mouse_movement);
 
-  shader_t mesh_shader =
-      shader_load("render/glsl/uber.vert", "render/glsl/uber.frag");
-
   perspective(projection_matrix, radians(60),
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
@@ -104,9 +103,6 @@ int main(int argc, char const *argv[]) {
 
   gen_mesh_buffers(&test_mesh);
   gen_mesh_buffers(&floor);
-
-  glUseProgram(mesh_shader);
-  shader_set_uniform_m4fv(mesh_shader, "projection", projection_matrix);
 
   struct light light = {0};
   light.m_color[0] = 1;
@@ -123,14 +119,9 @@ int main(int argc, char const *argv[]) {
   camera.m_pos[1] = 1.86;
   camera.m_pos[2] = 3;
 
-  camera.m_last_mouse_pos[0] = window_width / 2.0f;
   camera.m_last_mouse_pos[1] = window_height / 2.0f;
   camera.m_yaw = 275;
   process_mouse_movement(&camera, mouse_pos);
-
-  // init_ttf("assets/fonts/Consolas.ttf");
-
-  // vec4 text_col = {1};
 
   while (!glfwWindowShouldClose(window)) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -140,17 +131,14 @@ int main(int argc, char const *argv[]) {
     handle_keyboard_input(window);
     update_view_matrix();
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(0.2, 0.3, 0.3, 1);
-
     mat4 model;
     identity_mat4(model);
 
-    draw_mesh(mesh_shader, projection_matrix, view_matrix, model, camera.m_pos,
-              &light, &test_mesh);
+    dr_geometry_pass(projection_matrix, view_matrix, &model, &test_mesh, 1,
+                     camera.m_pos);
 
-    draw_mesh(mesh_shader, projection_matrix, view_matrix, model, camera.m_pos,
-              &light, &floor);
+    dr_lighting_pass(projection_matrix, view_matrix, &light, 1, camera.m_pos,
+        window_width, window_height);
 
     glfwSwapBuffers(window);
     glfwPollEvents();

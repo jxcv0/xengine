@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 
 #include "glad.h"
 #include "light.h"
@@ -17,6 +18,8 @@ static uint32_t rbo_depth;
 static uint32_t g_pos;
 static uint32_t g_norm;
 static uint32_t g_tex;
+static uint32_t quad_vao;
+static uint32_t quad_vbo;
 
 static shader_t geom_shader;
 static shader_t lighting_shader;
@@ -77,6 +80,22 @@ void dr_init(const uint32_t scr_w, const uint32_t scr_h) {
 
   lighting_shader = shader_load("render/glsl/deferred_light.vert",
                                 "render/glsl/deferred_light.frag");
+
+  // vao for rendering framebuffers?
+  const float quad_verts[] = {-1.0f, 1.0f, 0.0f,  0.0f, 1.0f, -1.0f, -1.0f,
+                              0.0f,  0.0f, 0.0f,  1.0f, 1.0f, 0.0f,  1.0f,
+                              1.0f,  1.0f, -1.0f, 0.0f, 1.0f, 0.0f};
+
+  glGenVertexArrays(1, &quad_vao);
+  glGenBuffers(1, &quad_vbo);
+  glBindVertexArray(quad_vao);
+  glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(quad_verts), quad_verts, GL_STATIC_DRAW);
+  glEnableVertexAttribArray(0);  // pos
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
+  glEnableVertexAttribArray(2);  // tex
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+                        (void *)(sizeof(float) * 3));
 }
 
 /**
@@ -85,11 +104,11 @@ void dr_init(const uint32_t scr_w, const uint32_t scr_h) {
 void dr_geometry_pass(const mat4 projection, const mat4 view,
                       const mat4 *model_matrices, const struct mesh *meshes,
                       const uint32_t n, const vec3 view_pos) {
+  glUseProgram(geom_shader);
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glBindFramebuffer(GL_FRAMEBUFFER, g_buffer);
-
-  glUseProgram(geom_shader);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   // transforms
   shader_set_uniform_m4fv(geom_shader, "projection", projection);
@@ -102,7 +121,7 @@ void dr_geometry_pass(const mat4 projection, const mat4 view,
     shader_set_uniform_m4fv(geom_shader, "model", model_matrices[i]);
 
     // textures
-    // TODO normal mapping: Need another buffer?
+    // TODO normal mapping: Need another buffer.
     shader_set_uniform_1i(geom_shader, "tex_diff", 0);
     shader_set_uniform_1i(geom_shader, "tex_spec", 1);
     // shader_set_uniform_1i(geom_shader, "tex_norm", 2);
@@ -128,11 +147,7 @@ void dr_geometry_pass(const mat4 projection, const mat4 view,
 
 void dr_lighting_pass(const mat4 projection, const mat4 view,
                       const struct light *lights, const uint32_t n,
-                      const vec3 view_pos) {
-  // TODO this is unfinished
-  (void)projection;
-  (void)view;
-
+                      const vec3 view_pos, const int scr_w, const int scr_h) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   glUseProgram(lighting_shader);
@@ -155,7 +170,6 @@ void dr_lighting_pass(const mat4 projection, const mat4 view,
 
   for (uint32_t i = 0; i < n; i++) {
     uniform_name[7] = i + '0';
-    // printf("%s\n", uniform_name);
     strncpy(&uniform_name[8], pos_suffix, 13);
     shader_set_uniform_3fv(lighting_shader, uniform_name, lights[i].m_position);
 
@@ -172,5 +186,18 @@ void dr_lighting_pass(const mat4 projection, const mat4 view,
     shader_set_uniform_1f(lighting_shader, uniform_name, lights[i].m_quadratic);
   }
 
+  shader_set_uniform_m4fv(lighting_shader, "projection", projection);
+  shader_set_uniform_m4fv(lighting_shader, "view", view);
+
   shader_set_uniform_3fv(lighting_shader, "view_pos", view_pos);
+  shader_set_uniform_1i(lighting_shader, "g_pos", 0);
+  shader_set_uniform_1i(lighting_shader, "g_norm", 1);
+  shader_set_uniform_1i(lighting_shader, "g_tex", 2);
+
+  glBindVertexArray(quad_vao);
+  glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+  glBindFramebuffer(GL_READ_FRAMEBUFFER, g_buffer);
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // default fbo
+  glBlitFramebuffer(0, 0, scr_w, scr_h, 0, 0, scr_w, scr_h, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 }
