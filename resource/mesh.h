@@ -2,6 +2,7 @@
 #define MESH_H_
 
 #include <stddef.h>
+#include <stdint.h>
 
 #include "lin.h"
 
@@ -16,6 +17,8 @@ struct vertex {
   vec3 m_position;
   vec2 m_tex_coord;
   vec3 m_normal;
+  // vec3 m_tangent;
+  // vec3 m_bitangent;
 };
 
 struct texture {
@@ -51,6 +54,8 @@ struct mesh {
   unsigned int m_vao;
   size_t m_num_vertices;
   struct vertex *mp_vertices;
+  size_t m_num_indices;
+  uint32_t *mp_indices;
   struct material m_material;
 };
 
