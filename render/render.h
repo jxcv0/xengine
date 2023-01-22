@@ -5,6 +5,7 @@
 #include "lin.h"
 #include "mesh.h"
 #include "shader.h"
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -12,6 +13,8 @@ extern "C" {
 
 /**
  * @brief Generate GL buffers.
+ * TODO this can probably be moved back to loading as meshes probabably dont
+ * need to be keep in game memory as well as video memory.
  *
  * @param mesh The mesh structure.
  */
@@ -25,7 +28,7 @@ void gen_mesh_buffers(struct mesh *mesh);
 void gen_material_buffers(struct material *material);
 
 /**
- * @brief Render primitives from array data.
+ * @brief Forward render primitives from array data.
  *
  * @param mesh A pointer to the mesh structure.
  * @param TODO
