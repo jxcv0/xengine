@@ -58,7 +58,8 @@ void main() {
 
      diffuse *= attenuation;
      specular *= attenuation;
-     lighting += diffuse + specular;
+     lighting += (diffuse + specular);
   }
+
   frag_col = vec4(lighting, 1.0);
 }

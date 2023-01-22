@@ -5,7 +5,6 @@
 #include <string.h>
 
 #include "shader.h"
-#include "text.h"
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
@@ -109,10 +108,10 @@ int main(int argc, char const *argv[]) {
   light.m_color[2] = 1;
   light.m_position[0] = 0;
   light.m_position[1] = 2;
-  light.m_position[2] = 0;
+  light.m_position[2] = 3;
   light.m_constant = 1.0;
-  light.m_linear = 0.0014;
-  light.m_quadratic = 0.000007;
+  light.m_linear = 0.7;
+  light.m_quadratic = 1.8;
 
   camera.m_pos[0] = 0;
   camera.m_pos[1] = 1.86;
@@ -213,6 +212,7 @@ int main(int argc, char const *argv[]) {
                   test_mesh.m_material.m_tex_specular.m_texture_id);
     glBindVertexArray(test_mesh.m_vao);
     glDrawArrays(GL_TRIANGLES, 0, test_mesh.m_num_vertices);
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -226,13 +226,13 @@ int main(int argc, char const *argv[]) {
     shader_set_uniform_1i(light_shader, "g_pos", 0);
     shader_set_uniform_1i(light_shader, "g_norm", 1);
     shader_set_uniform_1i(light_shader, "g_tex", 2);
-    shader_set_uniform_3fv(light_shader, "light[0].m_position",
+    shader_set_uniform_3fv(light_shader, "lights[0].m_position",
                            light.m_position);
-    shader_set_uniform_3fv(light_shader, "light[0].m_color", light.m_color);
-    shader_set_uniform_1f(light_shader, "light[0].m_constant",
+    shader_set_uniform_3fv(light_shader, "lights[0].m_color", light.m_color);
+    shader_set_uniform_1f(light_shader, "lights[0].m_constant",
                           light.m_constant);
-    shader_set_uniform_1f(light_shader, "light[0].m_linear", light.m_linear);
-    shader_set_uniform_1f(light_shader, "light[0].m_quadratic",
+    shader_set_uniform_1f(light_shader, "lights[0].m_linear", light.m_linear);
+    shader_set_uniform_1f(light_shader, "lights[0].m_quadratic",
                           light.m_quadratic);
     shader_set_uniform_3fv(light_shader, "view_pos", camera.m_pos);
     render_quad();
@@ -276,8 +276,8 @@ void render_quad()
         glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     }
     glBindVertexArray(quadVAO);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
