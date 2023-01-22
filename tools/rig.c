@@ -91,7 +91,7 @@ int main(int argc, char const *argv[]) {
   // glfwSetCursorPosCallback(window, handle_mouse_movement);
 
   shader_t mesh_shader =
-      shader_load("render/glsl/uber.vert", "render/glsl/uber.frag");
+      load_shader("render/glsl/uber.vert", "render/glsl/uber.frag");
 
   // shader_t text_shader =
   // shader_load("render/glsl/text.vert", "render/glsl/text.frag");

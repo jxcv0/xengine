@@ -17,7 +17,7 @@ struct light {
 };
 
 const float AMBIENT_STRENGTH = 0.1;
-const int NUM_LIGHTS = 32;
+const int NUM_LIGHTS = 1;
 uniform light lights[NUM_LIGHTS];
 
 uniform vec3 view_pos;

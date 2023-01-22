@@ -68,7 +68,7 @@ void shader_set_uniform_m4fv(shader_t shader, const char *uniform_name,
  *  @param frag_path Path to the fragment shader.
  *  @return A new Shader object.
  */
-shader_t shader_load(const char *vert_path, const char *frag_path);
+shader_t load_shader(const char *vert_path, const char *frag_path);
 
 #ifdef __cplusplus
 }

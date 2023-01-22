@@ -84,7 +84,7 @@ static void check_link(int id) {
 /**
  * ----------------------------------------------------------------------------
  */
-shader_t shader_load(const char *vert_path, const char *frag_path) {
+shader_t load_shader(const char *vert_path, const char *frag_path) {
   char *v = load_file_into_mem(vert_path);
   char *f = load_file_into_mem(frag_path);
 

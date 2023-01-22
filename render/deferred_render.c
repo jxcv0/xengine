@@ -33,7 +33,7 @@ void dr_init(const uint32_t scr_w, const uint32_t scr_h) {
   // position color buffer
   glGenTextures(1, &g_pos);
   glBindTexture(GL_TEXTURE_2D, g_pos);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16, scr_w, scr_h, 0, GL_RGBA, GL_FLOAT,
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, scr_w, scr_h, 0, GL_RGBA, GL_FLOAT,
                NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -43,7 +43,7 @@ void dr_init(const uint32_t scr_w, const uint32_t scr_h) {
   // normal color buffer
   glGenTextures(1, &g_norm);
   glBindTexture(GL_TEXTURE_2D, g_norm);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16, scr_w, scr_h, 0, GL_RGBA, GL_FLOAT,
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, scr_w, scr_h, 0, GL_RGBA, GL_FLOAT,
                NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -53,7 +53,7 @@ void dr_init(const uint32_t scr_w, const uint32_t scr_h) {
   // diffuse and specular color buffer
   glGenTextures(1, &g_tex);
   glBindTexture(GL_TEXTURE_2D, g_tex);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, scr_w, scr_h, 0, GL_RGBA,
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, scr_w, scr_h, 0, GL_RGBA,
                GL_UNSIGNED_BYTE, NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -75,10 +75,10 @@ void dr_init(const uint32_t scr_w, const uint32_t scr_h) {
     exit(EXIT_FAILURE);
   }
 
-  geom_shader = shader_load("render/glsl/deferred_geom.vert",
+  geom_shader = load_shader("render/glsl/deferred_geom.vert",
                             "render/glsl/deferred_geom.frag");
 
-  lighting_shader = shader_load("render/glsl/deferred_light.vert",
+  lighting_shader = load_shader("render/glsl/deferred_light.vert",
                                 "render/glsl/deferred_light.frag");
 
   // vao for rendering framebuffers?
@@ -168,6 +168,7 @@ void dr_lighting_pass(const mat4 projection, const mat4 view,
   const char *linear_suffix = "].m_linear\0";
   const char *quadratic_suffix = "].m_quadratic\0";
 
+  // TODO sprintf
   for (uint32_t i = 0; i < n; i++) {
     uniform_name[7] = i + '0';
     strncpy(&uniform_name[8], pos_suffix, 13);
@@ -180,7 +181,7 @@ void dr_lighting_pass(const mat4 projection, const mat4 view,
     shader_set_uniform_1f(lighting_shader, uniform_name, lights[i].m_constant);
 
     strncpy(&uniform_name[8], linear_suffix, 11);
-    shader_set_uniform_1f(lighting_shader, uniform_name, lights[i].m_constant);
+    shader_set_uniform_1f(lighting_shader, uniform_name, lights[i].m_linear);
 
     strncpy(&uniform_name[8], quadratic_suffix, 14);
     shader_set_uniform_1f(lighting_shader, uniform_name, lights[i].m_quadratic);
@@ -198,6 +199,7 @@ void dr_lighting_pass(const mat4 projection, const mat4 view,
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
   glBindFramebuffer(GL_READ_FRAMEBUFFER, g_buffer);
-  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // default fbo
-  glBlitFramebuffer(0, 0, scr_w, scr_h, 0, 0, scr_w, scr_h, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);  // default fbo
+  glBlitFramebuffer(0, 0, scr_w, scr_h, 0, 0, scr_w, scr_h, GL_DEPTH_BUFFER_BIT,
+                    GL_NEAREST);
 }

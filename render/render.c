@@ -21,17 +21,17 @@ void gen_mesh_buffers(struct mesh *mesh) {
   glBufferData(GL_ARRAY_BUFFER, mesh->m_num_vertices * sizeof(struct vertex),
                (void *)(mesh->mp_vertices), GL_DYNAMIC_DRAW);
 
+  glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
                         (void *)(offsetof(struct vertex, m_position)));
-  glEnableVertexAttribArray(0);
 
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-                        (void *)(offsetof(struct vertex, m_tex_coord)));
-  glEnableVertexAttribArray(1);
-
-  glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-                        (void *)(offsetof(struct vertex, m_normal)));
   glEnableVertexAttribArray(2);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
+                        (void *)(offsetof(struct vertex, m_normal)));
+
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
+                        (void *)(offsetof(struct vertex, m_tex_coord)));
 
   gen_material_buffers(&mesh->m_material);
 
@@ -48,7 +48,6 @@ void gen_mesh_buffers(struct mesh *mesh) {
  * ----------------------------------------------------------------------------
  */
 static void gen_texture_buffers(struct texture *texture) {
-  glUseProgram(0);
   if (texture->mp_data != NULL) {
     glGenTextures(1, &texture->m_texture_id);
     glBindTexture(GL_TEXTURE_2D, texture->m_texture_id);
@@ -125,7 +124,7 @@ void draw_mesh(const shader_t shader, const mat4 projection_matrix,
   glBindTexture(GL_TEXTURE_2D, mesh->m_material.m_tex_specular.m_texture_id);
 
   glActiveTexture(GL_TEXTURE2);
-  glBindTexture(GL_TEXTURE_2D, mesh->m_material.m_tex_specular.m_texture_id);
+  glBindTexture(GL_TEXTURE_2D, mesh->m_material.m_tex_normal.m_texture_id);
 
   glBindVertexArray(mesh->m_vao);
   glDrawArrays(GL_TRIANGLES, 0, mesh->m_num_vertices);

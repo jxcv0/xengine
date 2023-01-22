@@ -57,13 +57,11 @@ void create_window(GLFWwindow **window, const float width, const float height,
   glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
   glEnable(GL_DEPTH_TEST);
-  glDepthFunc(GL_LESS);
-
+  // glDepthFunc(GL_LESS);
   glEnable(GL_CULL_FACE);
-  glCullFace(GL_BACK);
-
+  // glCullFace(GL_BACK);
   glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 /**
