@@ -1,8 +1,9 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include "lin.h"
 #include <stdint.h>
+
+#include "lin.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,7 +21,7 @@ void shader_set_uniform_1i(shader_t id, const char *uniform_name,
                            const int32_t value);
 
 void shader_set_uniform_1ui(shader_t id, const char *uniform_name,
-                           const uint32_t value);
+                            const uint32_t value);
 
 /**
  * @brief Uniform float utility function.

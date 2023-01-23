@@ -94,11 +94,11 @@ int main(int argc, char *argv[]) {
 
     fprintf(file, "INDICES %d\n", out_num_indices[i]);
     for (unsigned int j = 0; j < out_num_indices[i]; j++) {
-      fprintf(file, "%d ", out_indices[i][j]);
+      fprintf(file, "%d\n", out_indices[i][j]);
     }
 
     if (out_has_textures[i]) {
-      fprintf(file, "\nTEXTURES\n");
+      fprintf(file, "TEXTURES\n");
       for (unsigned int j = 0; j < 3; j++) {
         fprintf(file, "%s\n", out_texture_names[i][j]);
       }

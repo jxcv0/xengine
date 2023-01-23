@@ -52,11 +52,11 @@ struct material {
 struct mesh {
   unsigned int m_vbo;
   unsigned int m_vao;
-  size_t m_num_vertices;
-  struct vertex *mp_vertices;
+  uint32_t m_num_vertices;
   size_t m_num_indices;
-  uint32_t *mp_indices;
   struct material m_material;
+  struct vertex *mp_vertices;
+  uint32_t *mp_indices;
 };
 
 /**

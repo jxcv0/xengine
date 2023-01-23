@@ -31,6 +31,9 @@ struct texture load_texture(const char *obj_filepath,
   return tex;
 }
 
+/**
+ * ----------------------------------------------------------------------------
+ */
 struct mesh load_mesh(const char *filepath) {
   struct mesh mesh = {0};
   FILE *file = fopen(filepath, "r");
@@ -40,11 +43,67 @@ struct mesh load_mesh(const char *filepath) {
 
   size_t linesize = 128;
   char *line = malloc(linesize);
+  struct vertex *vertices = NULL;
+  uint32_t *indices = NULL;
 
   ssize_t nread;
   while ((nread = getline(&line, &linesize, file)) != -1) {
-    printf("%ld\n", nread);
+    if (strstr(line, "MESHES") != NULL) {
+      if (atoi(&line[7]) > 1) {
+        fprintf(stderr, "Multiple meshes not supported. Loading first mesh.\n");
+      }
+    } else if (strstr(line, "VERTICES") != NULL) {
+      mesh.m_num_vertices = atoi(&line[9]);
+      vertices = malloc(sizeof(struct vertex) * mesh.m_num_vertices);
+      char *endptr;
+      for (uint32_t i = 0; i < mesh.m_num_vertices; i++) {
+        getline(&line, &linesize, file);
+        vertices[i].m_position[0] = strtof(line, &endptr);
+        line = endptr;
+        vertices[i].m_position[1] = strtof(line, &endptr);
+        line = endptr;
+        vertices[i].m_position[2] = strtof(line, &endptr);
+        line = endptr;
+        vertices[i].m_normal[0] = strtof(line, &endptr);
+        line = endptr;
+        vertices[i].m_normal[1] = strtof(line, &endptr);
+        line = endptr;
+        vertices[i].m_normal[2] = strtof(line, &endptr);
+        line = endptr;
+        vertices[i].m_tex_coord[0] = strtof(line, &endptr);
+        line = endptr;
+        vertices[i].m_tex_coord[1] = strtof(line, &endptr);
+      }
+    } else if (strstr(line, "INDICES") != NULL) {
+      mesh.m_num_indices = atoi(&line[8]);
+      indices = malloc(sizeof(uint32_t) * mesh.m_num_indices);
+      for (uint32_t i = 0; i < mesh.m_num_indices; i++) {
+        getline(&line, &linesize, file);
+        indices[i] = atoi(line);
+      }
+    } else if (strstr(line, "TEXTURES") != NULL) {
+      for (int i = 0; i < 3; i++) {
+        getline(&line, &linesize, file);
+        if (strncmp(line, "(null)", 6) == 0) {
+          break;
+        }
+        // TODO load_texture
+        printf("%s", line);
+      }
+    }
   }
+
+  for (uint32_t i = 0; i < mesh.m_num_vertices; i++) {
+    printf("%d - %f %f %f %f %f %f %f %f\n", i, vertices[i].m_position[0],
+           vertices[i].m_position[1], vertices[i].m_position[2],
+           vertices[i].m_normal[0], vertices[i].m_normal[1],
+           vertices[i].m_normal[2], vertices[i].m_tex_coord[0],
+           vertices[i].m_tex_coord[1]);
+  }
+
+  free(vertices);
+  free(indices);
+  fclose(file);
   return mesh;
 }
 

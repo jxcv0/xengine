@@ -15,7 +15,7 @@ void shader_set_uniform_1i(shader_t id, const char *uniform_name,
 }
 
 void shader_set_uniform_1ui(shader_t id, const char *uniform_name,
-                           const uint32_t value) {
+                            const uint32_t value) {
   glUniform1ui(glGetUniformLocation(id, uniform_name), value);
 }
 
