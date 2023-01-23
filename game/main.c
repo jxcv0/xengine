@@ -1,7 +1,7 @@
-#include <pthread.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "shader.h"
@@ -121,65 +121,11 @@ int main(int argc, char const *argv[]) {
   camera.m_yaw = 275;
   process_mouse_movement(&camera, mouse_pos);
 
-  shader_t geom_shader = load_shader("render/glsl/deferred_geom.vert",
-                                     "render/glsl/deferred_geom.frag");
-  shader_t light_shader = load_shader("render/glsl/deferred_light.vert",
-                                      "render/glsl/deferred_light.frag");
-
-  unsigned int gBuffer;
-  glGenFramebuffers(1, &gBuffer);
-  glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
-  unsigned int gPosition, gNormal, gAlbedoSpec;
-  // position color buffer
-  glGenTextures(1, &gPosition);
-  glBindTexture(GL_TEXTURE_2D, gPosition);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, window_width, window_height, 0,
-               GL_RGBA, GL_FLOAT, NULL);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-                         gPosition, 0);
-  // normal color buffer
-  glGenTextures(1, &gNormal);
-  glBindTexture(GL_TEXTURE_2D, gNormal);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, window_width, window_height, 0,
-               GL_RGBA, GL_FLOAT, NULL);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D,
-                         gNormal, 0);
-  // color + specular color buffer
-  glGenTextures(1, &gAlbedoSpec);
-  glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, window_width, window_height, 0,
-               GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D,
-                         gAlbedoSpec, 0);
-  // tell OpenGL which color attachments we'll use (of this framebuffer) for
-  // rendering
-  unsigned int attachments[3] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1,
-                                 GL_COLOR_ATTACHMENT2};
-  glDrawBuffers(3, attachments);
-  // create and attach depth buffer (renderbuffer)
-  unsigned int rboDepth;
-  glGenRenderbuffers(1, &rboDepth);
-  glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, window_width,
-                        window_height);
-  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-                            GL_RENDERBUFFER, rboDepth);
-  // finally check if framebuffer is complete
-  if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-    printf("Framebuffer incomplete. Exiting\n");
+  struct renderer r;
+  if (renderer_init(&r, window_width, window_height) != 0) {
+    fprintf(stderr, "Framebuffer incomplete\n");
+    exit(EXIT_FAILURE);
   }
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-  glUseProgram(light_shader);
-  shader_set_uniform_1i(light_shader, "g_pos", 0);
-  shader_set_uniform_1i(light_shader, "g_norm", 1);
-  shader_set_uniform_1i(light_shader, "g_tex", 2);
 
   while (!glfwWindowShouldClose(window)) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -192,56 +138,8 @@ int main(int argc, char const *argv[]) {
     mat4 model_matrix;
     identity_mat4(model_matrix);
 
-    glClearColor(0, 0, 0, 1);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    glad_glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glUseProgram(geom_shader);
-    shader_set_uniform_m4fv(geom_shader, "projection", projection_matrix);
-    shader_set_uniform_m4fv(geom_shader, "view", view_matrix);
-    shader_set_uniform_m4fv(geom_shader, "model", model_matrix);
-    shader_set_uniform_1i(geom_shader, "tex_diff", 0);
-    shader_set_uniform_1i(geom_shader, "tex_spec", 1);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D,
-                  test_mesh.m_material.m_tex_diffuse.m_texture_id);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D,
-                  test_mesh.m_material.m_tex_specular.m_texture_id);
-    glBindVertexArray(test_mesh.m_vao);
-    glDrawArrays(GL_TRIANGLES, 0, test_mesh.m_num_vertices);
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glUseProgram(light_shader);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, gPosition);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, gNormal);
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
-    shader_set_uniform_1i(light_shader, "g_pos", 0);
-    shader_set_uniform_1i(light_shader, "g_norm", 1);
-    shader_set_uniform_1i(light_shader, "g_tex", 2);
-    shader_set_uniform_3fv(light_shader, "lights[0].m_position",
-                           light.m_position);
-    shader_set_uniform_3fv(light_shader, "lights[0].m_color", light.m_color);
-    shader_set_uniform_1f(light_shader, "lights[0].m_constant",
-                          light.m_constant);
-    shader_set_uniform_1f(light_shader, "lights[0].m_linear", light.m_linear);
-    shader_set_uniform_1f(light_shader, "lights[0].m_quadratic",
-                          light.m_quadratic);
-    shader_set_uniform_3fv(light_shader, "view_pos", camera.m_pos);
-    render_quad();
-
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-    glBlitFramebuffer(0, 0, window_width, window_height, 0, 0, window_width,
-                      window_height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    render_geometries(&r, projection_matrix, view_matrix, &model_matrix, &test_mesh, 1);
+    render_lighting(&r, &light, 1, camera.m_pos);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
@@ -256,30 +154,3 @@ int main(int argc, char const *argv[]) {
   return 0;
 }
 
-unsigned int quadVAO = 0;
-unsigned int quadVBO;
-void render_quad() {
-  if (quadVAO == 0) {
-    float quadVertices[] = {
-        // positions        // texture Coords
-        -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-        1.0f,  1.0f, 0.0f, 1.0f, 1.0f, 1.0f,  -1.0f, 0.0f, 1.0f, 0.0f,
-    };
-    // setup plane VAO
-    glGenVertexArrays(1, &quadVAO);
-    glGenBuffers(1, &quadVBO);
-    glBindVertexArray(quadVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices,
-                 GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
-                          (void *)0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
-                          (void *)(3 * sizeof(float)));
-  }
-  glBindVertexArray(quadVAO);
-  glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-  glBindVertexArray(0);
-}

@@ -35,8 +35,8 @@ Game Engine
 |-----------|----------|
 
 ### Bearing Table
-| entity_id | bearing  |
-|-----------|----------|
+| entity_id | bearing |
+|-----------|---------|
 
 ### Texture Table
 | mesh_id | texture_id |
