@@ -17,8 +17,8 @@ struct light {
 };
 
 const float AMBIENT_STRENGTH = 0.1;
-const int NUM_LIGHTS = 1;
-uniform light lights[NUM_LIGHTS];
+uniform uint num_lights;
+uniform light lights[32];
 
 uniform vec3 view_pos;
 
@@ -32,7 +32,7 @@ void main() {
   vec3 lighting = g_diffuse * AMBIENT_STRENGTH;
   vec3 view_dir = normalize(view_pos - frag_pos);
 
-  for (int i = 0; i < NUM_LIGHTS; i++) {
+  for (int i = 0; i < num_lights; i++) {
     vec3 light_dir = normalize(lights[i].m_position - frag_pos);
 
     /**

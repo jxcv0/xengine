@@ -10,6 +10,9 @@
 #include "mesh.h"
 #include "shader.h"
 
+// this must be the same as in the shader
+#define MAX_NUM_LIGHTS 32
+
 /**
  * ----------------------------------------------------------------------------
  */
@@ -189,19 +192,22 @@ void render_geometries(const struct renderer *r, const mat4 projection,
   shader_set_uniform_m4fv(r->geom_shader, "view", view);
 
   // This assumes that vbo/vao have been generated elsewhere
-  shader_set_uniform_m4fv(r->geom_shader, "model", models[0]);
-  shader_set_uniform_1i(r->geom_shader, "tex_diff", 0);
-  shader_set_uniform_1i(r->geom_shader, "tex_spec", 1);
+  for (uint32_t i = 0; i < n; i++) {
+    shader_set_uniform_m4fv(r->geom_shader, "model", models[i]);
+    shader_set_uniform_1i(r->geom_shader, "tex_diff", 0);
+    shader_set_uniform_1i(r->geom_shader, "tex_spec", 1);
 
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, meshes[0].m_material.m_tex_diffuse.m_texture_id);
-  glActiveTexture(GL_TEXTURE1);
-  glBindTexture(GL_TEXTURE_2D,
-                meshes[0].m_material.m_tex_specular.m_texture_id);
-  glBindVertexArray(meshes[0].m_vao);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D,
+                  meshes[i].m_material.m_tex_diffuse.m_texture_id);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D,
+                  meshes[i].m_material.m_tex_specular.m_texture_id);
+    glBindVertexArray(meshes[i].m_vao);
+  }
 
   // TODO need to change this for switch to internal .model format.
-  // Maybe pass in an fp for if using GL_ARRAYS or GL_ELEMENTS?
+  // Maybe pass in an arg for if using GL_ARRAYS or GL_ELEMENTS?
   glDrawArrays(GL_TRIANGLES, 0, meshes[0].m_num_vertices);
 }
 
@@ -210,7 +216,6 @@ void render_geometries(const struct renderer *r, const mat4 projection,
  */
 void render_lighting(struct renderer *r, struct light *lights, const uint32_t n,
                      const vec3 view_pos) {
-  (void) n;
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -224,17 +229,23 @@ void render_lighting(struct renderer *r, struct light *lights, const uint32_t n,
   shader_set_uniform_1i(r->light_shader, "g_pos", 0);
   shader_set_uniform_1i(r->light_shader, "g_norm", 1);
   shader_set_uniform_1i(r->light_shader, "g_tex", 2);
-  shader_set_uniform_3fv(r->light_shader, "lights[0].m_position",
-                         lights[0].m_position);
-  shader_set_uniform_3fv(r->light_shader, "lights[0].m_color",
-                         lights[0].m_color);
-  shader_set_uniform_1f(r->light_shader, "lights[0].m_constant",
-                        lights[0].m_constant);
-  shader_set_uniform_1f(r->light_shader, "lights[0].m_linear",
-                        lights[0].m_linear);
-  shader_set_uniform_1f(r->light_shader, "lights[0].m_quadratic",
-                        lights[0].m_quadratic);
   shader_set_uniform_3fv(r->light_shader, "view_pos", view_pos);
+  shader_set_uniform_1ui(r->light_shader, "num_lights", n);
+
+  // @perf This can be made faster with a custom formatter
+  char light[32];
+  for (uint32_t i = 0; i < n; i++) {
+    sprintf(light, "lights[%d].m_position", i);
+    shader_set_uniform_3fv(r->light_shader, light, lights[i].m_position);
+    sprintf(light, "lights[%d].m_color", i);
+    shader_set_uniform_3fv(r->light_shader, light, lights[i].m_color);
+    sprintf(light, "lights[%d].m_constant", i);
+    shader_set_uniform_1f(r->light_shader, light, lights[i].m_constant);
+    sprintf(light, "lights[%d].m_linear", i);
+    shader_set_uniform_1f(r->light_shader, light, lights[i].m_linear);
+    sprintf(light, "lights[%d].m_quadratic", i);
+    shader_set_uniform_1f(r->light_shader, light, lights[i].m_quadratic);
+  }
 
   // render quad
   glBindVertexArray(r->quad_vao);

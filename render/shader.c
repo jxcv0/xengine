@@ -10,8 +10,13 @@
  * ----------------------------------------------------------------------------
  */
 void shader_set_uniform_1i(shader_t id, const char *uniform_name,
-                           const int value) {
+                           const int32_t value) {
   glUniform1i(glGetUniformLocation(id, uniform_name), value);
+}
+
+void shader_set_uniform_1ui(shader_t id, const char *uniform_name,
+                           const uint32_t value) {
+  glUniform1ui(glGetUniformLocation(id, uniform_name), value);
 }
 
 /**

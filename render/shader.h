@@ -2,6 +2,7 @@
 #define SHADER_H
 
 #include "lin.h"
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -16,7 +17,10 @@ typedef unsigned int shader_t;
  * @param value The value to set the uniform to.
  */
 void shader_set_uniform_1i(shader_t id, const char *uniform_name,
-                           const int value);
+                           const int32_t value);
+
+void shader_set_uniform_1ui(shader_t id, const char *uniform_name,
+                           const uint32_t value);
 
 /**
  * @brief Uniform float utility function.

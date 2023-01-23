@@ -138,7 +138,8 @@ int main(int argc, char const *argv[]) {
     mat4 model_matrix;
     identity_mat4(model_matrix);
 
-    render_geometries(&r, projection_matrix, view_matrix, &model_matrix, &test_mesh, 1);
+    render_geometries(&r, projection_matrix, view_matrix, &model_matrix,
+                      &test_mesh, 1);
     render_lighting(&r, &light, 1, camera.m_pos);
 
     glfwSwapBuffers(window);
@@ -153,4 +154,3 @@ int main(int argc, char const *argv[]) {
 
   return 0;
 }
-
