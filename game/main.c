@@ -97,6 +97,7 @@ int main(int argc, char const *argv[]) {
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
   struct mesh test_mesh = load_mesh("assets/models/cyborg/cyborg.obj");
+  exit(EXIT_SUCCESS);
   struct mesh floor = load_mesh("assets/models/floor/floor.obj");
 
   gen_mesh_buffers(&test_mesh);
