@@ -110,8 +110,8 @@ int main(int argc, char const *argv[]) {
   light.m_position[1] = 2;
   light.m_position[2] = 3;
   light.m_constant = 1.0;
-  light.m_linear = 0.7;
-  light.m_quadratic = 1.8;
+  light.m_linear = 0.07;
+  light.m_quadratic = 0.18;
 
   camera.m_pos[0] = 0;
   camera.m_pos[1] = 1.86;
