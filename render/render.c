@@ -16,81 +16,6 @@
 /**
  * ----------------------------------------------------------------------------
  */
-void gen_mesh_buffers(struct mesh *mesh) {
-  glGenBuffers(1, &mesh->m_vbo);
-  glGenVertexArrays(1, &mesh->m_vao);
-  glBindVertexArray(mesh->m_vao);
-
-  glBindBuffer(GL_ARRAY_BUFFER, mesh->m_vbo);
-  glBufferData(GL_ARRAY_BUFFER, mesh->m_num_vertices * sizeof(struct vertex),
-               (void *)(mesh->mp_vertices), GL_DYNAMIC_DRAW);
-
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-                        (void *)(offsetof(struct vertex, m_position)));
-
-  glEnableVertexAttribArray(2);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-                        (void *)(offsetof(struct vertex, m_normal)));
-
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-                        (void *)(offsetof(struct vertex, m_tex_coord)));
-
-  gen_material_buffers(&mesh->m_material);
-
-  /*
-  unsigned int ubo = glGetUniformBlockIndex(shader, "mesh");
-  if (ubo == GL_MAX_UNIFORM_BUFFER_BINDINGS) {
-    glGenBuffers(1, &ubo);
-    glBindBuffer(GL_UNIFORM_BUFFER, ubo);
-  }
-  */
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-static void gen_texture_buffers(struct texture *texture) {
-  if (texture->mp_data != NULL) {
-    glGenTextures(1, &texture->m_texture_id);
-    glBindTexture(GL_TEXTURE_2D, texture->m_texture_id);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-    int format;
-    switch (texture->m_num_channels) {
-      case 1:
-        format = GL_RED;
-        break;
-      case 4:
-        format = GL_RGBA;
-        break;
-      default:
-        format = GL_RGB;
-        break;
-    }
-
-    glTexImage2D(GL_TEXTURE_2D, 0, format, texture->m_width, texture->m_height,
-                 0, format, GL_UNSIGNED_BYTE, texture->mp_data);
-  }
-}
-
-/** *
- * ----------------------------------------------------------------------------
- */
-void gen_material_buffers(struct material *material) {
-  gen_texture_buffers(&material->m_tex_diffuse);
-  gen_texture_buffers(&material->m_tex_normal);
-  gen_texture_buffers(&material->m_tex_specular);
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
 int renderer_init(struct renderer *r, const uint32_t scr_w,
                   const uint32_t scr_h) {
   r->scr_w = scr_w;
@@ -181,7 +106,6 @@ int renderer_init(struct renderer *r, const uint32_t scr_w,
 void render_geometries(const struct renderer *r, const mat4 projection,
                        const mat4 view, const mat4 *models,
                        const struct mesh *meshes, const uint32_t n) {
-  (void)n;
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -198,17 +122,13 @@ void render_geometries(const struct renderer *r, const mat4 projection,
     shader_set_uniform_1i(r->geom_shader, "tex_spec", 1);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D,
-                  meshes[i].m_material.m_tex_diffuse.m_texture_id);
+    glBindTexture(GL_TEXTURE_2D, meshes[i].m_tex_diff);
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D,
-                  meshes[i].m_material.m_tex_specular.m_texture_id);
+    glBindTexture(GL_TEXTURE_2D, meshes[i].m_tex_spec);
     glBindVertexArray(meshes[i].m_vao);
-  }
 
-  // TODO need to change this for switch to internal .model format.
-  // Maybe pass in an arg for if using GL_ARRAYS or GL_ELEMENTS?
-  glDrawArrays(GL_TRIANGLES, 0, meshes[0].m_num_vertices);
+    glDrawElements(GL_TRIANGLES, meshes[i].m_num_indices, GL_UNSIGNED_INT, 0);
+  }
 }
 
 /**

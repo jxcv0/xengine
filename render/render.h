@@ -30,22 +30,6 @@ struct renderer {
 };
 
 /**
- * @brief Generate GL buffers.
- * TODO this can probably be moved back to loading as meshes probabably dont
- * need to be keep in game memory as well as video memory.
- *
- * @param mesh The mesh structure.
- */
-void gen_mesh_buffers(struct mesh *mesh);
-
-/**
- * @brief Generate GL texture buffers.
- *
- * @param material A pointer to the material structure.
- */
-void gen_material_buffers(struct material *material);
-
-/**
  * @brief Initialize a renderer r.
  *
  * @param r The renderer.
