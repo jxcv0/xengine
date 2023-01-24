@@ -58,21 +58,22 @@ struct mesh load_mesh(const char *filepath) {
       char *endptr;
       for (uint32_t i = 0; i < mesh.m_num_vertices; i++) {
         getline(&line, &linesize, file);
-        vertices[i].m_position[0] = strtof(line, &endptr);
-        line = endptr;
-        vertices[i].m_position[1] = strtof(line, &endptr);
-        line = endptr;
-        vertices[i].m_position[2] = strtof(line, &endptr);
-        line = endptr;
-        vertices[i].m_normal[0] = strtof(line, &endptr);
-        line = endptr;
-        vertices[i].m_normal[1] = strtof(line, &endptr);
-        line = endptr;
-        vertices[i].m_normal[2] = strtof(line, &endptr);
-        line = endptr;
-        vertices[i].m_tex_coord[0] = strtof(line, &endptr);
-        line = endptr;
-        vertices[i].m_tex_coord[1] = strtof(line, &endptr);
+        char *lineptr = line; // cant use line or get overrun
+        vertices[i].m_position[0] = strtof(lineptr, &endptr);
+        lineptr = endptr;
+        vertices[i].m_position[1] = strtof(lineptr, &endptr);
+        lineptr = endptr;
+        vertices[i].m_position[2] = strtof(lineptr, &endptr);
+        lineptr = endptr;
+        vertices[i].m_normal[0] = strtof(lineptr, &endptr);
+        lineptr = endptr;
+        vertices[i].m_normal[1] = strtof(lineptr, &endptr);
+        lineptr = endptr;
+        vertices[i].m_normal[2] = strtof(lineptr, &endptr);
+        lineptr = endptr;
+        vertices[i].m_tex_coord[0] = strtof(lineptr, &endptr);
+        lineptr = endptr;
+        vertices[i].m_tex_coord[1] = strtof(lineptr, &endptr);
       }
     } else if (strstr(line, "INDICES") != NULL) {
       mesh.m_num_indices = atoi(&line[8]);
@@ -83,7 +84,7 @@ struct mesh load_mesh(const char *filepath) {
       }
     } else if (strstr(line, "TEXTURES") != NULL) {
       for (int i = 0; i < 3; i++) {
-        getline(&line, &linesize, file);
+        assert(getline(&line, &linesize, file) != -1);
         if (strncmp(line, "(null)", 6) == 0) {
           break;
         }
@@ -100,8 +101,16 @@ struct mesh load_mesh(const char *filepath) {
            vertices[i].m_normal[2], vertices[i].m_tex_coord[0],
            vertices[i].m_tex_coord[1]);
   }
+  for (uint32_t i = 0; i < mesh.m_num_indices; i++) {
+    printf("%d - %d\n", i, indices[i]);
+  }
+
+  // TODO
+  // textures
+  // gl buffers
 
   free(vertices);
+  free(line);
   free(indices);
   fclose(file);
   return mesh;
