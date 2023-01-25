@@ -4,12 +4,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "shader.h"
-#define GLFW_INCLUDE_NONE
+#include "glad.h"
 #include <GLFW/glfw3.h>
 
 #include "camera.h"
-#include "glad.h"
 #include "input.h"
 #include "lin.h"
 #include "mesh.h"
@@ -20,14 +18,6 @@
 
 extern const vec3 GLOBAL_UP;
 
-void print_mat4(const char *name, const mat4 m) {
-  printf("mat4: %s {\n", name);
-  for (int i = 0; i < 4; i++) {
-    printf("%f, %f, %f, %f\n", m[i][0], m[i][1], m[i][2], m[i][3]);
-  }
-  printf("}\n");
-}
-
 GLFWwindow *window;
 const float window_width = 1080;
 const float window_height = 600;
@@ -37,53 +27,9 @@ vec2 mouse_pos;
 mat4 projection_matrix = {0};
 mat4 view_matrix = {0};
 
-void update_view_matrix() {
-  vec3 ctr = {camera.m_pos[0] + camera.m_view_dir[0],
-              camera.m_pos[1] + camera.m_view_dir[1],
-              camera.m_pos[2] + camera.m_view_dir[2]};
-
-  look_at(view_matrix, camera.m_pos, ctr, camera.m_up);
-}
-
-void handle_mouse_movement(GLFWwindow *w, double x, double y) {
-  (void)w;
-  mouse_pos[0] = (float)x;
-  mouse_pos[1] = (float)y;
-  process_mouse_movement(&camera, mouse_pos);
-}
-
-// move the fps camera with wasd and update mouse input
-void handle_keyboard_input(GLFWwindow *w) {
-  if (glfwGetKey(w, GLFW_KEY_W) == GLFW_PRESS) {
-    vec3 forward;
-    cross_vec3(forward, GLOBAL_UP, camera.m_right);
-    camera.m_pos[0] += forward[0] * camera.m_movement_speed;
-    camera.m_pos[1] += forward[1] * camera.m_movement_speed;
-    camera.m_pos[2] += forward[2] * camera.m_movement_speed;
-  }
-
-  if (glfwGetKey(w, GLFW_KEY_S) == GLFW_PRESS) {
-    vec3 forward;
-    cross_vec3(forward, GLOBAL_UP, camera.m_right);
-    camera.m_pos[0] -= forward[0] * camera.m_movement_speed;
-    camera.m_pos[1] -= forward[1] * camera.m_movement_speed;
-    camera.m_pos[2] -= forward[2] * camera.m_movement_speed;
-  }
-
-  if (glfwGetKey(w, GLFW_KEY_A) == GLFW_PRESS) {
-    camera.m_pos[0] -= camera.m_right[0] * camera.m_movement_speed;
-    camera.m_pos[1] -= camera.m_right[1] * camera.m_movement_speed;
-    camera.m_pos[2] -= camera.m_right[2] * camera.m_movement_speed;
-  }
-
-  if (glfwGetKey(w, GLFW_KEY_D) == GLFW_PRESS) {
-    camera.m_pos[0] += camera.m_right[0] * camera.m_movement_speed;
-    camera.m_pos[1] += camera.m_right[1] * camera.m_movement_speed;
-    camera.m_pos[2] += camera.m_right[2] * camera.m_movement_speed;
-  }
-}
-
-void render_quad(void);
+void update_view_matrix();
+void handle_mouse_movement(GLFWwindow *w, double x, double y);
+void handle_keyboard_input(GLFWwindow *w);
 
 // main
 int main(int argc, char const *argv[]) {
@@ -149,3 +95,50 @@ int main(int argc, char const *argv[]) {
 
   return 0;
 }
+
+void update_view_matrix() {
+  vec3 ctr = {camera.m_pos[0] + camera.m_view_dir[0],
+              camera.m_pos[1] + camera.m_view_dir[1],
+              camera.m_pos[2] + camera.m_view_dir[2]};
+
+  look_at(view_matrix, camera.m_pos, ctr, camera.m_up);
+}
+
+void handle_mouse_movement(GLFWwindow *w, double x, double y) {
+  (void)w;
+  mouse_pos[0] = (float)x;
+  mouse_pos[1] = (float)y;
+  process_mouse_movement(&camera, mouse_pos);
+}
+
+// move the fps camera with wasd and update mouse input
+void handle_keyboard_input(GLFWwindow *w) {
+  if (glfwGetKey(w, GLFW_KEY_W) == GLFW_PRESS) {
+    vec3 forward;
+    cross_vec3(forward, GLOBAL_UP, camera.m_right);
+    camera.m_pos[0] += forward[0] * camera.m_movement_speed;
+    camera.m_pos[1] += forward[1] * camera.m_movement_speed;
+    camera.m_pos[2] += forward[2] * camera.m_movement_speed;
+  }
+
+  if (glfwGetKey(w, GLFW_KEY_S) == GLFW_PRESS) {
+    vec3 forward;
+    cross_vec3(forward, GLOBAL_UP, camera.m_right);
+    camera.m_pos[0] -= forward[0] * camera.m_movement_speed;
+    camera.m_pos[1] -= forward[1] * camera.m_movement_speed;
+    camera.m_pos[2] -= forward[2] * camera.m_movement_speed;
+  }
+
+  if (glfwGetKey(w, GLFW_KEY_A) == GLFW_PRESS) {
+    camera.m_pos[0] -= camera.m_right[0] * camera.m_movement_speed;
+    camera.m_pos[1] -= camera.m_right[1] * camera.m_movement_speed;
+    camera.m_pos[2] -= camera.m_right[2] * camera.m_movement_speed;
+  }
+
+  if (glfwGetKey(w, GLFW_KEY_D) == GLFW_PRESS) {
+    camera.m_pos[0] += camera.m_right[0] * camera.m_movement_speed;
+    camera.m_pos[1] += camera.m_right[1] * camera.m_movement_speed;
+    camera.m_pos[2] += camera.m_right[2] * camera.m_movement_speed;
+  }
+}
+
