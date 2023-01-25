@@ -95,7 +95,7 @@ int main(int argc, char const *argv[]) {
 
   struct renderer r;
   if (renderer_init(&r, window_width, window_height) != 0) {
-    fprintf(stderr, "Framebuffer incomplete\n");
+    fprintf(stderr, "Unable to initialize renderer. Exiting...\n");
     exit(EXIT_FAILURE);
   }
 
