@@ -3,12 +3,12 @@ project(memory)
 
 set(
   SOURCES
-    database.c
+    id_list.c
 )
 
 set(
   HEADERS
-    database.h
+    id_list.h
 )
 
 add_library(${PROJECT_NAME} STATIC ${HEADERS} ${SOURCES})
