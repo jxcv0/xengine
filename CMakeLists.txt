@@ -31,6 +31,7 @@ add_subdirectory(lin)
 add_subdirectory(render)
 add_subdirectory(input)
 add_subdirectory(utils)
+add_subdirectory(memory)
 add_subdirectory(tools)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

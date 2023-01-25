@@ -1,13 +1,12 @@
+#include <GLFW/glfw3.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "glad.h"
-#include <GLFW/glfw3.h>
-
 #include "camera.h"
+#include "glad.h"
 #include "input.h"
 #include "lin.h"
 #include "mesh.h"
@@ -141,4 +140,3 @@ void handle_keyboard_input(GLFWwindow *w) {
     camera.m_pos[2] += camera.m_right[2] * camera.m_movement_speed;
   }
 }
-

@@ -53,6 +53,6 @@ Game Engine
 ## Systems
 | System Name | In        | In Mode | Out       | Out Mode |
 |-------------|-----------|---------|-----------|----------|
-| sys_move    | velocity  | R       | position  | W        |
 | sys_input   | GLOBAL_IN | R       | velocity  | W        |
+| sys_move    | velocity  | R       | position  | W        |
 
