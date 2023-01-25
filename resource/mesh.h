@@ -51,7 +51,7 @@ struct mesh load_mesh(const char *filepath);
 /**
  * @brief TODO
  */
-struct texture load_texture(const char *filename);
+uint32_t load_texture(const char *filename);
 
 /**
  * @brief TODO

@@ -93,6 +93,12 @@ int main(int argc, char const *argv[]) {
   create_window(&window, window_width, window_height, "game");
   glfwSetCursorPosCallback(window, handle_mouse_movement);
 
+  struct renderer r;
+  if (renderer_init(&r, window_width, window_height) != 0) {
+    fprintf(stderr, "Framebuffer incomplete\n");
+    exit(EXIT_FAILURE);
+  }
+
   perspective(projection_matrix, radians(60),
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
@@ -116,12 +122,6 @@ int main(int argc, char const *argv[]) {
   camera.m_last_mouse_pos[1] = window_height / 2.0f;
   camera.m_yaw = 275;
   process_mouse_movement(&camera, mouse_pos);
-
-  struct renderer r;
-  if (renderer_init(&r, window_width, window_height) != 0) {
-    fprintf(stderr, "Framebuffer incomplete\n");
-    exit(EXIT_FAILURE);
-  }
 
   while (!glfwWindowShouldClose(window)) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {

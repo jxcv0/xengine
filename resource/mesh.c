@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,20 +17,49 @@
 /**
  * ----------------------------------------------------------------------------
  */
-struct texture load_texture(const char *filename) {
-  size_t namelen = strlen(filename);
+uint32_t load_texture(const char *filename) {
+  size_t namelen = strlen(filename) - 1;  // '\n'
   size_t dirlen = strlen(TEXTURE_DIR);
-  char filepath[namelen + dirlen + 1];
+  char filepath[namelen + dirlen];
   filepath[namelen + dirlen] = '\0';
 
-  strncpy(filepath, MESH_DIR, dirlen);
+  strncpy(filepath, TEXTURE_DIR, dirlen);
   strncpy(&filepath[dirlen], filename, namelen);
 
+  printf("Loading texture from %s.\n", filepath);
+
   stbi_set_flip_vertically_on_load(true);
-  struct texture tex = {0};
-  tex.mp_data =
-      stbi_load(filepath, &tex.m_width, &tex.m_height, &tex.m_num_channels, 0);
-  return tex;
+  int w, h, n;
+  unsigned char *data = stbi_load(filepath, &w, &h, &n, 0);
+  assert(data != NULL);
+
+  uint32_t id;
+  glGenTextures(1, &id);
+  glBindTexture(GL_TEXTURE_2D, id);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+  int format = GL_RGB;
+  switch (n) {
+    case 1:
+      format = GL_RED;
+      break;
+    case 4:
+      format = GL_RGBA;
+      break;
+    default:
+      format = GL_RGB;
+      break;
+  }
+
+  glTexImage2D(GL_TEXTURE_2D, 0, format, w, h, 0, format, GL_UNSIGNED_BYTE,
+               data);
+
+  free(data);
+  return id;
 }
 
 /**
@@ -44,6 +74,8 @@ struct mesh load_mesh(const char *filename) {
   strncpy(filepath, MESH_DIR, dirlen);
   strncpy(&filepath[dirlen], filename, namelen);
 
+  printf("Loading mesh from %s.\n", filepath);
+
   struct mesh mesh = {0};
   FILE *file = fopen(filepath, "r");
   if (file == NULL) {
@@ -55,7 +87,6 @@ struct mesh load_mesh(const char *filename) {
   char *line = malloc(linesize);
   struct vertex *vertices = NULL;
   uint32_t *indices = NULL;
-  struct texture textures[3] = {0};
 
   ssize_t nread;
   while ((nread = getline(&line, &linesize, file)) != -1) {
@@ -94,12 +125,17 @@ struct mesh load_mesh(const char *filename) {
         indices[i] = atoi(line);
       }
     } else if (strstr(line, "TEXTURES") != NULL) {
-      for (int i = 0; i < 3; i++) {
-        getline(&line, &linesize, file);
-        if (strncmp(line, "(null)", 6) != 0) {
-          textures[i] = load_texture(line);
-        }
+      // TODO fix this - should not be getting (null) here
+      getline(&line, &linesize, file);
+      if (strncmp(line, "(null)", 6) != 0) {
+        mesh.m_tex_diff = load_texture(line);
       }
+
+      getline(&line, &linesize, file);
+      if (strncmp(line, "(null)", 6) != 0) {
+        mesh.m_tex_spec = load_texture(line);
+      }
+      // TODO normal map
     }
   }
 
@@ -127,40 +163,6 @@ struct mesh load_mesh(const char *filename) {
   glEnableVertexAttribArray(2);
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
                         (void *)(offsetof(struct vertex, m_tex_coord)));
-
-  // TODO what about textureless meshes
-  for (int i = 0; i < 3; i++) {
-    glGenTextures(1, &textures[i].m_texture_id);
-    glBindTexture(GL_TEXTURE_2D, textures[i].m_texture_id);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-    int format;
-    switch (textures[i].m_num_channels) {
-      case 1:
-        format = GL_RED;
-        break;
-      case 4:
-        format = GL_RGBA;
-        break;
-      default:
-        format = GL_RGB;
-        break;
-    }
-
-    glTexImage2D(GL_TEXTURE_2D, 0, format, textures[i].m_width,
-                 textures[i].m_height, 0, format, GL_UNSIGNED_BYTE,
-                 textures[i].mp_data);
-
-    free(textures[i].mp_data);
-  }
-
-  mesh.m_tex_diff = textures[0].m_texture_id;
-  mesh.m_tex_spec = textures[1].m_texture_id;
-  // TODO normal map
 
   free(vertices);
   free(line);
