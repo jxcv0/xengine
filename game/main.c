@@ -93,15 +93,16 @@ int main(int argc, char const *argv[]) {
   create_window(&window, window_width, window_height, "game");
   glfwSetCursorPosCallback(window, handle_mouse_movement);
 
+  struct renderer r;
+  if (renderer_init(&r, window_width, window_height) != 0) {
+    fprintf(stderr, "Framebuffer incomplete\n");
+    exit(EXIT_FAILURE);
+  }
+
   perspective(projection_matrix, radians(60),
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
-  struct mesh test_mesh = load_mesh("assets/models/cyborg/cyborg.model");
-  exit(EXIT_SUCCESS);
-  struct mesh floor = load_mesh("assets/models/floor/floor.obj");
-
-  gen_mesh_buffers(&test_mesh);
-  gen_mesh_buffers(&floor);
+  struct mesh test_mesh = load_mesh("cyborg.model");
 
   struct light light = {0};
   light.m_color[0] = 1;
@@ -121,12 +122,6 @@ int main(int argc, char const *argv[]) {
   camera.m_last_mouse_pos[1] = window_height / 2.0f;
   camera.m_yaw = 275;
   process_mouse_movement(&camera, mouse_pos);
-
-  struct renderer r;
-  if (renderer_init(&r, window_width, window_height) != 0) {
-    fprintf(stderr, "Framebuffer incomplete\n");
-    exit(EXIT_FAILURE);
-  }
 
   while (!glfwWindowShouldClose(window)) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -148,7 +143,6 @@ int main(int argc, char const *argv[]) {
   }
 
   unload_mesh(&test_mesh);
-  unload_mesh(&floor);
 
   glfwDestroyWindow(window);
   glfwTerminate();

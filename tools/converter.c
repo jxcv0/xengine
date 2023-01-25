@@ -40,8 +40,8 @@ struct vertex *out_vertices[MAX_MESHES] = {0};
 uint32_t *out_indices[MAX_MESHES] = {0};
 uint32_t out_num_vertices[MAX_MESHES] = {0};
 uint32_t out_num_indices[MAX_MESHES] = {0};
-bool out_has_textures[MAX_MESHES];  // could be bitmask
-char *out_texture_names[MAX_MESHES][MAX_TEXTURES];
+bool out_has_textures[MAX_MESHES] = {0};  // could be bitmask
+char *out_texture_names[MAX_MESHES][MAX_TEXTURES] = {0};
 
 FILE *file;
 
