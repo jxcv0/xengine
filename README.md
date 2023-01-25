@@ -50,3 +50,9 @@ Game Engine
 | animation_group | strafe_range | velocity | animation_id |
 |-----------------|--------------|----------|--------------|
 
+## Systems
+| System Name | In        | In Mode | Out       | Out Mode |
+|-------------|-----------|---------|-----------|----------|
+| sys_move    | velocity  | R       | position  | W        |
+| sys_input   | GLOBAL_IN | R       | velocity  | W        |
+
