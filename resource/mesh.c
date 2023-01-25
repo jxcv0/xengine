@@ -149,7 +149,7 @@ struct mesh load_mesh(const char *filename) {
                (void *)(vertices), GL_STATIC_DRAW);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.m_ebo);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * mesh.m_num_indices, indices,
                GL_STATIC_DRAW);
 
   glEnableVertexAttribArray(0);
