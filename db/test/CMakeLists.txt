@@ -1,4 +1,4 @@
-link_libraries(memory GTest::gtest_main)
+link_libraries(db GTest::gtest_main)
 
 add_executable(id_list_tests id_list_tests.cpp)
 

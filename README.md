@@ -19,7 +19,7 @@ Game Engine
 | animation_id     | uint32_t   |
 | position         | vec3       |
 | velocity         | vec3       |
-| bearing          | vec3       |
+| heading          | vec3       |
 | health           | uint32_t   |
 
 ### Model Table
@@ -34,8 +34,8 @@ Game Engine
 | entity_id | velocity |
 |-----------|----------|
 
-### Bearing Table
-| entity_id | bearing |
+### Heading Table
+| entity_id | heading |
 |-----------|---------|
 
 ### Texture Table
