@@ -4,11 +4,13 @@ project(db)
 set(
   SOURCES
     id_list.c
+    game_state.c
 )
 
 set(
   HEADERS
     id_list.h
+    game_state.h
 )
 
 add_library(${PROJECT_NAME} STATIC ${HEADERS} ${SOURCES})

@@ -4,7 +4,7 @@ struct game_state gs;
 int main() {
     load_config(); // and persistent settings like controls
     query_saves(); // check if save games are available
-    game_loop(); // main loop
+    main_loop(); // main loop
     clean_up(); // game cleanup
 }
 
@@ -15,8 +15,7 @@ enum {
     EXIT
 } game_mode = menu;
 
-void game_loop() {
-
+void main_loop() {
     while (game_mode != EXIT) {
         main_menu_loop();
         game_loop();

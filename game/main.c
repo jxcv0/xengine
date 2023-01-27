@@ -20,7 +20,7 @@ GLFWwindow *window;
 const float window_width = 1080;
 const float window_height = 600;
 
-struct camera camera = {.m_mouse_sensetivity = 0.3, .m_movement_speed = 0.1};
+struct camera camera = {.m_mouse_sensetivity = 0.3, .m_movement_speed = 0.15};
 vec2 mouse_pos;
 mat4 projection_matrix = {0};
 mat4 view_matrix = {0};
