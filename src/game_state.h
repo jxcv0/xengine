@@ -2,6 +2,7 @@
 #define GAME_STATE_H_
 
 #include <stdint.h>
+#include "lin.h"
 
 #define MAX_ENTITIES 1024
 #define MAX_MESHES 1024

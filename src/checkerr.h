@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include <glad.h>
+#include "glad.h"
 
 void APIENTRY gl_debug_output(GLenum source, GLenum type, unsigned int id,
                               GLenum severity, GLsizei length,
