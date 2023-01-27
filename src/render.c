@@ -20,10 +20,10 @@ int renderer_init(struct renderer *r, const uint32_t scr_w,
                   const uint32_t scr_h) {
   r->scr_w = scr_w;
   r->scr_h = scr_h;
-  r->geom_shader = load_shader("render/glsl/deferred_geom.vert",
-                               "render/glsl/deferred_geom.frag");
-  r->light_shader = load_shader("render/glsl/deferred_light.vert",
-                                "render/glsl/deferred_light.frag");
+  r->geom_shader = load_shader("glsl/deferred_geom.vert",
+                               "glsl/deferred_geom.frag");
+  r->light_shader = load_shader("glsl/deferred_light.vert",
+                                "glsl/deferred_light.frag");
   // g-buffer
   glGenFramebuffers(1, &r->g_buff);
   glBindFramebuffer(GL_FRAMEBUFFER, r->g_buff);
