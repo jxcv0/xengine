@@ -3,9 +3,9 @@
 
 #include <stdint.h>
 
+#include "assets.h"
 #include "light.h"
 #include "lin.h"
-#include "mesh.h"
 #include "shader.h"
 
 #ifdef __cplusplus
@@ -40,10 +40,28 @@ struct renderer {
 int renderer_init(struct renderer *r, const uint32_t scr_w,
                   const uint32_t scr_h);
 
+/**
+ * @brief Render data to G-Buffer
+ *
+ * @param r Renderer state.
+ * @param projection Projection matrix.
+ * @param view View matrix.
+ * @param model Model matrices.
+ * @param meshes Mesh data to render.
+ * @param n The number of model matrices and meshes.
+ */
 void render_geometries(const struct renderer *r, const mat4 projection,
                        const mat4 view, const mat4 *models,
                        const struct mesh *meshes, const uint32_t n);
 
+/**
+ * @brief Render lighting.
+ *
+ * @param r Renderer state.
+ * @param lights Lighting data.
+ * @param n The number of lights.
+ * @param view_pos The view position.
+ */
 void render_lighting(struct renderer *r, struct light *lights, const uint32_t n,
                      const vec3 view_pos);
 

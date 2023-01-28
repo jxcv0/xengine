@@ -2,6 +2,7 @@
 #define GAME_STATE_H_
 
 #include <stdint.h>
+
 #include "lin.h"
 
 #define MAX_ENTITIES 1024
@@ -11,11 +12,7 @@
 extern "C" {
 #endif
 
-enum {
-  MAIN_MENU,
-  GAME_PLAY,
-  GAME_MENU
-} game_mode = MAIN_MENU;
+enum { MAIN_MENU, GAME_PLAY, GAME_MENU } game_mode = MAIN_MENU;
 
 /**
  * @brief Reset ID free lists.
@@ -35,7 +32,8 @@ uint32_t create_entity(void);
 void delete_entity(const uint32_t id);
 
 /**
- * @brief Assign an entity a mesh id. TODO this mesh id is then passed to the loading system.
+ * @brief Assign an entity a mesh id. TODO this mesh id is then passed to the
+ * loading system.
  *
  * @brief id The id of the entity.
  * @brief filename The name of the file storing the mesh data.
@@ -43,6 +41,9 @@ void delete_entity(const uint32_t id);
  */
 uint32_t set_mesh(const uint32_t id, const char *filename);
 
+/**
+ * @brief
+ */
 void set_velocity(const uint32_t id, const vec3 v);
 
 void set_position(const uint32_t id, const vec3 v);

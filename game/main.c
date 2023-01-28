@@ -4,15 +4,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "assets.h"
 #include "camera.h"
 #include "glad.h"
 #include "input.h"
 #include "lin.h"
-#include "mesh.h"
 #include "render.h"
 #include "window.h"
 
-#define MAX_MESHES 64
+#define MAX_ENTITIES 1024
 
 extern const vec3 GLOBAL_UP;
 
@@ -25,15 +25,16 @@ vec2 mouse_pos;
 mat4 projection_matrix = {0};
 mat4 view_matrix = {0};
 
+// vec3 positions[MAX_ENTITIES] = {0};
+// vec3 velocities[MAX_ENTITIES] = {0};
+// struct mesh meshes[MAX_ENTITIES] = {0};
+
 void update_view_matrix();
 void handle_mouse_movement(GLFWwindow *w, double x, double y);
 void handle_keyboard_input(GLFWwindow *w);
 
 // main
-int main(int argc, char const *argv[]) {
-  (void)argc;
-  (void)argv;
-
+int main() {
   create_window(&window, window_width, window_height, "game");
   glfwSetCursorPosCallback(window, handle_mouse_movement);
 
@@ -46,6 +47,8 @@ int main(int argc, char const *argv[]) {
   perspective(projection_matrix, radians(60),
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
+  // for (int i = 0; i < MAX_ENTITIES; i++) {
+  // }
   struct mesh test_mesh = load_mesh("cyborg.model");
 
   struct light light = {0};

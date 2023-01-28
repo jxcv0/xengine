@@ -17,16 +17,6 @@ struct vertex {
   vec3 m_position;
   vec2 m_tex_coord;
   vec3 m_normal;
-  // vec3 m_tangent;
-  // vec3 m_bitangent;
-};
-
-struct texture {
-  unsigned int m_texture_id;
-  int m_width;
-  int m_height;
-  int m_num_channels;
-  unsigned char *mp_data;
 };
 
 /**
