@@ -25,10 +25,6 @@ vec2 mouse_pos;
 mat4 projection_matrix = {0};
 mat4 view_matrix = {0};
 
-// vec3 positions[MAX_ENTITIES] = {0};
-// vec3 velocities[MAX_ENTITIES] = {0};
-// struct mesh meshes[MAX_ENTITIES] = {0};
-
 void update_view_matrix();
 void handle_mouse_movement(GLFWwindow *w, double x, double y);
 void handle_keyboard_input(GLFWwindow *w);

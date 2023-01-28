@@ -12,24 +12,6 @@
 #include "stb_image.h"
 
 #define MAX_MESHES 128
-#define MESH_DIR "assets/meshes/"
-#define TEXTURE_DIR "assets/textures/"
-
-/*
-char loaded_meshes[MAX_MESHES][64] = {0};
-char loaded_textures[MAX_MESHES][64] = {0};
-struct mesh meshes[MAX_MESHES];
-uint32_t num_meshes = 0;
-
-static uint32_t mesh_loaded(const char *filename) {
-  for (int i = 0; i < MAX_MESHES; i++) {
-    if (strcmp(loaded_meshes[i], filename) == 0) {
-      return i;
-    }
-  }
-  return MAX_MESHES;
-}
-*/
 
 /**
  * ----------------------------------------------------------------------------
@@ -83,17 +65,6 @@ uint32_t load_texture(const char *filename) {
  * ----------------------------------------------------------------------------
  */
 struct mesh load_mesh(const char *filename) {
-  /**
-  uint32_t id = mesh_loaded("filename");
-  if (id != MAX_MESHES) {
-    return id;
-  }
-
-  if (num_meshes == MAX_MESHES) {
-    return MAX_MESHES;
-  }
-  */
-
   size_t namelen = strlen(filename);
   size_t dirlen = strlen(MESH_DIR);
   char filepath[namelen + dirlen + 1];
@@ -192,8 +163,6 @@ struct mesh load_mesh(const char *filename) {
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
                         (void *)(offsetof(struct vertex, m_tex_coord)));
 
-  // meshes[num_meshes++] = mesh;
-
   free(vertices);
   free(line);
   free(indices);
@@ -202,8 +171,16 @@ struct mesh load_mesh(const char *filename) {
   return mesh;
 }
 
+/**
+ * ----------------------------------------------------------------------------
+ */
 void unload_mesh(struct mesh *mesh) {
   glDeleteBuffers(1, &mesh->m_vbo);
   glDeleteBuffers(1, &mesh->m_ebo);
   glDeleteVertexArrays(1, &mesh->m_vao);
+}
+
+struct asset_array alloc_asset_array(size_t asset_size, const uint32_t count) {
+  struct asset_array arr = {0};
+  return arr;
 }
