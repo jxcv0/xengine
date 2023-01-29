@@ -31,8 +31,8 @@ struct mesh {
   uint32_t m_ebo;
   uint32_t m_num_vertices;
   uint32_t m_num_indices;
-  uint32_t m_tex_diff; // TODO link this some other way.
-  uint32_t m_tex_spec; // TODO see above.
+  uint32_t m_tex_diff;  // TODO link this some other way.
+  uint32_t m_tex_spec;  // TODO see above.
 };
 
 /**
@@ -57,6 +57,14 @@ uint32_t load_texture(const char *filename);
  * @param mesh A pointer to the mesh to delete.
  */
 void unload_mesh(struct mesh *mesh);
+
+// struct mesh *m = get_mesh("mesh_name");
+// if (m) {
+// 	m load_mesh
+// }
+// if (mesh_is_loaded(mesh_assets, "mesh_name")) {
+//   get_mesh_
+// }
 
 #ifdef __cplusplus
 }

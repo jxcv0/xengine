@@ -3,9 +3,14 @@
 #include <GLFW/glfw3.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "checkerr.h"
 #include "glad.h"
+
+static void error_callback(int error, const char *desc) {
+  fprintf(stderr, "GLFW (%d): %s\n", error, desc);
+}
 
 /**
  * ----------------------------------------------------------------------------
@@ -21,27 +26,31 @@ static void size_callback(GLFWwindow *window, int width, int height) {
 void create_window(GLFWwindow **window, const float width, const float height,
                    const char *name) {
   glfwInit();
-
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+  glfwSetErrorCallback(error_callback);
+  int major, minor, rev;
+  glfwGetVersion(&major, &minor, &rev);
+  printf("GLFW Version: %d.%d.%d\n", major, minor, rev);
+  printf("Using minimum context version 3.3\n");
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 
   *window = glfwCreateWindow(width, height, name, NULL, NULL);
 
   if (*window == NULL) {
-    perror("window: unable to create window");
+    perror("Unable to create window");
     glfwTerminate();
-    return;
+    exit(EXIT_FAILURE);
   }
 
   glfwMakeContextCurrent(*window);
   glfwSetFramebufferSizeCallback(*window, size_callback);
 
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-    perror("glad: unable to load opengl");
+    perror("Unable to load OpenGL");
     glfwTerminate();
-    return;
+    exit(EXIT_FAILURE);
   }
 
   int flags;

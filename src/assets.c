@@ -179,8 +179,3 @@ void unload_mesh(struct mesh *mesh) {
   glDeleteBuffers(1, &mesh->m_ebo);
   glDeleteVertexArrays(1, &mesh->m_vao);
 }
-
-struct asset_array alloc_asset_array(size_t asset_size, const uint32_t count) {
-  struct asset_array arr = {0};
-  return arr;
-}
