@@ -98,7 +98,7 @@ struct mesh load_mesh(const char *filename) {
       vertices = malloc(sizeof(struct vertex) * mesh.m_num_vertices);
       char *endptr;
       for (uint32_t i = 0; i < mesh.m_num_vertices; i++) {
-        getline(&line, &linesize, file);
+        assert(getline(&line, &linesize, file) != -1);
         char *lineptr = line;
         vertices[i].m_position[0] = strtof(lineptr, &endptr);
         lineptr = endptr;
@@ -120,17 +120,17 @@ struct mesh load_mesh(const char *filename) {
       mesh.m_num_indices = atoi(&line[8]);
       indices = malloc(sizeof(uint32_t) * mesh.m_num_indices);
       for (uint32_t i = 0; i < mesh.m_num_indices; i++) {
-        getline(&line, &linesize, file);
+        assert(getline(&line, &linesize, file) != -1);
         indices[i] = atoi(line);
       }
     } else if (strstr(line, "TEXTURES") != NULL) {
       // TODO fix this - should not be getting (null) here
-      getline(&line, &linesize, file);
+      assert(getline(&line, &linesize, file) != -1);
       if (strncmp(line, "(null)", 6) != 0) {
         mesh.m_tex_diff = load_texture(line);
       }
 
-      getline(&line, &linesize, file);
+      assert(getline(&line, &linesize, file) != -1);
       if (strncmp(line, "(null)", 6) != 0) {
         mesh.m_tex_spec = load_texture(line);
       }
@@ -178,4 +178,6 @@ void unload_mesh(struct mesh *mesh) {
   glDeleteBuffers(1, &mesh->m_vbo);
   glDeleteBuffers(1, &mesh->m_ebo);
   glDeleteVertexArrays(1, &mesh->m_vao);
+  glDeleteTextures(1, &mesh->m_tex_spec);
+  glDeleteTextures(1, &mesh->m_tex_diff);
 }
