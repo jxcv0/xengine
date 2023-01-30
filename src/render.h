@@ -53,7 +53,7 @@ int renderer_init(struct renderer *r, const uint32_t scr_w,
  * @param n The number of model matrices and meshes.
  */
 void render_geometries(const struct renderer *r, const mat4 projection,
-                       const mat4 view, const mat4 *models,
+                       const mat4 view, const vec3 *positions,
                        const struct mesh *meshes, const uint32_t n);
 
 /**

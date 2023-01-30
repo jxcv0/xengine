@@ -12,7 +12,7 @@
 #include "render.h"
 #include "window.h"
 
-#define MAX_ENTITIES 1024
+#define MAX_ENTITIES 128
 
 extern const vec3 GLOBAL_UP;
 
@@ -20,8 +20,9 @@ GLFWwindow *window;
 const float window_width = 1080;
 const float window_height = 600;
 
-uint32_t num_lights = 0;
 struct light light_array[MAX_NUM_LIGHTS] = {0};
+vec3 positions[MAX_ENTITIES] = {0};
+struct mesh meshes[MAX_ENTITIES] = {0};
 
 struct camera camera = {.m_mouse_sensetivity = 0.3, .m_movement_speed = 0.15};
 vec2 mouse_pos;
@@ -46,9 +47,16 @@ int main() {
   perspective(projection_matrix, radians(60),
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
-  // for (int i = 0; i < MAX_ENTITIES; i++) {
-  // }
-  struct mesh test_mesh = load_mesh("cyborg.model");
+
+  for (int i = 0; i < MAX_ENTITIES; i++) {
+    meshes[i] = load_mesh("cyborg.model");
+  }
+
+  for (int i = 0; i < MAX_ENTITIES; i++) {
+    positions[i][0] = (float)((rand() % 100) - 100);
+    positions[i][1] = (float)((rand() % 100) - 100);
+    positions[i][2] = (float)((rand() % 100) - 100);
+  }
 
   for (int i = 0; i < MAX_NUM_LIGHTS; i++) {
     struct light l = LIGHT_RANGE_65;
@@ -63,9 +71,10 @@ int main() {
   }
 
   camera.m_pos[0] = 0;
-  camera.m_pos[1] = 1.86;
-  camera.m_pos[2] = 3;
+  camera.m_pos[1] = 3;
+  camera.m_pos[2] = 5;
 
+  camera.m_last_mouse_pos[0] = window_width / 2.0f;
   camera.m_last_mouse_pos[1] = window_height / 2.0f;
   camera.m_yaw = 275;
   process_mouse_movement(&camera, mouse_pos);
@@ -81,15 +90,17 @@ int main() {
     mat4 model_matrix;
     identity_mat4(model_matrix);
 
-    render_geometries(&r, projection_matrix, view_matrix, &model_matrix,
-                      &test_mesh, 1);
+    render_geometries(&r, projection_matrix, view_matrix, positions,
+                      meshes, MAX_ENTITIES);
     render_lighting(&r, light_array, MAX_NUM_LIGHTS, camera.m_pos);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
 
-  unload_mesh(&test_mesh);
+  for (int i = 0; i < MAX_ENTITIES; i++) {
+    unload_mesh(&meshes[i]);
+  }
 
   glfwDestroyWindow(window);
   glfwTerminate();

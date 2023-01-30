@@ -101,7 +101,7 @@ int renderer_init(struct renderer *r, const uint32_t scr_w,
  * ----------------------------------------------------------------------------
  */
 void render_geometries(const struct renderer *r, const mat4 projection,
-                       const mat4 view, const mat4 *models,
+                       const mat4 view, const vec3 *positions,
                        const struct mesh *meshes, const uint32_t n) {
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -112,9 +112,12 @@ void render_geometries(const struct renderer *r, const mat4 projection,
   shader_set_uniform_m4fv(r->geom_shader, "projection", projection);
   shader_set_uniform_m4fv(r->geom_shader, "view", view);
 
+  mat4 model = {0};
   // This assumes that vbo/vao have been generated elsewhere
   for (uint32_t i = 0; i < n; i++) {
-    shader_set_uniform_m4fv(r->geom_shader, "model", models[i]);
+    identity_mat4(model);
+    translate(model, positions[i]);
+    shader_set_uniform_m4fv(r->geom_shader, "model", model);
     shader_set_uniform_1i(r->geom_shader, "tex_diff", 0);
     shader_set_uniform_1i(r->geom_shader, "tex_spec", 1);
 
