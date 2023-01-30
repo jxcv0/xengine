@@ -51,11 +51,6 @@ struct light {
   float m_quadratic;
 };
 
-struct light_array {
-  struct light *mp_lights;
-  uint32_t m_count;
-};
-
 #ifdef __cplusplus
 }
 #endif

@@ -20,6 +20,9 @@ GLFWwindow *window;
 const float window_width = 1080;
 const float window_height = 600;
 
+uint32_t num_lights = 0;
+struct light light_array[MAX_NUM_LIGHTS] = {0};
+
 struct camera camera = {.m_mouse_sensetivity = 0.3, .m_movement_speed = 0.15};
 vec2 mouse_pos;
 mat4 projection_matrix = {0};
@@ -28,9 +31,6 @@ mat4 view_matrix = {0};
 void update_view_matrix();
 void handle_mouse_movement(GLFWwindow *w, double x, double y);
 void handle_keyboard_input(GLFWwindow *w);
-
-// uint32_t num_lights = 0;
-// struct light lights[MAX_NUM_LIGHTS] = {0};
 
 // main
 int main() {
@@ -50,13 +50,17 @@ int main() {
   // }
   struct mesh test_mesh = load_mesh("cyborg.model");
 
-  struct light light = LIGHT_RANGE_3250;
-  light.m_color[0] = 1;
-  light.m_color[1] = 1;
-  light.m_color[2] = 1;
-  light.m_position[0] = 0;
-  light.m_position[1] = 2;
-  light.m_position[2] = 3;
+  for (int i = 0; i < MAX_NUM_LIGHTS; i++) {
+    struct light l = LIGHT_RANGE_65;
+    l.m_position[0] = (float)(rand() % MAX_NUM_LIGHTS);
+    l.m_position[1] = (float)(rand() % 5);
+    l.m_position[2] = (float)(rand() % MAX_NUM_LIGHTS);
+    l.m_color[0] = (float)(rand() % MAX_NUM_LIGHTS);
+    l.m_color[1] = (float)(rand() % MAX_NUM_LIGHTS);
+    l.m_color[2] = (float)(rand() % MAX_NUM_LIGHTS);
+    normalize_vec3(l.m_color);
+    light_array[i] = l;
+  }
 
   camera.m_pos[0] = 0;
   camera.m_pos[1] = 1.86;
@@ -79,7 +83,7 @@ int main() {
 
     render_geometries(&r, projection_matrix, view_matrix, &model_matrix,
                       &test_mesh, 1);
-    render_lighting(&r, &light, 1, camera.m_pos);
+    render_lighting(&r, light_array, MAX_NUM_LIGHTS, camera.m_pos);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
