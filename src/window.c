@@ -30,9 +30,9 @@ void create_window(GLFWwindow **window, const float width, const float height,
   int major, minor, rev;
   glfwGetVersion(&major, &minor, &rev);
   printf("GLFW Version: %d.%d.%d\n", major, minor, rev);
-  printf("Using minimum context version 3.3\n");
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  printf("Using minimum context version 4.6\n");
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 
@@ -66,13 +66,10 @@ void create_window(GLFWwindow **window, const float width, const float height,
   glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
   glEnable(GL_DEPTH_TEST);
-  /*
   glDepthFunc(GL_LESS);
   glEnable(GL_CULL_FACE);
   glCullFace(GL_BACK);
   glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  */
 }
 
 /**

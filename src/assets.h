@@ -58,13 +58,9 @@ uint32_t load_texture(const char *filename);
  */
 void unload_mesh(struct mesh *mesh);
 
-// struct mesh *m = get_mesh("mesh_name");
-// if (m) {
-// 	m load_mesh
-// }
-// if (mesh_is_loaded(mesh_assets, "mesh_name")) {
-//   get_mesh_
-// }
+//
+// char loaded_meshes[MAX_MESHES][32];
+//
 
 #ifdef __cplusplus
 }

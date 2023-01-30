@@ -29,6 +29,9 @@ void update_view_matrix();
 void handle_mouse_movement(GLFWwindow *w, double x, double y);
 void handle_keyboard_input(GLFWwindow *w);
 
+// uint32_t num_lights = 0;
+// struct light lights[MAX_NUM_LIGHTS] = {0};
+
 // main
 int main() {
   create_window(&window, window_width, window_height, "game");
@@ -47,16 +50,13 @@ int main() {
   // }
   struct mesh test_mesh = load_mesh("cyborg.model");
 
-  struct light light = {0};
+  struct light light = LIGHT_RANGE_3250;
   light.m_color[0] = 1;
   light.m_color[1] = 1;
   light.m_color[2] = 1;
   light.m_position[0] = 0;
   light.m_position[1] = 2;
   light.m_position[2] = 3;
-  light.m_constant = 1.0;
-  light.m_linear = 0.07;
-  light.m_quadratic = 0.18;
 
   camera.m_pos[0] = 0;
   camera.m_pos[1] = 1.86;
@@ -111,19 +111,15 @@ void handle_mouse_movement(GLFWwindow *w, double x, double y) {
 // move the fps camera with wasd and update mouse input
 void handle_keyboard_input(GLFWwindow *w) {
   if (glfwGetKey(w, GLFW_KEY_W) == GLFW_PRESS) {
-    vec3 forward;
-    cross_vec3(forward, GLOBAL_UP, camera.m_right);
-    camera.m_pos[0] += forward[0] * camera.m_movement_speed;
-    camera.m_pos[1] += forward[1] * camera.m_movement_speed;
-    camera.m_pos[2] += forward[2] * camera.m_movement_speed;
+    camera.m_pos[0] += camera.m_view_dir[0] * camera.m_movement_speed;
+    camera.m_pos[1] += camera.m_view_dir[1] * camera.m_movement_speed;
+    camera.m_pos[2] += camera.m_view_dir[2] * camera.m_movement_speed;
   }
 
   if (glfwGetKey(w, GLFW_KEY_S) == GLFW_PRESS) {
-    vec3 forward;
-    cross_vec3(forward, GLOBAL_UP, camera.m_right);
-    camera.m_pos[0] -= forward[0] * camera.m_movement_speed;
-    camera.m_pos[1] -= forward[1] * camera.m_movement_speed;
-    camera.m_pos[2] -= forward[2] * camera.m_movement_speed;
+    camera.m_pos[0] -= camera.m_view_dir[0] * camera.m_movement_speed;
+    camera.m_pos[1] -= camera.m_view_dir[1] * camera.m_movement_speed;
+    camera.m_pos[2] -= camera.m_view_dir[2] * camera.m_movement_speed;
   }
 
   if (glfwGetKey(w, GLFW_KEY_A) == GLFW_PRESS) {

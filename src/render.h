@@ -8,6 +8,8 @@
 #include "lin.h"
 #include "shader.h"
 
+#define MAX_NUM_LIGHTS 32
+
 #ifdef __cplusplus
 extern "C" {
 #endif
