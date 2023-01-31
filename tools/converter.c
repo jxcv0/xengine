@@ -28,7 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "mesh.h"
+#include "assets.h"
 
 #define MAX_MESHES 16
 #define MAX_TEXTURES 3

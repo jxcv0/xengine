@@ -11,6 +11,10 @@ game: libglad.a libstb.a
 	@echo "Building target $@"
 	@gcc $(cflags) -I src -I lib/stb -I lib/glad game/main.c $(wildcard $(xen_src_dir)/*.c) $(libs) -o $(bin_dir)/game
 
+converter: libglad.a libstb.a 
+	@echo "Building target $@"
+	@gcc $(cflags) -I src -I lib/stb -I lib/glad tools/converter.c $(wildcard $(xen_src_dir)/*.c) $(libs) -lassimp -o $(bin_dir)/converter
+
 mkbin:
 	@if [ ! -d $(build_dir)/$(bin_dir) ]; then mkdir $(build_dir)/$(bin_dir); fi
 
@@ -30,3 +34,6 @@ libstb.a: $(patsubst %.c, $(build_dir)/%.o, $(wildcard $(stb_src_dir)/*.c))
 mesh_loading_perf: libglad.a libstb.a 
 	@echo "Building target $@"
 	@gcc $(cflags) -I src -I lib/stb -I lib/glad test/mesh_loading_perf.c $(wildcard $(xen_src_dir)/*.c) $(libs) -o $(bin_dir)/mesh_loading_perf
+
+clean:
+	rm -rf build/*
