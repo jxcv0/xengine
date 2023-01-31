@@ -9,7 +9,7 @@ glad_src_dir := lib/glad
 
 game: libglad.a libstb.a 
 	@echo "Building target $@"
-	@gcc $(cflags) -ggdb -I src -I lib/stb -I lib/glad game/main.c $(wildcard $(xen_src_dir)/*.c) $(libs) -o $(bin_dir)/game
+	@gcc $(cflags) -I src -I lib/stb -I lib/glad game/main.c $(wildcard $(xen_src_dir)/*.c) $(libs) -o $(bin_dir)/game
 
 mkbin:
 	@if [ ! -d $(build_dir)/$(bin_dir) ]; then mkdir $(build_dir)/$(bin_dir); fi

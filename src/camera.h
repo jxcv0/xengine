@@ -22,18 +22,14 @@ struct camera {
   vec3 m_view_dir;
   vec3 m_up;
   vec3 m_right;
-  vec2 m_last_mouse_pos;
-  bool m_first_mouse_movement;
 };
 
 /**
  * @brief Update camera state based on mouse movement.
  *
  * @param camera The camera to update
- * @param x_offset Mouse movement offset in x.
- * @param y_offset Mouse movement offset in y.
  */
-void process_mouse_movement(struct camera *camera, const vec2 mouse_pos);
+void process_mouse_movement(struct camera *camera, const vec2 cursor_offset);
 
 #ifdef __cplusplus
 }

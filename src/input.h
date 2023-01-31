@@ -8,17 +8,26 @@
 extern "C" {
 #endif
 
-/**
- * @brief Input handler component functions.
- */
-typedef void (*input_handler_fp)(void);
+struct mouse_pos {
+  vec2 m_curr_pos;
+  vec2 m_last_pos;
+};
 
 /**
  * @brief Get the current cursor position.
  *
- * @return a Vec2 position.
+ * @param position The vec2 to store the mouse position in.
+ * @param window The window to get the mouse position from.
  */
-void input_poll_cursor_pos(vec2 pos, GLFWwindow *window);
+void get_cursor_position(struct mouse_pos *mp, GLFWwindow *window);
+
+/**
+ * @brief Calculate the change in cursor position and store the result in offset.
+ *
+ * @param offset The vec2 to store the result in.
+ * @param mp A pointer to the mouse position data to operate on.
+ */
+void get_cursor_offset(vec2 offset, const struct mouse_pos *mp);
 
 #ifdef __cplusplus
 }

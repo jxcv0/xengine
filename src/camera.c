@@ -2,24 +2,15 @@
 
 const vec3 GLOBAL_UP = {0, 1, 0};
 
-void process_mouse_movement(struct camera *camera, const vec2 mouse_pos) {
-  if (camera->m_first_mouse_movement) {
-    camera->m_last_mouse_pos[0] = mouse_pos[0];
-    camera->m_last_mouse_pos[1] = mouse_pos[1];
-    camera->m_first_mouse_movement = false;
-  }
+/**
+ * ----------------------------------------------------------------------------
+ */
+void process_mouse_movement(struct camera *camera, const vec2 cursor_offset) {
+  float offset_x = cursor_offset[0] * camera->m_mouse_sensetivity;
+  float offset_y = cursor_offset[1] * camera->m_mouse_sensetivity;
 
-  vec2 offset = {mouse_pos[0] - camera->m_last_mouse_pos[0],
-                 camera->m_last_mouse_pos[1] - mouse_pos[1]};
-
-  camera->m_last_mouse_pos[0] = mouse_pos[0];
-  camera->m_last_mouse_pos[1] = mouse_pos[1];
-
-  offset[0] *= camera->m_mouse_sensetivity;
-  offset[1] *= camera->m_mouse_sensetivity;
-
-  camera->m_yaw += offset[0];
-  camera->m_pitch += offset[1];
+  camera->m_yaw += offset_x;
+  camera->m_pitch += offset_y;
 
   if (camera->m_pitch > 89.0f) {
     camera->m_pitch = 89.0f;
