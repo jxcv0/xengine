@@ -24,8 +24,7 @@ struct light light_array[MAX_NUM_LIGHTS] = {0};
 vec3 positions[MAX_ENTITIES] = {0};
 struct mesh meshes[MAX_ENTITIES] = {0};
 
-struct camera camera __attribute__((aligned(64))) = {.m_mouse_sensetivity = 0.3,
-                                                     .m_movement_speed = 0.15};
+struct camera camera = {.m_mouse_sensetivity = 0.3, .m_movement_speed = 0.15};
 struct mouse_pos mouse_pos = {0};
 mat4 projection_matrix = {0};
 mat4 view_matrix = {0};
@@ -61,9 +60,7 @@ int main() {
     light_array[i] = l;
   }
 
-  camera.m_pos[0] = 0;
-  camera.m_pos[1] = 3;
-  camera.m_pos[2] = 5;
+  vec3 camera_centre = {0, 3, 0};
 
   mouse_pos.m_last_pos[0] = window_width / 2.0f;
   mouse_pos.m_last_pos[1] = window_height / 2.0f;
@@ -76,9 +73,9 @@ int main() {
     get_cursor_position(&mouse_pos, window);
     vec2 cursor_offset;
     get_cursor_offset(cursor_offset, &mouse_pos);
-    process_mouse_movement(&camera, cursor_offset);
+    update_3rd_person_camera(&camera, cursor_offset, 3, camera_centre);
+    // handle_keyboard_input(window);
 
-    handle_keyboard_input(window);
     update_view_matrix();
 
     mat4 model_matrix;
