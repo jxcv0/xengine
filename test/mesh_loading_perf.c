@@ -1,6 +1,7 @@
-#include "glad.h"
 #include <GLFW/glfw3.h>
+
 #include "assets.h"
+#include "glad.h"
 #include "window.h"
 
 #define COUNT 64

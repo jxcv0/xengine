@@ -8,8 +8,6 @@
 extern "C" {
 #endif
 
-extern const vec3 GLOBAL_UP;
-
 /**
  * @brief Camera class for calculating view matrix.
  */
@@ -25,9 +23,10 @@ struct camera {
 };
 
 /**
- * @brief Update camera state based on mouse movement.
+ * @brief Update camera state based on change in cursor position.
  *
- * @param camera The camera to update
+ * @param camera Pointer to the camera to update.
+ * @param cursor_offset The change in the camera position.
  */
 void process_mouse_movement(struct camera *camera, const vec2 cursor_offset);
 

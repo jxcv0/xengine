@@ -4,7 +4,6 @@
  * ----------------------------------------------------------------------------
  */
 void get_cursor_position(struct mouse_pos *mp, GLFWwindow *window) {
-
   // copy curr into last
   mp->m_last_pos[0] = mp->m_curr_pos[0];
   mp->m_last_pos[1] = mp->m_curr_pos[1];

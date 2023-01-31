@@ -24,7 +24,8 @@ struct light light_array[MAX_NUM_LIGHTS] = {0};
 vec3 positions[MAX_ENTITIES] = {0};
 struct mesh meshes[MAX_ENTITIES] = {0};
 
-struct camera camera = {.m_mouse_sensetivity = 0.3, .m_movement_speed = 0.15};
+struct camera camera __attribute__((aligned(64))) = {.m_mouse_sensetivity = 0.3,
+                                                     .m_movement_speed = 0.15};
 struct mouse_pos mouse_pos = {0};
 mat4 projection_matrix = {0};
 mat4 view_matrix = {0};
@@ -83,8 +84,7 @@ int main() {
     mat4 model_matrix;
     identity_mat4(model_matrix);
 
-    render_geometries(&r, projection_matrix, view_matrix, positions,
-                      meshes, 1);
+    render_geometries(&r, projection_matrix, view_matrix, positions, meshes, 1);
     render_lighting(&r, light_array, MAX_NUM_LIGHTS, camera.m_pos);
 
     glfwSwapBuffers(window);

@@ -22,7 +22,8 @@ struct mouse_pos {
 void get_cursor_position(struct mouse_pos *mp, GLFWwindow *window);
 
 /**
- * @brief Calculate the change in cursor position and store the result in offset.
+ * @brief Calculate the change in cursor position and store the result in
+ * offset.
  *
  * @param offset The vec2 to store the result in.
  * @param mp A pointer to the mouse position data to operate on.
