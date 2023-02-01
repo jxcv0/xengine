@@ -26,7 +26,7 @@ uint32_t load_texture(const char *filename) {
   strncpy(filepath, TEXTURE_DIR, dirlen);
   strncpy(&filepath[dirlen], filename, namelen);
 
-  printf("Loading texture from %s.\n", filepath);
+  printf("Loading texture from \"%s\".\n", filepath);
 
   stbi_set_flip_vertically_on_load(true);
   int w, h, n;
@@ -74,7 +74,7 @@ struct mesh load_mesh(const char *filename) {
   strncpy(filepath, MESH_DIR, dirlen);
   strncpy(&filepath[dirlen], filename, namelen);
 
-  printf("Loading mesh from %s.\n", filepath);
+  printf("Loading mesh from \"%s\".\n", filepath);
 
   struct mesh mesh = {0};
   char *file = load_file_into_mem(filepath);
@@ -134,6 +134,8 @@ struct mesh load_mesh(const char *filename) {
     strncpy(specname, pos, n);
     mesh.m_tex_spec = load_texture(specname);
   }
+  printf("%u\n", mesh.m_tex_diff);
+  printf("%u\n", mesh.m_tex_spec);
 
   /*
   for (uint32_t i = 0; i < mesh.m_num_vertices; i++) {
@@ -153,6 +155,8 @@ struct mesh load_mesh(const char *filename) {
     printf("%u: %u\n", i, indices[i]);
   }
   */
+
+  assert(vertices != NULL && indices != NULL);
 
   glGenBuffers(1, &mesh.m_vbo);
   glGenBuffers(1, &mesh.m_ebo);
