@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
-  file = fopen(argv[2], "w+");
+  file = fopen(argv[2], "wb+");
   if (file == NULL) {
     perror("fopen");
   }
@@ -82,10 +82,14 @@ int main(int argc, char *argv[]) {
   for (unsigned int i = 0; i < num_meshes; i++) {
     fprintf(file, "VERTICES %d\n", out_num_vertices[i]);
     fwrite(out_vertices[i], sizeof(struct vertex), out_num_vertices[i], file);
-    fprintf(file, "\nINDICES %d\n", out_num_indices[i]);
-    fwrite(out_indices[i], sizeof(uint32_t), out_num_vertices[i], file);
+    fprintf(file, "\n");
+
+    fprintf(file, "INDICES %d\n", out_num_indices[i]);
+    fwrite(out_indices[i], sizeof(uint32_t), out_num_indices[i], file);
+    fprintf(file, "\n");
+
     if (out_has_textures[i]) {
-      fprintf(file, "\nTEXTURES\n");
+      fprintf(file, "TEXTURES\n");
       for (unsigned int j = 0; j < 3; j++) {
         fprintf(file, "%s\n", out_texture_names[i][j]);
       }

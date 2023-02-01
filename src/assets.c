@@ -10,6 +10,7 @@
 
 #include "glad.h"
 #include "stb_image.h"
+#include "utils.h"
 
 #define MAX_MESHES 128
 
@@ -17,7 +18,7 @@
  * ----------------------------------------------------------------------------
  */
 uint32_t load_texture(const char *filename) {
-  size_t namelen = strlen(filename) - 1;  // '\n'
+  size_t namelen = strlen(filename);
   size_t dirlen = strlen(TEXTURE_DIR);
   char filepath[namelen + dirlen];
   filepath[namelen + dirlen] = '\0';
@@ -76,67 +77,82 @@ struct mesh load_mesh(const char *filename) {
   printf("Loading mesh from %s.\n", filepath);
 
   struct mesh mesh = {0};
-  FILE *file = fopen(filepath, "r");
-  if (file == NULL) {
-    perror("fopen");
-  }
+  char *file = load_file_into_mem(filepath);
+  assert(file != NULL);
+  char *pos = file;
 
-  // TODO make this into one malloc
-  size_t linesize = 128;
-  char *line = malloc(linesize);
   struct vertex *vertices = NULL;
   uint32_t *indices = NULL;
 
-  ssize_t nread;
-  while ((nread = getline(&line, &linesize, file)) != -1) {
-    if (strstr(line, "MESHES") != NULL) {
-      if (atoi(&line[7]) > 1) {
-        fprintf(stderr, "Multiple meshes not supported. Loading first mesh.\n");
-      }
-    } else if (strstr(line, "VERTICES") != NULL) {
-      mesh.m_num_vertices = atoi(&line[9]);
-      vertices = malloc(sizeof(struct vertex) * mesh.m_num_vertices);
-      char *endptr;
-      for (uint32_t i = 0; i < mesh.m_num_vertices; i++) {
-        assert(getline(&line, &linesize, file) != -1);
-        char *lineptr = line;
-        vertices[i].m_position[0] = strtof(lineptr, &endptr);
-        lineptr = endptr;
-        vertices[i].m_position[1] = strtof(lineptr, &endptr);
-        lineptr = endptr;
-        vertices[i].m_position[2] = strtof(lineptr, &endptr);
-        lineptr = endptr;
-        vertices[i].m_normal[0] = strtof(lineptr, &endptr);
-        lineptr = endptr;
-        vertices[i].m_normal[1] = strtof(lineptr, &endptr);
-        lineptr = endptr;
-        vertices[i].m_normal[2] = strtof(lineptr, &endptr);
-        lineptr = endptr;
-        vertices[i].m_tex_coord[0] = strtof(lineptr, &endptr);
-        lineptr = endptr;
-        vertices[i].m_tex_coord[1] = strtof(lineptr, &endptr);
-      }
-    } else if (strstr(line, "INDICES") != NULL) {
-      mesh.m_num_indices = atoi(&line[8]);
-      indices = malloc(sizeof(uint32_t) * mesh.m_num_indices);
-      for (uint32_t i = 0; i < mesh.m_num_indices; i++) {
-        assert(getline(&line, &linesize, file) != -1);
-        indices[i] = atoi(line);
-      }
-    } else if (strstr(line, "TEXTURES") != NULL) {
-      // TODO fix this - should not be getting (null) here
-      assert(getline(&line, &linesize, file) != -1);
-      if (strncmp(line, "(null)", 6) != 0) {
-        mesh.m_tex_diff = load_texture(line);
-      }
-
-      assert(getline(&line, &linesize, file) != -1);
-      if (strncmp(line, "(null)", 6) != 0) {
-        mesh.m_tex_spec = load_texture(line);
-      }
-      // TODO normal map
+  // MESHES header
+  if ((pos = strstr(pos, "MESHES")) != NULL) {
+    // TODO support multiple meshes
+    if (atoi(&pos[7]) > 1) {
+      fprintf(stderr, "Multiple meshes not supported. Loading first mesh.\n");
     }
   }
+
+  // VERTICES section
+  if ((pos = strstr(pos, "VERTICES")) != NULL) {
+    mesh.m_num_vertices = atoi(&pos[9]);
+    assert((pos = strchr(pos, '\n') + 1) != NULL); // +1 for '\n'
+    size_t n = sizeof(struct vertex) * mesh.m_num_vertices;
+    vertices = malloc(n);
+    memcpy(vertices, pos, n);
+    pos += n + 1;
+  }
+
+  // INDICES section
+  if ((pos = strstr(pos, "INDICES")) != NULL) {
+    mesh.m_num_indices = atoi(&pos[8]);
+    assert((pos = strchr(pos, '\n') + 1) != NULL); // +1 for '\n'
+    size_t n = sizeof(uint32_t) * mesh.m_num_indices;
+    indices = malloc(n);
+    memcpy(indices, pos, n);
+    pos += n + 1;
+  }
+
+  // TEXTURES section
+  // If the TEXTURES tag is found then we assume there are 3 lines to parse.
+  // while renderer does not do normal maps we only load 2 textures.
+  if ((pos = strstr(pos, "TEXTURES")) != NULL) {
+    char* end = pos;
+
+    assert((pos = strchr(pos, '\n') + 1) != NULL); // +1 for '\n'
+    assert((end = strchr(pos, '\n')) != NULL);
+    size_t n = end - pos;
+    char diffname[n];
+    diffname[n] = 0;
+    strncpy(diffname, pos, n);
+    mesh.m_tex_diff = load_texture(diffname);
+
+    assert((pos = strchr(pos, '\n') + 1) != NULL); // +1 for '\n'
+    assert((end = strchr(pos, '\n')) != NULL);
+    n = end - pos;
+    char specname[n];
+    specname[n] = 0;
+    strncpy(specname, pos, n);
+    mesh.m_tex_spec = load_texture(specname);
+  }
+
+  /*
+  for (uint32_t i = 0; i < mesh.m_num_vertices; i++) {
+    printf("%u: %f %f %f %f %f %f %f %f\n",
+        i,
+        vertices[i].m_position[0],
+        vertices[i].m_position[1],
+        vertices[i].m_position[2],
+        vertices[i].m_normal[0],
+        vertices[i].m_normal[1],
+        vertices[i].m_normal[2],
+        vertices[i].m_tex_coord[0],
+        vertices[i].m_tex_coord[1]);
+  }
+
+  for (uint32_t i = 0; i < mesh.m_num_indices; i++) {
+    printf("%u: %u\n", i, indices[i]);
+  }
+  */
 
   glGenBuffers(1, &mesh.m_vbo);
   glGenBuffers(1, &mesh.m_ebo);
@@ -164,10 +180,9 @@ struct mesh load_mesh(const char *filename) {
                         (void *)(offsetof(struct vertex, m_tex_coord)));
 
   free(vertices);
-  free(line);
   free(indices);
+  free(file);
 
-  fclose(file);
   return mesh;
 }
 
