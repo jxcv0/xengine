@@ -134,8 +134,6 @@ struct mesh load_mesh(const char *filename) {
     strncpy(specname, pos, n);
     mesh.m_tex_spec = load_texture(specname);
   }
-  printf("%u\n", mesh.m_tex_diff);
-  printf("%u\n", mesh.m_tex_spec);
 
   /*
   for (uint32_t i = 0; i < mesh.m_num_vertices; i++) {
@@ -156,6 +154,7 @@ struct mesh load_mesh(const char *filename) {
   }
   */
 
+  // sanity check
   assert(vertices != NULL && indices != NULL);
 
   glGenBuffers(1, &mesh.m_vbo);

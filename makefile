@@ -36,4 +36,5 @@ mesh_loading_perf: libglad.a libstb.a
 	@gcc $(cflags) -I src -I lib/stb -I lib/glad test/mesh_loading_perf.c $(wildcard $(xen_src_dir)/*.c) $(libs) -o $(bin_dir)/mesh_loading_perf
 
 clean:
-	rm -rf build/*
+	@rm -rf build/*
+	@rm -rf bin/*
