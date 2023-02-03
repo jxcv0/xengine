@@ -50,6 +50,7 @@ enum asset_type {
 
 /**
  * @brief Load a mesh by name from the mesh directory.
+ * TODO update this
  *
  * @param filename The name of the file to load.
  * @return A mesh structure with OpenGL buffer object handles.
