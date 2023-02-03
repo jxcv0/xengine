@@ -40,7 +40,6 @@ struct vertex *out_vertices[MAX_MESHES] = {0};
 uint32_t *out_indices[MAX_MESHES] = {0};
 uint32_t out_num_vertices[MAX_MESHES] = {0};
 uint32_t out_num_indices[MAX_MESHES] = {0};
-bool out_has_textures[MAX_MESHES] = {0};  // could be bitmask
 char *out_texture_names[MAX_MESHES][MAX_TEXTURES] = {0};
 
 FILE *file;
@@ -76,21 +75,28 @@ int main(int argc, char *argv[]) {
 
   process_node(scene->mRootNode, scene);
 
-  printf("Writing to file %s.\n", argv[2]);
+  printf("Writing to file \"%s\".\n", argv[2]);
   fprintf(file, "MESHES %d\n", num_meshes);
 
   for (unsigned int i = 0; i < num_meshes; i++) {
-    fprintf(file, "VERTICES %d\n", out_num_vertices[i]);
+    fprintf(file, "VERTICES %u\n", out_num_vertices[i]);
     fwrite(out_vertices[i], sizeof(struct vertex), out_num_vertices[i], file);
     fprintf(file, "\n");
 
-    fprintf(file, "INDICES %d\n", out_num_indices[i]);
+    fprintf(file, "INDICES %u\n", out_num_indices[i]);
     fwrite(out_indices[i], sizeof(uint32_t), out_num_indices[i], file);
     fprintf(file, "\n");
 
-    if (out_has_textures[i]) {
-      fprintf(file, "TEXTURES\n");
-      for (unsigned int j = 0; j < 3; j++) {
+    unsigned int tex_count = 0;
+    for (int j = 0; j < 3; j++) {
+      if (out_texture_names[i][j] != NULL) {
+        tex_count++;
+      }
+    }
+
+    fprintf(file, "TEXTURES %u\n", tex_count);
+    for (unsigned int j = 0; j < 3; j++) {
+      if (out_texture_names[i][j] != NULL) {
         fprintf(file, "%s\n", out_texture_names[i][j]);
       }
     }
@@ -166,11 +172,6 @@ void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
       process_material(material, aiTextureType_SPECULAR);
   out_texture_names[num_meshes][2] =
       process_material(material, aiTextureType_HEIGHT);
-
-  // load all or none
-  if (out_texture_names[num_meshes][0] != NULL) {
-    out_has_textures[num_meshes] = true;
-  }
 
   out_vertices[num_meshes] = vertices;
   out_indices[num_meshes] = indices;
