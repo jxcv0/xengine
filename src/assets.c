@@ -65,8 +65,8 @@ uint32_t load_texture(const char *filename) {
 /**
  * ----------------------------------------------------------------------------
  */
-void load_model(uint32_t entity_id, struct mesh *mesh_arr,
-                uint32_t *count, const char *filename) {
+void load_model(uint32_t entity_id, struct mesh *mesh_arr, uint32_t *count,
+                const char *filename) {
   size_t namelen = strlen(filename);
   size_t dirlen = strlen(MESH_DIR);
   char filepath[namelen + dirlen + 1];
@@ -77,15 +77,14 @@ void load_model(uint32_t entity_id, struct mesh *mesh_arr,
 
   printf("Loading mesh from \"%s\".\n", filepath);
 
-  struct mesh mesh = {0};
-  mesh.m_entity_id = entity_id;
-
   char *file = load_file_into_mem(filepath);
   assert(file != NULL);
   char *pos = file;
 
-  struct vertex *vertices;
-  uint32_t *indices = {0};
+  uint32_t last_num_vertices = 0;
+  struct vertex *vertices = NULL;
+  uint32_t last_num_indices = 0;
+  uint32_t *indices = NULL;
 
   // MESHES header
   uint32_t num_meshes = 0;
@@ -97,12 +96,17 @@ void load_model(uint32_t entity_id, struct mesh *mesh_arr,
   }
 
   for (uint32_t i = 0; i < num_meshes; i++) {
+    struct mesh mesh = {0};
+    mesh.m_entity_id = entity_id;
+
     // VERTICES section
     if ((pos = strstr(pos, "VERTICES")) != NULL) {
       mesh.m_num_vertices += atoi(&pos[9]);
       assert((pos = strchr(pos, '\n') + 1) != NULL);  // +1 for '\n'
       size_t n = sizeof(struct vertex) * mesh.m_num_vertices;
-      vertices = realloc(vertices, n);
+      if (last_num_vertices < mesh.m_num_vertices) {
+        vertices = realloc(vertices, n);
+      }
       memcpy(vertices, pos, n);
       pos += n + 1;
     }
@@ -112,7 +116,9 @@ void load_model(uint32_t entity_id, struct mesh *mesh_arr,
       mesh.m_num_indices += atoi(&pos[8]);
       assert((pos = strchr(pos, '\n') + 1) != NULL);  // +1 for '\n'
       size_t n = sizeof(uint32_t) * mesh.m_num_indices;
-      indices = malloc(n);
+      if (last_num_indices < mesh.m_num_indices) {
+        indices = realloc(indices, n);
+      }
       memcpy(indices, pos, n);
       pos += n + 1;
     }
@@ -139,60 +145,43 @@ void load_model(uint32_t entity_id, struct mesh *mesh_arr,
       strncpy(specname, pos, n);
       mesh.m_tex_spec = load_texture(specname);
     }
+
+    // sanity check
+    assert(vertices != NULL && indices != NULL);
+
+    glGenBuffers(1, &mesh.m_vbo);
+    glGenBuffers(1, &mesh.m_ebo);
+    glGenVertexArrays(1, &mesh.m_vao);
+    glBindVertexArray(mesh.m_vao);
+
+    glBindBuffer(GL_ARRAY_BUFFER, mesh.m_vbo);
+    glBufferData(GL_ARRAY_BUFFER, mesh.m_num_vertices * sizeof(struct vertex),
+                 (void *)(vertices), GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.m_ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * mesh.m_num_indices,
+                 indices, GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
+                          (void *)(offsetof(struct vertex, m_position)));
+
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
+                          (void *)(offsetof(struct vertex, m_normal)));
+
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
+                          (void *)(offsetof(struct vertex, m_tex_coord)));
+
+    mesh_arr[(*count)++] = mesh;
+    last_num_vertices = mesh.m_num_vertices;
+    last_num_indices = mesh.m_num_indices;
   }
-
-  /*
-  for (uint32_t i = 0; i < mesh.m_num_vertices; i++) {
-    printf("%u: %f %f %f %f %f %f %f %f\n",
-        i,
-        vertices[i].m_position[0],
-        vertices[i].m_position[1],
-        vertices[i].m_position[2],
-        vertices[i].m_normal[0],
-        vertices[i].m_normal[1],
-        vertices[i].m_normal[2],
-        vertices[i].m_tex_coord[0],
-        vertices[i].m_tex_coord[1]);
-  }
-
-  for (uint32_t i = 0; i < mesh.m_num_indices; i++) {
-    printf("%u: %u\n", i, indices[i]);
-  }
-  */
-
-  // sanity check
-  assert(vertices != NULL && indices != NULL);
-
-  glGenBuffers(1, &mesh.m_vbo);
-  glGenBuffers(1, &mesh.m_ebo);
-  glGenVertexArrays(1, &mesh.m_vao);
-  glBindVertexArray(mesh.m_vao);
-
-  glBindBuffer(GL_ARRAY_BUFFER, mesh.m_vbo);
-  glBufferData(GL_ARRAY_BUFFER, mesh.m_num_vertices * sizeof(struct vertex),
-               (void *)(vertices), GL_STATIC_DRAW);
-
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.m_ebo);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * mesh.m_num_indices,
-               indices, GL_STATIC_DRAW);
-
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-                        (void *)(offsetof(struct vertex, m_position)));
-
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-                        (void *)(offsetof(struct vertex, m_normal)));
-
-  glEnableVertexAttribArray(2);
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-                        (void *)(offsetof(struct vertex, m_tex_coord)));
 
   free(vertices);
   free(indices);
   free(file);
-
-  mesh_arr[(*count)++] = mesh;
 }
 
 /**

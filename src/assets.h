@@ -56,8 +56,8 @@ enum asset_type {
  * @param filename The name of the file to load.
  * @return A mesh structure with OpenGL buffer object handles.
  */
-void load_model(uint32_t entity_id, struct mesh *mesh_arr,
-                uint32_t *count, const char *filename);
+void load_model(uint32_t entity_id, struct mesh *mesh_arr, uint32_t *count,
+                const char *filename);
 
 /**
  * @brief Load a texture from the texture directory.

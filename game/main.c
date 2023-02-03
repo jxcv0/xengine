@@ -47,7 +47,7 @@ int main() {
   perspective(projection_matrix, radians(60),
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
-  load_model(1, meshes, &num_meshes, "cyborg.model");
+  load_model(1, meshes, &num_meshes, "rain.model");
 
   for (int i = 0; i < MAX_NUM_LIGHTS; i++) {
     struct light l = LIGHT_RANGE_65;
@@ -82,7 +82,8 @@ int main() {
     mat4 model_matrix;
     identity_mat4(model_matrix);
 
-    render_geometries(&r, projection_matrix, view_matrix, positions, meshes, 1);
+    render_geometries(&r, projection_matrix, view_matrix, positions, meshes,
+                      num_meshes);
     render_lighting(&r, light_array, MAX_NUM_LIGHTS, camera.m_pos);
 
     glfwSwapBuffers(window);
