@@ -22,6 +22,7 @@ const float window_height = 600;
 
 struct light light_array[MAX_NUM_LIGHTS] = {0};
 vec3 positions[MAX_ENTITIES] = {0};
+uint32_t num_meshes = 0;
 struct mesh meshes[MAX_ENTITIES] = {0};
 
 struct camera camera = {.m_mouse_sensetivity = 0.3, .m_movement_speed = 0.15};
@@ -46,7 +47,7 @@ int main() {
   perspective(projection_matrix, radians(60),
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
-  meshes[0] = load_mesh("cyborg.model");
+  load_model(1, meshes, &num_meshes, "cyborg.model");
 
   for (int i = 0; i < MAX_NUM_LIGHTS; i++) {
     struct light l = LIGHT_RANGE_65;

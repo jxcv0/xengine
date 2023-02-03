@@ -28,13 +28,14 @@ struct vertex {
  * @brief Stores the data required to render a mesh.
  */
 struct mesh {
+  uint32_t m_entity_id;
   uint32_t m_vbo;
   uint32_t m_vao;
   uint32_t m_ebo;
   uint32_t m_num_vertices;
   uint32_t m_num_indices;
-  uint32_t m_tex_diff;  // TODO link this some other way.
-  uint32_t m_tex_spec;  // TODO see above.
+  uint32_t m_tex_diff;
+  uint32_t m_tex_spec;
 };
 
 enum asset_type {
@@ -55,7 +56,8 @@ enum asset_type {
  * @param filename The name of the file to load.
  * @return A mesh structure with OpenGL buffer object handles.
  */
-struct mesh load_mesh(const char *filename);
+void load_model(uint32_t entity_id, struct mesh *mesh_arr,
+                uint32_t *count, const char *filename);
 
 /**
  * @brief Load a texture from the texture directory.
