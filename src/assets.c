@@ -86,7 +86,7 @@ void load_model(uint32_t entity_id, struct mesh *mesh_arr, uint32_t *count,
   uint32_t last_num_indices = 0;
   uint32_t *indices = NULL;
 
-  // MESHES header
+  // model start tag
   uint32_t num_meshes = 0;
   if ((pos = strstr(pos, "MESHES")) != NULL) {
     num_meshes = atoi(&pos[7]);
@@ -100,34 +100,51 @@ void load_model(uint32_t entity_id, struct mesh *mesh_arr, uint32_t *count,
     mesh.m_entity_id = entity_id;
 
     // VERTICES section
-    if ((pos = strstr(pos, "VERTICES")) != NULL) {
-      mesh.m_num_vertices += atoi(&pos[9]);
-      assert((pos = strchr(pos, '\n') + 1) != NULL);  // +1 for '\n'
-      size_t n = sizeof(struct vertex) * mesh.m_num_vertices;
-      if (last_num_vertices < mesh.m_num_vertices) {
-        vertices = realloc(vertices, n);
-      }
-      memcpy(vertices, pos, n);
-      pos += n + 1;
+    char *next_pos;
+    if ((next_pos = strstr(pos, "VERTICES")) != NULL) {
+      pos = next_pos;
+    } else {
+      fprintf(stderr, "VERTICES section not found\n");
+      return;
     }
 
-    // INDICES section
-    if ((pos = strstr(pos, "INDICES")) != NULL) {
-      mesh.m_num_indices += atoi(&pos[8]);
-      assert((pos = strchr(pos, '\n') + 1) != NULL);  // +1 for '\n'
-      size_t n = sizeof(uint32_t) * mesh.m_num_indices;
-      if (last_num_indices < mesh.m_num_indices) {
-        indices = realloc(indices, n);
-      }
-      memcpy(indices, pos, n);
-      pos += n + 1;
+    mesh.m_num_vertices += atoi(&pos[9]);
+    assert((pos = strchr(pos, '\n') + 1) != NULL);  // +1 for '\n'
+    size_t n = sizeof(struct vertex) * mesh.m_num_vertices;
+    if (last_num_vertices < mesh.m_num_vertices) {
+      vertices = realloc(vertices, n);
     }
+    memcpy(vertices, pos, n);
+    pos += n + 1;
+
+    // INDICES section
+    if ((next_pos = strstr(pos, "INDICES")) != NULL) {
+      pos = next_pos;
+    } else {
+      fprintf(stderr, "INDICES section not found\n");
+      return;
+    }
+
+    mesh.m_num_indices += atoi(&pos[8]);
+    assert((pos = strchr(pos, '\n') + 1) != NULL);  // +1 for '\n'
+    n = sizeof(uint32_t) * mesh.m_num_indices;
+    if (last_num_indices < mesh.m_num_indices) {
+      indices = realloc(indices, n);
+    }
+    memcpy(indices, pos, n);
+    pos += n + 1;
 
     // TEXTURES section
     // If the TEXTURES tag is found then we assume there are 3 lines to parse.
     // while renderer does not do normal maps we only load 2 textures.
     if ((pos = strstr(pos, "TEXTURES")) != NULL) {
+      uint32_t num_textures = atoi(&pos[9]);
+
       char *end = pos;
+      for (uint32_t j = 0; j < num_textures; j++) {
+        pos = strchr(pos, '\n') + 1;
+        end = strchr(pos, '\n');
+      }
 
       assert((pos = strchr(pos, '\n') + 1) != NULL);  // +1 for '\n'
       assert((end = strchr(pos, '\n')) != NULL);

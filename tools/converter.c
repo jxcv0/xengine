@@ -1,19 +1,3 @@
-// MESHES 3
-// VERTICES 1236
-// <pos_x> <pos_y> <pos_z> <norm_x> <norm_y> <norm_z> <tex_x> <tex_y>
-// <pos_x> <pos_y> <pos_z> <norm_x> <norm_y> <norm_z> <tex_x> <tex_y>
-// ...
-//
-// INDICES 342
-// 1 2 3 4 5 6 7 8 9 ...
-//
-// TEXTURES
-// <diffuse_filename>
-// <specular_filename>
-// <normal_filename>
-//
-// ...
-
 #include <assert.h>
 #include <assimp/cimport.h>
 #include <assimp/material.h>
@@ -27,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <libgen.h>
 
 #include "assets.h"
 
@@ -40,7 +25,8 @@ struct vertex *out_vertices[MAX_MESHES] = {0};
 uint32_t *out_indices[MAX_MESHES] = {0};
 uint32_t out_num_vertices[MAX_MESHES] = {0};
 uint32_t out_num_indices[MAX_MESHES] = {0};
-char *out_texture_names[MAX_MESHES][MAX_TEXTURES] = {0};
+char *out_diff_names[MAX_MESHES] = {0};
+char *out_spec_names[MAX_MESHES] = {0};
 
 FILE *file;
 
@@ -59,12 +45,6 @@ int main(int argc, char *argv[]) {
     perror("fopen");
   }
 
-  const char *dir = strrchr(argv[1], '/');
-  size_t n = dir - argv[1];
-  strncpy(directory, argv[1], n);
-  directory[n] = 0;
-  printf("Loading from directory %s\n", directory);
-
   const struct aiScene *scene =
       aiImportFile(argv[1], aiProcess_CalcTangentSpace | aiProcess_Triangulate |
                                 aiProcess_JoinIdenticalVertices);
@@ -76,40 +56,62 @@ int main(int argc, char *argv[]) {
   process_node(scene->mRootNode, scene);
 
   printf("Writing to file \"%s\".\n", argv[2]);
-  fprintf(file, "MESHES %d\n", num_meshes);
 
+  // write to file
+  fprintf(file, "{\n");
+  fprintf(file, "\t\"num_meshes\": \"%u\",\n", num_meshes);
+  fprintf(file, "\t\"meshes\": [\n");
   for (unsigned int i = 0; i < num_meshes; i++) {
-    fprintf(file, "VERTICES %u\n", out_num_vertices[i]);
+    fprintf(file, "\t\t{\n");
+    fprintf(file, "\t\t\t\"num_vertices\": \"%u\",\n", out_num_vertices[i]);
+    fprintf(file, "\t\t\t\"vertices_data\": \"");
     fwrite(out_vertices[i], sizeof(struct vertex), out_num_vertices[i], file);
-    fprintf(file, "\n");
-
-    fprintf(file, "INDICES %u\n", out_num_indices[i]);
+    fprintf(file, "\"\n");
+    fprintf(file, "\t\t\t\"num_indices\": \"%u\",\n", out_num_indices[i]);
+    fprintf(file, "\t\t\t\"indices_data\": \"");
     fwrite(out_indices[i], sizeof(uint32_t), out_num_indices[i], file);
-    fprintf(file, "\n");
+    fprintf(file, "\"\n");
 
-    unsigned int tex_count = 0;
-    for (int j = 0; j < 3; j++) {
-      if (out_texture_names[i][j] != NULL) {
-        tex_count++;
-      }
-    }
+    fprintf(file, "<count>");
+    fprintf(file, "%u", out_num_vertices[i]);
+    fprintf(file, "</count>");
+    fprintf(file, "<data>");
+    fprintf(file, "</data>");
+    fprintf(file, "</vertices>");
 
-    fprintf(file, "TEXTURES %u\n", tex_count);
-    for (unsigned int j = 0; j < 3; j++) {
-      if (out_texture_names[i][j] != NULL) {
-        fprintf(file, "%s\n", out_texture_names[i][j]);
-      }
+    fprintf(file, "<indices>");
+    fprintf(file, "<count>");
+    fprintf(file, "%u", out_num_indices[i]);
+    fprintf(file, "</count>");
+    fprintf(file, "<data>");
+    fwrite(out_indices[i], sizeof(uint32_t), out_num_indices[i], file);
+    fprintf(file, "</data>");
+    fprintf(file, "</indices>");
+
+    fprintf(file, "<diffuse>");
+    if (out_diff_names[i] != NULL) {
+      fprintf(file, "%s", out_diff_names[i]);
     }
+    fprintf(file, "</diffuse>");
+
+    fprintf(file, "<specular>");
+    if (out_spec_names[i] != NULL) {
+      fprintf(file, "%s", out_spec_names[i]);
+    }
+    fprintf(file, "</specular>");
+
+    fprintf(file, "\t\t\"]\n");
+    fprintf(file, "\t\t}\n");
   }
+
+  fprintf(file, "\t]\n");
+  fprintf(file, "}");
 
   aiReleaseImport(scene);
   fclose(file);
   return 0;
 }
 
-/**
- * ============================================================================
- */
 void process_node(struct aiNode *node, const struct aiScene *scene) {
   for (unsigned int i = 0; i < node->mNumMeshes; i++) {
     struct aiMesh *m = scene->mMeshes[node->mMeshes[i]];
@@ -121,9 +123,6 @@ void process_node(struct aiNode *node, const struct aiScene *scene) {
   }
 }
 
-/**
- * ============================================================================
- */
 void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
   assert(num_meshes < MAX_MESHES);
   out_num_vertices[num_meshes] = mesh->mNumVertices;
@@ -166,12 +165,9 @@ void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
 
   printf("Loading materials.\n");
   struct aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
-  out_texture_names[num_meshes][0] =
-      process_material(material, aiTextureType_DIFFUSE);
-  out_texture_names[num_meshes][1] =
-      process_material(material, aiTextureType_SPECULAR);
-  out_texture_names[num_meshes][2] =
-      process_material(material, aiTextureType_HEIGHT);
+  out_diff_names[num_meshes] = process_material(material, aiTextureType_DIFFUSE);
+  out_spec_names[num_meshes] = process_material(material, aiTextureType_SPECULAR);
+  // out_norm_name[num_meshes] = process_material(material, aiTextureType_HEIGHT);
 
   out_vertices[num_meshes] = vertices;
   out_indices[num_meshes] = indices;
