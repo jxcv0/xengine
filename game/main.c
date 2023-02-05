@@ -48,6 +48,7 @@ int main() {
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
   load_model(1, meshes, &num_meshes, "rain.model");
+  return 0;
 
   for (int i = 0; i < MAX_NUM_LIGHTS; i++) {
     struct light l = LIGHT_RANGE_65;

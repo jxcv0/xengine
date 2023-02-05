@@ -12,8 +12,6 @@
 #include "stb_image.h"
 #include "utils.h"
 
-#define MAX_MESHES 128
-
 /**
  * ----------------------------------------------------------------------------
  */
@@ -79,6 +77,13 @@ void load_model(uint32_t entity_id, struct mesh *mesh_arr, uint32_t *count,
 
   char *file = load_file_into_mem(filepath);
   assert(file != NULL);
+
+  uint32_t *header = (uint32_t *) file;
+  for (uint32_t i = 0; i < MAX_MESHES * 2; i++) {
+    printf("%u\n", header[i]);
+  }
+  return;
+
   char *pos = file;
 
   uint32_t last_num_vertices = 0;
@@ -96,7 +101,7 @@ void load_model(uint32_t entity_id, struct mesh *mesh_arr, uint32_t *count,
   }
 
   for (uint32_t i = 0; i < num_meshes; i++) {
-    struct mesh mesh = {0};
+    struct mesh mesh;
     mesh.m_entity_id = entity_id;
 
     // VERTICES section

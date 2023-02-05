@@ -57,6 +57,9 @@ int main(int argc, char *argv[]) {
 
   printf("Writing to file \"%s\".\n", argv[2]);
 
+  fwrite(out_num_vertices, sizeof(uint32_t) * MAX_MESHES, 1, file);
+  fwrite(out_num_indices, sizeof(uint32_t) * MAX_MESHES, 1, file);
+
   // write to file
   fprintf(file, "{\n");
   fprintf(file, "\t\"num_meshes\": \"%u\",\n", num_meshes);

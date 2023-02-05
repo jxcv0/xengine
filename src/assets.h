@@ -10,6 +10,7 @@
 #define MAX_ASSETS 128
 #define MESH_DIR "assets/meshes/"
 #define TEXTURE_DIR "assets/textures/"
+#define MAX_MESHES 32
 
 #ifdef __cplusplus
 extern "C" {
