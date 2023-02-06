@@ -36,12 +36,9 @@ struct mesh {
 };
 
 /**
- * @brief Load a mesh by name from the mesh directory.
- *
- * @param filename The name of the file to load.
- * @return A mesh structure with OpenGL buffer object handles.
+ * @brief TODO
  */
-struct mesh load_mesh(const char *filename);
+void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename);
 
 /**
  * @brief Load a texture from the texture directory.

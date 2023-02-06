@@ -64,7 +64,7 @@ uint32_t load_texture(const char *filename) {
 /**
  * ----------------------------------------------------------------------------
  */
-struct mesh load_mesh(const char *filename) {
+void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
   size_t namelen = strlen(filename);
   size_t dirlen = strlen(MESH_DIR);
   char filepath[namelen + dirlen + 1];
@@ -168,7 +168,7 @@ struct mesh load_mesh(const char *filename) {
   free(indices);
 
   fclose(file);
-  return mesh;
+  meshes[(*count)++] = mesh;
 }
 
 /**
