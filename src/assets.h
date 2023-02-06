@@ -28,6 +28,7 @@ struct vertex {
  * @brief Stores the data required to render a mesh.
  */
 struct mesh {
+  uint32_t m_id;
   uint32_t m_vbo;
   uint32_t m_vao;
   uint32_t m_ebo;

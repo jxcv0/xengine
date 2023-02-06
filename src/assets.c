@@ -85,54 +85,55 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
   uint32_t *indices = NULL;
 
   // MESHES header
+  uint32_t num_meshes = 0;
   if ((pos = strstr(pos, "MESHES")) != NULL) {
-    // TODO support multiple meshes
-    if (atoi(&pos[7]) > 1) {
-      fprintf(stderr, "Multiple meshes not supported. Loading first mesh.\n");
+    num_meshes = atoi(&pos[7]);
+    printf("Loading %u meshes.\n", num_meshes);
+  }
+
+  for (uint32_t i = 0; i < num_meshes; i++) {
+    // VERTICES section
+    if ((pos = strstr(pos, "VERTICES")) != NULL) {
+      mesh.m_num_vertices = atoi(&pos[9]);
+      assert((pos = strchr(pos, '\n') + 1) != NULL); // +1 for '\n'
+      size_t n = sizeof(struct vertex) * mesh.m_num_vertices;
+      vertices = malloc(n);
+      memcpy(vertices, pos, n);
+      pos += n + 1;
     }
-  }
 
-  // VERTICES section
-  if ((pos = strstr(pos, "VERTICES")) != NULL) {
-    mesh.m_num_vertices = atoi(&pos[9]);
-    assert((pos = strchr(pos, '\n') + 1) != NULL); // +1 for '\n'
-    size_t n = sizeof(struct vertex) * mesh.m_num_vertices;
-    vertices = malloc(n);
-    memcpy(vertices, pos, n);
-    pos += n + 1;
-  }
+    // INDICES section
+    if ((pos = strstr(pos, "INDICES")) != NULL) {
+      mesh.m_num_indices = atoi(&pos[8]);
+      assert((pos = strchr(pos, '\n') + 1) != NULL); // +1 for '\n'
+      size_t n = sizeof(uint32_t) * mesh.m_num_indices;
+      indices = malloc(n);
+      memcpy(indices, pos, n);
+      pos += n + 1;
+    }
 
-  // INDICES section
-  if ((pos = strstr(pos, "INDICES")) != NULL) {
-    mesh.m_num_indices = atoi(&pos[8]);
-    assert((pos = strchr(pos, '\n') + 1) != NULL); // +1 for '\n'
-    size_t n = sizeof(uint32_t) * mesh.m_num_indices;
-    indices = malloc(n);
-    memcpy(indices, pos, n);
-    pos += n + 1;
-  }
+    // TEXTURES section
+    // If the TEXTURES tag is found then we assume there are 3 lines to parse.
+    // while renderer does not do normal maps we only load 2 textures.
+    if ((pos = strstr(pos, "TEXTURES")) != NULL) {
+      char* end = pos;
 
-  // TEXTURES section
-  // If the TEXTURES tag is found then we assume there are 3 lines to parse.
-  // while renderer does not do normal maps we only load 2 textures.
-  if ((pos = strstr(pos, "TEXTURES")) != NULL) {
-    char* end = pos;
+      assert((pos = strchr(pos, '\n') + 1) != NULL); // +1 for '\n'
+      assert((end = strchr(pos, '\n')) != NULL);
+      size_t n = end - pos;
+      char diffname[n];
+      diffname[n] = 0;
+      strncpy(diffname, pos, n);
+      mesh.m_tex_diff = load_texture(diffname);
 
-    assert((pos = strchr(pos, '\n') + 1) != NULL); // +1 for '\n'
-    assert((end = strchr(pos, '\n')) != NULL);
-    size_t n = end - pos;
-    char diffname[n];
-    diffname[n] = 0;
-    strncpy(diffname, pos, n);
-    mesh.m_tex_diff = load_texture(diffname);
-
-    assert((pos = strchr(pos, '\n') + 1) != NULL); // +1 for '\n'
-    assert((end = strchr(pos, '\n')) != NULL);
-    n = end - pos;
-    char specname[n];
-    specname[n] = 0;
-    strncpy(specname, pos, n);
-    mesh.m_tex_spec = load_texture(specname);
+      assert((pos = strchr(pos, '\n') + 1) != NULL); // +1 for '\n'
+      assert((end = strchr(pos, '\n')) != NULL);
+      n = end - pos;
+      char specname[n];
+      specname[n] = 0;
+      strncpy(specname, pos, n);
+      mesh.m_tex_spec = load_texture(specname);
+    }
   }
 
   /*

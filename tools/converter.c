@@ -1,19 +1,3 @@
-// MESHES 3
-// VERTICES 1236
-// <pos_x> <pos_y> <pos_z> <norm_x> <norm_y> <norm_z> <tex_x> <tex_y>
-// <pos_x> <pos_y> <pos_z> <norm_x> <norm_y> <norm_z> <tex_x> <tex_y>
-// ...
-//
-// INDICES 342
-// 1 2 3 4 5 6 7 8 9 ...
-//
-// TEXTURES
-// <diffuse_filename>
-// <specular_filename>
-// <normal_filename>
-//
-// ...
-
 #include <assert.h>
 #include <assimp/cimport.h>
 #include <assimp/material.h>
