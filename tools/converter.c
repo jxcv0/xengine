@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
-  file = fopen(argv[2], "w+");
+  file = fopen(argv[2], "wb+");
   if (file == NULL) {
     perror("fopen");
   }
@@ -81,21 +81,12 @@ int main(int argc, char *argv[]) {
 
   for (unsigned int i = 0; i < num_meshes; i++) {
     fprintf(file, "VERTICES %d\n", out_num_vertices[i]);
-    for (unsigned int j = 0; j < out_num_vertices[i]; j++) {
-      fprintf(
-          file, "%f %f %f %f %f %f %f %f\n", out_vertices[i][j].m_position[0],
-          out_vertices[i][j].m_position[1], out_vertices[i][j].m_position[2],
-
-          out_vertices[i][j].m_normal[0], out_vertices[i][j].m_normal[1],
-          out_vertices[i][j].m_normal[2],
-
-          out_vertices[i][j].m_tex_coord[0], out_vertices[i][j].m_tex_coord[1]);
-    }
+    fwrite(out_vertices[i], sizeof(struct vertex), out_num_vertices[i], file);
+    fprintf(file, "\n");
 
     fprintf(file, "INDICES %d\n", out_num_indices[i]);
-    for (unsigned int j = 0; j < out_num_indices[i]; j++) {
-      fprintf(file, "%d\n", out_indices[i][j]);
-    }
+    fwrite(out_indices[i], sizeof(uint32_t), out_num_indices[i], file);
+    fprintf(file, "\n");
 
     if (out_has_textures[i]) {
       fprintf(file, "TEXTURES\n");
@@ -177,7 +168,7 @@ void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
       process_material(material, aiTextureType_HEIGHT);
 
   // load all or none
-  if (out_texture_names[num_meshes] != NULL) {
+  if (out_texture_names[num_meshes][0] != NULL) {
     out_has_textures[num_meshes] = true;
   }
 
@@ -207,38 +198,3 @@ char *process_material(struct aiMaterial *mat, enum aiTextureType type) {
   }
   return NULL;
 }
-
-// num of meshes
-// num vertices
-// vertices
-// texture file names
-// animation data...
-
-//
-// clear_db();
-//
-// load_world_at_position(PLAYER_START);
-//
-// e1 = create_entity(); // primary key of db
-// e2 = create_entity();
-//
-// set_health(e1, PLAYER_START_HEALTH);
-//
-// create_model(e1, "player_mesh"); // loads meshes, collision meshes, textures
-//                                  // and animations.
-// create_model(w2, "npc1_mesh");
-//
-// make_controlled(e1, PLAYER_INPUT); // the velocity of this entity is updated
-//                                    // by user input
-//
-// while (game_running) {
-//   load_world(camera_position);
-//
-//   process_input();
-//   process_animations();
-//   process_physics();
-//
-//   render_geometry();
-//   render_lighting();
-// }
-//

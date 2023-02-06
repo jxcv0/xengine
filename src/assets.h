@@ -6,6 +6,8 @@
 
 #include "lin.h"
 
+#define ASSET_MAX_NAME_LEN 64
+#define MAX_ASSETS 128
 #define MESH_DIR "assets/meshes/"
 #define TEXTURE_DIR "assets/textures/"
 
@@ -34,6 +36,17 @@ struct mesh {
   uint32_t m_tex_diff;  // TODO link this some other way.
   uint32_t m_tex_spec;  // TODO see above.
 };
+
+enum asset_type {
+  MESH,
+  TEXTURE
+  // ANIMATION
+  // AUDIO
+};
+
+// check asset is not already loaded
+// if it is return it
+// if not load it then return it
 
 /**
  * @brief TODO
