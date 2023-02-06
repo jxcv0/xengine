@@ -186,7 +186,6 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
   free(indices);
   free(file);
 
-  fclose(file);
   meshes[(*count)++] = mesh;
 }
 
