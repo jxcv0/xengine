@@ -86,8 +86,7 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
     printf("Loading %u meshes.\n", num_meshes);
   }
 
-// #pragma omp parallel for num_threads(4)
-  for (uint32_t i = 0; i < num_meshes; i += 4) {
+  for (uint32_t i = 0; i < num_meshes; i++) {
     struct vertex *vertices = NULL;
     uint32_t *indices = NULL;
     char diffuse_name[64] = {0};
@@ -129,12 +128,11 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
       pos += n;
     }
 
-// #pragma omp critical
-    if (diffuse_name != NULL) {
+    if (strncmp(diffuse_name, "(null)", 6) != 0) {
       mesh.m_tex_diff = load_texture(diffuse_name);
     }
 
-    if (specular_name != NULL) {
+    if (strncmp(specular_name, "(null)", 6) != 0) {
       mesh.m_tex_spec = load_texture(specular_name);
     }
 
