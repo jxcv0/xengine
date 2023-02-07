@@ -1,6 +1,6 @@
 build_dir := build
 bin_dir := bin
-cflags := -Wall -Wextra -ggdb
+cflags := -Wall -Wextra -ggdb -Og
 libs := -Lbuild -lglad -lstb -lm -ldl -lglfw -fopenmp
 
 xen_src_dir := src

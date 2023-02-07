@@ -24,8 +24,8 @@ struct vertex *out_vertices[MAX_MESHES] = {0};
 uint32_t *out_indices[MAX_MESHES] = {0};
 uint32_t out_num_vertices[MAX_MESHES] = {0};
 uint32_t out_num_indices[MAX_MESHES] = {0};
-bool out_has_textures[MAX_MESHES] = {0};  // could be bitmask
-char *out_texture_names[MAX_MESHES][MAX_TEXTURES] = {0};
+char *out_diff_names[MAX_MESHES] = {0};
+char *out_spec_names[MAX_MESHES] = {0};
 
 FILE *file;
 
@@ -61,8 +61,8 @@ int main(int argc, char *argv[]) {
   process_node(scene->mRootNode, scene);
 
   printf("Writing to file %s.\n", argv[2]);
-  fprintf(file, "MESHES %d\n", num_meshes);
 
+  fprintf(file, "MESHES %d\n", num_meshes);
   for (unsigned int i = 0; i < num_meshes; i++) {
     fprintf(file, "VERTICES %d\n", out_num_vertices[i]);
     fwrite(out_vertices[i], sizeof(struct vertex), out_num_vertices[i], file);
@@ -72,11 +72,18 @@ int main(int argc, char *argv[]) {
     fwrite(out_indices[i], sizeof(uint32_t), out_num_indices[i], file);
     fprintf(file, "\n");
 
-    if (out_has_textures[i]) {
-      fprintf(file, "TEXTURES\n");
-      for (unsigned int j = 0; j < 3; j++) {
-        fprintf(file, "%s\n", out_texture_names[i][j]);
-      }
+    fprintf(file, "DIFFUSE\n");
+    if (out_diff_names[i] != NULL) {
+      fprintf(file, "%s\n", out_diff_names[i]);
+    } else {
+      fprintf(file, "(null)\n");
+    }
+
+    fprintf(file, "SPECULAR\n");
+    if (out_spec_names[i] != NULL) {
+      fprintf(file, "%s\n", out_spec_names[i]);
+    } else {
+      fprintf(file, "(null)\n");
     }
   }
 
@@ -144,18 +151,11 @@ void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
 
   printf("Loading materials.\n");
   struct aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
-  out_texture_names[num_meshes][0] =
-      process_material(material, aiTextureType_DIFFUSE);
-  out_texture_names[num_meshes][1] =
-      process_material(material, aiTextureType_SPECULAR);
-  out_texture_names[num_meshes][2] =
-      process_material(material, aiTextureType_HEIGHT);
+  out_diff_names[num_meshes] = process_material(material, aiTextureType_DIFFUSE);
+  out_spec_names[num_meshes] = process_material(material, aiTextureType_SPECULAR);
+  // process_material(material, aiTextureType_HEIGHT);
 
   // load all or none
-  if (out_texture_names[num_meshes][0] != NULL) {
-    out_has_textures[num_meshes] = true;
-  }
-
   out_vertices[num_meshes] = vertices;
   out_indices[num_meshes] = indices;
 

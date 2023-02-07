@@ -83,6 +83,8 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
 
   struct vertex *vertices = NULL;
   uint32_t *indices = NULL;
+  char diffuse_name[64] = {0};
+  char specular_name[64] = {0};
 
   // MESHES header
   uint32_t num_meshes = 0;
@@ -99,7 +101,7 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
       size_t n = sizeof(struct vertex) * mesh.m_num_vertices;
       vertices = malloc(n);
       memcpy(vertices, pos, n);
-      pos += n + 1;
+      pos += n;
     }
 
     // INDICES section
@@ -109,30 +111,25 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
       size_t n = sizeof(uint32_t) * mesh.m_num_indices;
       indices = malloc(n);
       memcpy(indices, pos, n);
-      pos += n + 1;
+      pos += n;
     }
 
-    // TEXTURES section
-    // If the TEXTURES tag is found then we assume there are 3 lines to parse.
-    // while renderer does not do normal maps we only load 2 textures.
-    if ((pos = strstr(pos, "TEXTURES")) != NULL) {
-      char* end = pos;
-
-      assert((pos = strchr(pos, '\n') + 1) != NULL); // +1 for '\n'
-      assert((end = strchr(pos, '\n')) != NULL);
+    if ((pos = strstr(pos, "DIFFUSE")) != NULL) {
+      pos = strchr(pos, '\n') + 1;
+      char *end = strchr(pos, '\n');
       size_t n = end - pos;
-      char diffname[n];
-      diffname[n] = 0;
-      strncpy(diffname, pos, n);
-      mesh.m_tex_diff = load_texture(diffname);
+      strncpy(diffuse_name, pos, n);
+      mesh.m_tex_diff = load_texture(diffuse_name);
+      pos += n;
+    }
 
-      assert((pos = strchr(pos, '\n') + 1) != NULL); // +1 for '\n'
-      assert((end = strchr(pos, '\n')) != NULL);
-      n = end - pos;
-      char specname[n];
-      specname[n] = 0;
-      strncpy(specname, pos, n);
-      mesh.m_tex_spec = load_texture(specname);
+    if ((pos = strstr(pos, "SPECULAR")) != NULL) {
+      pos = strchr(pos, '\n') + 1;
+      char *end = strchr(pos, '\n');
+      size_t n = end - pos;
+      strncpy(specular_name, pos, n);
+      mesh.m_tex_spec = load_texture(specular_name);
+      pos += n;
     }
   }
 
