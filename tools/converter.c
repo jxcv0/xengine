@@ -14,9 +14,6 @@
 
 #include "assets.h"
 
-#define MAX_MESHES 16
-#define MAX_TEXTURES 3
-
 char directory[256];
 
 unsigned int num_meshes = 0;
@@ -151,8 +148,10 @@ void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
 
   printf("Loading materials.\n");
   struct aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
-  out_diff_names[num_meshes] = process_material(material, aiTextureType_DIFFUSE);
-  out_spec_names[num_meshes] = process_material(material, aiTextureType_SPECULAR);
+  out_diff_names[num_meshes] =
+      process_material(material, aiTextureType_DIFFUSE);
+  out_spec_names[num_meshes] =
+      process_material(material, aiTextureType_SPECULAR);
   // process_material(material, aiTextureType_HEIGHT);
 
   // load all or none

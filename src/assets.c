@@ -12,8 +12,6 @@
 #include "stb_image.h"
 #include "utils.h"
 
-#define MAX_MESHES 128
-
 /**
  * ----------------------------------------------------------------------------
  */
@@ -81,11 +79,6 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
   assert(file != NULL);
   char *pos = file;
 
-  struct vertex *vertices = NULL;
-  uint32_t *indices = NULL;
-  char diffuse_name[64] = {0};
-  char specular_name[64] = {0};
-
   // MESHES header
   uint32_t num_meshes = 0;
   if ((pos = strstr(pos, "MESHES")) != NULL) {
@@ -93,11 +86,17 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
     printf("Loading %u meshes.\n", num_meshes);
   }
 
-  for (uint32_t i = 0; i < num_meshes; i++) {
+// #pragma omp parallel for num_threads(4)
+  for (uint32_t i = 0; i < num_meshes; i += 4) {
+    struct vertex *vertices = NULL;
+    uint32_t *indices = NULL;
+    char diffuse_name[64] = {0};
+    char specular_name[64] = {0};
+
     // VERTICES section
     if ((pos = strstr(pos, "VERTICES")) != NULL) {
       mesh.m_num_vertices = atoi(&pos[9]);
-      assert((pos = strchr(pos, '\n') + 1) != NULL); // +1 for '\n'
+      assert((pos = strchr(pos, '\n') + 1) != NULL);  // +1 for '\n'
       size_t n = sizeof(struct vertex) * mesh.m_num_vertices;
       vertices = malloc(n);
       memcpy(vertices, pos, n);
@@ -107,7 +106,7 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
     // INDICES section
     if ((pos = strstr(pos, "INDICES")) != NULL) {
       mesh.m_num_indices = atoi(&pos[8]);
-      assert((pos = strchr(pos, '\n') + 1) != NULL); // +1 for '\n'
+      assert((pos = strchr(pos, '\n') + 1) != NULL);  // +1 for '\n'
       size_t n = sizeof(uint32_t) * mesh.m_num_indices;
       indices = malloc(n);
       memcpy(indices, pos, n);
@@ -119,7 +118,6 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
       char *end = strchr(pos, '\n');
       size_t n = end - pos;
       strncpy(diffuse_name, pos, n);
-      mesh.m_tex_diff = load_texture(diffuse_name);
       pos += n;
     }
 
@@ -128,63 +126,49 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
       char *end = strchr(pos, '\n');
       size_t n = end - pos;
       strncpy(specular_name, pos, n);
-      mesh.m_tex_spec = load_texture(specular_name);
       pos += n;
     }
+
+// #pragma omp critical
+    if (diffuse_name != NULL) {
+      mesh.m_tex_diff = load_texture(diffuse_name);
+    }
+
+    if (specular_name != NULL) {
+      mesh.m_tex_spec = load_texture(specular_name);
+    }
+
+    assert(vertices != NULL && indices != NULL);
+    glGenBuffers(1, &mesh.m_vbo);
+    glGenBuffers(1, &mesh.m_ebo);
+    glGenVertexArrays(1, &mesh.m_vao);
+    glBindVertexArray(mesh.m_vao);
+
+    glBindBuffer(GL_ARRAY_BUFFER, mesh.m_vbo);
+    glBufferData(GL_ARRAY_BUFFER, mesh.m_num_vertices * sizeof(struct vertex),
+                 (void *)(vertices), GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.m_ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * mesh.m_num_indices,
+                 indices, GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
+                          (void *)(offsetof(struct vertex, m_position)));
+
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
+                          (void *)(offsetof(struct vertex, m_normal)));
+
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
+                          (void *)(offsetof(struct vertex, m_tex_coord)));
+    free(vertices);
+    free(indices);
+    free(file);
+
+    meshes[(*count)++] = mesh;
   }
-
-  /*
-  for (uint32_t i = 0; i < mesh.m_num_vertices; i++) {
-    printf("%u: %f %f %f %f %f %f %f %f\n",
-        i,
-        vertices[i].m_position[0],
-        vertices[i].m_position[1],
-        vertices[i].m_position[2],
-        vertices[i].m_normal[0],
-        vertices[i].m_normal[1],
-        vertices[i].m_normal[2],
-        vertices[i].m_tex_coord[0],
-        vertices[i].m_tex_coord[1]);
-  }
-
-  for (uint32_t i = 0; i < mesh.m_num_indices; i++) {
-    printf("%u: %u\n", i, indices[i]);
-  }
-  */
-
-  // sanity check
-  assert(vertices != NULL && indices != NULL);
-
-  glGenBuffers(1, &mesh.m_vbo);
-  glGenBuffers(1, &mesh.m_ebo);
-  glGenVertexArrays(1, &mesh.m_vao);
-  glBindVertexArray(mesh.m_vao);
-
-  glBindBuffer(GL_ARRAY_BUFFER, mesh.m_vbo);
-  glBufferData(GL_ARRAY_BUFFER, mesh.m_num_vertices * sizeof(struct vertex),
-               (void *)(vertices), GL_STATIC_DRAW);
-
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.m_ebo);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * mesh.m_num_indices,
-               indices, GL_STATIC_DRAW);
-
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-                        (void *)(offsetof(struct vertex, m_position)));
-
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-                        (void *)(offsetof(struct vertex, m_normal)));
-
-  glEnableVertexAttribArray(2);
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-                        (void *)(offsetof(struct vertex, m_tex_coord)));
-
-  free(vertices);
-  free(indices);
-  free(file);
-
-  meshes[(*count)++] = mesh;
 }
 
 /**
