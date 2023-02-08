@@ -107,7 +107,6 @@ void update_view_matrix() {
   look_at(view_matrix, camera.m_pos, ctr, camera.m_up);
 }
 
-// move the fps camera with wasd and update mouse input
 void handle_keyboard_input(GLFWwindow *w) {
   if (glfwGetKey(w, GLFW_KEY_W) == GLFW_PRESS) {
     camera.m_pos[0] += camera.m_view_dir[0] * camera.m_movement_speed;
