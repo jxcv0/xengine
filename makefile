@@ -14,7 +14,7 @@ xen_lib := -Lbuild -lxen
 $(build_dir)/%.o: %.c
 	@echo "Building object $@"
 	@if [ ! -d $(build_dir)/% ]; then mkdir -p $(build_dir)/$(dir $<); fi
-	@gcc $< $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(dir $<) $(libs) -c -o $@
+	@gcc $< $(cflags) -Og -I$(glad_src_dir) -I$(stb_src_dir) -I$(dir $<) $(libs) -c -o $@
 
 game: libglad.a libstb.a libxen.a
 	@echo "Building target $@"

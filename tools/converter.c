@@ -59,24 +59,24 @@ int main(int argc, char *argv[]) {
 
   printf("Writing to file %s.\n", argv[2]);
 
-  fprintf(file, "MESHES %d\n", num_meshes);
+  fprintf(file, "[MESHES %d]\n", num_meshes);
   for (unsigned int i = 0; i < num_meshes; i++) {
-    fprintf(file, "VERTICES %d\n", out_num_vertices[i]);
+    fprintf(file, "[VERTICES %d]\n", out_num_vertices[i]);
     fwrite(out_vertices[i], sizeof(struct vertex), out_num_vertices[i], file);
     fprintf(file, "\n");
 
-    fprintf(file, "INDICES %d\n", out_num_indices[i]);
+    fprintf(file, "[INDICES %d]\n", out_num_indices[i]);
     fwrite(out_indices[i], sizeof(uint32_t), out_num_indices[i], file);
     fprintf(file, "\n");
 
-    fprintf(file, "DIFFUSE\n");
+    fprintf(file, "[DIFFUSE]\n");
     if (out_diff_names[i] != NULL) {
       fprintf(file, "%s\n", out_diff_names[i]);
     } else {
       fprintf(file, "(null)\n");
     }
 
-    fprintf(file, "SPECULAR\n");
+    fprintf(file, "[SPECULAR]\n");
     if (out_spec_names[i] != NULL) {
       fprintf(file, "%s\n", out_spec_names[i]);
     } else {

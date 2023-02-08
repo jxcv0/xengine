@@ -68,20 +68,17 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
   size_t dirlen = strlen(MESH_DIR);
   char filepath[namelen + dirlen + 1];
   filepath[namelen + dirlen] = '\0';
-
-  strncpy(filepath, MESH_DIR, dirlen);
+strncpy(filepath, MESH_DIR, dirlen);
   strncpy(&filepath[dirlen], filename, namelen);
 
-
-  struct mesh mesh = {0};
   char *file = load_file_into_mem(filepath);
   assert(file != NULL);
   char *pos = file;
 
   // MESHES header
   uint32_t num_meshes = 0;
-  if ((pos = strstr(pos, "MESHES")) != NULL) {
-    num_meshes = atoi(&pos[7]);
+  if ((pos = strstr(pos, "MESHES ")) != NULL) {
+    num_meshes = (uint32_t)strtol(&pos[6], NULL, 10);
   }
 
   printf("Loading %u meshes from \"%s\".\n", num_meshes, filepath);
@@ -89,18 +86,19 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
   char *start_positions[num_meshes];
   for(uint32_t i = 0; i < num_meshes; i++) {
     start_positions[i] = strstr(pos, "VERTICES");
-    pos = start_positions[i] + 8;
+    pos = start_positions[i] + 9;
   }
 
   for (uint32_t i = 0; i < num_meshes; i++) {
+    struct mesh mesh = {0};
     char *start_pos = start_positions[i];
     struct vertex *vertices = NULL;
     uint32_t *indices = NULL;
     char diffuse_name[64] = {0};
     char specular_name[64] = {0};
 
-    if ((start_pos = strstr(start_pos, "VERTICES")) != NULL) {
-      mesh.m_num_vertices = atoi(&start_pos[9]);
+    if ((start_pos = strstr(start_pos, "VERTICES ")) != NULL) {
+      mesh.m_num_vertices = (uint32_t)strtol(&start_pos[9], NULL, 10);
       assert((start_pos = strchr(start_pos, '\n') + 1) != NULL);  // +1 for '\n'
       size_t n = sizeof(struct vertex) * mesh.m_num_vertices;
       vertices = malloc(n);
@@ -108,8 +106,8 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
       start_pos += n;
     }
 
-    if ((start_pos = strstr(start_pos, "INDICES")) != NULL) {
-      mesh.m_num_indices = atoi(&start_pos[8]);
+    if ((start_pos = strstr(start_pos, "INDICES ")) != NULL) {
+      mesh.m_num_indices = (uint32_t)strtol(&start_pos[9], NULL, 10);
       assert((start_pos = strchr(start_pos, '\n') + 1) != NULL);  // +1 for '\n'
       size_t n = sizeof(uint32_t) * mesh.m_num_indices;
       indices = malloc(n);
@@ -117,15 +115,16 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
       start_pos += n;
     }
 
-    if ((start_pos = strstr(start_pos, "DIFFUSE")) != NULL) {
+    assert(start_pos != NULL);
+
+    if ((start_pos = strstr(start_pos, "[DIFFUSE]")) != NULL) {
       start_pos = strchr(start_pos, '\n') + 1;
       char *end = strchr(start_pos, '\n');
       size_t n = end - start_pos;
       strncpy(diffuse_name, start_pos, n);
-      start_pos += n;
     }
 
-    if ((start_pos = strstr(start_pos, "SPECULAR")) != NULL) {
+    if ((start_pos = strstr(start_pos, "[SPECULAR]")) != NULL) {
       start_pos = strchr(start_pos, '\n') + 1;
       char *end = strchr(start_pos, '\n');
       size_t n = end - start_pos;
