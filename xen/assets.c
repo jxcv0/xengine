@@ -77,60 +77,52 @@ strncpy(filepath, MESH_DIR, dirlen);
 
   // MESHES header
   uint32_t num_meshes = 0;
-  if ((pos = strstr(pos, "MESHES ")) != NULL) {
-    num_meshes = (uint32_t)strtol(&pos[6], NULL, 10);
-  }
-
-  printf("Loading %u meshes from \"%s\".\n", num_meshes, filepath);
-
-  char *start_positions[num_meshes];
-  for(uint32_t i = 0; i < num_meshes; i++) {
-    start_positions[i] = strstr(pos, "VERTICES");
-    pos = start_positions[i] + 9;
+  if ((pos = strstr(pos, "MESHES")) != NULL) {
+    num_meshes = atoi(&pos[7]);
+    printf("Loading %u meshes.\n", num_meshes);
   }
 
   for (uint32_t i = 0; i < num_meshes; i++) {
     struct mesh mesh = {0};
-    char *start_pos = start_positions[i];
     struct vertex *vertices = NULL;
     uint32_t *indices = NULL;
     char diffuse_name[64] = {0};
     char specular_name[64] = {0};
 
-    if ((start_pos = strstr(start_pos, "VERTICES ")) != NULL) {
-      mesh.m_num_vertices = (uint32_t)strtol(&start_pos[9], NULL, 10);
-      assert((start_pos = strchr(start_pos, '\n') + 1) != NULL);  // +1 for '\n'
+    // VERTICES section
+    if ((pos = strstr(pos, "VERTICES")) != NULL) {
+      mesh.m_num_vertices = atoi(&pos[9]);
+      assert((pos = strchr(pos, '\n') + 1) != NULL);  // +1 for '\n'
       size_t n = sizeof(struct vertex) * mesh.m_num_vertices;
       vertices = malloc(n);
-      memcpy(vertices, start_pos, n);
-      start_pos += n;
+      memcpy(vertices, pos, n);
+      pos += n;
     }
 
-    if ((start_pos = strstr(start_pos, "INDICES ")) != NULL) {
-      mesh.m_num_indices = (uint32_t)strtol(&start_pos[9], NULL, 10);
-      assert((start_pos = strchr(start_pos, '\n') + 1) != NULL);  // +1 for '\n'
+    // INDICES section
+    if ((pos = strstr(pos, "INDICES")) != NULL) {
+      mesh.m_num_indices = atoi(&pos[8]);
+      assert((pos = strchr(pos, '\n') + 1) != NULL);  // +1 for '\n'
       size_t n = sizeof(uint32_t) * mesh.m_num_indices;
       indices = malloc(n);
-      memcpy(indices, start_pos, n);
-      start_pos += n;
+      memcpy(indices, pos, n);
+      pos += n;
     }
 
-    assert(start_pos != NULL);
-    char *diff = NULL;
-    if ((diff = strstr(start_pos, "[DIFFUSE]")) != NULL) {
-      diff = strchr(diff, '\n') + 1;
-      char *end = strchr(diff, '\n');
-      size_t n = end - start_pos;
-      strncpy(diffuse_name, start_pos, n);
+    if ((pos = strstr(pos, "DIFFUSE")) != NULL) {
+      pos = strchr(pos, '\n') + 1;
+      char *end = strchr(pos, '\n');
+      size_t n = end - pos;
+      strncpy(diffuse_name, pos, n);
+      pos += n;
     }
 
-    assert(start_pos != NULL);
-    char *spec = NULL;
-    if ((spec = strstr(start_pos, "[SPECULAR]")) != NULL) {
-      spec = strchr(spec, '\n') + 1;
-      char *end = strchr(spec, '\n');
-      size_t n = end - start_pos;
-      strncpy(specular_name, start_pos, n);
+    if ((pos = strstr(pos, "SPECULAR")) != NULL) {
+      pos = strchr(pos, '\n') + 1;
+      char *end = strchr(pos, '\n');
+      size_t n = end - pos;
+      strncpy(specular_name, pos, n);
+      pos += n;
     }
 
     printf("diffuse_name: %s|\n", diffuse_name);

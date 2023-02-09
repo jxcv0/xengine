@@ -8,7 +8,7 @@
 
 #define ASSET_MAX_NAME_LEN 64
 #define MAX_ASSETS 128
-#define MAX_MESHES 4096
+#define MAX_MESHES 256
 
 #define MESH_DIR "assets/meshes/"
 #define TEXTURE_DIR "assets/textures/"
