@@ -68,7 +68,7 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
   size_t dirlen = strlen(MESH_DIR);
   char filepath[namelen + dirlen + 1];
   filepath[namelen + dirlen] = '\0';
-strncpy(filepath, MESH_DIR, dirlen);
+  strncpy(filepath, MESH_DIR, dirlen);
   strncpy(&filepath[dirlen], filename, namelen);
 
   char *file = load_file_into_mem(filepath);
@@ -134,6 +134,7 @@ strncpy(filepath, MESH_DIR, dirlen);
     }
 
     assert(vertices != NULL && indices != NULL);
+
     glGenBuffers(1, &mesh.m_vbo);
     glGenBuffers(1, &mesh.m_ebo);
     glGenVertexArrays(1, &mesh.m_vao);
