@@ -116,21 +116,24 @@ strncpy(filepath, MESH_DIR, dirlen);
     }
 
     assert(start_pos != NULL);
-
-    if ((start_pos = strstr(start_pos, "[DIFFUSE]")) != NULL) {
-      start_pos = strchr(start_pos, '\n') + 1;
-      char *end = strchr(start_pos, '\n');
+    char *diff = NULL;
+    if ((diff = strstr(start_pos, "[DIFFUSE]")) != NULL) {
+      diff = strchr(diff, '\n') + 1;
+      char *end = strchr(diff, '\n');
       size_t n = end - start_pos;
       strncpy(diffuse_name, start_pos, n);
     }
 
-    if ((start_pos = strstr(start_pos, "[SPECULAR]")) != NULL) {
-      start_pos = strchr(start_pos, '\n') + 1;
-      char *end = strchr(start_pos, '\n');
+    assert(start_pos != NULL);
+    char *spec = NULL;
+    if ((spec = strstr(start_pos, "[SPECULAR]")) != NULL) {
+      spec = strchr(spec, '\n') + 1;
+      char *end = strchr(spec, '\n');
       size_t n = end - start_pos;
       strncpy(specular_name, start_pos, n);
     }
 
+    printf("diffuse_name: %s|\n", diffuse_name);
     if (strncmp(diffuse_name, "(null)", 6) != 0) {
       mesh.m_tex_diff = load_texture(diffuse_name);
     }
