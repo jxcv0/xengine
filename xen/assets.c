@@ -125,7 +125,6 @@ strncpy(filepath, MESH_DIR, dirlen);
       pos += n;
     }
 
-    printf("diffuse_name: %s|\n", diffuse_name);
     if (strncmp(diffuse_name, "(null)", 6) != 0) {
       mesh.m_tex_diff = load_texture(diffuse_name);
     }
