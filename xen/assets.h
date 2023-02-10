@@ -7,6 +7,7 @@
 #include "lin.h"
 
 #define ASSET_MAX_NAME_LEN 64
+#define TEXTURE_NAME_LEN 64
 #define MAX_ASSETS 128
 #define MAX_MESHES 256
 

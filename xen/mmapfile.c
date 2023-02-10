@@ -1,5 +1,6 @@
 #include "mmapfile.h"
 
+#include <assert.h>
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <unistd.h>
@@ -7,25 +8,18 @@
 /**
  * ----------------------------------------------------------------------------
  */
-struct mmapfile mmapfile_map(const char *filepath) {
-  struct mmapfile result = {.mp_addr = NULL, .m_size = 0};
-
+char *map_file(size_t *n, const char *filepath) {
   int fd = open(filepath, O_RDWR);
-  if (fd == -1) {
-    return result;
-  }
-
-  result.m_size = lseek(fd, 0, SEEK_END);
+  assert(fd != -1);
+  *n = lseek(fd, 0, SEEK_END);
   lseek(fd, 0, SEEK_SET);
-  result.mp_addr =
-      mmap(NULL, result.m_size, (PROT_READ | PROT_WRITE), MAP_PRIVATE, fd, 0);
+  char *file =
+      (char *)mmap(NULL, *n, (PROT_READ | PROT_WRITE), MAP_PRIVATE, fd, 0);
   close(fd);
-  return result;
+  return file;
 }
 
 /**
  * ----------------------------------------------------------------------------
  */
-void mmapfile_unmap(struct mmapfile *mmapped_file) {
-  munmap(mmapped_file->mp_addr, mmapped_file->m_size);
-}
+void unmap_file(char *file, const size_t n) { munmap((void *)file, n); }

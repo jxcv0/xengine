@@ -9,8 +9,34 @@
 #include <string.h>
 
 #include "glad.h"
+#include "mmapfile.h"
 #include "stb_image.h"
-#include "utils.h"
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+bool xenstrncmp(const char *s1, const char *s2, size_t len) {
+  for (size_t i = 0; i < len; i ++) {
+    if (s1[i] != s2[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+const char *findstr(const char *haystack, const char *needle, const size_t len) {
+  size_t needle_len = strlen(needle);
+  for (size_t i = 0; i < len; i++) {
+    const char *p = &haystack[i];
+    if (xenstrncmp(p, needle, needle_len)) {
+      return p;
+    }
+  }
+  return NULL;
+}
 
 /**
  * ----------------------------------------------------------------------------
@@ -66,13 +92,50 @@ uint32_t load_texture(const char *filename) {
 void parse_vertices(struct vertex **vertices, uint32_t *vertex_counts,
                     const char *file, const uint32_t num_meshes) {
   for (uint32_t i = 0; i < num_meshes; i++) {
-    char *pos = strstr(file, "VERTICES");
+    const char *pos = strstr(file, "VERTICES");
+    assert(pos != NULL);
     vertex_counts[i] = (uint32_t)strtol(&pos[9], NULL, 10);
     assert((pos = strchr(pos, '\n') + 1) != NULL);  // +1 for '\n'
-    size_t n = sizeof(struct vertex) * vertex_counts[i];
+    const size_t n = sizeof(struct vertex) * vertex_counts[i];
     vertices[i] = malloc(n);
     memcpy(vertices[i], pos, n);
     pos += n;
+  }
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+void parse_indices(uint32_t **indices, uint32_t *indice_counts,
+                   const char *file, const uint32_t num_meshes) {
+  for (uint32_t i = 0; i < num_meshes; i++) {
+    const char *pos = strstr(file, "INDICES");
+    assert(pos != NULL);
+    indice_counts[i] = (uint32_t)strtol(&pos[8], NULL, 10);
+    assert((pos = strchr(pos, '\n') + 1) != NULL);  // +1 for '\n'
+    const size_t n = sizeof(uint32_t) * indice_counts[i];
+    indices[i] = malloc(n);
+    memcpy(indices[i], pos, n);
+    pos += n;
+  }
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+void parse_texture(char **texture_names, const char *texture_name,
+                   const char *file, const uint32_t num_meshes) {
+  for (uint32_t i = 0; i < num_meshes; i++) {
+    const char *pos = strstr(file, texture_name);
+    assert(pos != NULL);
+    if ((pos = strstr(pos, texture_name)) != NULL) {
+      pos = strchr(pos, '\n') + 1;
+      char *end = strchr(pos, '\n');
+      size_t n = end - pos + 1;
+      strncpy(texture_names[i], pos, n);
+      texture_names[n] = '\0';
+      pos += n;
+    }
   }
 }
 
@@ -87,71 +150,56 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
   strncpy(filepath, MESH_DIR, dirlen);
   strncpy(&filepath[dirlen], filename, namelen);
 
-  const char *file = load_file_into_mem(filepath);
-  assert(file != NULL);
-  char *pos = (char*)file;
+  size_t file_size = 0;
+  const char *file = map_file(&file_size, filepath);
 
   // MESHES header
   uint32_t num_meshes = 0;
-  if ((pos = strstr(pos, "MESHES")) != NULL) {
-    num_meshes = atoi(&pos[7]);
-    printf("Attempting to load %u meshes.\n", num_meshes);
-  }
+  const char *p = findstr(file, "MESHES", file_size);
+  assert(p != NULL);
+  num_meshes = strtol(&p[7], NULL, 10);
+  assert(num_meshes != 0);
+  printf("Attempting to load %u meshes.\n", num_meshes);
 
-  struct vertex *vertices[num_meshes];
-  uint32_t vertex_counts[num_meshes];
+  // pointer arrays
+  struct vertex **vertices = calloc(num_meshes, sizeof(struct vertex));
+  uint32_t *vertex_counts = calloc(num_meshes, sizeof(uint32_t));
+  uint32_t **indices = calloc(num_meshes, sizeof(uint32_t));
+  uint32_t *indice_counts = calloc(num_meshes, sizeof(uint32_t));
+  char **diffuse_textures = calloc(num_meshes, TEXTURE_NAME_LEN);
+  char **specular_textures = calloc(num_meshes, TEXTURE_NAME_LEN);
 
-#pragma omp parallel
+  /*
+#pragma omp parallel default(shared) firstprivate(file)
   {
 #pragma omp single
     {
-#pragma omp task
-      { parse_vertices(vertices, &vertex_counts, file, num_meshes); }
+      // #pragma omp task
+      { parse_vertices(vertices, vertex_counts, file, num_meshes); }
+      // #pragma omp task
+      { parse_indices(indices, indice_counts, file, num_meshes); }
+      // #pragma omp task
+      { parse_texture(diffuse_textures, "DIFFUSE", file, num_meshes); }
+      // #pragma omp task
+      { parse_texture(specular_textures, "SPECULAR", file, num_meshes); }
     }
   }
+  */
+
+  parse_vertices(vertices, vertex_counts, file, num_meshes);
+  parse_indices(indices, indice_counts, file, num_meshes);
+  parse_texture(diffuse_textures, "DIFFUSE", file, num_meshes);
+  parse_texture(specular_textures, "SPECULAR", file, num_meshes);
 
   for (uint32_t i = 0; i < num_meshes; i++) {
     struct mesh mesh = {0};
-    struct vertex *vertices = NULL;
-    uint32_t *indices = NULL;
-    char diffuse_name[64] = {0};
-    char specular_name[64] = {0};
-
-    // INDICES section
-    if ((pos = strstr(pos, "INDICES")) != NULL) {
-      mesh.m_num_indices = atoi(&pos[8]);
-      assert((pos = strchr(pos, '\n') + 1) != NULL);  // +1 for '\n'
-      size_t n = sizeof(uint32_t) * mesh.m_num_indices;
-      indices = malloc(n);
-      memcpy(indices, pos, n);
-      pos += n;
+    if (strncmp(diffuse_textures[i], "(null)", 6) != 0) {
+      mesh.m_tex_diff = load_texture(diffuse_textures[i]);
     }
 
-    if ((pos = strstr(pos, "DIFFUSE")) != NULL) {
-      pos = strchr(pos, '\n') + 1;
-      char *end = strchr(pos, '\n');
-      size_t n = end - pos;
-      strncpy(diffuse_name, pos, n);
-      pos += n;
+    if (strncmp(specular_textures[i], "(null)", 6) != 0) {
+      mesh.m_tex_spec = load_texture(specular_textures[i]);
     }
-
-    if ((pos = strstr(pos, "SPECULAR")) != NULL) {
-      pos = strchr(pos, '\n') + 1;
-      char *end = strchr(pos, '\n');
-      size_t n = end - pos;
-      strncpy(specular_name, pos, n);
-      pos += n;
-    }
-
-    if (strncmp(diffuse_name, "(null)", 6) != 0) {
-      mesh.m_tex_diff = load_texture(diffuse_name);
-    }
-
-    if (strncmp(specular_name, "(null)", 6) != 0) {
-      mesh.m_tex_spec = load_texture(specular_name);
-    }
-
-    assert(vertices != NULL && indices != NULL);
 
     glGenBuffers(1, &mesh.m_vbo);
     glGenBuffers(1, &mesh.m_ebo);
@@ -159,8 +207,8 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
     glBindVertexArray(mesh.m_vao);
 
     glBindBuffer(GL_ARRAY_BUFFER, mesh.m_vbo);
-    glBufferData(GL_ARRAY_BUFFER, mesh.m_num_vertices * sizeof(struct vertex),
-                 (void *)(vertices), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertex_counts[i] * sizeof(struct vertex),
+                 (void *)(vertices[i]), GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.m_ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * mesh.m_num_indices,
@@ -177,12 +225,10 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
                           (void *)(offsetof(struct vertex, m_tex_coord)));
-    free(vertices);
-    free(indices);
-    free(file);
 
     meshes[(*count)++] = mesh;
   }
+  unmap_file((char *)file, file_size);
 }
 
 /**

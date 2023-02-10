@@ -16,27 +16,20 @@ struct mmapfile {
 };
 
 /**
- * @brief A line of text. Basically a string.
- */
-struct string {
-  char *mp_start;
-  size_t m_len;
-};
-
-/**
- * @brief Create a memory mapped file.
+ * @brief Map a file to a memory address
  *
  * @param filepath The path to the file to open.
- * @return struct mmapfile.
+ * @return An array of the bytes in the file.
  */
-struct mmapfile mmapfile_map(const char *filepath);
+char *map_file(size_t *n, const char *filepath);
 
 /**
  * @brief Unmap a memory mapped file.
  *
- * @param m A pointer to the mmapfile structure.
+ * @param file A pointer to the mapped address.
+ * @param n The size of the mapped file in bytes.
  */
-void mmapfile_unmap(struct mmapfile *mapped_file);
+void unmap_file(char *file, const size_t n);
 
 #ifdef __cplusplus
 }

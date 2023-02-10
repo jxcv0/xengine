@@ -7,7 +7,7 @@ stb_src_dir := $(lib_dir)/stb
 glad_src_dir := $(lib_dir)/glad
 
 
-cflags := -Wall -Wextra -ggdb -Og
+cflags := -Wall -Wextra -ggdb -O0
 libs := -Llib -lglad -lstb -lm -ldl -lglfw -fopenmp
 xen_lib := -Lbuild -lxen
 
@@ -19,13 +19,12 @@ $(build_dir)/%.o: %.c
 game: libglad.a libstb.a libxen.a
 	@gcc game/main.c $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_src_dir) $(xen_lib) $(libs) -o $(bin_dir)/game
 
+converter: libglad.a libstb.a libxen.a
+	@gcc tools/converter.c $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_src_dir) $(xen_lib) $(libs) -lassimp -o $(bin_dir)/converter
+
 libxen.a: $(patsubst %.c, $(build_dir)/%.o, $(wildcard $(xen_src_dir)/*.c))
 	@echo "Building target $@"
 	@ar rcs build/$@ $^
-
-converter: libglad.a libstb.a 
-	@echo "Building target $@"
-	@gcc tools/converter.c $(cflags) -I src tools/converter.c $(wildcard $(xen_src_dir)/*.c) $(libs) -lassimp -o $(bin_dir)/converter
 
 libglad.a: 
 	@gcc $(cflags) -I$(glad_src_dir) $(glad_src_dir)/glad.c -c -o $(build_dir)/glad.o
