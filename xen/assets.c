@@ -63,6 +63,22 @@ uint32_t load_texture(const char *filename) {
 /**
  * ----------------------------------------------------------------------------
  */
+void parse_vertices(struct vertex **vertices, uint32_t *num_vertices,
+                    const char *file, const uint32_t num_meshes) {
+  for (uint32_t i = 0; i < num_meshes; i++) {
+    char *pos = strstr(file, "VERTICES");
+    num_vertices[i] = (uint32_t)strtol(&pos[9], NULL, 10);
+    assert((pos = strchr(pos, '\n') + 1) != NULL);  // +1 for '\n'
+    size_t n = sizeof(struct vertex) * num_vertices[i];
+    vertices[i] = malloc(n);
+    memcpy(vertices[i], pos, n);
+    pos += n;
+  }
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
 void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
   size_t namelen = strlen(filename);
   size_t dirlen = strlen(MESH_DIR);
