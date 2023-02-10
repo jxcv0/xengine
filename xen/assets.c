@@ -63,13 +63,13 @@ uint32_t load_texture(const char *filename) {
 /**
  * ----------------------------------------------------------------------------
  */
-void parse_vertices(struct vertex **vertices, uint32_t *num_vertices,
+void parse_vertices(struct vertex **vertices, uint32_t *vertex_counts,
                     const char *file, const uint32_t num_meshes) {
   for (uint32_t i = 0; i < num_meshes; i++) {
     char *pos = strstr(file, "VERTICES");
-    num_vertices[i] = (uint32_t)strtol(&pos[9], NULL, 10);
+    vertex_counts[i] = (uint32_t)strtol(&pos[9], NULL, 10);
     assert((pos = strchr(pos, '\n') + 1) != NULL);  // +1 for '\n'
-    size_t n = sizeof(struct vertex) * num_vertices[i];
+    size_t n = sizeof(struct vertex) * vertex_counts[i];
     vertices[i] = malloc(n);
     memcpy(vertices[i], pos, n);
     pos += n;
@@ -87,15 +87,27 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
   strncpy(filepath, MESH_DIR, dirlen);
   strncpy(&filepath[dirlen], filename, namelen);
 
-  char *file = load_file_into_mem(filepath);
+  const char *file = load_file_into_mem(filepath);
   assert(file != NULL);
-  char *pos = file;
+  char *pos = (char*)file;
 
   // MESHES header
   uint32_t num_meshes = 0;
   if ((pos = strstr(pos, "MESHES")) != NULL) {
     num_meshes = atoi(&pos[7]);
-    printf("Loading %u meshes.\n", num_meshes);
+    printf("Attempting to load %u meshes.\n", num_meshes);
+  }
+
+  struct vertex *vertices[num_meshes];
+  uint32_t vertex_counts[num_meshes];
+
+#pragma omp parallel
+  {
+#pragma omp single
+    {
+#pragma omp task
+      { parse_vertices(vertices, &vertex_counts, file, num_meshes); }
+    }
   }
 
   for (uint32_t i = 0; i < num_meshes; i++) {
@@ -104,16 +116,6 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
     uint32_t *indices = NULL;
     char diffuse_name[64] = {0};
     char specular_name[64] = {0};
-
-    // VERTICES section
-    if ((pos = strstr(pos, "VERTICES")) != NULL) {
-      mesh.m_num_vertices = atoi(&pos[9]);
-      assert((pos = strchr(pos, '\n') + 1) != NULL);  // +1 for '\n'
-      size_t n = sizeof(struct vertex) * mesh.m_num_vertices;
-      vertices = malloc(n);
-      memcpy(vertices, pos, n);
-      pos += n;
-    }
 
     // INDICES section
     if ((pos = strstr(pos, "INDICES")) != NULL) {
