@@ -195,6 +195,24 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
   parse_texture(diffuse_textures, "DIFFUSE", file, num_meshes, file_size);
   parse_texture(specular_textures, "SPECULAR", file, num_meshes, file_size);
 
+  /*
+  for (uint32_t i = 0; i < indice_counts[0]; i++) {
+      printf("%u\n", indices[0][i]);
+  }
+
+  for (uint32_t i = 0; i < vertex_counts[0]; i++) {
+      printf("%f %f %f %f %f %f %f %f\n",
+              vertices[0][i].m_position[0],
+              vertices[0][i].m_position[1],
+              vertices[0][i].m_position[2],
+              vertices[0][i].m_normal[0],
+              vertices[0][i].m_normal[1],
+              vertices[0][i].m_normal[2],
+              vertices[0][i].m_tex_coord[1],
+              vertices[0][i].m_tex_coord[2]);
+  }
+  */
+
   for (uint32_t i = 0; i < num_meshes; i++) {
     struct mesh mesh = {0};
     if (strncmp(diffuse_textures[i], "(null)", 6) != 0) {
