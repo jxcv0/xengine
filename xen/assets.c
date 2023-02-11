@@ -135,8 +135,10 @@ void parse_texture(char **texture_names, const char *texture_name,
       pos = strchr(pos, '\n') + 1;
       char *end = strchr(pos, '\n');
       size_t n = end - pos + 1;
-      memcpy(&texture_names[i][0], pos, n);
-      texture_names[n] = '\0';
+      char *dest = texture_names[i];
+      dest = malloc(n + 1);
+      strncpy(dest, pos, n);
+      dest[n] = '\0';
       pos += n;
     }
   }
@@ -169,8 +171,8 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
   uint32_t *vertex_counts = calloc(num_meshes, sizeof(uint32_t));
   uint32_t **indices = calloc(num_meshes, sizeof(uint32_t));
   uint32_t *indice_counts = calloc(num_meshes, sizeof(uint32_t));
-  char **diffuse_textures = calloc(num_meshes, TEXTURE_NAME_LEN);
-  char **specular_textures = calloc(num_meshes, TEXTURE_NAME_LEN);
+  char *diffuse_textures[num_meshes];
+  char *specular_textures[num_meshes];
 
   /*
 #pragma omp parallel default(shared) firstprivate(file)
@@ -191,8 +193,6 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
 
   parse_vertices(vertices, vertex_counts, file, num_meshes, file_size);
   parse_indices(indices, indice_counts, file, num_meshes, file_size);
-
-
   parse_texture(diffuse_textures, "DIFFUSE", file, num_meshes, file_size);
   parse_texture(specular_textures, "SPECULAR", file, num_meshes, file_size);
 
