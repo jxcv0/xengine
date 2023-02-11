@@ -37,7 +37,7 @@ void process_mouse_movement(struct camera *camera, const vec2 cursor_offset) {
 /**
  * ----------------------------------------------------------------------------
  */
-void update_3rd_person_camera(struct camera *camera, const vec3 cursor_offset,
+void update_3rd_person_camera(struct camera *camera, const vec2 cursor_offset,
                               const float rad, const vec3 centre) {
   float offset_x = cursor_offset[0] * camera->m_mouse_sensetivity;
   float offset_y = cursor_offset[1] * camera->m_mouse_sensetivity;

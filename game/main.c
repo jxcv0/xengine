@@ -47,7 +47,7 @@ int main() {
   perspective(projection_matrix, radians(60),
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
-  load_mesh(meshes, &num_meshes, "cube.model");
+  load_mesh(meshes, &num_meshes, "cyborg.model");
 
   for (int i = 0; i < MAX_NUM_LIGHTS; i++) {
     struct light l = LIGHT_RANGE_65;
