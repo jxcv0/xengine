@@ -16,7 +16,7 @@
  * ----------------------------------------------------------------------------
  */
 bool xenstrncmp(const char *s1, const char *s2, size_t len) {
-  for (size_t i = 0; i < len; i ++) {
+  for (size_t i = 0; i < len; i++) {
     if (s1[i] != s2[i]) {
       return false;
     }
@@ -27,12 +27,12 @@ bool xenstrncmp(const char *s1, const char *s2, size_t len) {
 /**
  * ----------------------------------------------------------------------------
  */
-const char *findstr(const char *haystack, const char *needle, const size_t len) {
+char *findstr(const char *haystack, const char *needle, const size_t len) {
   size_t needle_len = strlen(needle);
   for (size_t i = 0; i < len; i++) {
     const char *p = &haystack[i];
     if (xenstrncmp(p, needle, needle_len)) {
-      return p;
+      return (char *)p;
     }
   }
   return NULL;
@@ -90,9 +90,10 @@ uint32_t load_texture(const char *filename) {
  * ----------------------------------------------------------------------------
  */
 void parse_vertices(struct vertex **vertices, uint32_t *vertex_counts,
-                    const char *file, const uint32_t num_meshes) {
+                    const char *file, const uint32_t num_meshes,
+                    size_t file_size) {
   for (uint32_t i = 0; i < num_meshes; i++) {
-    const char *pos = strstr(file, "VERTICES");
+    const char *pos = findstr(file, "VERTICES", file_size);
     assert(pos != NULL);
     vertex_counts[i] = (uint32_t)strtol(&pos[9], NULL, 10);
     assert((pos = strchr(pos, '\n') + 1) != NULL);  // +1 for '\n'
@@ -107,9 +108,10 @@ void parse_vertices(struct vertex **vertices, uint32_t *vertex_counts,
  * ----------------------------------------------------------------------------
  */
 void parse_indices(uint32_t **indices, uint32_t *indice_counts,
-                   const char *file, const uint32_t num_meshes) {
+                   const char *file, const uint32_t num_meshes,
+                   size_t file_size) {
   for (uint32_t i = 0; i < num_meshes; i++) {
-    const char *pos = strstr(file, "INDICES");
+    const char *pos = findstr(file, "INDICES", file_size);
     assert(pos != NULL);
     indice_counts[i] = (uint32_t)strtol(&pos[8], NULL, 10);
     assert((pos = strchr(pos, '\n') + 1) != NULL);  // +1 for '\n'
@@ -124,11 +126,12 @@ void parse_indices(uint32_t **indices, uint32_t *indice_counts,
  * ----------------------------------------------------------------------------
  */
 void parse_texture(char **texture_names, const char *texture_name,
-                   const char *file, const uint32_t num_meshes) {
+                   const char *file, const uint32_t num_meshes,
+                   size_t file_size) {
   for (uint32_t i = 0; i < num_meshes; i++) {
-    const char *pos = strstr(file, texture_name);
+    const char *pos = findstr(file, texture_name, file_size);
     assert(pos != NULL);
-    if ((pos = strstr(pos, texture_name)) != NULL) {
+    if ((pos = findstr(pos, texture_name, file_size)) != NULL) {
       pos = strchr(pos, '\n') + 1;
       char *end = strchr(pos, '\n');
       size_t n = end - pos + 1;
@@ -186,10 +189,10 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
   }
   */
 
-  parse_vertices(vertices, vertex_counts, file, num_meshes);
-  parse_indices(indices, indice_counts, file, num_meshes);
-  parse_texture(diffuse_textures, "DIFFUSE", file, num_meshes);
-  parse_texture(specular_textures, "SPECULAR", file, num_meshes);
+  parse_vertices(vertices, vertex_counts, file, num_meshes, file_size);
+  parse_indices(indices, indice_counts, file, num_meshes, file_size);
+  parse_texture(diffuse_textures, "DIFFUSE", file, num_meshes, file_size);
+  parse_texture(specular_textures, "SPECULAR", file, num_meshes, file_size);
 
   for (uint32_t i = 0; i < num_meshes; i++) {
     struct mesh mesh = {0};
