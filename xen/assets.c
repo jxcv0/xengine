@@ -107,9 +107,8 @@ void parse_vertices(struct vertex **vertices, uint32_t *vertex_counts,
 /**
  * ----------------------------------------------------------------------------
  */
-void parse_indices(uint32_t **indices, uint32_t *index_counts,
-                   const char *file, const uint32_t num_meshes,
-                   size_t file_size) {
+void parse_indices(uint32_t **indices, uint32_t *index_counts, const char *file,
+                   const uint32_t num_meshes, size_t file_size) {
   for (uint32_t i = 0; i < num_meshes; i++) {
     const char *pos = findstr(file, "INDICES", file_size);
     assert(pos != NULL);
@@ -215,30 +214,25 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
 
   for (uint32_t i = 0; i < num_meshes; i++) {
     uint32_t n = *count;
-    if (strncmp(diffuse_textures[i], "(null)", 6) != 0) {
-      meshes[n].m_tex_diff = load_texture(diffuse_textures[i]);
-    }
-
-    if (strncmp(specular_textures[i], "(null)", 6) != 0) {
-      meshes[n].m_tex_spec = load_texture(specular_textures[i]);
-    }
 
     glGenBuffers(1, &meshes[n].m_vbo);
     glGenBuffers(1, &meshes[n].m_ebo);
     glGenVertexArrays(1, &meshes[n].m_vao);
     glBindVertexArray(meshes[n].m_vao);
 
-    struct vertex *v = vertices[i];
+    struct vertex *vertex_array = vertices[i];
     uint32_t num_vertices = vertex_counts[i];
+    printf("%u\n", num_vertices);
     glBindBuffer(GL_ARRAY_BUFFER, meshes[n].m_vbo);
     glBufferData(GL_ARRAY_BUFFER, num_vertices * sizeof(struct vertex),
-                 (void *)v, GL_STATIC_DRAW);
+                 vertex_array, GL_STATIC_DRAW);
 
-    uint32_t *idx = indices[i];
+    uint32_t *index_array = indices[i];
     uint32_t num_indices = index_counts[i];
+    printf("%u\n", num_indices);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshes[n].m_ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, num_indices * sizeof(uint32_t),
-                 idx, GL_STATIC_DRAW);
+                 index_array, GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
@@ -252,7 +246,10 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
                           (void *)(offsetof(struct vertex, m_tex_coord)));
 
-    (*count)++;
+    meshes[n].m_tex_diff = load_texture(diffuse_textures[i]);
+    meshes[n].m_tex_spec = load_texture(specular_textures[i]);
+
+    *count = *count + 1;
   }
   unmap_file((char *)file, file_size);
 
