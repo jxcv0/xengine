@@ -82,7 +82,7 @@ int main() {
     mat4 model_matrix;
     identity_mat4(model_matrix);
 
-    render_geometries(&r, projection_matrix, view_matrix, positions, meshes, 1);
+    render_geometries(&r, projection_matrix, view_matrix, positions, meshes, num_meshes);
     render_lighting(&r, light_array, MAX_NUM_LIGHTS, camera.m_pos);
 
     glfwSwapBuffers(window);

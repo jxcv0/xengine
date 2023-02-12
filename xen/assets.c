@@ -107,15 +107,15 @@ void parse_vertices(struct vertex **vertices, uint32_t *vertex_counts,
 /**
  * ----------------------------------------------------------------------------
  */
-void parse_indices(uint32_t **indices, uint32_t *indice_counts,
+void parse_indices(uint32_t **indices, uint32_t *index_counts,
                    const char *file, const uint32_t num_meshes,
                    size_t file_size) {
   for (uint32_t i = 0; i < num_meshes; i++) {
     const char *pos = findstr(file, "INDICES", file_size);
     assert(pos != NULL);
-    indice_counts[i] = (uint32_t)strtol(&pos[8], NULL, 10);
+    index_counts[i] = (uint32_t)strtol(&pos[8], NULL, 10);
     assert((pos = strchr(pos, '\n') + 1) != NULL);  // +1 for '\n'
-    const size_t n = sizeof(uint32_t) * indice_counts[i];
+    const size_t n = sizeof(uint32_t) * index_counts[i];
     indices[i] = malloc(n);
     memcpy(indices[i], pos, n);
     pos += n;
@@ -169,7 +169,7 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
   struct vertex **vertices = calloc(num_meshes, sizeof(struct vertex));
   uint32_t *vertex_counts = calloc(num_meshes, sizeof(uint32_t));
   uint32_t **indices = calloc(num_meshes, sizeof(uint32_t));
-  uint32_t *indice_counts = calloc(num_meshes, sizeof(uint32_t));
+  uint32_t *index_counts = calloc(num_meshes, sizeof(uint32_t));
   char *diffuse_textures[num_meshes];
   char *specular_textures[num_meshes];
 
@@ -181,7 +181,7 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
       // #pragma omp task
       { parse_vertices(vertices, vertex_counts, file, num_meshes); }
       // #pragma omp task
-      { parse_indices(indices, indice_counts, file, num_meshes); }
+      { parse_indices(indices, index_counts, file, num_meshes); }
       // #pragma omp task
       { parse_texture(diffuse_textures, "DIFFUSE", file, num_meshes); }
       // #pragma omp task
@@ -191,12 +191,12 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
   */
 
   parse_vertices(vertices, vertex_counts, file, num_meshes, file_size);
-  parse_indices(indices, indice_counts, file, num_meshes, file_size);
+  parse_indices(indices, index_counts, file, num_meshes, file_size);
   parse_texture(diffuse_textures, "DIFFUSE", file, num_meshes, file_size);
   parse_texture(specular_textures, "SPECULAR", file, num_meshes, file_size);
 
   /*
-  for (uint32_t i = 0; i < indice_counts[0]; i++) {
+  for (uint32_t i = 0; i < index_counts[0]; i++) {
       printf("%u\n", indices[0][i]);
   }
 
@@ -214,27 +214,31 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
   */
 
   for (uint32_t i = 0; i < num_meshes; i++) {
-    struct mesh mesh = {0};
+    uint32_t n = *count;
     if (strncmp(diffuse_textures[i], "(null)", 6) != 0) {
-      mesh.m_tex_diff = load_texture(diffuse_textures[i]);
+      meshes[n].m_tex_diff = load_texture(diffuse_textures[i]);
     }
 
     if (strncmp(specular_textures[i], "(null)", 6) != 0) {
-      mesh.m_tex_spec = load_texture(specular_textures[i]);
+      meshes[n].m_tex_spec = load_texture(specular_textures[i]);
     }
 
-    glGenBuffers(1, &mesh.m_vbo);
-    glGenBuffers(1, &mesh.m_ebo);
-    glGenVertexArrays(1, &mesh.m_vao);
-    glBindVertexArray(mesh.m_vao);
+    glGenBuffers(1, &meshes[n].m_vbo);
+    glGenBuffers(1, &meshes[n].m_ebo);
+    glGenVertexArrays(1, &meshes[n].m_vao);
+    glBindVertexArray(meshes[n].m_vao);
 
-    glBindBuffer(GL_ARRAY_BUFFER, mesh.m_vbo);
-    glBufferData(GL_ARRAY_BUFFER, vertex_counts[i] * sizeof(struct vertex),
-                 (void *)(vertices[i]), GL_STATIC_DRAW);
+    struct vertex *v = vertices[i];
+    uint32_t num_vertices = vertex_counts[i];
+    glBindBuffer(GL_ARRAY_BUFFER, meshes[n].m_vbo);
+    glBufferData(GL_ARRAY_BUFFER, num_vertices * sizeof(struct vertex),
+                 (void *)v, GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.m_ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indice_counts[i] * sizeof(uint32_t),
-                 indices[i], GL_STATIC_DRAW);
+    uint32_t *idx = indices[i];
+    uint32_t num_indices = index_counts[i];
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshes[n].m_ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, num_indices * sizeof(uint32_t),
+                 idx, GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
@@ -248,9 +252,11 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
                           (void *)(offsetof(struct vertex, m_tex_coord)));
 
-    meshes[(*count)++] = mesh;
+    (*count)++;
   }
   unmap_file((char *)file, file_size);
+
+  // TODO all the free()'s
 }
 
 /**
