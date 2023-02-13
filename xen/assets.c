@@ -45,10 +45,8 @@ uint32_t load_texture(const char *filename) {
   size_t namelen = strlen(filename);
   size_t dirlen = strlen(TEXTURE_DIR);
   char filepath[namelen + dirlen];
-  filepath[namelen + dirlen] = '\0';
-
-  strncpy(filepath, TEXTURE_DIR, dirlen);
-  strncpy(&filepath[dirlen], filename, namelen);
+  strncpy(filepath, TEXTURE_DIR, dirlen + 1);
+  strncpy(&filepath[dirlen], filename, namelen + 1);
 
   printf("Loading texture from \"%s\".\n", filepath);
 
@@ -150,8 +148,8 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
   size_t dirlen = strlen(MESH_DIR);
   char filepath[namelen + dirlen + 1];
   filepath[namelen + dirlen] = '\0';
-  strncpy(filepath, MESH_DIR, dirlen);
-  strncpy(&filepath[dirlen], filename, namelen);
+  strncpy(filepath, MESH_DIR, dirlen + 1);
+  strncpy(&filepath[dirlen], filename, namelen + 1);
 
   size_t file_size = 0;
   const char *file = map_file(&file_size, filepath);
@@ -172,49 +170,32 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
   char *diffuse_textures[num_meshes];
   char *specular_textures[num_meshes];
 
-  /*
 #pragma omp parallel default(shared) firstprivate(file)
   {
 #pragma omp single
     {
-      // #pragma omp task
-      { parse_vertices(vertices, vertex_counts, file, num_meshes); }
-      // #pragma omp task
-      { parse_indices(indices, index_counts, file, num_meshes); }
-      // #pragma omp task
-      { parse_texture(diffuse_textures, "DIFFUSE", file, num_meshes); }
-      // #pragma omp task
-      { parse_texture(specular_textures, "SPECULAR", file, num_meshes); }
+      #pragma omp task
+      { parse_vertices(vertices, vertex_counts, file, num_meshes, file_size); }
+      #pragma omp task
+      { parse_indices(indices, index_counts, file, num_meshes, file_size); }
+      #pragma omp task
+      { parse_texture(diffuse_textures, "DIFFUSE", file, num_meshes, file_size); }
+      #pragma omp task
+      { parse_texture(specular_textures, "SPECULAR", file, num_meshes, file_size); }
     }
   }
-  */
 
+  /*
   parse_vertices(vertices, vertex_counts, file, num_meshes, file_size);
   parse_indices(indices, index_counts, file, num_meshes, file_size);
   parse_texture(diffuse_textures, "DIFFUSE", file, num_meshes, file_size);
   parse_texture(specular_textures, "SPECULAR", file, num_meshes, file_size);
-
-  /*
-  for (uint32_t i = 0; i < index_counts[0]; i++) {
-      printf("%u\n", indices[0][i]);
-  }
-
-  for (uint32_t i = 0; i < vertex_counts[0]; i++) {
-      printf("%f %f %f %f %f %f %f %f\n",
-              vertices[0][i].m_position[0],
-              vertices[0][i].m_position[1],
-              vertices[0][i].m_position[2],
-              vertices[0][i].m_normal[0],
-              vertices[0][i].m_normal[1],
-              vertices[0][i].m_normal[2],
-              vertices[0][i].m_tex_coord[1],
-              vertices[0][i].m_tex_coord[2]);
-  }
   */
 
   for (uint32_t i = 0; i < num_meshes; i++) {
     struct mesh mesh = {0};
 
+    printf("Loading mesh %u of %u.\n", i, num_meshes);
     glGenBuffers(1, &mesh.m_vbo);
     glGenBuffers(1, &mesh.m_ebo);
     glGenVertexArrays(1, &mesh.m_vao);

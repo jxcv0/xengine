@@ -11,6 +11,7 @@
 #include "lin.h"
 #include "render.h"
 #include "window.h"
+#include <omp.h>
 
 #define MAX_ENTITIES 128
 
@@ -36,6 +37,9 @@ void handle_keyboard_input(GLFWwindow *w);
 
 // main
 int main() {
+  omp_set_num_threads(4);
+  omp_set_dynamic(0);
+
   create_window(&window, window_width, window_height, "game");
 
   struct renderer r;
