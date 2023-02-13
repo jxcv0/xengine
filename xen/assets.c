@@ -213,25 +213,23 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
   */
 
   for (uint32_t i = 0; i < num_meshes; i++) {
-    uint32_t n = *count;
+    struct mesh mesh = {0};
 
-    glGenBuffers(1, &meshes[n].m_vbo);
-    glGenBuffers(1, &meshes[n].m_ebo);
-    glGenVertexArrays(1, &meshes[n].m_vao);
-    glBindVertexArray(meshes[n].m_vao);
+    glGenBuffers(1, &mesh.m_vbo);
+    glGenBuffers(1, &mesh.m_ebo);
+    glGenVertexArrays(1, &mesh.m_vao);
+    glBindVertexArray(mesh.m_vao);
 
     struct vertex *vertex_array = vertices[i];
-    uint32_t num_vertices = vertex_counts[i];
-    printf("%u\n", num_vertices);
-    glBindBuffer(GL_ARRAY_BUFFER, meshes[n].m_vbo);
-    glBufferData(GL_ARRAY_BUFFER, num_vertices * sizeof(struct vertex),
+    mesh.m_num_vertices = vertex_counts[i];
+    glBindBuffer(GL_ARRAY_BUFFER, mesh.m_vbo);
+    glBufferData(GL_ARRAY_BUFFER, mesh.m_num_vertices * sizeof(struct vertex),
                  vertex_array, GL_STATIC_DRAW);
 
     uint32_t *index_array = indices[i];
-    uint32_t num_indices = index_counts[i];
-    printf("%u\n", num_indices);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshes[n].m_ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, num_indices * sizeof(uint32_t),
+    mesh.m_num_indices = index_counts[i];
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.m_ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.m_num_indices * sizeof(uint32_t),
                  index_array, GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
@@ -246,9 +244,10 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
                           (void *)(offsetof(struct vertex, m_tex_coord)));
 
-    meshes[n].m_tex_diff = load_texture(diffuse_textures[i]);
-    meshes[n].m_tex_spec = load_texture(specular_textures[i]);
+    mesh.m_tex_diff = load_texture(diffuse_textures[i]);
+    mesh.m_tex_spec = load_texture(specular_textures[i]);
 
+    meshes[*count] = mesh;
     *count = *count + 1;
   }
   unmap_file((char *)file, file_size);
