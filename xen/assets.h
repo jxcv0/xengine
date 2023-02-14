@@ -28,6 +28,28 @@ struct vertex {
 };
 
 /**
+ * @brief 3D geometry data that all describe the same mesh.
+ */
+struct geometry {
+  uint32_t m_vbo;
+  uint32_t m_vao;
+  uint32_t m_ebo;
+  uint32_t m_num_vertices;
+  uint32_t m_num_indices;
+};
+
+/**
+ * @brief Contains ID's of diffuse, normal, roughness and displacement image
+ * maps.
+ */
+struct pbr_material {
+  uint32_t m_diffuse;
+  uint32_t m_normal;
+  uint32_t m_roughness;
+  uint32_t m_displacement;
+};
+
+/**
  * @brief Stores the data required to render a mesh.
  */
 struct mesh {

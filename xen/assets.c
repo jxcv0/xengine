@@ -174,14 +174,19 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
   {
 #pragma omp single
     {
-      #pragma omp task
+#pragma omp task
       { parse_vertices(vertices, vertex_counts, file, num_meshes, file_size); }
-      #pragma omp task
+#pragma omp task
       { parse_indices(indices, index_counts, file, num_meshes, file_size); }
-      #pragma omp task
-      { parse_texture(diffuse_textures, "DIFFUSE", file, num_meshes, file_size); }
-      #pragma omp task
-      { parse_texture(specular_textures, "SPECULAR", file, num_meshes, file_size); }
+#pragma omp task
+      {
+        parse_texture(diffuse_textures, "DIFFUSE", file, num_meshes, file_size);
+      }
+#pragma omp task
+      {
+        parse_texture(specular_textures, "SPECULAR", file, num_meshes,
+                      file_size);
+      }
     }
   }
 

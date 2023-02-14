@@ -1,3 +1,4 @@
+#include <omp.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -11,7 +12,6 @@
 #include "lin.h"
 #include "render.h"
 #include "window.h"
-#include <omp.h>
 
 #define MAX_ENTITIES 128
 
