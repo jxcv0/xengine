@@ -98,7 +98,6 @@ int main(int argc, char *argv[]) {
  * ============================================================================
  */
 void process_node(struct aiNode *node, const struct aiScene *scene) {
-
   if (node->mNumMeshes > 1) {
     fprintf(stderr, "Multiple meshes not supported. Exiting...\n");
     exit(EXIT_FAILURE);
@@ -156,15 +155,16 @@ void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
     }
   }
 
-  (void) scene;
+  (void)scene;
   // hot loading materials here
   /*
   printf("Loading materials.\n");
   struct aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
   diffuse_name = process_material(material, aiTextureType_DIFFUSE);
-  roughness_name = process_material(material, aiTextureType_SHININESS); // is this correct?
-  normal_name = process_material(material, aiTextureType_HEIGHT); // should this be HEIGHT?
-  displacement_name = process_material(material, aiTextureType_DISPLACEMENT);
+  roughness_name = process_material(material, aiTextureType_SHININESS); // is
+  this correct? normal_name = process_material(material, aiTextureType_HEIGHT);
+  // should this be HEIGHT? displacement_name = process_material(material,
+  aiTextureType_DISPLACEMENT);
   */
 
   out_vertices = vertices;

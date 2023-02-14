@@ -10,7 +10,7 @@
 #include "glad.h"
 #include "input.h"
 #include "lin.h"
-#include "render.h"
+#include "pbr_deferred.h"
 #include "window.h"
 
 #define MAX_ENTITIES 128
@@ -21,7 +21,7 @@ GLFWwindow *window;
 const float window_width = 1080;
 const float window_height = 600;
 
-struct light light_array[MAX_NUM_LIGHTS] = {0};
+// struct light light_array[MAX_NUM_LIGHTS] = {0};
 vec3 positions[MAX_ENTITIES] = {0};
 uint32_t num_meshes = 0;
 struct mesh meshes[MAX_ENTITIES] = {0};
@@ -42,31 +42,22 @@ int main() {
 
   create_window(&window, window_width, window_height, "game");
 
-  struct renderer r;
-  if (renderer_init(&r, window_width, window_height) != 0) {
-    fprintf(stderr, "Unable to initialize renderer. Exiting...\n");
-    exit(EXIT_FAILURE);
-  }
+  pbrd_init(window_width, window_height);
 
   perspective(projection_matrix, radians(60),
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
   struct pbr_material stone_tiles = load_pbr_material("stone_tiles");
-  struct geometry pbr_sphere = load_geometry("assets/meshes/pbr_test_sphere.geom");
+  struct geometry pbr_sphere =
+      load_geometry("assets/meshes/pbr_test_sphere.geom");
 
-  load_mesh(meshes, &num_meshes, "pbr_test_sphere.model");
-
-  for (int i = 0; i < MAX_NUM_LIGHTS; i++) {
-    struct light l = LIGHT_RANGE_65;
-    l.m_position[0] = (float)(rand() % MAX_NUM_LIGHTS);
-    l.m_position[1] = (float)(rand() % 5);
-    l.m_position[2] = (float)(rand() % MAX_NUM_LIGHTS);
-    l.m_color[0] = (float)(rand() % MAX_NUM_LIGHTS);
-    l.m_color[1] = (float)(rand() % MAX_NUM_LIGHTS);
-    l.m_color[2] = (float)(rand() % MAX_NUM_LIGHTS);
-    normalize_vec3(l.m_color);
-    light_array[i] = l;
-  }
+  struct light l = LIGHT_RANGE_65;
+  l.m_position[0] = 1.0;
+  l.m_position[1] = 1.0;
+  l.m_position[2] = 1.0;
+  l.m_color[0] = 1.0;
+  l.m_color[1] = 1.0;
+  l.m_color[2] = 1.0;
 
   vec3 camera_centre = {0};
 
@@ -89,9 +80,9 @@ int main() {
     mat4 model_matrix;
     identity_mat4(model_matrix);
 
-    render_geometries(&r, projection_matrix, view_matrix, positions, meshes,
-                      num_meshes);
-    render_lighting(&r, light_array, MAX_NUM_LIGHTS, camera.m_pos);
+    pbrd_render_geometries(projection_matrix, view_matrix, positions,
+                           &pbr_sphere, &stone_tiles, 1);
+    pbrd_render_lighting(&l, 1, camera.m_pos, window_width, window_height);
 
     glfwSwapBuffers(window);
     glfwPollEvents();

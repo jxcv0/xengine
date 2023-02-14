@@ -3,6 +3,10 @@
 
 #include <stdint.h>
 
+#include "assets.h"
+#include "light.h"
+#include "lin.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -19,14 +23,18 @@ int pbrd_init(const uint32_t scr_w, const uint32_t scr_h);
 /**
  * @brief Render geometry and texture data to the G-Buffer.
  *
- * @param
+ * @param TODO
  */
-void pbrd_render_geometries();
-
+void pbrd_render_geometries(const mat4 projection, const mat4 view,
+                            const vec3 *positions, const struct geometry *geoms,
+                            const struct pbr_material *mats, const uint32_t n);
 /**
  * @brief Render lighting using data stored in G-Buffer.
+ * TODO
  */
-void pbrd_render_lighting();
+void pbrd_render_lighting(struct light *lights, const uint32_t n,
+                          const vec3 view_pos, const uint32_t scr_w,
+                          const uint32_t scr_h);
 
 #ifdef __cplusplus
 }

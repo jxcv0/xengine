@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "assets.h"
 #include "glad.h"
 #include "shader.h"
 
@@ -122,5 +121,86 @@ int pbrd_init(const uint32_t scr_w, const uint32_t scr_h) {
 /**
  * ----------------------------------------------------------------------------
  */
-void pbrd_render_geometries(const struct geometry *geometries,
-                            const pbr_material) {}
+void pbrd_render_geometries(const mat4 projection, const mat4 view,
+                            const vec3 *positions, const struct geometry *geoms,
+                            const struct pbr_material *mats, const uint32_t n) {
+  glClearColor(0, 0, 0, 1);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  glBindFramebuffer(GL_FRAMEBUFFER, pbr.g_buff);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glUseProgram(pbr.deferred_geometry);
+  shader_set_uniform_m4fv(pbr.deferred_geometry, "projection", projection);
+  shader_set_uniform_m4fv(pbr.deferred_geometry, "view", view);
+
+  // TODO this should be a component as it can be parallelized.
+  mat4 model = {0};
+  for (uint32_t i = 0; i < n; i++) {
+    identity_mat4(model);            // see above
+    translate(model, positions[i]);  // see above
+    shader_set_uniform_m4fv(pbr.deferred_geometry, "model", model);
+    shader_set_uniform_1i(pbr.deferred_geometry, "tex_diffuse", 0);
+    shader_set_uniform_1i(pbr.deferred_geometry, "tex_roughness", 1);
+    shader_set_uniform_1i(pbr.deferred_geometry, "tex_normal", 2);
+    shader_set_uniform_1i(pbr.deferred_geometry, "tex_displacement", 3);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, mats[i].m_diffuse);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, mats[i].m_roughness);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, mats[i].m_normal);
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, mats[i].m_displacement);
+
+    glBindVertexArray(geoms[i].m_vao);
+
+    glDrawElements(GL_TRIANGLES, geoms[i].m_num_indices, GL_UNSIGNED_INT, 0);
+  }
+}
+
+void pbrd_render_lighting(struct light *lights, const uint32_t n,
+                          const vec3 view_pos, const uint32_t scr_w,
+                          const uint32_t scr_h) {
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  glUseProgram(pbr.deferred_lighting);
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, pbr.g_pos);
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, pbr.g_norm);
+  glActiveTexture(GL_TEXTURE2);
+  glBindTexture(GL_TEXTURE_2D, pbr.g_tex_diff);
+
+  shader_set_uniform_1i(pbr.deferred_lighting, "g_pos", 0);
+  shader_set_uniform_1i(pbr.deferred_lighting, "g_norm", 1);
+  shader_set_uniform_1i(pbr.deferred_lighting, "g_tex", 2);
+  shader_set_uniform_3fv(pbr.deferred_lighting, "view_pos", view_pos);
+  shader_set_uniform_1ui(pbr.deferred_lighting, "num_lights", n);
+
+  // TODO This can be made faster without the formatting
+  char light[32];
+  for (uint32_t i = 0; i < n; i++) {
+    sprintf(light, "lights[%d].m_position", i);
+    shader_set_uniform_3fv(pbr.deferred_lighting, light, lights[i].m_position);
+    sprintf(light, "lights[%d].m_color", i);
+    shader_set_uniform_3fv(pbr.deferred_lighting, light, lights[i].m_color);
+    sprintf(light, "lights[%d].m_constant", i);
+    shader_set_uniform_1f(pbr.deferred_lighting, light, lights[i].m_constant);
+    sprintf(light, "lights[%d].m_linear", i);
+    shader_set_uniform_1f(pbr.deferred_lighting, light, lights[i].m_linear);
+    sprintf(light, "lights[%d].m_quadratic", i);
+    shader_set_uniform_1f(pbr.deferred_lighting, light, lights[i].m_quadratic);
+  }
+
+  // render quad
+  glBindVertexArray(pbr.quad_vao);
+  glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+  glBindFramebuffer(GL_READ_FRAMEBUFFER, pbr.g_buff);
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+  glBlitFramebuffer(0, 0, scr_w, scr_h, 0, 0, scr_w, scr_h, GL_DEPTH_BUFFER_BIT,
+                    GL_NEAREST);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}

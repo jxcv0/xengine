@@ -280,6 +280,31 @@ struct geometry load_geometry(const char *filepath) {
   uint32_t *indices = malloc(n);
   memcpy(indices, pos, n);
 
+  glGenBuffers(1, &geom.m_vbo);
+  glGenBuffers(1, &geom.m_ebo);
+  glGenVertexArrays(1, &geom.m_vao);
+  glBindVertexArray(geom.m_vao);
+
+  glBindBuffer(GL_ARRAY_BUFFER, geom.m_vbo);
+  glBufferData(GL_ARRAY_BUFFER, geom.m_num_vertices * sizeof(struct vertex),
+               vertices, GL_STATIC_DRAW);
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geom.m_ebo);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, geom.m_num_indices * sizeof(uint32_t),
+               indices, GL_STATIC_DRAW);
+
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
+                        (void *)(offsetof(struct vertex, m_position)));
+
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
+                        (void *)(offsetof(struct vertex, m_normal)));
+
+  glEnableVertexAttribArray(2);
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
+                        (void *)(offsetof(struct vertex, m_tex_coord)));
+
   // TODO defer this.
   unmap_file((void *)file, file_size);
   free(vertices);
