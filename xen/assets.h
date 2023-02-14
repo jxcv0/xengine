@@ -63,21 +63,26 @@ struct mesh {
   uint32_t m_tex_spec;  // TODO see above.
 };
 
-enum asset_type {
-  MESH,
-  TEXTURE
-  // ANIMATION
-  // AUDIO
-};
-
-// check asset is not already loaded
-// if it is return it
-// if not load it then return it
-
 /**
  * @brief TODO
  */
 void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename);
+
+/**
+ * @brief Load a geometry from a file.
+ *
+ * @param filepath The path to the file to load.
+ * @return A geometry containing the data in the file.
+ */
+struct geometry load_geometry(const char *filepath);
+
+/**
+ * @brief Load a material from a file.
+ *
+ * @param filepath The path to the file to load.
+ * @return A material containing the data in the file.
+ */
+struct pbr_material load_pbr_material(const char *filepath);
 
 /**
  * @brief Load a texture from the texture directory.

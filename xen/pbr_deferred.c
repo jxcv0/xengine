@@ -1,9 +1,11 @@
 #include "pbr_deferred.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "assets.h"
 #include "glad.h"
-#include <stdlib.h>
-#include <stdio.h>
+#include "shader.h"
 
 // we want this all in the same block of memory.
 static struct {
@@ -15,14 +17,18 @@ static struct {
   uint32_t g_tex_norm;
   uint32_t quad_vbo;
   uint32_t quad_vao;
+  shader_t deferred_geometry;
+  shader_t deferred_lighting;
 } pbr;
 
 /**
  * ----------------------------------------------------------------------------
  */
 int pbrd_init(const uint32_t scr_w, const uint32_t scr_h) {
-  // TODO do textures need to be rgba?
-  // TODO load shaders
+  pbr.deferred_geometry =
+      load_shader("glsl/pbrd_geom.vert", "glsl/pbrd_geom.frag");
+  pbr.deferred_lighting =
+      load_shader("glsl/pbrd_light.vert", "glsl/pbrd_light.frag");
 
   // set up G-Buffer
   glGenFramebuffers(1, &pbr.g_buff);
@@ -81,11 +87,11 @@ int pbrd_init(const uint32_t scr_w, const uint32_t scr_h) {
   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
                             GL_RENDERBUFFER, pbr.g_depth);
 
-  // glUseProgram(pbr.deferred_lighting)
-  // shader_set_uniform_1i(pbr.deferred_lighting, "g_pos", 0);
-  // shader_set_uniform_1i(pbr.deferred_lighting, "g_norm", 1);
-  // shader_set_uniform_1i(pbr.deferred_lighting, "g_tex_diff", 2);
-  // shader_set_uniform_1i(pbr.deferred_lighting, "g_tex_norm", 3);
+  glUseProgram(pbr.deferred_lighting);
+  shader_set_uniform_1i(pbr.deferred_lighting, "g_pos", 0);
+  shader_set_uniform_1i(pbr.deferred_lighting, "g_norm", 1);
+  shader_set_uniform_1i(pbr.deferred_lighting, "g_tex_diff", 2);
+  shader_set_uniform_1i(pbr.deferred_lighting, "g_tex_norm", 3);
 
   const float quad_verts[] = {
       -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
@@ -112,3 +118,9 @@ int pbrd_init(const uint32_t scr_w, const uint32_t scr_h) {
                         (void *)(3 * sizeof(float)));
   return 0;
 }
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+void pbrd_render_geometries(const struct geometry *geometries,
+                            const pbr_material) {}
