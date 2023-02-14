@@ -6,7 +6,6 @@ layout (location = 1) in vec2 tex_coord_in;
 out vec2 tex_coord;
 
 void main() {
-  // TODO displacement
   tex_coord = tex_coord_in;
   gl_Position = vec4(pos_in, 1.0);
 }

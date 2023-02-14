@@ -6,7 +6,8 @@ in vec2 tex_coord;
 
 uniform sampler2D g_pos;
 uniform sampler2D g_norm;
-uniform sampler2D g_tex;
+uniform sampler2D g_tex_diff;
+uniform sampler2D g_tex_normal;
 
 struct light {
   vec3 m_position;
@@ -25,9 +26,13 @@ uniform vec3 view_pos;
 void main() {
   // fetch data from G-Buffer
   vec3 frag_pos = texture(g_pos, tex_coord).rgb;
+
   vec3 g_normal = texture(g_norm, tex_coord).rgb;
-  vec3 g_diffuse = texture(g_tex, tex_coord).rgb;
-  float g_specular = texture(g_tex, tex_coord).a;
+  g_normal += texture(g_tex_normal, tex_coord).rgb;
+  g_normal = normalize(g_normal * 2.0 - 1.0);
+
+  vec3 g_diffuse = texture(g_tex_diff, tex_coord).rgb;
+  float g_specular = texture(g_tex_diff, tex_coord).a;
 
   vec3 lighting = g_diffuse * AMBIENT_STRENGTH;
   vec3 view_dir = normalize(view_pos - frag_pos);
