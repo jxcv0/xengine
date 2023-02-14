@@ -54,6 +54,9 @@ int main() {
   printf("\n");
   struct pbr_material stone_tiles = load_pbr_material("stone_tiles");
   printf("\n");
+  struct geometry pbr_sphere = load_geometry("assets/meshes/pbr_test_sphere.geom");
+  printf("\n");
+
 
   load_mesh(meshes, &num_meshes, "pbr_test_sphere.model");
 

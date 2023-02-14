@@ -255,6 +255,42 @@ void unload_mesh(struct mesh *mesh) {
 /**
  * ----------------------------------------------------------------------------
  */
+struct geometry load_geometry(const char *filepath) {
+  size_t file_size = 0;
+  const char *file = map_file(&file_size, filepath);
+
+  struct geometry geom = {0};
+
+  // vertices
+  const char *pos = findstr(file, "VERTICES", file_size);
+  assert(pos != NULL);
+  geom.m_num_vertices = (uint32_t)strtol(&pos[9], NULL, 10);
+  assert((pos = strchr(pos, '\n') + 1) != NULL);
+  size_t n = sizeof(struct vertex) * geom.m_num_vertices;
+  struct vertex *vertices = malloc(n);
+  memcpy(vertices, pos, n);
+  pos += n;
+
+  // indices
+  pos = findstr(file, "INDICES", file_size);
+  assert(pos != NULL);
+  geom.m_num_indices = (uint32_t)strtol(&pos[8], NULL, 10);
+  assert((pos = strchr(pos, '\n') + 1) != NULL);
+  n = sizeof(uint32_t) * geom.m_num_indices;
+  uint32_t *indices = malloc(n);
+  memcpy(indices, pos, n);
+
+  // TODO defer this.
+  unmap_file((void *)file, file_size);
+  free(vertices);
+  free(indices);
+
+  return geom;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
 struct pbr_material load_pbr_material(const char *material_name) {
   char buff[64] = {0};
   struct pbr_material mat = {0};
