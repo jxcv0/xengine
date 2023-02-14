@@ -51,6 +51,10 @@ int main() {
   perspective(projection_matrix, radians(60),
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
+  printf("\n");
+  struct pbr_material stone_tiles = load_pbr_material("stone_tiles");
+  printf("\n");
+
   load_mesh(meshes, &num_meshes, "pbr_test_sphere.model");
 
   for (int i = 0; i < MAX_NUM_LIGHTS; i++) {

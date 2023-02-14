@@ -79,10 +79,10 @@ struct geometry load_geometry(const char *filepath);
 /**
  * @brief Load a material from a file.
  *
- * @param filepath The path to the file to load.
- * @return A material containing the data in the file.
+ * @param material_name The prefix of the textures to load.
+ * @return A material containing the data in the texture group.
  */
-struct pbr_material load_pbr_material(const char *filepath);
+struct pbr_material load_pbr_material(const char *material_name);
 
 /**
  * @brief Load a texture from the texture directory.

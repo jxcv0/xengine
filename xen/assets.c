@@ -251,3 +251,27 @@ void unload_mesh(struct mesh *mesh) {
   glDeleteTextures(1, &mesh->m_tex_spec);
   glDeleteTextures(1, &mesh->m_tex_diff);
 }
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+struct pbr_material load_pbr_material(const char *material_name) {
+  char buff[64] = {0};
+  struct pbr_material mat = {0};
+  size_t n = strlen(material_name);
+  strncpy(buff, material_name, n);
+
+  strncpy(&buff[n], "_diffuse.jpg", 13);
+  mat.m_diffuse = load_texture(buff);
+
+  strncpy(&buff[n], "_normal.jpg", 12);
+  mat.m_normal = load_texture(buff);
+
+  strncpy(&buff[n], "_roughness.jpg", 15);
+  mat.m_roughness = load_texture(buff);
+
+  strncpy(&buff[n], "_displacement.jpg", 18);
+  mat.m_displacement = load_texture(buff);
+
+  return mat;
+}
