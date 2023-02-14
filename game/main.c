@@ -51,7 +51,7 @@ int main() {
   perspective(projection_matrix, radians(60),
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
-  load_mesh(meshes, &num_meshes, "cyborg.model");
+  load_mesh(meshes, &num_meshes, "pbr_test_sphere.model");
 
   for (int i = 0; i < MAX_NUM_LIGHTS; i++) {
     struct light l = LIGHT_RANGE_65;
@@ -65,7 +65,7 @@ int main() {
     light_array[i] = l;
   }
 
-  vec3 camera_centre = {0, 3, 0};
+  vec3 camera_centre = {0};
 
   mouse_pos.m_last_pos[0] = window_width / 2.0f;
   mouse_pos.m_last_pos[1] = window_height / 2.0f;

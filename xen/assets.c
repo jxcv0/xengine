@@ -226,7 +226,7 @@ void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename) {
                           (void *)(offsetof(struct vertex, m_tex_coord)));
 
     mesh.m_tex_diff = load_texture(diffuse_textures[i]);
-    mesh.m_tex_spec = load_texture(specular_textures[i]);
+    // mesh.m_tex_spec = load_texture(specular_textures[i]);
 
     meshes[*count] = mesh;
     *count = *count + 1;
