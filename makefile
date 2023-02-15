@@ -19,9 +19,6 @@ $(build_dir)/%.o: %.c
 game: libglad.a libstb.a libxen.a
 	@gcc game/main.c $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_src_dir) $(xen_lib) $(libs) -o $(bin_dir)/game
 
-converter: libglad.a libstb.a libxen.a
-	@gcc tools/converter.c $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_src_dir) $(xen_lib) $(libs) -lassimp -o $(bin_dir)/converter
-
 geom_converter: libglad.a libstb.a libxen.a
 	@gcc tools/geom_converter.c $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_src_dir) $(xen_lib) $(libs) -lassimp -o $(bin_dir)/geom_converter
 
