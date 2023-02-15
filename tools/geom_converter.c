@@ -74,21 +74,6 @@ int main(int argc, char *argv[]) {
   fwrite(out_indices, sizeof(uint32_t), out_num_indices, file);
   fprintf(file, "\n");
 
-  // not loading these here
-  /*
-  fprintf(file, "DIFFUSE ");
-  fprintf(file, "%s\n", diffuse_name);
-
-  fprintf(file, "NORMAL ");
-  fprintf(file, "%s\n", normal_name);
-
-  fprintf(file, "ROUGHNESS ");
-  fprintf(file, "%s\n", roughness_name);
-
-  fprintf(file, "DISPLACEMENT ");
-  fprintf(file, "%s\n", displacement_name);
-  */
-
   aiReleaseImport(scene);
   fclose(file);
   return 0;
@@ -134,10 +119,6 @@ void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
     v->m_position[1] = mesh->mVertices[i].y;
     v->m_position[2] = mesh->mVertices[i].z;
 
-    v->m_normal[0] = mesh->mNormals[i].x;
-    v->m_normal[1] = mesh->mNormals[i].y;
-    v->m_normal[2] = mesh->mNormals[i].z;
-
     v->m_tangent[0] = mesh->mTangents[i].x;
     v->m_tangent[1] = mesh->mTangents[i].y;
     v->m_tangent[2] = mesh->mTangents[i].z;
@@ -145,6 +126,10 @@ void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
     v->m_bitangent[0] = mesh->mBitangents[i].x;
     v->m_bitangent[1] = mesh->mBitangents[i].y;
     v->m_bitangent[2] = mesh->mBitangents[i].z;
+
+    v->m_normal[0] = mesh->mNormals[i].x;
+    v->m_normal[1] = mesh->mNormals[i].y;
+    v->m_normal[2] = mesh->mNormals[i].z;
 
     if (mesh->mTextureCoords[0] != 0) {
       v->m_tex_coord[0] = mesh->mTextureCoords[0][i].x;
@@ -164,7 +149,7 @@ void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
   }
 
   (void)scene;
-  // hot loading materials here
+  // not loading materials here
   /*
   printf("Loading materials.\n");
   struct aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];

@@ -267,7 +267,7 @@ struct geometry load_geometry(const char *filepath) {
   geom.m_num_vertices = (uint32_t)strtol(&pos[9], NULL, 10);
   assert((pos = strchr(pos, '\n') + 1) != NULL);
   size_t n = sizeof(struct vertex) * geom.m_num_vertices;
-  struct vertex *vertices = malloc(n);
+  struct vertex *vertices = calloc(geom.m_num_vertices, sizeof(struct vertex));
   memcpy(vertices, pos, n);
   pos += n;
 
@@ -277,7 +277,7 @@ struct geometry load_geometry(const char *filepath) {
   geom.m_num_indices = (uint32_t)strtol(&pos[8], NULL, 10);
   assert((pos = strchr(pos, '\n') + 1) != NULL);
   n = sizeof(uint32_t) * geom.m_num_indices;
-  uint32_t *indices = malloc(n);
+  uint32_t *indices = calloc(geom.m_num_indices, sizeof(uint32_t));
   memcpy(indices, pos, n);
 
   glGenBuffers(1, &geom.m_vbo);
