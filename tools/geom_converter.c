@@ -54,8 +54,9 @@ int main(int argc, char *argv[]) {
   printf("Loading from directory %s\n", directory);
 
   const struct aiScene *scene =
-      aiImportFile(argv[1], aiProcess_CalcTangentSpace | aiProcess_Triangulate |
-                                aiProcess_JoinIdenticalVertices);
+      aiImportFile(argv[1], aiProcess_Triangulate | aiProcess_GenSmoothNormals |
+                                aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+
   if (scene == NULL) {
     fprintf(stderr, "%s\n", aiGetErrorString());
     return 0;

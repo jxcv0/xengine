@@ -1,8 +1,10 @@
 #version 460 core
 layout (location = 0) out vec3 g_pos;
+
 layout (location = 1) out vec3 g_tangent;
 layout (location = 2) out vec3 g_bitangent;
 layout (location = 3) out vec3 g_normal;
+
 layout (location = 4) out vec4 g_tex_diff; // roughness
 layout (location = 5) out vec4 g_tex_norm; // displacement
 

@@ -83,14 +83,13 @@ vec3 fresnel_schlick_approx(float cos_theta, vec3 f) {
 }
 
 void main() {
-
   vec3 frag_pos = texture(g_pos, tex_coord).rgb;
 
   // normals
   vec3 t = texture(g_tangent, tex_coord).rgb;
   vec3 b = texture(g_bitangent, tex_coord).rgb;
   vec3 n = texture(g_normal, tex_coord).rgb;
-  mat3 normal_matrix = transpose(mat3(t, b, n));
+  mat3 normal_matrix = mat3(t, b, n);
   vec3 normal = texture(g_tex_normal, tex_coord).rgb;
   normal = (normal * 2.0) - 1.0;
   normal = normalize(normal_matrix * normal);

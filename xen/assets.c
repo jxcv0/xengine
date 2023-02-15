@@ -313,7 +313,6 @@ struct geometry load_geometry(const char *filepath) {
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
                         (void *)(offsetof(struct vertex, m_tex_coord)));
 
-
   // TODO defer this.
   unmap_file((void *)file, file_size);
   free(vertices);
