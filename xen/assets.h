@@ -90,20 +90,10 @@ struct pbr_material load_pbr_material(const char *material_name);
  * @brief Load a texture from the texture directory.
  *
  * @param filename The name of the file to load.
+ * @prarm format The GL format.
  * @return The OpenGL texture buffer.
  */
 uint32_t load_texture(const char *filename);
-
-/**
- * @brief Delete the buffers associated with a mesh.
- *
- * @param mesh A pointer to the mesh to delete.
- */
-void unload_mesh(struct mesh *mesh);
-
-//
-// char loaded_meshes[MAX_MESHES][32];
-//
 
 #ifdef __cplusplus
 }

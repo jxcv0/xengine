@@ -95,7 +95,7 @@ int pbrd_init(const uint32_t scr_w, const uint32_t scr_h) {
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D,
                          pbr.g_tex_diff, 0);
 
-  // normal texture
+  // normal + displacement texture
   glGenTextures(1, &pbr.g_tex_norm);
   glBindTexture(GL_TEXTURE_2D, pbr.g_tex_norm);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, scr_w, scr_h, 0, GL_RGBA,

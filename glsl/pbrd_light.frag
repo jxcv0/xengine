@@ -32,7 +32,7 @@ out vec4 frag_col;
 
 /**
  * Trowbridge-Reitz GGX normal distribution function.
- * Statiscicaly approximates the relative surface area of microfacets alighned
+ * Approximates the relative surface area of microfacets alighned
  * to a halfway vector.
  */
 float distributionGGX(vec3 surface_normal, vec3 halfway_vector,
@@ -47,7 +47,7 @@ float distributionGGX(vec3 surface_normal, vec3 halfway_vector,
 
 /**
  * Schlick GXX geometry function
- * Statisticaly approximates the surface occlusion using roughness remapping (k)
+ * Approximates the surface occlusion using roughness remapping (k)
  * and a view direction.
  */
 float schlickGGX(float n_dot_v, float k) {
@@ -89,8 +89,7 @@ void main() {
   vec3 t = texture(g_tangent, tex_coord).rgb;
   vec3 b = texture(g_bitangent, tex_coord).rgb;
   vec3 n = texture(g_normal, tex_coord).rgb;
-  mat3 normal_matrix = mat3(t, b, n); // inverse?
-
+  mat3 normal_matrix = mat3(t, b, n);
   vec3 normal = texture(g_tex_normal, tex_coord).rgb;
   normal = (normal * 2.0) - 1.0;
   normal = normalize(normal_matrix * normal);

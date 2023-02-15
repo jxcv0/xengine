@@ -88,10 +88,6 @@ int main() {
     glfwPollEvents();
   }
 
-  for (int i = 0; i < MAX_ENTITIES; i++) {
-    unload_mesh(&meshes[i]);
-  }
-
   glfwDestroyWindow(window);
   glfwTerminate();
 

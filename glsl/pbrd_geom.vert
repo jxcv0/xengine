@@ -30,9 +30,9 @@ void main() {
   /**
    * translate to world space then write to g_buff
    */
-  tangent = normalize(vec3(model * vec4(tangent, 0.0)));
-  bitangent = normalize(vec3(model * vec4(bitangent, 0.0)));
-  normal = normalize(vec3(model * vec4(normal, 0.0)));
+  tangent = normalize(vec3(projection * view * model * vec4(tangent_in, 0.0)));
+  bitangent = normalize(vec3(projection * view * model * vec4(bitangent_in, 0.0)));
+  normal = normalize(vec3(projection * view * model * vec4(normal_in, 0.0)));
 
   gl_Position = projection * view * world_pos;
 }
