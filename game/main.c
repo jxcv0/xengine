@@ -51,10 +51,10 @@ int main() {
   struct geometry pbr_sphere =
       load_geometry("assets/meshes/pbr_test_sphere.geom");
 
-  struct light l = LIGHT_RANGE_325;
-  l.m_position[0] = 1.0;
-  l.m_position[1] = 1.0;
-  l.m_position[2] = 1.0;
+  struct light l = LIGHT_RANGE_3250;
+  l.m_position[0] = 3.0;
+  l.m_position[1] = 3.0;
+  l.m_position[2] = 3.0;
   l.m_color[0] = 1.0;
   l.m_color[1] = 1.0;
   l.m_color[2] = 1.0;
