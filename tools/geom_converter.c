@@ -138,6 +138,14 @@ void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
     v->m_normal[1] = mesh->mNormals[i].y;
     v->m_normal[2] = mesh->mNormals[i].z;
 
+    v->m_tangent[0] = mesh->mTangents[i].x;
+    v->m_tangent[1] = mesh->mTangents[i].y;
+    v->m_tangent[2] = mesh->mTangents[i].z;
+
+    v->m_bitangent[0] = mesh->mBitangents[i].x;
+    v->m_bitangent[1] = mesh->mBitangents[i].y;
+    v->m_bitangent[2] = mesh->mBitangents[i].z;
+
     if (mesh->mTextureCoords[0] != 0) {
       v->m_tex_coord[0] = mesh->mTextureCoords[0][i].x;
       v->m_tex_coord[1] = mesh->mTextureCoords[0][i].y;

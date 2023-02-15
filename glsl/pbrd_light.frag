@@ -79,6 +79,7 @@ vec3 fresnel_schlick_approx(float cos_theta, vec3 f) {
 }
 
 void main() {
+
   vec3 frag_pos = texture(g_pos, tex_coord).rgb;
 
   vec3 normal = texture(g_tex_normal, tex_coord).rgb;

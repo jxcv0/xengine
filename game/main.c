@@ -47,7 +47,7 @@ int main() {
   perspective(projection_matrix, radians(60),
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
-  struct pbr_material stone_tiles = load_pbr_material("vintage_tile");
+  struct pbr_material material = load_pbr_material("older_wood_flooring");
   struct geometry pbr_sphere =
       load_geometry("assets/meshes/pbr_test_sphere.geom");
 
@@ -81,7 +81,7 @@ int main() {
     identity_mat4(model_matrix);
 
     pbrd_render_geometries(projection_matrix, view_matrix, positions,
-                           &pbr_sphere, &stone_tiles, 1);
+                           &pbr_sphere, &material, 1);
     pbrd_render_lighting(&l, 1, camera.m_pos, window_width, window_height);
 
     glfwSwapBuffers(window);

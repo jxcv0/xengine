@@ -25,6 +25,8 @@ struct vertex {
   vec3 m_position;
   vec2 m_tex_coord;
   vec3 m_normal;
+  vec3 m_tangent;
+  vec3 m_bitangent;
 };
 
 /**

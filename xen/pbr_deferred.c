@@ -8,14 +8,26 @@
 
 // we want this all in the same block of memory.
 static struct {
+  // geometry
   uint32_t g_buff;
   uint32_t g_pos;
+
+  // normal matrix
+  uint32_t g_tangent;
+  uint32_t g_bitangent;
   uint32_t g_norm;
-  uint32_t g_depth;
+
+  // textures
   uint32_t g_tex_diff;
   uint32_t g_tex_norm;
+
+  // depth
+  uint32_t g_depth;
+
+  // lighting
   uint32_t quad_vbo;
   uint32_t quad_vao;
+
   shader_t deferred_geometry;
   shader_t deferred_lighting;
 } pbr;
@@ -43,41 +55,60 @@ int pbrd_init(const uint32_t scr_w, const uint32_t scr_h) {
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
                          pbr.g_pos, 0);
 
-  // vertex normal buffer
-  glGenTextures(1, &pbr.g_norm);
-  glBindTexture(GL_TEXTURE_2D, pbr.g_norm);
+  // tangent
+  glGenTextures(1, &pbr.g_tangent);
+  glBindTexture(GL_TEXTURE_2D, pbr.g_tangent);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, scr_w, scr_h, 0, GL_RGBA, GL_FLOAT,
                NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D,
-                         pbr.g_norm, 0);
+                         pbr.g_tangent, 0);
 
-  // diffuse texture buffer
-  // roughness stored in alpha component
-  glGenTextures(1, &pbr.g_tex_diff);
-  glBindTexture(GL_TEXTURE_2D, pbr.g_tex_diff);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, scr_w, scr_h, 0, GL_RGBA,
-               GL_UNSIGNED_BYTE, NULL);
+  // bitangent
+  glGenTextures(1, &pbr.g_bitangent);
+  glBindTexture(GL_TEXTURE_2D, pbr.g_bitangent);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, scr_w, scr_h, 0, GL_RGB, GL_FLOAT,
+               NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D,
-                         pbr.g_tex_diff, 0);
+                         pbr.g_bitangent, 0);
 
-  // normal texture buffer
-  // displacement stored in alpha component
-  glGenTextures(1, &pbr.g_tex_norm);
-  glBindTexture(GL_TEXTURE_2D, pbr.g_tex_norm);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, scr_w, scr_h, 0, GL_RGBA,
-               GL_UNSIGNED_BYTE, NULL);
+  // normal buffer
+  glGenTextures(1, &pbr.g_norm);
+  glBindTexture(GL_TEXTURE_2D, pbr.g_norm);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, scr_w, scr_h, 0, GL_RGB, GL_FLOAT,
+               NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D,
+                         pbr.g_norm, 0);
+
+  // diffuse texture
+  glGenTextures(1, &pbr.g_tex_diff);
+  glBindTexture(GL_TEXTURE_2D, pbr.g_tex_diff);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, scr_w, scr_h, 0, GL_RGB,
+               GL_UNSIGNED_BYTE, NULL);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D,
                          pbr.g_tex_diff, 0);
 
-  const uint32_t attachments[4] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1,
-                                   GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT4};
-  glDrawBuffers(4, attachments);
+  // normal texture buffer
+  glGenTextures(1, &pbr.g_tex_norm);
+  glBindTexture(GL_TEXTURE_2D, pbr.g_tex_norm);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, scr_w, scr_h, 0, GL_RGBA, GL_FLOAT,
+               NULL);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT5, GL_TEXTURE_2D,
+                         pbr.g_tex_diff, 0);
+
+  const uint32_t attachments[6] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1,
+                                   GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3,
+                                   GL_COLOR_ATTACHMENT4, GL_COLOR_ATTACHMENT5};
+  glDrawBuffers(6, attachments);
 
   // depth buffer
   glGenRenderbuffers(1, &pbr.g_depth);
