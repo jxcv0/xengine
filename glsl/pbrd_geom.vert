@@ -34,6 +34,5 @@ void main() {
   bitangent = normalize(vec3(model * vec4(bitangent, 0.0)));
   normal = normalize(vec3(model * vec4(normal, 0.0)));
 
-
   gl_Position = projection * view * world_pos;
 }

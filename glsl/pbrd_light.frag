@@ -9,7 +9,7 @@ uniform sampler2D g_pos;
 
 uniform sampler2D g_tangent;
 uniform sampler2D g_bitangent;
-uniform sampler2D g_norm;
+uniform sampler2D g_normal;
 
 uniform sampler2D g_tex_diff;
 uniform sampler2D g_tex_normal;
@@ -86,7 +86,14 @@ void main() {
 
   vec3 frag_pos = texture(g_pos, tex_coord).rgb;
 
+  // normals
+  vec3 t = texture(g_tangent, tex_coord).rgb;
+  vec3 b = texture(g_bitangent, tex_coord).rgb;
+  vec3 n = texture(g_normal, tex_coord).rgb;
+  mat3 normal_matrix = transpose(mat3(t, b, n));
   vec3 normal = texture(g_tex_normal, tex_coord).rgb;
+  normal = (normal * 2.0) - 1.0;
+  normal = normalize(normal_matrix * normal);
 
   vec3 diffuse = texture(g_tex_diff, tex_coord).rgb;
   float roughness = texture(g_tex_diff, tex_coord).a;

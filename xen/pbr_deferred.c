@@ -48,7 +48,7 @@ int pbrd_init(const uint32_t scr_w, const uint32_t scr_h) {
   // vertex position buffer
   glGenTextures(1, &pbr.g_pos);
   glBindTexture(GL_TEXTURE_2D, pbr.g_pos);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, scr_w, scr_h, 0, GL_RGBA, GL_FLOAT,
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, scr_w, scr_h, 0, GL_RGB, GL_FLOAT,
                NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -58,7 +58,7 @@ int pbrd_init(const uint32_t scr_w, const uint32_t scr_h) {
   // tangent
   glGenTextures(1, &pbr.g_tangent);
   glBindTexture(GL_TEXTURE_2D, pbr.g_tangent);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, scr_w, scr_h, 0, GL_RGBA, GL_FLOAT,
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, scr_w, scr_h, 0, GL_RGB, GL_FLOAT,
                NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -98,12 +98,12 @@ int pbrd_init(const uint32_t scr_w, const uint32_t scr_h) {
   // normal texture
   glGenTextures(1, &pbr.g_tex_norm);
   glBindTexture(GL_TEXTURE_2D, pbr.g_tex_norm);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, scr_w, scr_h, 0, GL_RGBA,
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, scr_w, scr_h, 0, GL_RGBA,
                GL_UNSIGNED_BYTE, NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT5, GL_TEXTURE_2D,
-                         pbr.g_tex_diff, 0);
+                         pbr.g_tex_norm, 0);
 
   const uint32_t attachments[6] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1,
                                    GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3,
@@ -197,12 +197,24 @@ void pbrd_render_lighting(struct light *lights, const uint32_t n,
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   glUseProgram(pbr.deferred_lighting);
+
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, pbr.g_pos);
+
   glActiveTexture(GL_TEXTURE1);
-  glBindTexture(GL_TEXTURE_2D, pbr.g_normal);
+  glBindTexture(GL_TEXTURE_2D, pbr.g_tangent);
+
   glActiveTexture(GL_TEXTURE2);
+  glBindTexture(GL_TEXTURE_2D, pbr.g_bitangent);
+
+  glActiveTexture(GL_TEXTURE3);
+  glBindTexture(GL_TEXTURE_2D, pbr.g_normal);
+
+  glActiveTexture(GL_TEXTURE4);
   glBindTexture(GL_TEXTURE_2D, pbr.g_tex_diff);
+
+  glActiveTexture(GL_TEXTURE5);
+  glBindTexture(GL_TEXTURE_2D, pbr.g_tex_norm);
 
   shader_set_uniform_1i(pbr.deferred_lighting, "g_pos", 0);
 
