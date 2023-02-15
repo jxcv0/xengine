@@ -322,16 +322,16 @@ struct pbr_material load_pbr_material(const char *material_name) {
   size_t n = strlen(material_name);
   strncpy(buff, material_name, n);
 
-  strncpy(&buff[n], "_diffuse.jpg", 13);
+  strncpy(&buff[n], "_diffuse.png", 13);
   mat.m_diffuse = load_texture(buff);
 
-  strncpy(&buff[n], "_normal.jpg", 12);
+  strncpy(&buff[n], "_normal.png", 12);
   mat.m_normal = load_texture(buff);
 
-  strncpy(&buff[n], "_roughness.jpg", 15);
+  strncpy(&buff[n], "_roughness.png", 15);
   mat.m_roughness = load_texture(buff);
 
-  strncpy(&buff[n], "_displacement.jpg", 18);
+  strncpy(&buff[n], "_displacement.png", 18);
   mat.m_displacement = load_texture(buff);
 
   return mat;
