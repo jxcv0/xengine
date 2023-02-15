@@ -15,7 +15,7 @@ static struct {
   // normal matrix
   uint32_t g_tangent;
   uint32_t g_bitangent;
-  uint32_t g_norm;
+  uint32_t g_normal;
 
   // textures
   uint32_t g_tex_diff;
@@ -75,31 +75,31 @@ int pbrd_init(const uint32_t scr_w, const uint32_t scr_h) {
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D,
                          pbr.g_bitangent, 0);
 
-  // normal buffer
-  glGenTextures(1, &pbr.g_norm);
-  glBindTexture(GL_TEXTURE_2D, pbr.g_norm);
+  // normal
+  glGenTextures(1, &pbr.g_normal);
+  glBindTexture(GL_TEXTURE_2D, pbr.g_normal);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, scr_w, scr_h, 0, GL_RGB, GL_FLOAT,
                NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D,
-                         pbr.g_norm, 0);
+                         pbr.g_normal, 0);
 
-  // diffuse texture
+  // diffuse + roughness texture
   glGenTextures(1, &pbr.g_tex_diff);
   glBindTexture(GL_TEXTURE_2D, pbr.g_tex_diff);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, scr_w, scr_h, 0, GL_RGB,
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, scr_w, scr_h, 0, GL_RGBA,
                GL_UNSIGNED_BYTE, NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D,
                          pbr.g_tex_diff, 0);
 
-  // normal texture buffer
+  // normal texture
   glGenTextures(1, &pbr.g_tex_norm);
   glBindTexture(GL_TEXTURE_2D, pbr.g_tex_norm);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, scr_w, scr_h, 0, GL_RGBA, GL_FLOAT,
-               NULL);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, scr_w, scr_h, 0, GL_RGBA,
+               GL_UNSIGNED_BYTE, NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT5, GL_TEXTURE_2D,
@@ -200,13 +200,19 @@ void pbrd_render_lighting(struct light *lights, const uint32_t n,
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, pbr.g_pos);
   glActiveTexture(GL_TEXTURE1);
-  glBindTexture(GL_TEXTURE_2D, pbr.g_norm);
+  glBindTexture(GL_TEXTURE_2D, pbr.g_normal);
   glActiveTexture(GL_TEXTURE2);
   glBindTexture(GL_TEXTURE_2D, pbr.g_tex_diff);
 
   shader_set_uniform_1i(pbr.deferred_lighting, "g_pos", 0);
-  shader_set_uniform_1i(pbr.deferred_lighting, "g_norm", 1);
-  shader_set_uniform_1i(pbr.deferred_lighting, "g_tex", 2);
+
+  shader_set_uniform_1i(pbr.deferred_lighting, "g_tangent", 1);
+  shader_set_uniform_1i(pbr.deferred_lighting, "g_bitangent", 2);
+  shader_set_uniform_1i(pbr.deferred_lighting, "g_normal", 3);
+
+  shader_set_uniform_1i(pbr.deferred_lighting, "g_tex_diff", 4);
+  shader_set_uniform_1i(pbr.deferred_lighting, "g_tex_norm", 5);
+
   shader_set_uniform_3fv(pbr.deferred_lighting, "view_pos", view_pos);
   shader_set_uniform_1ui(pbr.deferred_lighting, "num_lights", n);
 

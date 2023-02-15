@@ -3,12 +3,14 @@
 #define PI 3.141593
 #define METALIC 0.1
 
-out vec4 frag_col;
-
 in vec2 tex_coord;
 
 uniform sampler2D g_pos;
+
+uniform sampler2D g_tangent;
+uniform sampler2D g_bitangent;
 uniform sampler2D g_norm;
+
 uniform sampler2D g_tex_diff;
 uniform sampler2D g_tex_normal;
 
@@ -25,6 +27,8 @@ uniform uint num_lights;
 uniform light lights[128];
 
 uniform vec3 view_pos;
+
+out vec4 frag_col;
 
 /**
  * Trowbridge-Reitz GGX normal distribution function.
@@ -83,7 +87,6 @@ void main() {
   vec3 frag_pos = texture(g_pos, tex_coord).rgb;
 
   vec3 normal = texture(g_tex_normal, tex_coord).rgb;
-  normal = normalize(normal); // TODO TBN
 
   vec3 diffuse = texture(g_tex_diff, tex_coord).rgb;
   float roughness = texture(g_tex_diff, tex_coord).a;
