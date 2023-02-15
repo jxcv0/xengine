@@ -298,19 +298,19 @@ struct geometry load_geometry(const char *filepath) {
                         (void *)(offsetof(struct vertex, m_position)));
 
   glEnableVertexAttribArray(1);
-  glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
                         (void *)(offsetof(struct vertex, m_tangent)));
 
   glEnableVertexAttribArray(2);
-  glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
+  glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
                         (void *)(offsetof(struct vertex, m_bitangent)));
 
   glEnableVertexAttribArray(3);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
+  glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
                         (void *)(offsetof(struct vertex, m_normal)));
 
   glEnableVertexAttribArray(4);
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
+  glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
                         (void *)(offsetof(struct vertex, m_tex_coord)));
 
   // TODO defer this.
