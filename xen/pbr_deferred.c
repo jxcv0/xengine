@@ -6,6 +6,8 @@
 #include "glad.h"
 #include "shader.h"
 
+#define MAX_NUM_LIGHTS 8
+
 // we want this all in the same block of memory.
 static struct {
   // geometry

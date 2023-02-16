@@ -18,6 +18,7 @@ void main() {
 
   g_normal = normalize(vec3(normal_matrix * texture(tex_normal, tex_coord).rgb));
 
+
   g_tex_diff.rgb = texture(tex_diffuse, tex_coord).rgb;
   g_tex_diff.a = texture(tex_roughness, tex_coord).r;
 }

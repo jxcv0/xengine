@@ -19,7 +19,7 @@ struct light {
 
 const float AMBIENT_STRENGTH = 0.1;
 uniform uint num_lights;
-uniform light lights[32];
+uniform light lights[8];
 
 uniform vec3 view_pos;
 
