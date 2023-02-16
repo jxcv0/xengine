@@ -18,8 +18,8 @@
 extern const vec3 GLOBAL_UP;
 
 GLFWwindow *window;
-const float window_width = 1080;
-const float window_height = 800;
+const float window_width = 640;
+const float window_height = 480;
 
 // struct light light_array[MAX_NUM_LIGHTS] = {0};
 vec3 positions[MAX_ENTITIES] = {0};
