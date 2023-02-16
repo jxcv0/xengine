@@ -1,7 +1,6 @@
 #version 460 core
 
 #define PI 3.141593
-#define METALIC 0.15
 
 in vec2 tex_coord;
 
@@ -73,19 +72,21 @@ float smith_geom(vec3 surface_normal, vec3 view, vec3 light, float roughness) {
  * Calculated the ratio of light reflected vs refracted
  */
 vec3 fresnel_schlick_approx(float cos_theta, vec3 f) {
-  // f = base_color * 0.04 * metalic
+  // f = base_color * 0.04 * metallic
   return f + (1.0 - f) * pow(1.0 - cos_theta, 5.0);
 }
 
 void main() {
   vec3 frag_pos = texture(g_pos, tex_coord).rgb;
-  vec3 normal = texture(g_normal, tex_coord).rgb;
 
+  vec3 normal = texture(g_normal, tex_coord).rgb;
   vec3 diffuse = texture(g_tex_diff, tex_coord).rgb;
+
   float roughness = texture(g_tex_diff, tex_coord).a;
+  float metallic = texture(g_normal, tex_coord).a;
 
   vec3 f = vec3(0.04);
-  f = mix(f, diffuse, METALIC);
+  f = mix(f, diffuse, metallic);
 
   vec3 view_dir = normalize(view_pos - frag_pos);
 
@@ -105,7 +106,7 @@ void main() {
 
     vec3 ks = fresnel;
     vec3 kd = vec3(1.0) - ks;
-    kd *= 1.0 - METALIC;
+    kd *= 1.0 - metallic;
 
     float n_dot_l = max(dot(normal, light_dir), 0.0);
 

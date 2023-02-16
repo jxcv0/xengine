@@ -47,7 +47,7 @@ int main() {
   perspective(projection_matrix, radians(60),
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
-  struct pbr_material material = load_pbr_material("vintage_tile");
+  struct pbr_material material = load_pbr_material("rusted_iron");
   struct geometry pbr_sphere =
       load_geometry("assets/meshes/pbr_test_sphere.geom");
 

@@ -60,7 +60,7 @@ int pbrd_init(const uint32_t scr_w, const uint32_t scr_h) {
   // normal
   glGenTextures(1, &pbr.g_normal);
   glBindTexture(GL_TEXTURE_2D, pbr.g_normal);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, scr_w, scr_h, 0, GL_RGB, GL_FLOAT,
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, scr_w, scr_h, 0, GL_RGBA, GL_FLOAT,
                NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -143,7 +143,7 @@ void pbrd_render_geometries(const mat4 projection, const mat4 view,
     shader_set_uniform_1i(pbr.deferred_geometry, "tex_diffuse", 0);
     shader_set_uniform_1i(pbr.deferred_geometry, "tex_roughness", 1);
     shader_set_uniform_1i(pbr.deferred_geometry, "tex_normal", 2);
-    shader_set_uniform_1i(pbr.deferred_geometry, "tex_displacement", 3);
+    shader_set_uniform_1i(pbr.deferred_geometry, "tex_metallic", 3);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, mats[i].m_diffuse);
@@ -152,7 +152,7 @@ void pbrd_render_geometries(const mat4 projection, const mat4 view,
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, mats[i].m_normal);
     glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, mats[i].m_displacement);
+    glBindTexture(GL_TEXTURE_2D, mats[i].m_metallic);
 
     glBindVertexArray(geoms[i].m_vao);
 

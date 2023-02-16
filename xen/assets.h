@@ -48,7 +48,7 @@ struct pbr_material {
   uint32_t m_diffuse;
   uint32_t m_normal;
   uint32_t m_roughness;
-  uint32_t m_displacement;
+  uint32_t m_metallic;
 };
 
 /**
