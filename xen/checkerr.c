@@ -76,4 +76,7 @@ void gl_debug_output(GLenum source, GLenum type, unsigned int id,
   }
 
   printf("(%d): %s\n", id, message);
+  if (type == GL_DEBUG_TYPE_ERROR) {
+    exit(EXIT_FAILURE);
+  }
 }

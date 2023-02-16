@@ -15,14 +15,9 @@ uniform sampler2D tex_normal;
 uniform sampler2D tex_displacement;
 
 void main() {
-  // float disp = texture(tex_displacement, tex_coord).r;
-  // disp = (disp * 2.0) - 1.0;
-  vec3 normal = texture(tex_normal, tex_coord).rgb;
-
   g_pos = frag_pos;
-
+  vec3 normal = texture(tex_normal, tex_coord).rgb;
   g_normal.rgb = normalize(normal_matrix * normal);
-
   g_tex_diff.rgb = texture(tex_diffuse, tex_coord).rgb;
   g_tex_diff.a = texture(tex_roughness, tex_coord).r;
 }

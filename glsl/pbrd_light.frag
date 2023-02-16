@@ -1,7 +1,7 @@
 #version 460 core
 
 #define PI 3.141593
-#define METALIC 0.0
+#define METALIC 0.15
 
 in vec2 tex_coord;
 
