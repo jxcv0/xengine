@@ -25,9 +25,9 @@ void main() {
   frag_pos = world_pos.xyz;
   tex_coord = tex_coord_in;
 
-  vec3 t = normalize(vec3(projection * view * model * vec4(tangent_in, 0.0)));
-  vec3 b = normalize(vec3(projection * view * model * vec4(bitangent_in, 0.0)));
-  vec3 n = normalize(vec3(projection * view * model * vec4(normal_in, 0.0)));
+  vec3 t = normalize(vec3(model * vec4(tangent_in, 0.0)));
+  vec3 b = normalize(vec3(model * vec4(bitangent_in, 0.0)));
+  vec3 n = normalize(vec3(model * vec4(normal_in, 0.0)));
   normal_matrix = mat3(t, b, n);
 
   gl_Position = projection * view * world_pos;
