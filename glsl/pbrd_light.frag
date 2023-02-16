@@ -90,7 +90,6 @@ void main() {
   vec3 view_dir = normalize(view_pos - frag_pos);
 
   vec3 lo = vec3(0.0);
-
   for (int i = 0; i < num_lights; i++) {
     vec3 light_dir = normalize(lights[i].m_position - frag_pos);
     vec3 half_dir = normalize(light_dir + view_dir);

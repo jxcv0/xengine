@@ -67,7 +67,7 @@ int pbrd_init(const uint32_t scr_w, const uint32_t scr_h) {
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D,
                          pbr.g_normal, 0);
 
-  // diffuse + roughness texture
+  // diffuse
   glGenTextures(1, &pbr.g_tex_diff);
   glBindTexture(GL_TEXTURE_2D, pbr.g_tex_diff);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, scr_w, scr_h, 0, GL_RGBA,
@@ -134,7 +134,7 @@ void pbrd_render_geometries(const mat4 projection, const mat4 view,
   shader_set_uniform_m4fv(pbr.deferred_geometry, "projection", projection);
   shader_set_uniform_m4fv(pbr.deferred_geometry, "view", view);
 
-  // TODO this should be a component as it can be parallelized.
+  // TODO model should be a component as it can be parallelized.
   mat4 model = {0};
   for (uint32_t i = 0; i < n; i++) {
     identity_mat4(model);            // see above

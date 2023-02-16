@@ -1,10 +1,8 @@
 #version 460 core
 layout (location = 0) in vec3 pos_in;
-
 layout (location = 1) in vec3 tangent_in;
 layout (location = 2) in vec3 bitangent_in;
 layout (location = 3) in vec3 normal_in;
-
 layout (location = 4) in vec2 tex_coord_in;
 
 out vec3 frag_pos;
@@ -22,6 +20,7 @@ uniform mat4 model;
  */
 void main() {
   vec4 world_pos = model * vec4(pos_in, 1.0);
+
   frag_pos = world_pos.xyz;
   tex_coord = tex_coord_in;
 
