@@ -1,7 +1,7 @@
 #version 460 core
 
 #define PI 3.141593
-#define METALIC 0.1
+#define METALIC 0.0
 
 in vec2 tex_coord;
 
@@ -94,10 +94,10 @@ void main() {
   for (int i = 0; i < num_lights; i++) {
     vec3 light_dir = normalize(lights[i].m_position - frag_pos);
     vec3 half_dir = normalize(light_dir + view_dir);
-    float distance = length(lights[i].m_position - frag_pos);
+    float dist = length(lights[i].m_position - frag_pos);
     float attenuation = 1.0 /
-      (1.0 + lights[i].m_linear * distance + lights[i].m_quadratic
-      * (distance * distance));
+      (1.0 + lights[i].m_linear * dist + lights[i].m_quadratic
+      * (dist * dist));
     vec3 radiance = lights[i].m_color * attenuation;
 
     float ndf = distributionGGX(normal, half_dir, roughness);
@@ -111,8 +111,7 @@ void main() {
     float n_dot_l = max(dot(normal, light_dir), 0.0);
 
     vec3 num = ndf * geom_occ * fresnel;
-    float denom = 4.0 * max(dot(normal, view_dir), 0.0) *
-      n_dot_l + 0.0001;
+    float denom = 4.0 * max(dot(normal, view_dir), 0.0) * n_dot_l + 0.0001;
 
     vec3 specular = num / denom;
 
