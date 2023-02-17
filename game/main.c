@@ -23,8 +23,8 @@ const float window_height = 600;
 
 // struct light light_array[MAX_NUM_LIGHTS] = {0};
 vec3 positions[MAX_ENTITIES] = {0};
+mat4 model_matrices[MAX_ENTITIES] = {0};
 uint32_t num_meshes = 0;
-struct mesh meshes[MAX_ENTITIES] = {0};
 
 struct camera camera = {.m_mouse_sensetivity = 0.3, .m_movement_speed = 0.15};
 struct mouse_pos mouse_pos = {0};
@@ -48,8 +48,14 @@ int main() {
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
   struct pbr_material material = load_pbr_material("stacked-rock-cliff");
-  struct geometry pbr_sphere =
-      load_geometry("assets/meshes/noyau.geom");
+  struct geometry pbr_sphere = load_geometry("assets/meshes/noyau.geom");
+
+  mat4 model_matrix = {0};
+  identity_mat4(model_matrix);
+  // vec3 rot = {0, 0, 0};
+  // vec3 pos = {0, 0, 0};
+  // rotate(model_matrix, model_matrix, rot, radians(0));
+  // translate(model_matrix, pos);
 
   struct light l = LIGHT_RANGE_3250;
   l.m_position[0] = 3.0;
@@ -77,10 +83,7 @@ int main() {
 
     update_view_matrix();
 
-    mat4 model_matrix;
-    identity_mat4(model_matrix);
-
-    pbrd_render_geometries(projection_matrix, view_matrix, positions,
+    pbrd_render_geometries(projection_matrix, view_matrix, &model_matrix,
                            &pbr_sphere, &material, 1);
     pbrd_render_lighting(&l, 1, camera.m_pos, window_width, window_height);
 

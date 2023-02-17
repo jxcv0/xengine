@@ -123,8 +123,10 @@ int pbrd_init(const uint32_t scr_w, const uint32_t scr_h) {
  * ----------------------------------------------------------------------------
  */
 void pbrd_render_geometries(const mat4 projection, const mat4 view,
-                            const vec3 *positions, const struct geometry *geoms,
-                            const struct pbr_material *mats, const uint32_t n) {
+                            const mat4 *model_matrices,
+                            const struct geometry *geometries,
+                            const struct pbr_material *materials,
+                            const uint32_t n) {
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -134,29 +136,26 @@ void pbrd_render_geometries(const mat4 projection, const mat4 view,
   shader_set_uniform_m4fv(pbr.deferred_geometry, "projection", projection);
   shader_set_uniform_m4fv(pbr.deferred_geometry, "view", view);
 
-  // TODO model should be a component as it can be parallelized.
-  mat4 model = {0};
   for (uint32_t i = 0; i < n; i++) {
-    identity_mat4(model);            // see above
-    translate(model, positions[i]);  // see above
-    shader_set_uniform_m4fv(pbr.deferred_geometry, "model", model);
+    shader_set_uniform_m4fv(pbr.deferred_geometry, "model", model_matrices[i]);
     shader_set_uniform_1i(pbr.deferred_geometry, "tex_diffuse", 0);
     shader_set_uniform_1i(pbr.deferred_geometry, "tex_roughness", 1);
     shader_set_uniform_1i(pbr.deferred_geometry, "tex_normal", 2);
     shader_set_uniform_1i(pbr.deferred_geometry, "tex_metallic", 3);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, mats[i].m_diffuse);
+    glBindTexture(GL_TEXTURE_2D, materials[i].m_diffuse);
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, mats[i].m_roughness);
+    glBindTexture(GL_TEXTURE_2D, materials[i].m_roughness);
     glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, mats[i].m_normal);
+    glBindTexture(GL_TEXTURE_2D, materials[i].m_normal);
     glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, mats[i].m_metallic);
+    glBindTexture(GL_TEXTURE_2D, materials[i].m_metallic);
 
-    glBindVertexArray(geoms[i].m_vao);
+    glBindVertexArray(geometries[i].m_vao);
 
-    glDrawElements(GL_TRIANGLES, geoms[i].m_num_indices, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, geometries[i].m_num_indices, GL_UNSIGNED_INT,
+                   0);
   }
 }
 

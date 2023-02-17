@@ -165,6 +165,9 @@ void translate(mat4 m, const vec3 v) {
   m[3][2] += v[2];
 }
 
+/**
+ * ----------------------------------------------------------------------------
+ */
 void rotate(mat4 dest, const mat4 m, vec3 axis, const float angle) {
   const float c = cos(angle);
   const float s = sin(angle);

@@ -26,8 +26,10 @@ int pbrd_init(const uint32_t scr_w, const uint32_t scr_h);
  * @param TODO
  */
 void pbrd_render_geometries(const mat4 projection, const mat4 view,
-                            const vec3 *positions, const struct geometry *geoms,
-                            const struct pbr_material *mats, const uint32_t n);
+                            const mat4 *model_matrices,
+                            const struct geometry *geometries,
+                            const struct pbr_material *materials,
+                            const uint32_t n);
 /**
  * @brief Render lighting using data stored in G-Buffer.
  * TODO

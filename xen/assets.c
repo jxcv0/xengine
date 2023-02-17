@@ -48,7 +48,6 @@ uint32_t load_texture(const char *filename) {
   strncpy(filepath, TEXTURE_DIR, dirlen + 1);
   strncpy(&filepath[dirlen], filename, namelen + 1);
 
-
   printf("Loading texture from \"%s\".\n", filepath);
   stbi_set_flip_vertically_on_load(true);
   int w, h, n;

@@ -108,7 +108,6 @@ void translate(mat4 m, const vec3 v);
  * @param m The matrix to apply the rotation to.
  * @param axis The axis of the rotation.
  * @param angle The rotation angle in degrees.
- * @return A rotation matrix.
  */
 void rotate(mat4 dest, const mat4 m, vec3 axis, const float angle);
 
