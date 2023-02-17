@@ -1,12 +1,13 @@
-#include "lin.h"
-
 #include <assert.h>
+#include <stdio.h>
+#include <libgen.h>
+#include <string.h>
+
+#include "lin.h"
 
 #define ASSERT_FLOAT_EQ(f1, f2) assert(fabs(f1 - f2) < 0.0001)
 
-void tst_radians(void) {
-  ASSERT_FLOAT_EQ(radians(3.122f), 0.054489179f);
-}
+void tst_radians(void) { ASSERT_FLOAT_EQ(radians(3.122f), 0.054489179f); }
 
 void tst_identity_mat4(void) {
   mat4 m;
@@ -36,8 +37,8 @@ void tst_normalize_vec(void) {
   vec3 v = {5, 2, -3};
   normalize_vec3(v);
 
-  ASSERT_FLOAT_EQ(v[0],  0.8111071056538127f);
-  ASSERT_FLOAT_EQ(v[1],  0.3244428422615251f);
+  ASSERT_FLOAT_EQ(v[0], 0.8111071056538127f);
+  ASSERT_FLOAT_EQ(v[1], 0.3244428422615251f);
   ASSERT_FLOAT_EQ(v[2], -0.4866642633922876f);
 }
 
@@ -192,5 +193,8 @@ int main() {
   tst_translate();
   tst_rotate();
   tst_look_at();
+
+  char *suite = basename(__FILE__);
+  printf("[%s]: All tests passed.\n", suite);
   return 0;
 }
