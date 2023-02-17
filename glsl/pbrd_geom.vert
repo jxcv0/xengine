@@ -6,10 +6,8 @@ layout (location = 3) in vec3 normal_in;
 layout (location = 4) in vec2 tex_coord_in;
 
 out vec3 frag_pos;
-
-out mat3 normal_matrix;
-
 out vec2 tex_coord;
+out mat3 normal_matrix;
 
 uniform mat4 projection;
 uniform mat4 view;

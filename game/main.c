@@ -18,8 +18,8 @@
 extern const vec3 GLOBAL_UP;
 
 GLFWwindow *window;
-const float window_width = 640;
-const float window_height = 480;
+const float window_width = 1080;
+const float window_height = 920;
 
 // struct light light_array[MAX_NUM_LIGHTS] = {0};
 vec3 positions[MAX_ENTITIES] = {0};
@@ -47,14 +47,14 @@ int main() {
   perspective(projection_matrix, radians(60),
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
-  struct pbr_material material = load_pbr_material("rusted_iron");
+  struct pbr_material material = load_pbr_material("black-white-tile");
   struct geometry pbr_sphere =
       load_geometry("assets/meshes/pbr_test_sphere.geom");
 
   struct light l = LIGHT_RANGE_3250;
   l.m_position[0] = 3.0;
   l.m_position[1] = 3.0;
-  l.m_position[2] = 3.0;
+  l.m_position[2] = 0.0;
   l.m_color[0] = 1.0;
   l.m_color[1] = 1.0;
   l.m_color[2] = 1.0;

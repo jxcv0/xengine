@@ -4,10 +4,8 @@ layout (location = 1) out vec4 g_normal; // + metallic
 layout (location = 2) out vec4 g_tex_diff; // + roughness
 
 in vec3 frag_pos;
-
-in mat3 normal_matrix;
-
 in vec2 tex_coord;
+in mat3 normal_matrix;
 
 uniform sampler2D tex_diffuse;
 uniform sampler2D tex_roughness;
@@ -18,9 +16,10 @@ void main() {
   g_pos = frag_pos;
 
   vec3 normal = texture(tex_normal, tex_coord).rgb;
+  normal = normal * 2.0 - 1.0;
   g_normal.rgb = normalize(normal_matrix * normal);
-
   g_normal.a = texture(tex_metallic, tex_coord).r;
+
   g_tex_diff.rgb = texture(tex_diffuse, tex_coord).rgb;
   g_tex_diff.a = texture(tex_roughness, tex_coord).r;
 }
