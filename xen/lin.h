@@ -1,11 +1,13 @@
 #ifndef LIN_H_
 #define LIN_H_
 
+#include <math.h>
+
+#define IDENTITY_MAT4 {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <math.h>
 
 typedef float mat4[4][4];
 typedef float vec2[2];

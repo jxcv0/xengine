@@ -47,15 +47,14 @@ int main() {
   perspective(projection_matrix, radians(60),
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
-  struct pbr_material material = load_pbr_material("stacked-rock-cliff");
+  struct pbr_material material = load_pbr_material("black-white-tile");
   struct geometry pbr_sphere = load_geometry("assets/meshes/noyau.geom");
 
-  mat4 model_matrix = {0};
-  identity_mat4(model_matrix);
-  // vec3 rot = {0, 0, 0};
-  // vec3 pos = {0, 0, 0};
-  // rotate(model_matrix, model_matrix, rot, radians(0));
-  // translate(model_matrix, pos);
+  mat4 model_matrix = IDENTITY_MAT4;
+  vec3 rot = {0, 0, 0};
+  vec3 pos = {0, 0, 0};
+  rotate(model_matrix, model_matrix, rot, radians(0));
+  translate(model_matrix, pos);
 
   struct light l = LIGHT_RANGE_3250;
   l.m_position[0] = 3.0;
@@ -75,10 +74,11 @@ int main() {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
       glfwSetWindowShouldClose(window, true);
     }
+
     get_cursor_position(&mouse_pos, window);
     vec2 cursor_offset;
     get_cursor_offset(cursor_offset, &mouse_pos);
-    update_3rd_person_camera(&camera, cursor_offset, 4, camera_centre);
+    update_3rd_person_camera(&camera, cursor_offset, 10, camera_centre);
     // handle_keyboard_input(window);
 
     update_view_matrix();
