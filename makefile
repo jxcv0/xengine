@@ -41,3 +41,5 @@ clean:
 	@rm -rf build/*
 	@rm -rf bin/*
 
+lin_tests: libxen.a
+	@gcc test/$@.c $(cflags) -I$(xen_src_dir) $(xen_lib) $(libs) -o $(bin_dir)/lin_tests

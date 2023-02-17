@@ -1,11 +1,14 @@
-#include <gtest/gtest.h>
-#include <lin.h>
+#include "lin.h"
 
-TEST(lintests, radians) {
+#include <assert.h>
+
+#define ASSERT_FLOAT_EQ(f1, f2) assert(fabs(f1 - f2) < 0.0001)
+
+void tst_radians(void) {
   ASSERT_FLOAT_EQ(radians(3.122f), 0.054489179f);
 }
 
-TEST(lintests, identity_mat4) {
+void tst_identity_mat4(void) {
   mat4 m;
   identity_mat4(m);
   ASSERT_FLOAT_EQ(m[0][0], 1);
@@ -29,7 +32,7 @@ TEST(lintests, identity_mat4) {
   ASSERT_FLOAT_EQ(m[3][3], 1);
 }
 
-TEST(lintests, normalize_vec3) {
+void tst_normalize_vec(void) {
   vec3 v = {5, 2, -3};
   normalize_vec3(v);
 
@@ -38,7 +41,7 @@ TEST(lintests, normalize_vec3) {
   ASSERT_FLOAT_EQ(v[2], -0.4866642633922876f);
 }
 
-TEST(lintests, cross_vec3) {
+void tst_cross_vec3(void) {
   vec3 dest = {0};
   vec3 v1 = {1.0f, 2.0f, 3.0f};
   vec3 v2 = {1.0f, 5.0f, 7.0f};
@@ -48,13 +51,13 @@ TEST(lintests, cross_vec3) {
   ASSERT_FLOAT_EQ(dest[2], 3.0f);
 }
 
-TEST(lintests, product_mat4) {
+void tst_product_mat4(void) {
   mat4 m1 = {{0}};
   mat4 m2 = {{0}};
 
   float x = 0.0f;
-  for (auto i = 0; i < 4; i++) {
-    for (auto j = 0; j < 4; j++) {
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 4; j++) {
       m1[i][j] = x;
       m2[i][j] = x;
       x += 1.0f;
@@ -80,19 +83,19 @@ TEST(lintests, product_mat4) {
   ASSERT_FLOAT_EQ(result[3][3], 506.0);
 }
 
-TEST(lintests, dot_vec3) {
+void tst_dot_vec3(void) {
   vec3 v1 = {1.0f, -3.2f, 0.0f};
   vec3 v2 = {5.4f, 3.2f, -5.0f};
   ASSERT_FLOAT_EQ(dot_vec3(v1, v2), -4.84);
 }
 
-TEST(lintests, dot_vec4) {
+void tst_dot_vec4(void) {
   vec4 v1 = {1.0f, -3.2f, 0.0f, 1.0f};
   vec4 v2 = {5.4f, 3.2f, -5.0f, -0.5f};
   ASSERT_FLOAT_EQ(dot_vec4(v1, v2), -5.34);
 }
 
-TEST(lintests, perspective) {
+void tst_perspective(void) {
   mat4 m = {{0}};
   perspective(m, radians(45.0f), (800.0f / 600.0f), 0.1f, 100.0f);
 
@@ -117,7 +120,7 @@ TEST(lintests, perspective) {
   ASSERT_FLOAT_EQ(m[3][3], 0.0f);
 }
 
-TEST(lintests, translate) {
+void tst_translate(void) {
   mat4 m;
   identity_mat4(m);
   vec3 v = {0.1f, 0.1f, 0.1f};
@@ -128,10 +131,9 @@ TEST(lintests, translate) {
   ASSERT_FLOAT_EQ(m[3][2], 0.1f);
 }
 
-TEST(lintests, rotate) {
+void tst_rotate(void) {
   mat4 dest = {{0}};
-  mat4 m = {{0}};
-  identity_mat4(m);
+  mat4 m = IDENTITY_MAT4;
   vec3 v = {0.0f, 1.0f, 0.0f};
   rotate(dest, m, v, radians(30.0f));
   ASSERT_FLOAT_EQ(dest[0][0], 0.86602539f);
@@ -152,7 +154,7 @@ TEST(lintests, rotate) {
   ASSERT_FLOAT_EQ(dest[3][3], 1.0f);
 }
 
-TEST(lintests, look_at) {
+void tst_look_at(void) {
   vec3 eye = {3.0f, 3.0f, 3.0f};
   vec3 ctr = {1.0f, 0.0f, 1.0f};
   vec3 c = {eye[0] + ctr[0], eye[1] + ctr[1], eye[2] + ctr[2]};
@@ -176,4 +178,19 @@ TEST(lintests, look_at) {
   ASSERT_FLOAT_EQ(m[3][1], -3.0f);
   ASSERT_FLOAT_EQ(m[3][2], 4.24264f);
   ASSERT_FLOAT_EQ(m[3][3], 1.0f);
+}
+
+int main() {
+  tst_radians();
+  tst_identity_mat4();
+  tst_normalize_vec();
+  tst_cross_vec3();
+  tst_product_mat4();
+  tst_dot_vec3();
+  tst_dot_vec4();
+  tst_perspective();
+  tst_translate();
+  tst_rotate();
+  tst_look_at();
+  return 0;
 }
