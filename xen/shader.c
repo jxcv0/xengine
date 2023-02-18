@@ -63,54 +63,56 @@ void shader_set_uniform_m4fv(shader_t shader, const char *uniform_name,
 /**
  * ----------------------------------------------------------------------------
  */
-static void check_compile(int id) {
+static void check_compile(uint32_t id) {
   GLint success;
   char infoLog[1024];
   glGetShaderiv(id, GL_COMPILE_STATUS, &success);
   if (!success) {
     glGetShaderInfoLog(id, 1024, NULL, infoLog);
     printf("%s\n", infoLog);
+    exit(EXIT_FAILURE);
   }
 }
 
 /**
  * ----------------------------------------------------------------------------
  */
-static void check_link(int id) {
+static void check_link(uint32_t id) {
   GLint success;
   char infoLog[1024];
   glGetProgramiv(id, GL_LINK_STATUS, &success);
   if (!success) {
     glGetProgramInfoLog(id, 1024, NULL, infoLog);
     printf("%s\n", infoLog);
+    exit(EXIT_FAILURE);
   }
 }
 
 /**
  * ----------------------------------------------------------------------------
  */
-shader_t load_shader(const char *vert_path, const char *frag_path) {
+shader_t load_shader_vf(const char *vert_path, const char *frag_path) {
   char *v = load_file_into_mem(vert_path);
   char *f = load_file_into_mem(frag_path);
 
   const char *vert_file = v;
   const char *frag_file = f;
 
-  unsigned int vert_id = glCreateShader(GL_VERTEX_SHADER);
+  uint32_t vert_id = glCreateShader(GL_VERTEX_SHADER);
   glShaderSource(vert_id, 1, &vert_file, NULL);
   glCompileShader(vert_id);
   check_compile(vert_id);
 
-  unsigned int frag_id = glCreateShader(GL_FRAGMENT_SHADER);
+  uint32_t frag_id = glCreateShader(GL_FRAGMENT_SHADER);
   glShaderSource(frag_id, 1, &frag_file, NULL);
   glCompileShader(frag_id);
   check_compile(frag_id);
 
-  unsigned int program_id = glCreateProgram();
+  uint32_t program_id = glCreateProgram();
   glAttachShader(program_id, vert_id);
   glAttachShader(program_id, frag_id);
-  glLinkProgram(program_id);
 
+  glLinkProgram(program_id);
   check_link(program_id);
 
   glDeleteShader(vert_id);
@@ -118,6 +120,53 @@ shader_t load_shader(const char *vert_path, const char *frag_path) {
 
   free(v);
   free(f);
+
+  return program_id;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+shader_t load_shader_vfg(const char *vert_path, const char *frag_path,
+                     const char *geom_path) {
+  char *v = load_file_into_mem(vert_path);
+  char *f = load_file_into_mem(frag_path);
+  char *g = load_file_into_mem(geom_path);
+
+  const char *vert_file = v;
+  const char *frag_file = f;
+  const char *geom_file = g;
+
+  uint32_t vert_id = glCreateShader(GL_VERTEX_SHADER);
+  glShaderSource(vert_id, 1, &vert_file, NULL);
+  glCompileShader(vert_id);
+  check_compile(vert_id);
+
+  uint32_t frag_id = glCreateShader(GL_FRAGMENT_SHADER);
+  glShaderSource(frag_id, 1, &frag_file, NULL);
+  glCompileShader(frag_id);
+  check_compile(frag_id);
+
+  uint32_t geom_id = glCreateShader(GL_GEOMETRY_SHADER);
+  glShaderSource(geom_id, 1, &geom_file, NULL);
+  glCompileShader(geom_id);
+  check_compile(geom_id);
+
+  uint32_t program_id = glCreateProgram();
+  glAttachShader(program_id, vert_id);
+  glAttachShader(program_id, frag_id);
+  glAttachShader(program_id, geom_id);
+
+  glLinkProgram(program_id);
+  check_link(program_id);
+
+  glDeleteShader(vert_id);
+  glDeleteShader(frag_id);
+  glDeleteShader(geom_id);
+
+  free(v);
+  free(f);
+  free(g);
 
   return program_id;
 }

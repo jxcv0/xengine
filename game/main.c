@@ -48,7 +48,8 @@ int main() {
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
   struct pbr_material material = load_pbr_material("ravine_rock");
-  struct geometry pbr_sphere = load_geometry("assets/meshes/pbr_test_sphere.geom");
+  struct geometry pbr_sphere =
+      load_geometry("assets/meshes/pbr_test_sphere.geom");
 
   struct light l = LIGHT_RANGE_3250;
   l.m_position[0] = 3.0;
@@ -82,7 +83,6 @@ int main() {
     update_3rd_person_camera(&camera, cursor_offset, 3, camera_centre);
     // handle_keyboard_input(window);
     update_view_matrix();
-
 
     pbrd_render_geometries(projection_matrix, view_matrix, &model_matrix,
                            &pbr_sphere, &material, 1);

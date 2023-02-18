@@ -1,6 +1,6 @@
 #include <assert.h>
-#include <stdio.h>
 #include <libgen.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "lin.h"
@@ -194,12 +194,8 @@ void tst_scale(void) {
   vec3 v = {0, 2, 3};
   scale(m, v);
 
-  for (int i = 0 ; i < 4; i++) {
-    printf("%f %f %f %f\n",
-        m[i][0],
-        m[i][1],
-        m[i][2],
-        m[i][3]);
+  for (int i = 0; i < 4; i++) {
+    printf("%f %f %f %f\n", m[i][0], m[i][1], m[i][2], m[i][3]);
   }
 
   ASSERT_FLOAT_EQ(m[0][0], 0.000000);

@@ -20,6 +20,12 @@ typedef unsigned int shader_t;
 void shader_set_uniform_1i(shader_t id, const char *uniform_name,
                            const int32_t value);
 
+/**
+ * @brief Uniform unsigned integer utility function.
+ *
+ * @param uniform_name The name of the uniform.
+ * @param value The value to set the uniform to.
+ */
 void shader_set_uniform_1ui(shader_t id, const char *uniform_name,
                             const uint32_t value);
 
@@ -73,7 +79,17 @@ void shader_set_uniform_m4fv(shader_t shader, const char *uniform_name,
  *  @param frag_path Path to the fragment shader.
  *  @return A new Shader object.
  */
-shader_t load_shader(const char *vert_path, const char *frag_path);
+shader_t load_shader_vf(const char *vert_path, const char *frag_path);
+
+/** @brief Load a shader from a file.
+ *  @param vert_path Path to the vertex shader.
+ *  @param frag_path Path to the fragment shader.
+ *  @param geom_path Path to an optional geometry shader.
+ *  @return A new Shader object.
+ */
+shader_t load_shader_vfg(const char *vert_path, const char *frag_path, const char *geom_path);
+
+
 
 #ifdef __cplusplus
 }

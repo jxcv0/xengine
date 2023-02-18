@@ -39,10 +39,12 @@ static struct {
  */
 int pbrd_init(const uint32_t scr_w, const uint32_t scr_h) {
   // TODO tesellation to subdivide mesh
-  pbr.deferred_geometry =
-      load_shader("glsl/pbrd_geom.vert", "glsl/pbrd_geom.frag");
+  pbr.deferred_geometry = load_shader_vfg(
+      "glsl/pbrd_geom.vert", "glsl/pbrd_geom.frag", "glsl/pbrd_geom.geom");
   pbr.deferred_lighting =
-      load_shader("glsl/pbrd_light.vert", "glsl/pbrd_light.frag");
+      load_shader_vf("glsl/pbrd_light.vert", "glsl/pbrd_light.frag");
+
+
 
   // set up G-Buffer
   glGenFramebuffers(1, &pbr.g_buff);
