@@ -137,18 +137,22 @@ void tst_rotate(void) {
   mat4 m = IDENTITY_MAT4;
   vec3 v = {0.0f, 1.0f, 0.0f};
   rotate(dest, m, v, radians(30.0f));
+
   ASSERT_FLOAT_EQ(dest[0][0], 0.86602539f);
   ASSERT_FLOAT_EQ(dest[0][1], 0.0f);
   ASSERT_FLOAT_EQ(dest[0][2], -0.5f);
   ASSERT_FLOAT_EQ(dest[0][3], 0.0f);
+
   ASSERT_FLOAT_EQ(dest[1][0], 0.0f);
   ASSERT_FLOAT_EQ(dest[1][1], 1.0f);
   ASSERT_FLOAT_EQ(dest[1][2], 0.0f);
   ASSERT_FLOAT_EQ(dest[1][3], 0.0f);
+
   ASSERT_FLOAT_EQ(dest[2][0], 0.5f);
   ASSERT_FLOAT_EQ(dest[2][1], 0.0f);
   ASSERT_FLOAT_EQ(dest[2][2], 0.86602539f);
   ASSERT_FLOAT_EQ(dest[2][3], 0.0f);
+
   ASSERT_FLOAT_EQ(dest[3][0], 0.0f);
   ASSERT_FLOAT_EQ(dest[3][1], 0.0f);
   ASSERT_FLOAT_EQ(dest[3][2], 0.0f);
