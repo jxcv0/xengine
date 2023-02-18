@@ -38,6 +38,7 @@ static struct {
  * ----------------------------------------------------------------------------
  */
 int pbrd_init(const uint32_t scr_w, const uint32_t scr_h) {
+  // TODO tesellation to subdivide mesh
   pbr.deferred_geometry =
       load_shader("glsl/pbrd_geom.vert", "glsl/pbrd_geom.frag");
   pbr.deferred_lighting =
@@ -142,6 +143,7 @@ void pbrd_render_geometries(const mat4 projection, const mat4 view,
     shader_set_uniform_1i(pbr.deferred_geometry, "tex_roughness", 1);
     shader_set_uniform_1i(pbr.deferred_geometry, "tex_normal", 2);
     shader_set_uniform_1i(pbr.deferred_geometry, "tex_metallic", 3);
+    shader_set_uniform_1i(pbr.deferred_geometry, "tex_displacement", 4);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, materials[i].m_diffuse);
@@ -151,6 +153,8 @@ void pbrd_render_geometries(const mat4 projection, const mat4 view,
     glBindTexture(GL_TEXTURE_2D, materials[i].m_normal);
     glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_2D, materials[i].m_metallic);
+    glActiveTexture(GL_TEXTURE4);
+    glBindTexture(GL_TEXTURE_2D, materials[i].m_displacement);
 
     glBindVertexArray(geometries[i].m_vao);
 

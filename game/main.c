@@ -47,8 +47,8 @@ int main() {
   perspective(projection_matrix, radians(60),
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
-  struct pbr_material material = load_pbr_material("black-white-tile");
-  struct geometry pbr_sphere = load_geometry("assets/meshes/noyau.geom");
+  struct pbr_material material = load_pbr_material("ravine_rock");
+  struct geometry pbr_sphere = load_geometry("assets/meshes/pbr_test_sphere.geom");
 
   struct light l = LIGHT_RANGE_3250;
   l.m_position[0] = 3.0;
@@ -79,7 +79,7 @@ int main() {
     get_cursor_position(&mouse_pos, window);
     vec2 cursor_offset;
     get_cursor_offset(cursor_offset, &mouse_pos);
-    update_3rd_person_camera(&camera, cursor_offset, 10, camera_centre);
+    update_3rd_person_camera(&camera, cursor_offset, 3, camera_centre);
     // handle_keyboard_input(window);
     update_view_matrix();
 

@@ -169,8 +169,11 @@ struct pbr_material load_pbr_material(const char *material_name) {
   strncpy(&buff[n], "_roughness.png", 15);
   mat.m_roughness = load_texture(buff);
 
-  strncpy(&buff[n], "_metallic.png", 18);
+  strncpy(&buff[n], "_metallic.png", 14);
   mat.m_metallic = load_texture(buff);
+
+  strncpy(&buff[n], "_displacement.png", 18);
+  mat.m_displacement = load_texture(buff);
 
   return mat;
 }
