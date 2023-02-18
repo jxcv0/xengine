@@ -1,6 +1,7 @@
 #include "lin.h"
 
 #include <stdio.h>
+#include <string.h>
 
 /**
  * ----------------------------------------------------------------------------
@@ -196,4 +197,21 @@ void rotate(mat4 dest, const mat4 m, vec3 axis, const float angle) {
   rot[3][3] = 1.0f;
 
   product_mat4(dest, m, rot);
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+void scale(mat4 m, const vec3 v) {
+  mat4 temp = IDENTITY_MAT4;
+  temp[0][0] = v[0];
+  temp[1][1] = v[1];
+  temp[2][2] = v[2];
+  temp[3][0] = m[3][0];
+  temp[3][1] = m[3][1];
+  temp[3][2] = m[3][2];
+  temp[3][3] = m[3][3];
+  mat4 result = IDENTITY_MAT4;
+  product_mat4(result, m, temp);
+  memcpy(m, result, sizeof(float) * 16);
 }

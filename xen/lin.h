@@ -113,6 +113,14 @@ void translate(mat4 m, const vec3 v);
  */
 void rotate(mat4 dest, const mat4 m, vec3 axis, const float angle);
 
+/**
+ * @brief Scale a tramsformation matrix by a vector v.
+ *
+ * @param m The matrix to transform.
+ * @param v The scaling vector.
+ */
+void scale(mat4 m, const vec3 v);
+
 #ifdef __cplusplus
 }
 #endif

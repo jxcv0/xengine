@@ -185,6 +185,41 @@ void tst_look_at(void) {
   ASSERT_FLOAT_EQ(m[3][3], 1.0f);
 }
 
+void tst_scale(void) {
+  mat4 m = {0};
+  m[0][2] = 1.032f;
+  m[2][1] = 0.032f;
+  m[3][0] = 1.0f;
+  m[3][2] = 0.888f;
+  vec3 v = {0, 2, 3};
+  scale(m, v);
+
+  for (int i = 0 ; i < 4; i++) {
+    printf("%f %f %f %f\n",
+        m[i][0],
+        m[i][1],
+        m[i][2],
+        m[i][3]);
+  }
+
+  ASSERT_FLOAT_EQ(m[0][0], 0.000000);
+  ASSERT_FLOAT_EQ(m[0][1], 0.000000);
+  ASSERT_FLOAT_EQ(m[0][2], 1.032000);
+  ASSERT_FLOAT_EQ(m[0][3], 0.000000);
+  ASSERT_FLOAT_EQ(m[1][0], 0.000000);
+  ASSERT_FLOAT_EQ(m[1][1], 0.000000);
+  ASSERT_FLOAT_EQ(m[1][2], 0.000000);
+  ASSERT_FLOAT_EQ(m[1][3], 0.000000);
+  ASSERT_FLOAT_EQ(m[2][0], 0.000000);
+  ASSERT_FLOAT_EQ(m[2][1], 0.032000);
+  ASSERT_FLOAT_EQ(m[2][2], 0.000000);
+  ASSERT_FLOAT_EQ(m[2][3], 0.000000);
+  ASSERT_FLOAT_EQ(m[3][0], 1.000000);
+  ASSERT_FLOAT_EQ(m[3][1], 0.000000);
+  ASSERT_FLOAT_EQ(m[3][2], 0.888000);
+  ASSERT_FLOAT_EQ(m[3][3], 0.000000);
+}
+
 int main() {
   tst_radians();
   tst_identity_mat4();
@@ -197,6 +232,7 @@ int main() {
   tst_translate();
   tst_rotate();
   tst_look_at();
+  tst_scale();
 
   char *suite = basename(__FILE__);
   printf("[%s]: All tests passed.\n", suite);
