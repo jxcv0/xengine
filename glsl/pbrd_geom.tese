@@ -7,11 +7,11 @@ in vec3 v_bitangent[];
 in vec3 v_normal[];
 in vec2 v_tex_coord[];
 
-out vec3 e_position[];
-out vec3 e_tangent[];
-out vec3 e_bitangent[];
-out vec3 e_normal[];
-out vec2 e_tex_coord[];
+out vec3 e_position;
+out vec3 e_tangent;
+out vec3 e_bitangent;
+out vec3 e_normal;
+out vec2 e_tex_coord;
 
 uniform sampler2D tex_displacement;
 
@@ -44,6 +44,7 @@ void main() {
   float disp = texture(tex_displacement, tex_coord).r;
 
   gl_Position = vec4(position, 1.0);
+
   e_position = position;
   e_tangent = tangent;
   e_bitangent = bitangent;

@@ -202,7 +202,7 @@ void pbrd_render_geometries(const mat4 projection, const mat4 view,
 
     glBindVertexArray(geometries[i].m_vao);
 
-    glDrawElements(GL_TRIANGLES, geometries[i].m_num_indices, GL_UNSIGNED_INT,
+    glDrawElements(GL_PATCHES, geometries[i].m_num_indices, GL_UNSIGNED_INT,
                    0);
   }
 }
