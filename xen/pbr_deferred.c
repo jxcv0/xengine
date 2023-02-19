@@ -40,13 +40,11 @@ static struct {
  */
 static void load_pbrd_shaders(void) {
   char *v = load_file_into_mem("glsl/pbrd_geom.vert");
-  //char *te = load_file_into_mem("glsl/pbrd_geom.tese");
-  //char *g = load_file_into_mem("glsl/pbrd_geom.geom");
+  char *e = load_file_into_mem("glsl/pbrd_geom.tese");
   char *f = load_file_into_mem("glsl/pbrd_geom.frag");
 
   const char *vert_file = v;
-  //const char *tese_file = te;
-  //const char *geom_file = g;
+  const char *tese_file = e;
   const char *frag_file = f;
 
   uint32_t vert_id = glCreateShader(GL_VERTEX_SHADER);
@@ -54,17 +52,10 @@ static void load_pbrd_shaders(void) {
   glCompileShader(vert_id);
   check_compile(vert_id);
 
-  /**
   uint32_t tese_id = glCreateShader(GL_TESS_EVALUATION_SHADER);
   glShaderSource(tese_id, 1, &tese_file, NULL);
   glCompileShader(tese_id);
   check_compile(tese_id);
-
-  uint32_t geom_id = glCreateShader(GL_GEOMETRY_SHADER);
-  glShaderSource(geom_id, 1, &geom_file, NULL);
-  glCompileShader(geom_id);
-  check_compile(geom_id);
-  **/
 
   uint32_t frag_id = glCreateShader(GL_FRAGMENT_SHADER);
   glShaderSource(frag_id, 1, &frag_file, NULL);
@@ -73,21 +64,18 @@ static void load_pbrd_shaders(void) {
 
   uint32_t program_id = glCreateProgram();
   glAttachShader(program_id, vert_id);
-  //glAttachShader(program_id, tese_id);
-  //glAttachShader(program_id, geom_id);
+  glAttachShader(program_id, tese_id);
   glAttachShader(program_id, frag_id);
 
   glLinkProgram(program_id);
   check_link(program_id);
 
   glDeleteShader(vert_id);
-  //glDeleteShader(tese_id);
-  //glDeleteShader(geom_id);
+  glDeleteShader(tese_id);
   glDeleteShader(frag_id);
 
   free(v);
-  //free(te);
-  //free(g);
+  free(e);
   free(f);
 
   pbr.deferred_geometry = program_id;

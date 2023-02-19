@@ -6,10 +6,10 @@ layout (location = 3) in vec3 normal_in;
 layout (location = 4) in vec2 tex_coord_in;
 
 out vec3 v_position;
-out vec2 v_tex_coord;
 out vec3 v_tangent;
 out vec3 v_bitangent;
 out vec3 v_normal;
+out vec2 v_tex_coord;
 
 uniform mat4 projection;
 uniform mat4 view;
