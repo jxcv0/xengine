@@ -88,6 +88,7 @@ static void load_pbrd_shaders(void) {
  */
 int pbrd_init(const uint32_t scr_w, const uint32_t scr_h) {
   load_pbrd_shaders();
+  glPatchParameteri(GL_PATCH_VERTICES, 3);
   const float outer[] = {4, 4, 4, 4};
   const float inner[]  = {4, 4};
   glPatchParameterfv(GL_PATCH_DEFAULT_OUTER_LEVEL, outer);

@@ -16,17 +16,12 @@ uniform mat4 view;
 uniform mat4 model;
 
 /**
- * Create normal matrix
+ * Pass through
  */
 void main() {
-  vec4 world_pos = model * vec4(pos_in, 1.0);
-
-  v_position = world_pos.xyz;
+  v_position = pos_in;
   v_tex_coord = tex_coord_in;
-
-  v_tangent = normalize(vec3(model * vec4(tangent_in, 0.0)));
-  v_bitangent = normalize(vec3(model * vec4(bitangent_in, 0.0)));
-  v_normal = normalize(vec3(model * vec4(normal_in, 0.0)));
-
-  gl_Position = projection * view * world_pos;
+  v_tangent = tangent_in;
+  v_bitangent = bitangent_in;
+  v_normal = normal_in;
 }

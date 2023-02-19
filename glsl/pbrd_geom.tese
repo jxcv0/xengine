@@ -13,6 +13,10 @@ out vec3 e_bitangent;
 out vec3 e_normal;
 out vec2 e_tex_coord;
 
+uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 model;
+
 uniform sampler2D tex_displacement;
 
 void main() {
@@ -45,10 +49,13 @@ void main() {
 
   gl_Position = vec4(position, 1.0);
 
-  e_position = position;
-  e_tangent = tangent;
-  e_bitangent = bitangent;
-  e_normal = normal;
+  e_position = vec3(model * vec4(position + (normal * disp * 0.15), 1.0));
+
+  e_tangent = normalize(vec3(model * vec4(tangent, 0.0)));
+  e_bitangent = normalize(vec3(model * vec4(bitangent, 0.0)));
+  e_normal = normalize(vec3(model * vec4(normal, 0.0)));
+
   e_tex_coord = tex_coord;
+
+  gl_Position = projection * view * model * vec4(position, 1.0);
 }
-// https://stackoverflow.com/questions/24166446/glsl-tessellation-displacement-mapping
