@@ -57,5 +57,5 @@ void main() {
 
   e_tex_coord = tex_coord;
 
-  gl_Position = projection * view * model * vec4(position, 1.0);
+  gl_Position = projection * view * model * vec4(e_position, 1.0);
 }
