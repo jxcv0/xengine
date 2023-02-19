@@ -5,6 +5,7 @@
 
 #include "glad.h"
 #include "shader.h"
+#include "utils.h"
 
 #define MAX_NUM_LIGHTS 8
 
@@ -37,14 +38,56 @@ static struct {
 /**
  * ----------------------------------------------------------------------------
  */
-int pbrd_init(const uint32_t scr_w, const uint32_t scr_h) {
-  // TODO tesellation to subdivide mesh
-  pbr.deferred_geometry = load_shader_vfg(
-      "glsl/pbrd_geom.vert", "glsl/pbrd_geom.frag", "glsl/pbrd_geom.geom");
+static void load_pbrd_shaders(void) {
+  char *v = load_file_into_mem("glsl/pbrd_geom.vert");
+  char *g = load_file_into_mem("glsl/pbrd_geom.geom");
+  char *f = load_file_into_mem("glsl/pbrd_geom.frag");
+
+  const char *vert_file = v;
+  const char *frag_file = f;
+  const char *geom_file = g;
+
+  uint32_t vert_id = glCreateShader(GL_VERTEX_SHADER);
+  glShaderSource(vert_id, 1, &vert_file, NULL);
+  glCompileShader(vert_id);
+  check_compile(vert_id);
+
+  uint32_t geom_id = glCreateShader(GL_GEOMETRY_SHADER);
+  glShaderSource(geom_id, 1, &geom_file, NULL);
+  glCompileShader(geom_id);
+  check_compile(geom_id);
+
+  uint32_t frag_id = glCreateShader(GL_FRAGMENT_SHADER);
+  glShaderSource(frag_id, 1, &frag_file, NULL);
+  glCompileShader(frag_id);
+  check_compile(frag_id);
+
+  uint32_t program_id = glCreateProgram();
+  glAttachShader(program_id, vert_id);
+  glAttachShader(program_id, geom_id);
+  glAttachShader(program_id, frag_id);
+
+  glLinkProgram(program_id);
+  check_link(program_id);
+
+  glDeleteShader(vert_id);
+  glDeleteShader(geom_id);
+  glDeleteShader(frag_id);
+
+  free(v);
+  free(g);
+  free(f);
+
+  pbr.deferred_geometry = program_id;
   pbr.deferred_lighting =
       load_shader_vf("glsl/pbrd_light.vert", "glsl/pbrd_light.frag");
+}
 
-
+/**
+ * ----------------------------------------------------------------------------
+ */
+int pbrd_init(const uint32_t scr_w, const uint32_t scr_h) {
+  load_pbrd_shaders();
 
   // set up G-Buffer
   glGenFramebuffers(1, &pbr.g_buff);

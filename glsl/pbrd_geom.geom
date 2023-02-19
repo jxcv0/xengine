@@ -10,6 +10,8 @@ out vec3 frag_pos;
 out vec2 tex_coord;
 out mat3 normal_matrix;
 
+uniform sampler2D tex_displacement;
+
 void main() {
   for(int i = 0; i < 3; i++) {
     gl_Position = gl_in[i].gl_Position;
