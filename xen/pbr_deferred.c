@@ -13,7 +13,7 @@
 static struct {
   // geometry
   uint32_t g_buff;
-  uint32_t g_pos;
+  uint32_t g_position;
 
   // normal matrix
   uint32_t g_tangent;
@@ -40,22 +40,31 @@ static struct {
  */
 static void load_pbrd_shaders(void) {
   char *v = load_file_into_mem("glsl/pbrd_geom.vert");
-  char *g = load_file_into_mem("glsl/pbrd_geom.geom");
+  //char *te = load_file_into_mem("glsl/pbrd_geom.tese");
+  //char *g = load_file_into_mem("glsl/pbrd_geom.geom");
   char *f = load_file_into_mem("glsl/pbrd_geom.frag");
 
   const char *vert_file = v;
+  //const char *tese_file = te;
+  //const char *geom_file = g;
   const char *frag_file = f;
-  const char *geom_file = g;
 
   uint32_t vert_id = glCreateShader(GL_VERTEX_SHADER);
   glShaderSource(vert_id, 1, &vert_file, NULL);
   glCompileShader(vert_id);
   check_compile(vert_id);
 
+  /**
+  uint32_t tese_id = glCreateShader(GL_TESS_EVALUATION_SHADER);
+  glShaderSource(tese_id, 1, &tese_file, NULL);
+  glCompileShader(tese_id);
+  check_compile(tese_id);
+
   uint32_t geom_id = glCreateShader(GL_GEOMETRY_SHADER);
   glShaderSource(geom_id, 1, &geom_file, NULL);
   glCompileShader(geom_id);
   check_compile(geom_id);
+  **/
 
   uint32_t frag_id = glCreateShader(GL_FRAGMENT_SHADER);
   glShaderSource(frag_id, 1, &frag_file, NULL);
@@ -64,18 +73,21 @@ static void load_pbrd_shaders(void) {
 
   uint32_t program_id = glCreateProgram();
   glAttachShader(program_id, vert_id);
-  glAttachShader(program_id, geom_id);
+  //glAttachShader(program_id, tese_id);
+  //glAttachShader(program_id, geom_id);
   glAttachShader(program_id, frag_id);
 
   glLinkProgram(program_id);
   check_link(program_id);
 
   glDeleteShader(vert_id);
-  glDeleteShader(geom_id);
+  //glDeleteShader(tese_id);
+  //glDeleteShader(geom_id);
   glDeleteShader(frag_id);
 
   free(v);
-  free(g);
+  //free(te);
+  //free(g);
   free(f);
 
   pbr.deferred_geometry = program_id;
@@ -88,20 +100,24 @@ static void load_pbrd_shaders(void) {
  */
 int pbrd_init(const uint32_t scr_w, const uint32_t scr_h) {
   load_pbrd_shaders();
+  const float outer[] = {4, 4, 4, 4};
+  const float inner[]  = {4, 4};
+  glPatchParameterfv(GL_PATCH_DEFAULT_OUTER_LEVEL, outer);
+  glPatchParameterfv(GL_PATCH_DEFAULT_INNER_LEVEL, inner);
 
   // set up G-Buffer
   glGenFramebuffers(1, &pbr.g_buff);
   glBindFramebuffer(GL_FRAMEBUFFER, pbr.g_buff);
 
   // vertex position buffer
-  glGenTextures(1, &pbr.g_pos);
-  glBindTexture(GL_TEXTURE_2D, pbr.g_pos);
+  glGenTextures(1, &pbr.g_position);
+  glBindTexture(GL_TEXTURE_2D, pbr.g_position);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, scr_w, scr_h, 0, GL_RGB, GL_FLOAT,
                NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-                         pbr.g_pos, 0);
+                         pbr.g_position, 0);
 
   // normal
   glGenTextures(1, &pbr.g_normal);
@@ -133,11 +149,6 @@ int pbrd_init(const uint32_t scr_w, const uint32_t scr_h) {
   glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, scr_w, scr_h);
   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
                             GL_RENDERBUFFER, pbr.g_depth);
-
-  glUseProgram(pbr.deferred_lighting);
-  shader_set_uniform_1i(pbr.deferred_lighting, "g_pos", 0);
-  shader_set_uniform_1i(pbr.deferred_lighting, "g_norm", 1);
-  shader_set_uniform_1i(pbr.deferred_lighting, "g_tex_diff", 2);
 
   const float quad_verts[] = {
       -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
@@ -217,7 +228,7 @@ void pbrd_render_lighting(struct light *lights, const uint32_t n,
   glUseProgram(pbr.deferred_lighting);
 
   glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, pbr.g_pos);
+  glBindTexture(GL_TEXTURE_2D, pbr.g_position);
 
   glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_2D, pbr.g_normal);
@@ -225,7 +236,7 @@ void pbrd_render_lighting(struct light *lights, const uint32_t n,
   glActiveTexture(GL_TEXTURE2);
   glBindTexture(GL_TEXTURE_2D, pbr.g_tex_diff);
 
-  shader_set_uniform_1i(pbr.deferred_lighting, "g_pos", 0);
+  shader_set_uniform_1i(pbr.deferred_lighting, "g_position", 0);
   shader_set_uniform_1i(pbr.deferred_lighting, "g_normal", 1);
   shader_set_uniform_1i(pbr.deferred_lighting, "g_tex_diff", 2);
 
