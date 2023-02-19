@@ -45,4 +45,9 @@ void main() {
 
   gl_Position = vec4(position, 1.0);
   e_position = position;
+  e_tangent = tangent;
+  e_bitangent = bitangent;
+  e_normal = normal;
+  e_tex_coord = tex_coord;
 }
+// https://stackoverflow.com/questions/24166446/glsl-tessellation-displacement-mapping
