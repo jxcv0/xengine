@@ -7,7 +7,9 @@ layout (location = 4) in vec2 tex_coord_in;
 
 out vec3 v_position;
 out vec2 v_tex_coord;
-out mat3 v_normal_matrix;
+out vec3 v_tangent;
+out vec3 v_bitangent;
+out vec3 v_normal;
 
 uniform mat4 projection;
 uniform mat4 view;
@@ -22,10 +24,9 @@ void main() {
   v_position = world_pos.xyz;
   v_tex_coord = tex_coord_in;
 
-  vec3 t = normalize(vec3(model * vec4(tangent_in, 0.0)));
-  vec3 b = normalize(vec3(model * vec4(bitangent_in, 0.0)));
-  vec3 n = normalize(vec3(model * vec4(normal_in, 0.0)));
-  v_normal_matrix = mat3(t, b, n);
+  v_tangent = normalize(vec3(model * vec4(tangent_in, 0.0)));
+  v_bitangent = normalize(vec3(model * vec4(bitangent_in, 0.0)));
+  v_normal = normalize(vec3(model * vec4(normal_in, 0.0)));
 
   gl_Position = projection * view * world_pos;
 }
