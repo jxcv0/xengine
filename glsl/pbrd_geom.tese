@@ -17,7 +17,7 @@ uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 model;
 
-uniform sampler2D tex_displacement;
+// uniform sampler2D tex_displacement;
 
 vec2 interpolate2D(vec2 v0, vec2 v1, vec2 v2) {
     return vec2(gl_TessCoord.x) * v0 + vec2(gl_TessCoord.y) * v1 +
@@ -35,8 +35,8 @@ void main() {
   vec2 tex2 = c_tex_coord[2];
   vec2 tex_coord = interpolate2D(tex0, tex1, tex2);
 
-  float disp = texture(tex_displacement, tex_coord).r;
-  disp = disp * 2.0 - 1.0;
+  // float disp = texture(tex_displacement, tex_coord).r;
+  // disp = disp * 2.0 - 1.0;
 
   vec3 p0 = c_position[0];
   vec3 p1 = c_position[1];
@@ -63,7 +63,8 @@ void main() {
   vec3 n = normalize(vec3(model * vec4(normal, 0.0)));
   e_normal_matrix = mat3(t, b, n);
 
-  e_position = vec3(model * vec4(position + (normal * disp * DISPLACE), 0.0));
+  // e_position = vec3(model * vec4(position + (normal * disp * DISPLACE), 0.0));
+  e_position = position;
   e_tex_coord = tex_coord;
 
   gl_Position = projection * view * model * vec4(e_position, 1.0);

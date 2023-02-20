@@ -17,6 +17,8 @@ out vec3 c_normal[];
 out vec2 c_tex_coord[];
 
 // TODO dynamic tesselation levels based on distance
+// uniform vec3 view_position;
+// tess = (1.0 / length(v_position[gl_InvocationID] - view_position)) * 16
 
 void main() {
   c_position[gl_InvocationID] = v_position[gl_InvocationID];
