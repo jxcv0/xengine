@@ -16,6 +16,8 @@ out vec3 c_bitangent[];
 out vec3 c_normal[];
 out vec2 c_tex_coord[];
 
+// TODO dynamic tesselation levels based on distance
+
 void main() {
   c_position[gl_InvocationID] = v_position[gl_InvocationID];
   c_tangent[gl_InvocationID] = v_tangent[gl_InvocationID];
