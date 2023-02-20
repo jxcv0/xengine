@@ -80,7 +80,7 @@ int main() {
     get_cursor_position(&mouse_pos, window);
     vec2 cursor_offset;
     get_cursor_offset(cursor_offset, &mouse_pos);
-    update_3rd_person_camera(&camera, cursor_offset, 3, camera_centre);
+    update_3rd_person_camera(&camera, cursor_offset, 2, camera_centre);
     // handle_keyboard_input(window);
     update_view_matrix();
 

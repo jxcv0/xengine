@@ -40,19 +40,27 @@ static struct {
  */
 static void load_pbrd_shaders(void) {
   char *v = load_file_into_mem("glsl/pbrd_geom.vert");
-  char *e = load_file_into_mem("glsl/pbrd_geom.tese");
-  char *g = load_file_into_mem("glsl/pbrd_geom.geom");
+  // char *c = load_file_into_mem("glsl/pbrd_geom.tesc");
+  // char *e = load_file_into_mem("glsl/pbrd_geom.tese");
+  // char *g = load_file_into_mem("glsl/pbrd_geom.geom");
   char *f = load_file_into_mem("glsl/pbrd_geom.frag");
 
   const char *vert_file = v;
-  const char *tese_file = e;
-  const char *geom_file = g;
+  // const char *tesc_file = c;
+  // const char *tese_file = e;
+  // const char *geom_file = g;
   const char *frag_file = f;
 
   uint32_t vert_id = glCreateShader(GL_VERTEX_SHADER);
   glShaderSource(vert_id, 1, &vert_file, NULL);
   glCompileShader(vert_id);
   check_compile(vert_id);
+
+  /*
+  uint32_t tesc_id = glCreateShader(GL_TESS_CONTROL_SHADER);
+  glShaderSource(tesc_id, 1, &tesc_file, NULL);
+  glCompileShader(tesc_id);
+  check_compile(tesc_id);
 
   uint32_t tese_id = glCreateShader(GL_TESS_EVALUATION_SHADER);
   glShaderSource(tese_id, 1, &tese_file, NULL);
@@ -63,6 +71,7 @@ static void load_pbrd_shaders(void) {
   glShaderSource(geom_id, 1, &geom_file, NULL);
   glCompileShader(geom_id);
   check_compile(geom_id);
+  */
 
   uint32_t frag_id = glCreateShader(GL_FRAGMENT_SHADER);
   glShaderSource(frag_id, 1, &frag_file, NULL);
@@ -71,20 +80,24 @@ static void load_pbrd_shaders(void) {
 
   uint32_t program_id = glCreateProgram();
   glAttachShader(program_id, vert_id);
-  glAttachShader(program_id, tese_id);
+  // glAttachShader(program_id, tesc_id);
+  // glAttachShader(program_id, tese_id);
+  // glAttachShader(program_id, geom_id);
   glAttachShader(program_id, frag_id);
 
   glLinkProgram(program_id);
   check_link(program_id);
 
   glDeleteShader(vert_id);
-  glDeleteShader(tese_id);
-  glDeleteShader(geom_id);
+  // glDeleteShader(tesc_id);
+  // glDeleteShader(tese_id);
+  // glDeleteShader(geom_id);
   glDeleteShader(frag_id);
 
   free(v);
-  free(e);
-  free(g);
+  // free(c);
+  // free(e);
+  // free(g);
   free(f);
 
   pbr.deferred_geometry = program_id;
@@ -100,6 +113,7 @@ int pbrd_init(const uint32_t scr_w, const uint32_t scr_h) {
   glPatchParameteri(GL_PATCH_VERTICES, 3);
   const float outer[] = {4, 4, 4, 4};
   const float inner[]  = {4, 4};
+  glPatchParameteri(GL_PATCH_VERTICES, 3);
   glPatchParameterfv(GL_PATCH_DEFAULT_OUTER_LEVEL, outer);
   glPatchParameterfv(GL_PATCH_DEFAULT_INNER_LEVEL, inner);
 
@@ -212,7 +226,11 @@ void pbrd_render_geometries(const mat4 projection, const mat4 view,
 
     glBindVertexArray(geometries[i].m_vao);
 
+    /*
     glDrawElements(GL_PATCHES, geometries[i].m_num_indices, GL_UNSIGNED_INT,
+                   0);
+    */
+    glDrawElements(GL_TRIANGLES, geometries[i].m_num_indices, GL_UNSIGNED_INT,
                    0);
   }
 }
