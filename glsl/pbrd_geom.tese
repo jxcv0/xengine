@@ -1,7 +1,7 @@
 #version 460 core
 layout(triangles, equal_spacing, ccw) in;
 
-#define DISPLACE 0.0
+#define DISPLACE 0.15
 
 in vec3 c_position[];
 in vec3 c_tangent[];
@@ -10,9 +10,7 @@ in vec3 c_normal[];
 in vec2 c_tex_coord[];
 
 out vec3 e_position;
-out vec3 e_tangent;
-out vec3 e_bitangent;
-out vec3 e_normal;
+out mat3 e_normal_matrix;
 out vec2 e_tex_coord;
 
 uniform mat4 projection;
@@ -61,9 +59,10 @@ void main() {
   disp = disp * 2.0 - 1.0;
   e_position = vec3(model * vec4(position + (normal * disp * DISPLACE), 1.0));
 
-  e_tangent = normalize(vec3(model * vec4(tangent, 0.0)));
-  e_bitangent = normalize(vec3(model * vec4(bitangent, 0.0)));
-  e_normal = normalize(vec3(model * vec4(normal, 0.0)));
+  vec3 t = normalize(vec3(model * vec4(tangent, 0.0)));
+  vec3 b = normalize(vec3(model * vec4(bitangent, 0.0)));
+  vec3 n = normalize(vec3(model * vec4(normal, 0.0)));
+  e_normal_matrix = mat3(t, b, n);
 
   e_tex_coord = tex_coord;
 

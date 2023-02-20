@@ -23,10 +23,8 @@ void main() {
   c_normal[gl_InvocationID] = v_normal[gl_InvocationID];
   c_tex_coord[gl_InvocationID] = v_tex_coord[gl_InvocationID];
 
-  if (gl_InvocationID == 0) {
-    gl_TessLevelOuter[0] = OUT_TESS;
-    gl_TessLevelOuter[1] = OUT_TESS;
-    gl_TessLevelOuter[2] = OUT_TESS;
-    gl_TessLevelInner[0] = OUT_TESS;
-  }
+  gl_TessLevelOuter[0] = OUT_TESS;
+  gl_TessLevelOuter[1] = OUT_TESS;
+  gl_TessLevelOuter[2] = OUT_TESS;
+  gl_TessLevelInner[0] = OUT_TESS;
 }

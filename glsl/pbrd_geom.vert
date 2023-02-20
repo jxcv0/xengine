@@ -6,25 +6,30 @@ layout (location = 3) in vec3 normal_in;
 layout (location = 4) in vec2 tex_coord_in;
 
 out vec3 v_position;
-out mat3 v_normal_matrix;
+out vec3 v_tangent;
+out vec3 v_bitangent;
+out vec3 v_normal;
 out vec2 v_tex_coord;
 
+/*
 uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 model;
+*/
 
-/**
- * Pass through
- */
 void main() {
-  vec4 pos = model * vec4(pos_in, 1.0);
-  v_position = pos.xyz;
+  v_position = pos_in;
+  v_tangent = tangent_in;
+  v_bitangent = bitangent_in;
+  v_normal = normal_in;
   v_tex_coord = tex_coord_in;
 
+  /*
   vec3 t = normalize(vec3(model * vec4(tangent_in, 0.0)));
   vec3 b = normalize(vec3(model * vec4(bitangent_in, 0.0)));
   vec3 n = normalize(vec3(model * vec4(normal_in, 0.0)));
   v_normal_matrix = mat3(t, b, n);
 
   gl_Position = projection * view * model * pos;
+  */
 }
