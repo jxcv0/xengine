@@ -11,6 +11,8 @@ cflags := -Wall -Wextra -ggdb -O0
 libs := -Llib -lglad -lstb -lm -ldl -lglfw -fopenmp
 xen_lib := -Lbuild -lxen
 
+all: game geom_converter tests
+
 $(build_dir)/%.o: %.c
 	@echo "Building object $@"
 	@if [ ! -d $(build_dir)/% ]; then mkdir -p $(build_dir)/$(dir $<); fi
@@ -40,6 +42,8 @@ libstb.a:
 clean:
 	@rm -rf build/*
 	@rm -rf bin/*
+
+tests: lin_tests
 
 lin_tests: libxen.a
 	@gcc test/$@.c $(cflags) -I$(xen_src_dir) $(xen_lib) $(libs) -o $(bin_dir)/lin_tests
