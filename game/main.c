@@ -49,7 +49,7 @@ int main() {
 
   struct pbr_material material = load_pbr_material("ravine_rock");
   struct geometry pbr_sphere =
-      load_geometry("assets/meshes/pbr_test_sphere.geom");
+      load_geometry("assets/meshes/Sphere-mesh.geom");
 
   struct light l = LIGHT_RANGE_3250;
   l.m_position[0] = 3.0;

@@ -14,44 +14,32 @@
 
 #include "assets.h"
 
-char directory[256];
+FILE *file;
 
+char *out_name;
 struct vertex *out_vertices = NULL;
 uint32_t *out_indices = NULL;
 uint32_t out_num_vertices = 0;
 uint32_t out_num_indices = 0;
-
-FILE *file;
-
-void process_node(struct aiNode *node, const struct aiScene *scene);
-void process_mesh(struct aiMesh *mesh, const struct aiScene *scene);
-char *process_material(struct aiMaterial *mat, enum aiTextureType);
 char *diffuse_name = NULL;
 char *normal_name = NULL;
 char *roughness_name = NULL;
 char *displacement_name = NULL;
 
+void process_node(struct aiNode *node, const struct aiScene *scene);
+void process_mesh(struct aiMesh *mesh, const struct aiScene *scene);
+char *process_material(struct aiMaterial *mat, enum aiTextureType);
+
 /**
- * @brief Load a file using assimp and save it as a .geom and a .material file.
+ * @brief Load a file using assimp and save it as a geometry file (.geom)
  * A geom file may only contain the definition of a single geometry (a single
  * group of vertices).
  */
 int main(int argc, char *argv[]) {
-  if (argc != 3) {
-    printf("usage:\n\tconverter <in file> <out file>\n");
+  if (argc != 2) {
+    printf("usage:\n\tconverter <file>\n");
     return 0;
   }
-
-  file = fopen(argv[2], "wb+");
-  if (file == NULL) {
-    perror("fopen");
-  }
-
-  const char *dir = strrchr(argv[1], '/');
-  size_t n = dir - argv[1];
-  strncpy(directory, argv[1], n);
-  directory[n] = 0;
-  printf("Loading from directory %s\n", directory);
 
   const struct aiScene *scene =
       aiImportFile(argv[1], aiProcess_Triangulate | aiProcess_GenSmoothNormals |
@@ -63,17 +51,6 @@ int main(int argc, char *argv[]) {
   }
 
   process_node(scene->mRootNode, scene);
-
-  printf("Writing to file %s.\n", argv[2]);
-
-  // write out
-  fprintf(file, "VERTICES %d\n", out_num_vertices);
-  fwrite(out_vertices, sizeof(struct vertex), out_num_vertices, file);
-  fprintf(file, "\n");
-
-  fprintf(file, "INDICES %d\n", out_num_indices);
-  fwrite(out_indices, sizeof(uint32_t), out_num_indices, file);
-  fprintf(file, "\n");
 
   aiReleaseImport(scene);
   fclose(file);
@@ -103,14 +80,15 @@ void process_node(struct aiNode *node, const struct aiScene *scene) {
  * ============================================================================
  */
 void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
-  out_num_vertices = mesh->mNumVertices;
-  out_num_indices = mesh->mNumFaces * 3;
-  size_t vertices_size = sizeof(struct vertex) * out_num_vertices;
-  size_t indices_size = sizeof(uint32_t) * out_num_indices;
+  uint32_t num_vertices = mesh->mNumVertices;
+  uint32_t num_indices = mesh->mNumFaces * 3;
+  size_t vertices_size = sizeof(struct vertex) * num_vertices;
+  size_t indices_size = sizeof(uint32_t) * num_indices;
   struct vertex *vertices = malloc(vertices_size);
   uint32_t *indices = malloc(indices_size);
 
-  printf("Loading mesh: %s.\n", mesh->mName.data);
+  char *mesh_name = mesh->mName.data;
+  printf("Loading mesh: %s.\n", mesh_name);
   printf("Copying %d vertices.\n", mesh->mNumVertices);
 
   for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
@@ -120,6 +98,7 @@ void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
     v->m_position[1] = mesh->mVertices[i].y;
     v->m_position[2] = mesh->mVertices[i].z;
 
+    assert(mesh->mTangents != NULL);
     v->m_tangent[0] = mesh->mTangents[i].x;
     v->m_tangent[1] = mesh->mTangents[i].y;
     v->m_tangent[2] = mesh->mTangents[i].z;
@@ -161,8 +140,28 @@ void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
   aiTextureType_DISPLACEMENT);
   */
 
-  out_vertices = vertices;
-  out_indices = indices;
+  // out_vertices = vertices;
+  // out_indices = indices;
+
+  char filename[64] = {0};
+  size_t mesh_name_len = strlen(mesh_name);
+  strncpy(filename, mesh_name, mesh_name_len);
+  strncpy(&filename[mesh_name_len], ".geom", 6);
+
+  file = fopen(filename, "wb+");
+  if (file == NULL) {
+    perror("fopen");
+  }
+
+  printf("Writing to file %s.\n", filename);
+
+  fprintf(file, "VERTICES %d\n", num_vertices);
+  fwrite(vertices, sizeof(struct vertex), num_vertices, file);
+  fprintf(file, "\n");
+
+  fprintf(file, "INDICES %d\n", num_indices);
+  fwrite(indices, sizeof(uint32_t), num_indices, file);
+  fprintf(file, "\n");
 }
 
 char *process_material(struct aiMaterial *mat, enum aiTextureType type) {
