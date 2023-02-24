@@ -48,8 +48,7 @@ int main() {
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
   struct pbr_material material = load_pbr_material("ravine_rock");
-  struct geometry pbr_sphere =
-      load_geometry("assets/meshes/Sphere-mesh.geom");
+  struct geometry pbr_sphere = load_geometry("assets/meshes/Sphere-mesh.geom");
 
   struct light l = LIGHT_RANGE_3250;
   l.m_position[0] = 3.0;

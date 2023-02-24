@@ -52,6 +52,10 @@ uint32_t load_texture(const char *filename) {
   stbi_set_flip_vertically_on_load(true);
   int w, h, n;
   unsigned char *data = stbi_load(filepath, &w, &h, &n, 0);
+
+  if (data == NULL) {
+    return load_default_texture();
+  }
   assert(data != NULL);
 
   uint32_t id;
@@ -160,6 +164,8 @@ struct pbr_material load_pbr_material(const char *material_name) {
   size_t n = strlen(material_name);
   strncpy(buff, material_name, n);
 
+  // TODO need to pass in the type here somehow so that we know what default to
+  // fall back on
   strncpy(&buff[n], "_diffuse.png", 13);
   mat.m_diffuse = load_texture(buff);
 

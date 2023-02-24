@@ -31,6 +31,9 @@ struct vertex {
 
 /**
  * @brief 3D geometry data that all describe the same mesh.
+ * TODO Default material
+ * Each geometry must have a material. If no material is assigned to the
+ * geometry then a default material is used.
  */
 struct geometry {
   uint32_t m_vbo;
@@ -38,6 +41,7 @@ struct geometry {
   uint32_t m_ebo;
   uint32_t m_num_vertices;
   uint32_t m_num_indices;
+  pbr_material m_material;
 };
 
 /**
