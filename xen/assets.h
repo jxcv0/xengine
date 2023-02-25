@@ -30,18 +30,10 @@ struct vertex {
 };
 
 /**
- * @brief 3D geometry data that all describe the same mesh.
- * TODO Default material
- * Each geometry must have a material. If no material is assigned to the
- * geometry then a default material is used.
+ * @brief Defines how a texture data should be interpreted.
  */
-struct geometry {
-  uint32_t m_vbo;
-  uint32_t m_vao;
-  uint32_t m_ebo;
-  uint32_t m_num_vertices;
-  uint32_t m_num_indices;
-  pbr_material m_material;
+enum texture_type {
+  DIFFUSE, ROUGHNESS, NORMAL, METALLIC
 };
 
 /**
@@ -55,6 +47,22 @@ struct pbr_material {
   uint32_t m_metallic;
   // uint32_t m_displacement;
 };
+
+/**
+ * @brief 3D geometry data that all describe the same mesh.
+ * TODO Default material
+ * Each geometry must have a material. If no material is assigned to the
+ * geometry then a default material is used.
+ */
+struct geometry {
+  uint32_t m_vbo;
+  uint32_t m_vao;
+  uint32_t m_ebo;
+  uint32_t m_num_vertices;
+  uint32_t m_num_indices;
+  struct pbr_material m_material;
+};
+
 
 /**
  * @brief Stores the data required to render a mesh.

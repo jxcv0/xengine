@@ -53,9 +53,11 @@ uint32_t load_texture(const char *filename) {
   int w, h, n;
   unsigned char *data = stbi_load(filepath, &w, &h, &n, 0);
 
+  /*
   if (data == NULL) {
     return load_default_texture();
   }
+  */
   assert(data != NULL);
 
   uint32_t id;
