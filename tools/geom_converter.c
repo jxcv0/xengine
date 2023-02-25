@@ -20,6 +20,8 @@
  * meshes, textures and animations that make up the model.
  */
 FILE *model_file;
+char *model_name;
+char *in_file;
 
 // char *diffuse_name = NULL;
 // char *normal_name = NULL;
@@ -30,19 +32,45 @@ void process_node(struct aiNode *node, const struct aiScene *scene);
 void process_mesh(struct aiMesh *mesh, const struct aiScene *scene);
 char *process_material(struct aiMaterial *mat, enum aiTextureType);
 
-/**
- * @brief Load a file using assimp and save it as a geometry file (.geom)
- * A geom file may only contain the definition of a single geometry (a single
- * group of vertices).
- */
-int main(int argc, char *argv[]) {
-  // TODO argp!
-  if (argc != 2) {
-    printf("usage:\n\tconverter <file>\n");
-    return 0;
-  }
+// command line options
+static struct argp_option options[] = {
+{"infile", 'i', "input file", 0, "The file to convert", 0},
+{"name", 'n', "model name", 0, "The name of the resulting model", 0},
+{0}
+};
 
-  model_file = fopen(""); // see above
+static error_t parse_opt(int key, char *argv, struct argp_state *state) {
+  switch (key) {
+    case 'i':
+      in_file = argv;
+      break;
+    case 'n':
+      model_name = argv;
+      break;
+    case ARGP_KEY_ARG:
+      if (state->arg_num > 2) {
+        argp_usage(state);
+      }
+      exit(EXIT_FAILURE);
+      break;
+    case ARGP_KEY_END:
+      if (state->arg_num < 2) {
+        argp_usage(state);
+      }
+      break;
+    default:
+      return ARGP_ERR_UNKNOWN;
+  }
+  return 0;
+}
+
+int main(int argc, char *argv[]) {
+  struct argp parser = {0};
+  parser.options = options;
+  parser.parser = parse_opt;
+  argp_parse(&parser, argc, argv, 0, 0, 0);
+
+  model_file = fopen(in_file, "wb+");
   const struct aiScene *scene =
       aiImportFile(argv[1], aiProcess_Triangulate | aiProcess_GenSmoothNormals |
                                 aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
