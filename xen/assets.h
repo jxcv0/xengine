@@ -32,9 +32,7 @@ struct vertex {
 /**
  * @brief Defines how a texture data should be interpreted.
  */
-enum texture_type {
-  DIFFUSE, ROUGHNESS, NORMAL, METALLIC
-};
+enum texture_type { DIFFUSE, ROUGHNESS, NORMAL, METALLIC };
 
 /**
  * @brief Contains ID's of diffuse, normal, roughness and displacement image
@@ -62,7 +60,6 @@ struct geometry {
   uint32_t m_num_indices;
   struct pbr_material m_material;
 };
-
 
 /**
  * @brief Stores the data required to render a mesh.

@@ -11,20 +11,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <argp.h>
 
 #include "assets.h"
 
-FILE *file;
+/**
+ * @brief This is the file that contains the relative filepaths of all the
+ * meshes, textures and animations that make up the model.
+ */
+FILE *model_file;
 
-char *out_name;
-struct vertex *out_vertices = NULL;
-uint32_t *out_indices = NULL;
-uint32_t out_num_vertices = 0;
-uint32_t out_num_indices = 0;
-char *diffuse_name = NULL;
-char *normal_name = NULL;
-char *roughness_name = NULL;
-char *displacement_name = NULL;
+// char *diffuse_name = NULL;
+// char *normal_name = NULL;
+// char *roughness_name = NULL;
+// char *displacement_name = NULL;
 
 void process_node(struct aiNode *node, const struct aiScene *scene);
 void process_mesh(struct aiMesh *mesh, const struct aiScene *scene);
@@ -36,6 +36,7 @@ char *process_material(struct aiMaterial *mat, enum aiTextureType);
  * group of vertices).
  */
 int main(int argc, char *argv[]) {
+  // TODO argp!
   if (argc != 2) {
     printf("usage:\n\tconverter <file>\n");
     return 0;
@@ -53,7 +54,6 @@ int main(int argc, char *argv[]) {
   process_node(scene->mRootNode, scene);
 
   aiReleaseImport(scene);
-  fclose(file);
   return 0;
 }
 
@@ -61,11 +61,6 @@ int main(int argc, char *argv[]) {
  * ============================================================================
  */
 void process_node(struct aiNode *node, const struct aiScene *scene) {
-  if (node->mNumMeshes > 1) {
-    fprintf(stderr, "Multiple meshes not supported. Exiting...\n");
-    exit(EXIT_FAILURE);
-  }
-
   for (unsigned int i = 0; i < node->mNumMeshes; i++) {
     struct aiMesh *m = scene->mMeshes[node->mMeshes[i]];
     process_mesh(m, scene);
@@ -129,7 +124,7 @@ void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
   }
 
   (void)scene;
-  // not loading materials here
+
   /*
   printf("Loading materials.\n");
   struct aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
@@ -140,15 +135,12 @@ void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
   aiTextureType_DISPLACEMENT);
   */
 
-  // out_vertices = vertices;
-  // out_indices = indices;
-
   char filename[64] = {0};
   size_t mesh_name_len = strlen(mesh_name);
   strncpy(filename, mesh_name, mesh_name_len);
   strncpy(&filename[mesh_name_len], ".geom", 6);
 
-  file = fopen(filename, "wb+");
+  FILE *file = fopen(filename, "wb+");
   if (file == NULL) {
     perror("fopen");
   }
@@ -162,8 +154,12 @@ void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
   fprintf(file, "INDICES %d\n", num_indices);
   fwrite(indices, sizeof(uint32_t), num_indices, file);
   fprintf(file, "\n");
+  fclose(file);
 }
 
+/*
+ * ============================================================================
+ */
 char *process_material(struct aiMaterial *mat, enum aiTextureType type) {
   if (mat != NULL) {
     unsigned int tex_count = aiGetMaterialTextureCount(mat, type);
