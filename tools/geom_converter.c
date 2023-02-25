@@ -42,6 +42,7 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
+  model_file = fopen(""); // see above
   const struct aiScene *scene =
       aiImportFile(argv[1], aiProcess_Triangulate | aiProcess_GenSmoothNormals |
                                 aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
@@ -93,7 +94,7 @@ void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
     v->m_position[1] = mesh->mVertices[i].y;
     v->m_position[2] = mesh->mVertices[i].z;
 
-    assert(mesh->mTangents != NULL);
+    assert(mesh->mTangents != NULL); // if no texture is specified in the source file.
     v->m_tangent[0] = mesh->mTangents[i].x;
     v->m_tangent[1] = mesh->mTangents[i].y;
     v->m_tangent[2] = mesh->mTangents[i].z;
