@@ -1,3 +1,4 @@
+#include <argp.h>
 #include <assert.h>
 #include <assimp/cimport.h>
 #include <assimp/material.h>
@@ -11,7 +12,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <argp.h>
 
 #include "assets.h"
 
@@ -19,9 +19,9 @@
  * @brief This is the file that contains the relative filepaths of all the
  * meshes, textures and animations that make up the model.
  */
-FILE *model_file;
-char *model_name;
-char *in_file;
+FILE *model_file = NULL;
+char *model_name = NULL;
+char *in_file = NULL;
 
 // char *diffuse_name = NULL;
 // char *normal_name = NULL;
@@ -34,10 +34,9 @@ char *process_material(struct aiMaterial *mat, enum aiTextureType);
 
 // command line options
 static struct argp_option options[] = {
-{"infile", 'i', "input file", 0, "The file to convert", 0},
-{"name", 'n', "model name", 0, "The name of the resulting model", 0},
-{0}
-};
+    {"infile", 'i', "input file", 0, "The file to convert", 0},
+    {"name", 'n', "model name", 0, "The name of the resulting model", 0},
+    {0}};
 
 static error_t parse_opt(int key, char *argv, struct argp_state *state) {
   switch (key) {
@@ -51,12 +50,11 @@ static error_t parse_opt(int key, char *argv, struct argp_state *state) {
       if (state->arg_num > 2) {
         argp_usage(state);
       }
-      exit(EXIT_FAILURE);
       break;
     case ARGP_KEY_END:
-      if (state->arg_num < 2) {
-        argp_usage(state);
-      }
+      // if (state->arg_num < 2) {
+        // argp_usage(state);
+      // }
       break;
     default:
       return ARGP_ERR_UNKNOWN;
@@ -70,9 +68,13 @@ int main(int argc, char *argv[]) {
   parser.parser = parse_opt;
   argp_parse(&parser, argc, argv, 0, 0, 0);
 
-  model_file = fopen(in_file, "wb+");
+  model_file = fopen(model_name, "wb+");
+  if (model_file == NULL) {
+    perror("fopen");
+  }
+
   const struct aiScene *scene =
-      aiImportFile(argv[1], aiProcess_Triangulate | aiProcess_GenSmoothNormals |
+      aiImportFile(in_file, aiProcess_Triangulate | aiProcess_GenSmoothNormals |
                                 aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 
   if (scene == NULL) {
@@ -122,7 +124,8 @@ void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
     v->m_position[1] = mesh->mVertices[i].y;
     v->m_position[2] = mesh->mVertices[i].z;
 
-    assert(mesh->mTangents != NULL); // if no texture is specified in the source file.
+    assert(mesh->mTangents !=
+           NULL);  // if no texture is specified in the source file.
     v->m_tangent[0] = mesh->mTangents[i].x;
     v->m_tangent[1] = mesh->mTangents[i].y;
     v->m_tangent[2] = mesh->mTangents[i].z;
