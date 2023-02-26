@@ -179,12 +179,12 @@ void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
 
   (void)scene;
 
-  // printf("Loading materials for mesh.\n");
-  // struct aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
-  // char *diffuse_name = process_material(material, aiTextureType_DIFFUSE);
-  // char *roughness_name = process_material(material, aiTextureType_SHININESS);
-  // char *normal_name = process_material(material, aiTextureType_HEIGHT);
-  // // char *metallic_name = process_material(material, aiTexureType_);
+  printf("Loading materials for mesh.\n");
+  struct aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
+  char *diffuse_name = process_material(material, aiTextureType_DIFFUSE);
+  char *roughness_name = process_material(material, aiTextureType_SHININESS);
+  char *normal_name = process_material(material, aiTextureType_HEIGHT);
+  char *metallic_name = process_material(material, aiTextureType_METALNESS);
 
   char filename[256];
   size_t mesh_name_len = strlen(mesh_name);
@@ -208,7 +208,8 @@ void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
   fprintf(file, "\n");
   fclose(file);
 
-  fprintf(model_file, "%s.geom\n", mesh_name);
+  fprintf(model_file, "%s.geom %s %s %s %s\n", mesh_name, diffuse_name,
+          roughness_name, normal_name, metallic_name);
 }
 
 /*
@@ -247,7 +248,8 @@ char *process_material(struct aiMaterial *mat, enum aiTextureType type) {
     case aiTextureType_METALNESS:
       strcpy(tex, "default_metallic.png");
       break;
-    default: break;
+    default:
+      break;
   }
   return tex;
 }
