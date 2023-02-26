@@ -22,6 +22,8 @@
 FILE *model_file = NULL;
 char *model_name = NULL;
 char *in_file = NULL;
+char *out_dir = NULL;
+size_t out_dir_len = 0;
 
 // char *diffuse_name = NULL;
 // char *normal_name = NULL;
@@ -34,8 +36,9 @@ char *process_material(struct aiMaterial *mat, enum aiTextureType);
 
 // command line options
 static struct argp_option options[] = {
-    {"infile", 'i', "input file", 0, "The file to convert", 0},
-    {"name", 'n', "model name", 0, "The name of the resulting model", 0},
+    {"in_file", 'i', "input_file", 0, "The file to convert", 0},
+    {"name", 'n', "model_name", 0, "The name of the resulting model", 0},
+    {"out_dir", 'd', "output_directory", 0, "The directory to store the output files in", 0},
     {0}};
 
 static error_t parse_opt(int key, char *argv, struct argp_state *state) {
@@ -47,13 +50,17 @@ static error_t parse_opt(int key, char *argv, struct argp_state *state) {
     case 'n':
       model_name = argv;
       break;
+    case 'd':
+      out_dir = argv;
+      out_dir_len = strlen(out_dir);
+      break;
     case ARGP_KEY_ARG:
-      if (arg_num > 2) {
+      if (arg_num > 3) {
         argp_usage(state);
       }
       break;
     case ARGP_KEY_END:
-      if (arg_num < 2) {
+      if (arg_num < 3) {
         argp_usage(state);
       }
       break;
@@ -70,10 +77,21 @@ int main(int argc, char *argv[]) {
   parser.parser = parse_opt;
   argp_parse(&parser, argc, argv, 0, 0, 0);
 
-  model_file = fopen(model_name, "wb+");
+  char model_filepath[256];
+  strncpy(model_filepath, out_dir, out_dir_len);
+  strncpy(&model_filepath[out_dir_len], "/", 2);
+
+  size_t len = strlen(model_name);
+  strncpy(&model_filepath[out_dir_len + 1], model_name, len);
+  strncpy(&model_filepath[out_dir_len + len + 1], ".model", 7);
+
+  printf("Creating model file: %s\n", model_filepath);
+  model_file = fopen(model_filepath, "wb+");
   if (model_file == NULL) {
     perror("fopen");
   }
+
+  printf("Outputing files to %s\n", out_dir);
 
   const struct aiScene *scene =
       aiImportFile(in_file, aiProcess_Triangulate | aiProcess_GenSmoothNormals |
@@ -126,8 +144,9 @@ void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
     v->m_position[1] = mesh->mVertices[i].y;
     v->m_position[2] = mesh->mVertices[i].z;
 
-    assert(mesh->mTangents !=
-           NULL);  // if no texture is specified in the source file.
+    // if no texture is specified in the source file.
+    assert(mesh->mTangents != NULL);
+
     v->m_tangent[0] = mesh->mTangents[i].x;
     v->m_tangent[1] = mesh->mTangents[i].y;
     v->m_tangent[2] = mesh->mTangents[i].z;
@@ -158,7 +177,6 @@ void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
   }
 
   (void)scene;
-
   /*
   printf("Loading materials.\n");
   struct aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
@@ -169,17 +187,18 @@ void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
   aiTextureType_DISPLACEMENT);
   */
 
-  char filename[64] = {0};
+  char filename[256];
   size_t mesh_name_len = strlen(mesh_name);
-  strncpy(filename, mesh_name, mesh_name_len);
-  strncpy(&filename[mesh_name_len], ".geom", 6);
+  strncpy(filename, out_dir, out_dir_len);
+  strncpy(&filename[out_dir_len], "/", 2);
+  strncpy(&filename[out_dir_len + 1], mesh_name, mesh_name_len);
+  strncpy(&filename[out_dir_len + mesh_name_len + 1], ".geom", 6);
 
+  printf("Writing to file %s.\n", filename);
   FILE *file = fopen(filename, "wb+");
   if (file == NULL) {
     perror("fopen");
   }
-
-  printf("Writing to file %s.\n", filename);
 
   fprintf(file, "VERTICES %d\n", num_vertices);
   fwrite(vertices, sizeof(struct vertex), num_vertices, file);
@@ -189,6 +208,8 @@ void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
   fwrite(indices, sizeof(uint32_t), num_indices, file);
   fprintf(file, "\n");
   fclose(file);
+
+  fprintf(model_file, "%s\n", mesh_name);
 }
 
 /*
