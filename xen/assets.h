@@ -105,6 +105,11 @@ struct pbr_material load_pbr_material(const char *material_name);
  */
 uint32_t load_texture(const char *filename);
 
+/**
+ * @brief Load a collection of meshes and textures from a file.
+ */
+void load_model(const char *filepath);
+
 #ifdef __cplusplus
 }
 #endif

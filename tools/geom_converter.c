@@ -38,7 +38,8 @@ char *process_material(struct aiMaterial *mat, enum aiTextureType);
 static struct argp_option options[] = {
     {"in_file", 'i', "input_file", 0, "The file to convert", 0},
     {"name", 'n', "model_name", 0, "The name of the resulting model", 0},
-    {"out_dir", 'd', "output_directory", 0, "The directory to store the output files in", 0},
+    {"out_dir", 'd', "output_directory", 0,
+     "The directory to store the output files in", 0},
     {0}};
 
 static error_t parse_opt(int key, char *argv, struct argp_state *state) {
@@ -91,7 +92,7 @@ int main(int argc, char *argv[]) {
     perror("fopen");
   }
 
-  printf("Outputing files to %s\n", out_dir);
+  printf("Outputting files to %s\n", out_dir);
 
   const struct aiScene *scene =
       aiImportFile(in_file, aiProcess_Triangulate | aiProcess_GenSmoothNormals |
@@ -134,7 +135,7 @@ void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
   uint32_t *indices = malloc(indices_size);
 
   char *mesh_name = mesh->mName.data;
-  printf("Loading mesh: %s.\n", mesh_name);
+  printf("\nLoading mesh: %s.\n", mesh_name);
   printf("Copying %d vertices.\n", mesh->mNumVertices);
 
   for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
@@ -177,15 +178,13 @@ void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
   }
 
   (void)scene;
-  /*
-  printf("Loading materials.\n");
-  struct aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
-  diffuse_name = process_material(material, aiTextureType_DIFFUSE);
-  roughness_name = process_material(material, aiTextureType_SHININESS); // is
-  this correct? normal_name = process_material(material, aiTextureType_HEIGHT);
-  // should this be HEIGHT? displacement_name = process_material(material,
-  aiTextureType_DISPLACEMENT);
-  */
+
+  // printf("Loading materials for mesh.\n");
+  // struct aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
+  // char *diffuse_name = process_material(material, aiTextureType_DIFFUSE);
+  // char *roughness_name = process_material(material, aiTextureType_SHININESS);
+  // char *normal_name = process_material(material, aiTextureType_HEIGHT);
+  // // char *metallic_name = process_material(material, aiTexureType_);
 
   char filename[256];
   size_t mesh_name_len = strlen(mesh_name);
@@ -233,5 +232,22 @@ char *process_material(struct aiMaterial *mat, enum aiTextureType type) {
       return texture_filename;
     }
   }
-  return NULL;
+
+  char *tex = malloc(64);
+  switch (type) {
+    case aiTextureType_DIFFUSE:
+      strcpy(tex, "default_diffuse.png");
+      break;
+    case aiTextureType_SHININESS:
+      strcpy(tex, "default_roughness.png");
+      break;
+    case aiTextureType_HEIGHT:
+      strcpy(tex, "default_normal.png");
+      break;
+    case aiTextureType_METALNESS:
+      strcpy(tex, "default_metallic.png");
+      break;
+    default: break;
+  }
+  return tex;
 }
