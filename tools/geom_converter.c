@@ -39,6 +39,7 @@ static struct argp_option options[] = {
     {0}};
 
 static error_t parse_opt(int key, char *argv, struct argp_state *state) {
+  static int arg_num = 0;
   switch (key) {
     case 'i':
       in_file = argv;
@@ -47,18 +48,19 @@ static error_t parse_opt(int key, char *argv, struct argp_state *state) {
       model_name = argv;
       break;
     case ARGP_KEY_ARG:
-      if (state->arg_num > 2) {
+      if (arg_num > 2) {
         argp_usage(state);
       }
       break;
     case ARGP_KEY_END:
-      // if (state->arg_num < 2) {
-        // argp_usage(state);
-      // }
+      if (arg_num < 2) {
+        argp_usage(state);
+      }
       break;
     default:
       return ARGP_ERR_UNKNOWN;
   }
+  arg_num++;
   return 0;
 }
 
