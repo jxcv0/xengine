@@ -209,7 +209,7 @@ void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
   fprintf(file, "\n");
   fclose(file);
 
-  fprintf(model_file, "%s\n", mesh_name);
+  fprintf(model_file, "%s.geom\n", mesh_name);
 }
 
 /*
