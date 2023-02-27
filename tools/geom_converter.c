@@ -25,11 +25,6 @@ char *in_file = NULL;
 char *out_dir = NULL;
 size_t out_dir_len = 0;
 
-// char *diffuse_name = NULL;
-// char *normal_name = NULL;
-// char *roughness_name = NULL;
-// char *displacement_name = NULL;
-
 void process_node(struct aiNode *node, const struct aiScene *scene);
 void process_mesh(struct aiMesh *mesh, const struct aiScene *scene);
 char *process_material(struct aiMaterial *mat, enum aiTextureType);
@@ -106,6 +101,7 @@ int main(int argc, char *argv[]) {
   process_node(scene->mRootNode, scene);
 
   aiReleaseImport(scene);
+  fclose(model_file);
   return 0;
 }
 
@@ -145,7 +141,7 @@ void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
     v->m_position[1] = mesh->mVertices[i].y;
     v->m_position[2] = mesh->mVertices[i].z;
 
-    // if no texture is specified in the source file.
+    // if no texture coords are specified in the source file this will fail.
     assert(mesh->mTangents != NULL);
 
     v->m_tangent[0] = mesh->mTangents[i].x;
@@ -176,8 +172,6 @@ void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
       indices[j++] = face.mIndices[k];
     }
   }
-
-  (void)scene;
 
   printf("Loading materials for mesh.\n");
   struct aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
