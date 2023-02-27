@@ -107,8 +107,12 @@ uint32_t load_texture(const char *filename);
 
 /**
  * @brief Load a collection of meshes and textures from a file.
+ *
+ * @param mesh_arr The array of meshes to store the meshes of the model into.
+ * @param num_meshes A pointer to the int storing the current mesh count.
+ * @param filepath The path to the .model file.
  */
-void load_model(const char *filepath);
+void load_model(const struct mesh *mesh_arr, uint32_t *num_meshes, const char *filepath);
 
 #ifdef __cplusplus
 }

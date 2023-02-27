@@ -52,13 +52,7 @@ uint32_t load_texture(const char *filename) {
   stbi_set_flip_vertically_on_load(true);
   int w, h, n;
   unsigned char *data = stbi_load(filepath, &w, &h, &n, 0);
-
-  /*
-  if (data == NULL) {
-    return load_default_texture();
-  }
-  */
-  assert(data != NULL);
+  assert(data != NULL); // filename may not exist.
 
   uint32_t id;
   glGenTextures(1, &id);
@@ -166,8 +160,6 @@ struct pbr_material load_pbr_material(const char *material_name) {
   size_t n = strlen(material_name);
   strncpy(buff, material_name, n);
 
-  // TODO need to pass in the type here somehow so that we know what default to
-  // fall back on
   strncpy(&buff[n], "_diffuse.png", 13);
   mat.m_diffuse = load_texture(buff);
 
@@ -184,4 +176,20 @@ struct pbr_material load_pbr_material(const char *material_name) {
   // mat.m_displacement = load_texture(buff);
 
   return mat;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+void load_model(const struct mesh *mesh_arr, uint32_t *num_meshes, const char *filepath) {
+  (void) mesh_arr;
+  (void) num_meshes;
+
+  FILE *model_file = fopen(filepath, "r");
+  size_t n = 0;
+  char *lineptr = NULL;
+  while (getline(&lineptr, &n, model_file) != -1) {
+    printf("%s\n", lineptr);
+  }
+  free(lineptr);
 }

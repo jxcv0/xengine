@@ -24,6 +24,8 @@ const float window_height = 600;
 // struct light light_array[MAX_NUM_LIGHTS] = {0};
 vec3 positions[MAX_ENTITIES] = {0};
 mat4 model_matrices[MAX_ENTITIES] = {0};
+
+struct mesh mesh_arr[64] = {0};
 uint32_t num_meshes = 0;
 
 struct camera camera = {.m_mouse_sensetivity = 0.3, .m_movement_speed = 0.15};
@@ -41,7 +43,6 @@ int main() {
   omp_set_dynamic(0);
 
   create_window(&window, window_width, window_height, "game");
-
   pbrd_init(window_width, window_height);
 
   perspective(projection_matrix, radians(60),
@@ -49,6 +50,8 @@ int main() {
 
   struct pbr_material material = load_pbr_material("ravine_rock");
   struct geometry pbr_sphere = load_geometry("assets/meshes/Sphere-mesh.geom");
+
+  load_model(mesh_arr, &num_meshes, "assets/meshes/Superheroine_Basemesh_No_Hair.model");
 
   struct light l = LIGHT_RANGE_3250;
   l.m_position[0] = 3.0;
