@@ -191,6 +191,8 @@ void load_model(const struct mesh *mesh_arr, uint32_t *num_meshes, const char *f
     perror("fopen");
   }
 
+
+  // TODO get dirname to construct new paths
   size_t n = 0;
   char *lineptr;
   ssize_t nread = -1;
