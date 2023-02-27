@@ -48,10 +48,10 @@ int main() {
   perspective(projection_matrix, radians(60),
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
+  load_model(mesh_arr, &num_meshes, "assets/models/Superheroine_Basemesh_No_Hair.model");
+
   struct pbr_material material = load_pbr_material("ravine_rock");
   struct geometry pbr_sphere = load_geometry("assets/meshes/Sphere-mesh.geom");
-
-  load_model(mesh_arr, &num_meshes, "assets/models/Superheroine_Basemesh_No_Hair.model");
 
   struct light l = LIGHT_RANGE_3250;
   l.m_position[0] = 3.0;

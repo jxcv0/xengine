@@ -195,7 +195,15 @@ void load_model(const struct mesh *mesh_arr, uint32_t *num_meshes, const char *f
   char *lineptr;
   ssize_t nread = -1;
   while ((nread = getline(&lineptr, &n, model_file)) != -1) {
-    printf("%s\n", lineptr);
+    char *start = lineptr;
+    for (int i = 0; i < 4; i++) {
+      char *end = strchr(start, ' ');
+      char s[(end - start) + 1];
+      strncpy(s, start, (end - start));
+      s[end - start] = '\0';
+      printf("|%s|\n", s);
+      start = end + 1;
+    }
   }
   free(lineptr);
 }
