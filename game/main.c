@@ -51,7 +51,7 @@ int main() {
   struct pbr_material material = load_pbr_material("ravine_rock");
   struct geometry pbr_sphere = load_geometry("assets/meshes/Sphere-mesh.geom");
 
-  load_model(mesh_arr, &num_meshes, "assets/meshes/Superheroine_Basemesh_No_Hair.model");
+  load_model(mesh_arr, &num_meshes, "assets/models/Superheroine_Basemesh_No_Hair.model");
 
   struct light l = LIGHT_RANGE_3250;
   l.m_position[0] = 3.0;

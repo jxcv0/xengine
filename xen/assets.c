@@ -185,10 +185,16 @@ void load_model(const struct mesh *mesh_arr, uint32_t *num_meshes, const char *f
   (void) mesh_arr;
   (void) num_meshes;
 
+  printf("Loading model from \"%s\".\n", filepath);
   FILE *model_file = fopen(filepath, "r");
+  if (model_file == NULL) {
+    perror("fopen");
+  }
+
   size_t n = 0;
-  char *lineptr = NULL;
-  while (getline(&lineptr, &n, model_file) != -1) {
+  char *lineptr;
+  ssize_t nread = -1;
+  while ((nread = getline(&lineptr, &n, model_file)) != -1) {
     printf("%s\n", lineptr);
   }
   free(lineptr);
