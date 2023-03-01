@@ -83,19 +83,22 @@ int main() {
   mouse_pos.m_last_pos[1] = window_height / 2.0f;
   camera.m_yaw = 275;
 
-  mat4 identity = IDENTITY_MAT4;
-  mat4 model_matrix = {0};
-  vec3 rot = {1, 0, 0};
-  vec3 pos = {0, 0, 0};
-  rotate(model_matrix, identity, rot, radians(-90));
-  translate(model_matrix, pos);
+  mat4 identities[4] = {0};
+  for (int i = 0; i < 4; i++) {
+    mat4 identity = IDENTITY_MAT4;
+    mat4 model_matrix = {0};
+    vec3 rot = {1, 0, 0};
+    vec3 pos = {0, 0, 0};
+    rotate(model_matrix, identity, rot, radians(-90));
+    translate(model_matrix, pos);
+    memcpy(identities[i], model_matrix, sizeof(mat4));
+  }
 
   while (!glfwWindowShouldClose(window)) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
       glfwSetWindowShouldClose(window, true);
     }
-
-    get_cursor_position(&mouse_pos, window);
+get_cursor_position(&mouse_pos, window);
     vec2 cursor_offset;
     get_cursor_offset(cursor_offset, &mouse_pos);
     update_3rd_person_camera(&camera, cursor_offset, 2, camera_centre);
@@ -103,7 +106,7 @@ int main() {
     update_view_matrix();
 
     // TODO update model_matrices
-    pbrd_render_geometries(projection_matrix, view_matrix, &model_matrix,
+    pbrd_render_geometries(projection_matrix, view_matrix, identities,
                            geometry_arr, num_geoms);
     pbrd_render_lighting(&l, 1, camera.m_pos, window_width, window_height);
 
