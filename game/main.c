@@ -104,6 +104,7 @@ int main() {
 
     pbrd_render_geometries(projection_matrix, view_matrix, &model_matrix,
                            geometry_arr, &material, num_geoms);
+    // TODO this is causing invalid operation
     pbrd_render_lighting(&l, 1, camera.m_pos, window_width, window_height);
 
     glfwSwapBuffers(window);
