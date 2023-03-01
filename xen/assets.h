@@ -18,8 +18,8 @@
 extern "C" {
 #endif
 
-typedef struct geometry*(*alloc_geometries)(size_t);
-typedef struct pbr_material*(*alloc_pbr_materials)(size_t);
+typedef struct geometry *(*alloc_geometries)(size_t);
+typedef struct pbr_material *(*alloc_pbr_materials)(size_t);
 
 /**
  * @brief Vertex position and texture data.
@@ -120,7 +120,7 @@ uint32_t load_texture(const char *filename);
  * @param alloc_geom Geometry allocation function.
  * @param alloc_mat Material allocation function.
  */
-void load_model(const char *filepath, alloc_geometries alloc_geom, alloc_pbr_materials alloc_mat);
+void load_model(const char *filepath, alloc_geometries alloc_geom);
 
 #ifdef __cplusplus
 }

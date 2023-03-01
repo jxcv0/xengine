@@ -1,10 +1,10 @@
+#include <assert.h>
 #include <omp.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 
 #include "assets.h"
 #include "camera.h"
@@ -64,7 +64,7 @@ int main() {
   load_model(
       "assets/models/Superheroine_Basemesh_No_Hair/"
       "Superheroine_Basemesh_No_Hair.model",
-      alloc_geom, alloc_mat);
+      alloc_geom);
 
   struct pbr_material material = load_pbr_material("ravine_rock");
   struct geometry pbr_sphere = load_geometry("assets/meshes/Sphere-mesh.geom");
@@ -102,9 +102,9 @@ int main() {
     // handle_keyboard_input(window);
     update_view_matrix();
 
+    // TODO material does not match geometry.
     pbrd_render_geometries(projection_matrix, view_matrix, &model_matrix,
-                           geometry_arr, &material, num_geoms);
-    // TODO this is causing invalid operation
+                           geometry_arr, num_geoms);
     pbrd_render_lighting(&l, 1, camera.m_pos, window_width, window_height);
 
     glfwSwapBuffers(window);

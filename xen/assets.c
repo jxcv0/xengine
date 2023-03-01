@@ -189,8 +189,9 @@ struct pbr_material load_pbr_material(const char *material_name) {
 /**
  * ----------------------------------------------------------------------------
  */
-void load_model(const char *filepath, alloc_geometries alloc_geom, alloc_pbr_materials alloc_mat) {
+void load_model(const char *filepath, alloc_geometries alloc_geom) {
   printf("Loading model from \"%s\".\n", filepath);
+
   FILE *model_file = fopen(filepath, "r");
   if (model_file == NULL) {
     perror("fopen");
@@ -213,11 +214,8 @@ void load_model(const char *filepath, alloc_geometries alloc_geom, alloc_pbr_mat
     size_t len = end - start;
     strncpy(&buffer[dir_len], start, len);
     buffer[len + dir_len] = '\0';
-    struct geometry *mesh = alloc_geom(1);
-    *mesh = load_geometry(buffer);
-
-    // material
-    struct pbr_material *mat = alloc_mat(1);
+    struct geometry *geom = alloc_geom(1);
+    *geom = load_geometry(buffer);
 
     // diffuse
     start = end + 1;
@@ -225,7 +223,7 @@ void load_model(const char *filepath, alloc_geometries alloc_geom, alloc_pbr_mat
     len = end - start;
     strncpy(&buffer[dir_len], start, len);
     buffer[len + dir_len] = '\0';
-    mat->m_diffuse = do_texture_loading(buffer);
+    geom->m_material.m_diffuse = do_texture_loading(buffer);
 
     // roughness
     start = end + 1;
@@ -233,7 +231,7 @@ void load_model(const char *filepath, alloc_geometries alloc_geom, alloc_pbr_mat
     len = end - start;
     strncpy(&buffer[dir_len], start, len);
     buffer[len + dir_len] = '\0';
-    mat->m_roughness = do_texture_loading(buffer);
+    geom->m_material.m_roughness = do_texture_loading(buffer);
 
     // normal
     start = end + 1;
@@ -241,7 +239,7 @@ void load_model(const char *filepath, alloc_geometries alloc_geom, alloc_pbr_mat
     len = end - start;
     strncpy(&buffer[dir_len], start, len);
     buffer[len + dir_len] = '\0';
-    mat->m_normal = do_texture_loading(buffer);
+    geom->m_material.m_normal = do_texture_loading(buffer);
 
     // metallic
     start = end + 1;
@@ -249,8 +247,7 @@ void load_model(const char *filepath, alloc_geometries alloc_geom, alloc_pbr_mat
     len = end - start;
     strncpy(&buffer[dir_len], start, len);
     buffer[len + dir_len] = '\0';
-    mat->m_metallic = do_texture_loading(buffer);
+    geom->m_material.m_metallic = do_texture_loading(buffer);
   }
-
   free(lineptr);
 }
