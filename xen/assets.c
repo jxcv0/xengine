@@ -42,13 +42,7 @@ char *findstr(const char *haystack, const char *needle, const size_t len) {
 /**
  * ----------------------------------------------------------------------------
  */
-uint32_t load_texture(const char *filename) {
-  size_t namelen = strlen(filename);
-  size_t dirlen = strlen(TEXTURE_DIR);
-  char filepath[namelen + dirlen];
-  strncpy(filepath, TEXTURE_DIR, dirlen + 1);
-  strncpy(&filepath[dirlen], filename, namelen + 1);
-
+static uint32_t do_texture_loading(const char *filepath) {
   printf("Loading texture from \"%s\".\n", filepath);
   stbi_set_flip_vertically_on_load(true);
   int w, h, n;
@@ -81,6 +75,18 @@ uint32_t load_texture(const char *filename) {
 
   free(data);
   return id;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+uint32_t load_texture(const char *filename) {
+  size_t namelen = strlen(filename);
+  size_t dirlen = strlen(TEXTURE_DIR);
+  char filepath[namelen + dirlen];
+  strncpy(filepath, TEXTURE_DIR, dirlen + 1);
+  strncpy(&filepath[dirlen], filename, namelen + 1);
+  return do_texture_loading(filepath);
 }
 
 /**
@@ -183,7 +189,8 @@ struct pbr_material load_pbr_material(const char *material_name) {
 /**
  * ----------------------------------------------------------------------------
  */
-void load_model(const char *filepath, alloc_func_t alloc_geom, alloc_func_t alloc_mat) {
+void load_model(const char *filepath, alloc_func_t alloc_geom,
+                alloc_func_t alloc_mat) {
   printf("Loading model from \"%s\".\n", filepath);
   FILE *model_file = fopen(filepath, "r");
   if (model_file == NULL) {
@@ -192,8 +199,7 @@ void load_model(const char *filepath, alloc_func_t alloc_geom, alloc_func_t allo
 
   // get the directory
   char *dir_end = strrchr(filepath, '/');
-  size_t dir_len = (dir_end - filepath) + 1; // + 1 for '/'
-
+  size_t dir_len = (dir_end - filepath) + 1;  // + 1 for '/'
 
   char buffer[256];
   strncpy(buffer, filepath, dir_len);
@@ -202,7 +208,6 @@ void load_model(const char *filepath, alloc_func_t alloc_geom, alloc_func_t allo
   char *lineptr;
   ssize_t nread = -1;
   while ((nread = getline(&lineptr, &lineptr_len, model_file)) != -1) {
-
     // geometry
     char *start = lineptr;
     char *end = strchr(start, ' ');
@@ -213,7 +218,7 @@ void load_model(const char *filepath, alloc_func_t alloc_geom, alloc_func_t allo
     *mesh = load_geometry(buffer);
 
     // material
-    struct pbr_material* mat = alloc_mat(sizeof(struct pbr_material));
+    struct pbr_material *mat = alloc_mat(sizeof(struct pbr_material));
 
     // diffuse
     start = end + 1;
@@ -221,7 +226,7 @@ void load_model(const char *filepath, alloc_func_t alloc_geom, alloc_func_t allo
     len = end - start;
     strncpy(&buffer[dir_len], start, len);
     buffer[len + dir_len] = '\0';
-    printf("%s\n", buffer);
+    mat->m_diffuse = do_texture_loading(buffer);
 
     // roughness
     start = end + 1;
@@ -229,7 +234,7 @@ void load_model(const char *filepath, alloc_func_t alloc_geom, alloc_func_t allo
     len = end - start;
     strncpy(&buffer[dir_len], start, len);
     buffer[len + dir_len] = '\0';
-    printf("%s\n", buffer);
+    mat->m_roughness = do_texture_loading(buffer);
 
     // normal
     start = end + 1;
@@ -237,7 +242,7 @@ void load_model(const char *filepath, alloc_func_t alloc_geom, alloc_func_t allo
     len = end - start;
     strncpy(&buffer[dir_len], start, len);
     buffer[len + dir_len] = '\0';
-    printf("%s\n", buffer);
+    mat->m_normal = do_texture_loading(buffer);
 
     // metallic
     start = end + 1;
@@ -245,7 +250,7 @@ void load_model(const char *filepath, alloc_func_t alloc_geom, alloc_func_t allo
     len = end - start;
     strncpy(&buffer[dir_len], start, len);
     buffer[len + dir_len] = '\0';
-    printf("%s\n", buffer);
+    mat->m_metallic = do_texture_loading(buffer);
   }
 
   free(lineptr);

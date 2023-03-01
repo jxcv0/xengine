@@ -48,7 +48,9 @@ int main() {
   perspective(projection_matrix, radians(60),
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
-  load_model("assets/models/Superheroine_Basemesh_No_Hair.model", malloc, malloc);
+  load_model(
+      "assets/models/Superheroine_Basemesh_No_Hair/Superheroine_Basemesh_No_Hair.model",
+      malloc, malloc);
 
   struct pbr_material material = load_pbr_material("ravine_rock");
   struct geometry pbr_sphere = load_geometry("assets/meshes/Sphere-mesh.geom");

@@ -24,7 +24,7 @@ extern "C" {
  * @detail The idea is that the allocation of memory is not the responsibility
  * of parsing functions since handling memory can be rather complicated. The
  * signature of this function is that same ss libc's malloc to allow for a
- * reasonable default allocation function. 
+ * reasonable default allocation function.
  *
  * @param size_t The size of the memory to allocate
  */
@@ -124,7 +124,8 @@ uint32_t load_texture(const char *filename);
  * @param alloc_geom Geometry allocation function.
  * @param alloc_mat Material allocation function.
  */
-void load_model(const char *filepath, alloc_func_t alloc_geom, alloc_func_t alloc_mat);
+void load_model(const char *filepath, alloc_func_t alloc_geom,
+                alloc_func_t alloc_mat);
 
 #ifdef __cplusplus
 }
