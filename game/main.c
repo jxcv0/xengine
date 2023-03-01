@@ -33,6 +33,14 @@ struct mouse_pos mouse_pos = {0};
 mat4 projection_matrix = {0};
 mat4 view_matrix = {0};
 
+struct geometry *alloc_geom(size_t n) {
+  return calloc(n, sizeof(struct geometry));
+}
+
+struct pbr_material *alloc_mat(size_t n) {
+  return calloc(n, sizeof(struct pbr_material));
+};
+
 void update_view_matrix();
 void handle_mouse_movement(GLFWwindow *w, double x, double y);
 void handle_keyboard_input(GLFWwindow *w);
@@ -49,8 +57,9 @@ int main() {
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
   load_model(
-      "assets/models/Superheroine_Basemesh_No_Hair/Superheroine_Basemesh_No_Hair.model",
-      malloc, malloc);
+      "assets/models/Superheroine_Basemesh_No_Hair/"
+      "Superheroine_Basemesh_No_Hair.model",
+      alloc_geom, alloc_mat);
 
   struct pbr_material material = load_pbr_material("ravine_rock");
   struct geometry pbr_sphere = load_geometry("assets/meshes/Sphere-mesh.geom");

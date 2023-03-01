@@ -189,8 +189,7 @@ struct pbr_material load_pbr_material(const char *material_name) {
 /**
  * ----------------------------------------------------------------------------
  */
-void load_model(const char *filepath, alloc_func_t alloc_geom,
-                alloc_func_t alloc_mat) {
+void load_model(const char *filepath, alloc_geometries alloc_geom, alloc_pbr_materials alloc_mat) {
   printf("Loading model from \"%s\".\n", filepath);
   FILE *model_file = fopen(filepath, "r");
   if (model_file == NULL) {
@@ -214,11 +213,11 @@ void load_model(const char *filepath, alloc_func_t alloc_geom,
     size_t len = end - start;
     strncpy(&buffer[dir_len], start, len);
     buffer[len + dir_len] = '\0';
-    struct geometry *mesh = alloc_geom(sizeof(struct geometry));
+    struct geometry *mesh = alloc_geom(1);
     *mesh = load_geometry(buffer);
 
     // material
-    struct pbr_material *mat = alloc_mat(sizeof(struct pbr_material));
+    struct pbr_material *mat = alloc_mat(1);
 
     // diffuse
     start = end + 1;

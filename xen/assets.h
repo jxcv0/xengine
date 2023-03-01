@@ -18,17 +18,8 @@
 extern "C" {
 #endif
 
-/**
- * @brief Allocation function to be passed into loading functions.
- *
- * @detail The idea is that the allocation of memory is not the responsibility
- * of parsing functions since handling memory can be rather complicated. The
- * signature of this function is that same ss libc's malloc to allow for a
- * reasonable default allocation function.
- *
- * @param size_t The size of the memory to allocate
- */
-typedef void *(*alloc_func_t)(size_t size);
+typedef struct geometry*(*alloc_geometries)(size_t);
+typedef struct pbr_material*(*alloc_pbr_materials)(size_t);
 
 /**
  * @brief Vertex position and texture data.
@@ -40,11 +31,6 @@ struct vertex {
   vec3 m_tangent;
   vec3 m_bitangent;
 };
-
-/**
- * @brief Defines how a texture data should be interpreted.
- */
-enum texture_type { DIFFUSE, ROUGHNESS, NORMAL, METALLIC };
 
 /**
  * @brief Contains ID's of diffuse, normal, roughness and displacement image
@@ -88,6 +74,16 @@ struct mesh {
 };
 
 /**
+ * @brief An array of geometries.
+ */
+struct geometry_array {
+  uint32_t m_num_geometries;
+  struct geometry *mp_geometries;
+};
+
+void init_geometry_array(struct geometry_array *arr, size_t nmemb);
+
+/**
  * @brief TODO
  */
 void load_mesh(struct mesh *meshes, uint32_t *count, const char *filename);
@@ -124,8 +120,7 @@ uint32_t load_texture(const char *filename);
  * @param alloc_geom Geometry allocation function.
  * @param alloc_mat Material allocation function.
  */
-void load_model(const char *filepath, alloc_func_t alloc_geom,
-                alloc_func_t alloc_mat);
+void load_model(const char *filepath, alloc_geometries alloc_geom, alloc_pbr_materials alloc_mat);
 
 #ifdef __cplusplus
 }
