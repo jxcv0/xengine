@@ -102,7 +102,7 @@ int main() {
     // handle_keyboard_input(window);
     update_view_matrix();
 
-    // TODO material does not match geometry.
+    // TODO update model_matrices
     pbrd_render_geometries(projection_matrix, view_matrix, &model_matrix,
                            geometry_arr, num_geoms);
     pbrd_render_lighting(&l, 1, camera.m_pos, window_width, window_height);
