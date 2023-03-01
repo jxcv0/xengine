@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #include "assets.h"
 #include "camera.h"
@@ -14,6 +15,7 @@
 #include "window.h"
 
 #define MAX_ENTITIES 128
+#define MAX_GEOMS 64
 
 extern const vec3 GLOBAL_UP;
 
@@ -25,16 +27,19 @@ const float window_height = 600;
 vec3 positions[MAX_ENTITIES] = {0};
 mat4 model_matrices[MAX_ENTITIES] = {0};
 
-struct mesh mesh_arr[64] = {0};
-uint32_t num_meshes = 0;
-
 struct camera camera = {.m_mouse_sensetivity = 0.3, .m_movement_speed = 0.15};
 struct mouse_pos mouse_pos = {0};
 mat4 projection_matrix = {0};
 mat4 view_matrix = {0};
 
+uint32_t num_geoms = 0;
+struct geometry geometry_arr[MAX_GEOMS] = {0};
+
 struct geometry *alloc_geom(size_t n) {
-  return calloc(n, sizeof(struct geometry));
+  assert(num_geoms < MAX_GEOMS);
+  struct geometry *temp = &geometry_arr[num_geoms];
+  num_geoms += n;
+  return temp;
 }
 
 struct pbr_material *alloc_mat(size_t n) {
@@ -98,7 +103,7 @@ int main() {
     update_view_matrix();
 
     pbrd_render_geometries(projection_matrix, view_matrix, &model_matrix,
-                           &pbr_sphere, &material, 1);
+                           geometry_arr, &material, num_geoms);
     pbrd_render_lighting(&l, 1, camera.m_pos, window_width, window_height);
 
     glfwSwapBuffers(window);
