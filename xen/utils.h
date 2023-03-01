@@ -21,6 +21,8 @@ char *load_file_into_mem(const char *filepath);
  */
 unsigned char *load_file_into_mem_u(const char *filepath);
 
+char *dirname(char *buff, char *src);
+
 #ifdef __cplusplus
 }
 #endif

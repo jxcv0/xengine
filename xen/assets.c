@@ -1,6 +1,7 @@
 #include "assets.h"
 
 #include <assert.h>
+#include <libgen.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -52,7 +53,7 @@ uint32_t load_texture(const char *filename) {
   stbi_set_flip_vertically_on_load(true);
   int w, h, n;
   unsigned char *data = stbi_load(filepath, &w, &h, &n, 0);
-  assert(data != NULL); // filename may not exist.
+  assert(data != NULL);  // filename may not exist.
 
   uint32_t id;
   glGenTextures(1, &id);
@@ -86,6 +87,7 @@ uint32_t load_texture(const char *filename) {
  * ----------------------------------------------------------------------------
  */
 struct geometry load_geometry(const char *filepath) {
+  printf("Loading geometry from \"%s\".\n", filepath);
   size_t file_size = 0;
   const char *file = map_file(&file_size, filepath);
 
@@ -181,31 +183,70 @@ struct pbr_material load_pbr_material(const char *material_name) {
 /**
  * ----------------------------------------------------------------------------
  */
-void load_model(const struct mesh *mesh_arr, uint32_t *num_meshes, const char *filepath) {
-  (void) mesh_arr;
-  (void) num_meshes;
-
+void load_model(const char *filepath, alloc_func_t alloc_geom, alloc_func_t alloc_mat) {
   printf("Loading model from \"%s\".\n", filepath);
   FILE *model_file = fopen(filepath, "r");
   if (model_file == NULL) {
     perror("fopen");
   }
 
+  // get the directory
+  char *dir_end = strrchr(filepath, '/');
+  size_t dir_len = (dir_end - filepath) + 1; // + 1 for '/'
 
-  // TODO get dirname to construct new paths
-  size_t n = 0;
+
+  char buffer[256];
+  strncpy(buffer, filepath, dir_len);
+
+  size_t lineptr_len = 0;
   char *lineptr;
   ssize_t nread = -1;
-  while ((nread = getline(&lineptr, &n, model_file)) != -1) {
+  while ((nread = getline(&lineptr, &lineptr_len, model_file)) != -1) {
+
+    // geometry
     char *start = lineptr;
-    for (int i = 0; i < 4; i++) {
-      char *end = strchr(start, ' ');
-      char s[(end - start) + 1];
-      strncpy(s, start, (end - start));
-      s[end - start] = '\0';
-      printf("|%s|\n", s);
-      start = end + 1;
-    }
+    char *end = strchr(start, ' ');
+    size_t len = end - start;
+    strncpy(&buffer[dir_len], start, len);
+    buffer[len + dir_len] = '\0';
+    struct geometry *mesh = alloc_geom(sizeof(struct geometry));
+    *mesh = load_geometry(buffer);
+
+    // material
+    struct pbr_material* mat = alloc_mat(sizeof(struct pbr_material));
+
+    // diffuse
+    start = end + 1;
+    end = strchr(start, ' ');
+    len = end - start;
+    strncpy(&buffer[dir_len], start, len);
+    buffer[len + dir_len] = '\0';
+    printf("%s\n", buffer);
+
+    // roughness
+    start = end + 1;
+    end = strchr(start, ' ');
+    len = end - start;
+    strncpy(&buffer[dir_len], start, len);
+    buffer[len + dir_len] = '\0';
+    printf("%s\n", buffer);
+
+    // normal
+    start = end + 1;
+    end = strchr(start, ' ');
+    len = end - start;
+    strncpy(&buffer[dir_len], start, len);
+    buffer[len + dir_len] = '\0';
+    printf("%s\n", buffer);
+
+    // metallic
+    start = end + 1;
+    end = strchr(start, '\n');
+    len = end - start;
+    strncpy(&buffer[dir_len], start, len);
+    buffer[len + dir_len] = '\0';
+    printf("%s\n", buffer);
   }
+
   free(lineptr);
 }

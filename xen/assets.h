@@ -19,6 +19,18 @@ extern "C" {
 #endif
 
 /**
+ * @brief Allocation function to be passed into loading functions.
+ *
+ * @detail The idea is that the allocation of memory is not the responsibility
+ * of parsing functions since handling memory can be rather complicated. The
+ * signature of this function is that same ss libc's malloc to allow for a
+ * reasonable default allocation function. 
+ *
+ * @param size_t The size of the memory to allocate
+ */
+typedef void *(*alloc_func_t)(size_t size);
+
+/**
  * @brief Vertex position and texture data.
  */
 struct vertex {
@@ -108,11 +120,11 @@ uint32_t load_texture(const char *filename);
 /**
  * @brief Load a collection of meshes and textures from a file.
  *
- * @param mesh_arr The array of meshes to store the meshes of the model into.
- * @param num_meshes A pointer to the int storing the current mesh count.
- * @param filepath The path to the .model file.
+ * @param filepath The path to the .model file
+ * @param alloc_geom Geometry allocation function.
+ * @param alloc_mat Material allocation function.
  */
-void load_model(const struct mesh *mesh_arr, uint32_t *num_meshes, const char *filepath);
+void load_model(const char *filepath, alloc_func_t alloc_geom, alloc_func_t alloc_mat);
 
 #ifdef __cplusplus
 }
