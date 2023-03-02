@@ -72,12 +72,12 @@ int main() {
   struct light l = LIGHT_RANGE_3250;
   l.m_position[0] = 3.0;
   l.m_position[1] = 3.0;
-  l.m_position[2] = 0.0;
+  l.m_position[2] = 3.0;
   l.m_color[0] = 1.0;
   l.m_color[1] = 1.0;
   l.m_color[2] = 1.0;
 
-  vec3 camera_centre = {0};
+  vec3 camera_centre = {0, 1, 0};
 
   mouse_pos.m_last_pos[0] = window_width / 2.0f;
   mouse_pos.m_last_pos[1] = window_height / 2.0f;
@@ -101,7 +101,7 @@ int main() {
 get_cursor_position(&mouse_pos, window);
     vec2 cursor_offset;
     get_cursor_offset(cursor_offset, &mouse_pos);
-    update_3rd_person_camera(&camera, cursor_offset, 2, camera_centre);
+    update_3rd_person_camera(&camera, cursor_offset, 1, camera_centre);
     // handle_keyboard_input(window);
     update_view_matrix();
 

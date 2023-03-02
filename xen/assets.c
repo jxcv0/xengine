@@ -44,7 +44,7 @@ char *findstr(const char *haystack, const char *needle, const size_t len) {
  */
 static uint32_t do_texture_loading(const char *filepath) {
   printf("Loading texture from \"%s\".\n", filepath);
-  stbi_set_flip_vertically_on_load(true);
+  // stbi_set_flip_vertically_on_load(true);
   int w, h, n;
   unsigned char *data = stbi_load(filepath, &w, &h, &n, 0);
   assert(data != NULL);  // filename may not exist.
