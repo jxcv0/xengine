@@ -1,4 +1,4 @@
 #include "database.h"
 
-struct { 
+struct {
 } entity_list;

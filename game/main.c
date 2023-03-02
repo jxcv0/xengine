@@ -95,7 +95,7 @@ int main() {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
       glfwSetWindowShouldClose(window, true);
     }
-get_cursor_position(&mouse_pos, window);
+    get_cursor_position(&mouse_pos, window);
     vec2 cursor_offset;
     get_cursor_offset(cursor_offset, &mouse_pos);
     update_3rd_person_camera(&camera, cursor_offset, 1, camera_centre);

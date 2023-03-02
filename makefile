@@ -19,13 +19,14 @@ $(build_dir)/%.o: %.c
 	@gcc $< $(cflags) -Og -I$(glad_src_dir) -I$(stb_src_dir) -I$(dir $<) $(libs) -c -o $@
 
 game: libglad.a libstb.a libxen.a
+	@echo "building executable $@"
 	@gcc game/main.c $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_src_dir) $(xen_lib) $(libs) -o $(bin_dir)/game
 
 geom_converter: libglad.a libstb.a libxen.a
 	@gcc tools/geom_converter.c $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_src_dir) $(xen_lib) $(libs) -lassimp -o $(bin_dir)/geom_converter
 
 libxen.a: $(patsubst %.c, $(build_dir)/%.o, $(wildcard $(xen_src_dir)/*.c))
-	@echo "Building target $@"
+	@echo "Building static library $@"
 	@ar rcs build/$@ $^
 
 libglad.a: 
@@ -46,4 +47,5 @@ clean:
 tests: lin_tests
 
 lin_tests: libxen.a
+	@echo "building executable $@"
 	@gcc test/$@.c $(cflags) -I$(xen_src_dir) $(xen_lib) $(libs) -o $(bin_dir)/lin_tests
