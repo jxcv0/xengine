@@ -58,7 +58,7 @@ static uint32_t do_texture_loading(const char *filepath) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-  int format = GL_RGB;
+  int format;
   switch (n) {
     case 1:
       format = GL_RED;

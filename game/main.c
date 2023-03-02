@@ -66,9 +66,6 @@ int main() {
       "Superheroine_Basemesh_No_Hair.model",
       alloc_geom);
 
-  struct pbr_material material = load_pbr_material("ravine_rock");
-  struct geometry pbr_sphere = load_geometry("assets/meshes/Sphere-mesh.geom");
-
   struct light l = LIGHT_RANGE_3250;
   l.m_position[0] = 3.0;
   l.m_position[1] = 3.0;
