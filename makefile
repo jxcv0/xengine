@@ -44,8 +44,12 @@ clean:
 	@rm -rf build/*
 	@rm -rf bin/*
 
-tests: lin_tests
+tests: lin_tests database_tests
 
 lin_tests: libxen.a
 	@echo "building executable $@"
-	@gcc test/$@.c $(cflags) -I$(xen_src_dir) $(xen_lib) $(libs) -o $(bin_dir)/lin_tests
+	@gcc test/$@.c $(cflags) -I$(xen_src_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
+
+database_tests: libxen.a
+	@echo "building executable $@"
+	@gcc test/$@.c $(cflags) -I$(xen_src_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
