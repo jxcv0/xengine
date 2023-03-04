@@ -12,6 +12,45 @@
 extern "C" {
 #endif
 
+struct id_buffer {
+  uint32_t *mp_data; 
+  uint32_t m_head;
+  uint32_t m_tail;
+  uint32_t m_max_size;
+  uint32_t m_size;
+};
+
+/**
+ * @brief Initialize an id_buffer with memory for nmemb members.
+ *
+ * @param buf A pointer to the buffer to initialize.
+ * @param nmemb The the number of members in the id buffer.
+ */
+void init_id_buffer(struct id_buffer *buf, const size_t nmemb);
+
+/**
+ * @breif Release resources in use by an id buffer.
+ *
+ * @param buf A pointer to the buffer to delete.
+ */
+void delete_id_buffer(struct id_buffer *buf);
+
+/**
+ * @brief Get the next id from the buffer.
+ * 
+ * @param buf A pointer to the buffer to fetch the id from.
+ * @return The id.
+ */
+uint32_t pop_id(struct id_buffer *buf);
+
+/**
+ * @brief Push an id onto a buffer.
+ *
+ * @param buf A pointer to the buffer.
+ * @param id The id to store.
+ */
+void push_id(struct id_buffer *buf, const uint32_t id);
+
 /**
  * @brief Initialize the id free list;
  */
