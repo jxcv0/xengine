@@ -12,12 +12,14 @@
 extern "C" {
 #endif
 
+/**
+ * @brief Circular buffer for id's.
+ */
 struct id_buffer {
-  uint32_t *mp_data; 
-  uint32_t m_head;
-  uint32_t m_tail;
-  uint32_t m_max_size;
+  uint32_t *mp_data;
   uint32_t m_size;
+  uint32_t m_index;
+  uint32_t m_max_size;
 };
 
 /**
@@ -26,7 +28,7 @@ struct id_buffer {
  * @param buf A pointer to the buffer to initialize.
  * @param nmemb The the number of members in the id buffer.
  */
-void init_id_buffer(struct id_buffer *buf, const size_t nmemb);
+void init_id_buffer(struct id_buffer *buf, const uint32_t nmemb);
 
 /**
  * @breif Release resources in use by an id buffer.
@@ -37,7 +39,7 @@ void delete_id_buffer(struct id_buffer *buf);
 
 /**
  * @brief Get the next id from the buffer.
- * 
+ *
  * @param buf A pointer to the buffer to fetch the id from.
  * @return The id.
  */
@@ -84,7 +86,7 @@ uint32_t db_get_signature(const uint32_t entity_id);
  * @return The id of the component array.
  */
 uint32_t db_create_table(const size_t nmemb, const size_t size,
-                      uint32_t table_mask);
+                         uint32_t table_mask);
 
 /**
  * @brief Insert a component into a table. Copies data into component
@@ -98,8 +100,8 @@ uint32_t db_create_table(const size_t nmemb, const size_t size,
  *
  * @return 0 on success, -1 on error.
  */
-int db_insert_component(uint32_t entity_id, uint32_t table_mask, void *component,
-                     size_t size);
+int db_insert_component(uint32_t entity_id, uint32_t table_mask,
+                        void *component, size_t size);
 
 /**
  * @brief Combine tables into one so that each field contains contiguous
@@ -112,7 +114,7 @@ int db_insert_component(uint32_t entity_id, uint32_t table_mask, void *component
  * @return The zipped table.
  */
 void *db_zip_tables(const uint32_t num_tables, uint32_t *table_masks,
-                 uint32_t *stride);
+                    uint32_t *stride);
 
 /**
  * @brief Extract data from a zipped table and store it back in a table.
