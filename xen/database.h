@@ -1,9 +1,8 @@
 #ifndef DATABASE_H_
 #define DATABASE_H_
 
-#ifndef NUM_ENTITIES
 #define NUM_ENTITIES 256
-#endif
+#define NUM_COMPONENT_TABLES 32
 
 #include <stddef.h>
 #include <stdint.h>
