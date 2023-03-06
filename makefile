@@ -50,10 +50,6 @@ libstb.a:
 	@echo "Building static library $@"
 	@ar rcs $(lib_dir)/$@ $(build_dir)/stb_truetype.o $(build_dir)/stb_image.o
 
-clean:
-	@rm -rf build/*
-	@rm -rf bin/*
-
 tests: lin_tests database_tests
 
 lin_tests: libxen.a
@@ -63,6 +59,11 @@ lin_tests: libxen.a
 database_tests: libxen.a
 	@echo "building executable $@"
 	@$(c_comp) test/$@.c $(cflags) -I$(xen_src_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
+
+.PHONY: clean format
+clean:
+	@rm -rf build/*
+	@rm -rf bin/*
 
 format: $(wildcard $(xen_src_dir)/*.h) $(wildcard $(xen_src_dir)/*.c) $(wildcard $(xen_src_dir)/*.cpp)
 	@clang-format -i -style=Google $^
