@@ -27,7 +27,7 @@ const float window_height = 600;
 vec3 positions[MAX_ENTITIES] = {0};
 mat4 model_matrices[MAX_ENTITIES] = {0};
 
-struct camera camera = {.m_mouse_sensetivity = 0.3, .m_movement_speed = 0.15};
+struct camera camera;
 struct mouse_pos mouse_pos = {0};
 mat4 projection_matrix = {0};
 mat4 view_matrix = {0};
@@ -43,7 +43,7 @@ struct geometry *alloc_geom(size_t n) {
 }
 
 struct pbr_material *alloc_mat(size_t n) {
-  return calloc(n, sizeof(struct pbr_material));
+  return static_cast<pbr_material *>(calloc(n, sizeof(struct pbr_material)));
 };
 
 void update_view_matrix();
@@ -52,6 +52,9 @@ void handle_keyboard_input(GLFWwindow *w);
 
 // main
 int main() {
+  camera.m_mouse_sensetivity = 0.3;
+  camera.m_movement_speed = 0.15;
+
   omp_set_num_threads(4);
   omp_set_dynamic(0);
 
