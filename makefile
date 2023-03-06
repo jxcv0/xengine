@@ -60,6 +60,10 @@ database_tests: libxen.a
 	@echo "building executable $@"
 	@$(c_comp) test/$@.c $(cflags) -I$(xen_src_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
 
+circular_buffer_tests: libxen.a
+	@echo "building executable $@"
+	@$(cpp_comp) test/$@.cpp $(cflags) -I$(xen_src_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
+
 .PHONY: clean format
 clean:
 	@rm -rf build/*
