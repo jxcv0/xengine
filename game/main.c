@@ -13,7 +13,6 @@
 #include "lin.h"
 #include "pbr_deferred.h"
 #include "window.h"
-#include "circular_buffer.h"
 
 #define MAX_ENTITIES 128
 #define MAX_GEOMS 64
@@ -44,7 +43,7 @@ struct geometry *alloc_geom(size_t n) {
 }
 
 struct pbr_material *alloc_mat(size_t n) {
-  return static_cast<pbr_material *>(calloc(n, sizeof(struct pbr_material)));
+  return calloc(n, sizeof(struct pbr_material));
 };
 
 void update_view_matrix();
@@ -55,8 +54,6 @@ void handle_keyboard_input(GLFWwindow *w);
 int main() {
   camera.m_mouse_sensetivity = 0.3;
   camera.m_movement_speed = 0.15;
-
-  circular_buffer<int> buf(10);
 
   omp_set_num_threads(4);
   omp_set_dynamic(0);

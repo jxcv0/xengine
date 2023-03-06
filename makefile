@@ -30,7 +30,7 @@ $(build_dir)/%.o: %.cpp
 
 game: libglad.a libstb.a libxen.a
 	@echo "building executable $@"
-	@g++ game/main.cpp $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_src_dir) $(xen_lib) $(libs) -o $(bin_dir)/game
+	@gcc game/main.c $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_src_dir) $(xen_lib) $(libs) -o $(bin_dir)/game
 
 geom_converter: libglad.a libstb.a libxen.a
 	@$(c_comp) tools/geom_converter.c $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_src_dir) $(xen_lib) $(libs) -lassimp -o $(bin_dir)/geom_converter
