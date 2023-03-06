@@ -68,30 +68,26 @@ void push_id(struct id_buffer *buf, const uint32_t id) {
 /**
  * ----------------------------------------------------------------------------
  */
-void db_init(void) {
-  init_id_buffer(&entity_id_buf, NUM_ENTITIES);
-}
+void db_init(void) { init_id_buffer(&entity_id_buf, NUM_ENTITIES); }
 
 /**
  * ----------------------------------------------------------------------------
  */
-uint32_t db_create_id(void) {
-  return pop_id(&entity_id_buf);
-}
+uint32_t db_create_id(void) { return pop_id(&entity_id_buf); }
 
 /**
  * ----------------------------------------------------------------------------
  */
 void db_delete_id(const uint32_t entity_id) {
-    push_id(&entity_id_buf, entity_id);
-    // TODO free entries in component arrays
+  push_id(&entity_id_buf, entity_id);
+  // TODO free entries in component arrays
 }
 
 /**
  * ----------------------------------------------------------------------------
  */
 uint32_t db_get_signature(const uint32_t entity_id) {
-    return signatures[entity_id];
+  return signatures[entity_id];
 }
 
 /**
@@ -99,5 +95,5 @@ uint32_t db_get_signature(const uint32_t entity_id) {
  */
 uint32_t db_create_table(const size_t nmemb, const size_t size,
                          uint32_t table_mask) {
-    return 0;
+  return 0;
 }

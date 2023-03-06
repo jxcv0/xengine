@@ -13,6 +13,9 @@ xen_lib := -Lbuild -lxen
 c_comp := gcc
 cpp_comp := g++
 
+sh := "/bin/bash"
+format_cmd := "/usr/bin/clang-format -i -style=Google"
+
 all: game geom_converter tests
 
 $(build_dir)/%.o: %.c
@@ -60,3 +63,6 @@ lin_tests: libxen.a
 database_tests: libxen.a
 	@echo "building executable $@"
 	@$(c_comp) test/$@.c $(cflags) -I$(xen_src_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
+
+format: $(wildcard $(xen_src_dir)/*.c) $(wildcard $(xen_src_dir)/*.cpp)
+	@clang-format -i -style=Google $^
