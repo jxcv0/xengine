@@ -7,7 +7,8 @@
  * @brief A circular buffer
  */
 template <typename T>
-struct circular_buffer {
+class circular_buffer {
+ public:
   circular_buffer(const size_t buf_size)
       : m_index(0), m_size(0), m_max_size(buf_size) {
     mp_data = static_cast<T *>(calloc(m_max_size, sizeof(T)));

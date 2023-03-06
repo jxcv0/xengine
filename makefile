@@ -64,5 +64,5 @@ database_tests: libxen.a
 	@echo "building executable $@"
 	@$(c_comp) test/$@.c $(cflags) -I$(xen_src_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
 
-format: $(wildcard $(xen_src_dir)/*.c) $(wildcard $(xen_src_dir)/*.cpp)
+format: $(wildcard $(xen_src_dir)/*.h) $(wildcard $(xen_src_dir)/*.c) $(wildcard $(xen_src_dir)/*.cpp)
 	@clang-format -i -style=Google $^
