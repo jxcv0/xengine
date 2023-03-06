@@ -1,11 +1,13 @@
 #ifndef DATABASE_H_
 #define DATABASE_H_
 
-#define NUM_ENTITIES 256
-#define NUM_COMPONENT_TABLES 32
-
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
+
+#define ID_BUF_ERR 0
+#define NUM_ENTITIES 256
+#define NUM_COMPONENT_TABLES 32
 
 #ifdef __cplusplus
 extern "C" {
@@ -16,10 +18,27 @@ extern "C" {
  */
 struct id_buffer {
   uint32_t *mp_data;
-  uint32_t m_size;
+  uint32_t size;
   uint32_t m_index;
   uint32_t m_max_size;
 };
+
+/**
+ * @brief Component storage.
+ */
+struct component_table {
+  uint8_t *mp_data;
+  size_t m_stride;
+  uint32_t size;
+  uint32_t m_max_size;
+  uint32_t m_mask;
+};
+
+extern struct id_buffer entity_id_buf;
+extern uint32_t signatures[];
+
+extern struct id_buffer component_id_buf;
+extern struct component_table components[];
 
 /**
  * @brief Initialize an id_buffer with memory for nmemb members.
@@ -42,7 +61,7 @@ void delete_id_buffer(struct id_buffer *buf);
  * @param buf A pointer to the buffer to fetch the id from.
  * @return The id.
  */
-uint32_t pop_id(struct id_buffer *buf);
+uint32_t id_buffer_pop(struct id_buffer *buf);
 
 /**
  * @brief Push an id onto a buffer.
@@ -50,7 +69,14 @@ uint32_t pop_id(struct id_buffer *buf);
  * @param buf A pointer to the buffer.
  * @param id The id to store.
  */
-void push_id(struct id_buffer *buf, const uint32_t id);
+void id_buffer_push(struct id_buffer *buf, const uint32_t id);
+
+/**
+ * @brief Check if a buffer is full.
+ *
+ * @param buf A pointer to the buffer to check.
+ */
+bool id_buffer_full(struct id_buffer *buf);
 
 /**
  * @brief Initialize the id free list;

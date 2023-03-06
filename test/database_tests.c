@@ -8,7 +8,7 @@ void tst_init_id_buffer(void) {
   struct id_buffer buf = {0};
   init_id_buffer(&buf, 64);
   assert(buf.mp_data != NULL);
-  assert(buf.m_size == 64);
+  assert(buf.size == 64);
   assert(buf.m_index == 0);
   assert(buf.m_max_size == 64);
 }
@@ -16,18 +16,18 @@ void tst_init_id_buffer(void) {
 void tst_pop_push_id(void) {
   struct id_buffer buf = {0};
   init_id_buffer(&buf, 3);
-  uint32_t id1 = pop_id(&buf);
-  uint32_t id2 = pop_id(&buf);
-  uint32_t id3 = pop_id(&buf);
+  uint32_t id1 = id_buffer_pop(&buf);
+  uint32_t id2 = id_buffer_pop(&buf);
+  uint32_t id3 = id_buffer_pop(&buf);
   assert(id1 == 1);
   assert(id2 == 2);
   assert(id3 == 3);
-  push_id(&buf, id3);
-  push_id(&buf, id2);
-  push_id(&buf, id1);
-  id1 = pop_id(&buf);
-  id2 = pop_id(&buf);
-  id3 = pop_id(&buf);
+  id_buffer_push(&buf, id3);
+  id_buffer_push(&buf, id2);
+  id_buffer_push(&buf, id1);
+  id1 = id_buffer_pop(&buf);
+  id2 = id_buffer_pop(&buf);
+  id3 = id_buffer_pop(&buf);
   assert(id1 == 3);
   assert(id2 == 2);
   assert(id3 == 1);
