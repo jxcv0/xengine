@@ -3,12 +3,6 @@
 #include <assert.h>
 #include <stdlib.h>
 
-struct id_buffer entity_id_buf = {0};
-uint32_t signatures[NUM_ENTITIES] = {0};
-
-struct id_buffer component_id_buf = {0};
-struct component_table components[NUM_COMPONENT_TABLES];
-
 /**
  * ----------------------------------------------------------------------------
  */
@@ -37,7 +31,7 @@ void delete_id_buffer(struct id_buffer *buf) {
  * ----------------------------------------------------------------------------
  */
 bool id_buffer_full(struct id_buffer *buf) {
-  return buf->size != buf->m_max_size;
+  return buf->size == buf->m_max_size;
 }
 
 /**
@@ -77,54 +71,8 @@ void id_buffer_push(struct id_buffer *buf, const uint32_t id) {
 /**
  * ----------------------------------------------------------------------------
  */
-void db_init(void) {
-  init_id_buffer(&entity_id_buf, NUM_ENTITIES);
-  init_id_buffer(&component_id_buf, NUM_COMPONENT_TABLES);
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-uint32_t db_create_id(void) {
-  return id_buffer_pop(&entity_id_buf);
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-void db_delete_id(const uint32_t entity_id) {
-  id_buffer_push(&entity_id_buf, entity_id);
-  // TODO free entries in component arrays
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-uint32_t db_get_signature(const uint32_t entity_id) {
-  return signatures[entity_id];
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-uint32_t db_create_table(const size_t nmemb, const size_t size,
-                         uint32_t table_mask) {
-  struct component_table table = {
-    .mp_data = calloc(nmemb, size),
-    .m_stride = size,
-    .size = 0,
-    .m_max_size = nmemb,
-    .m_mask = table_mask,
-  };
-
-  uint32_t table_id = ID_BUF_ERR;
-  if (!id_buffer_full(&component_id_buf)) {
-    table_id = id_buffer_pop(&component_id_buf);
-  }
-
-  if (table_id != ID_BUF_ERR) {
-    components[table_id] = table;
-  }
-
-  return table_id;
+eid_t create_entity(void) {
+  static eid_t id_counter = 0;
+  assert(id_counter != MAX_NUM_ENTITIES);
+  return id_counter++;
 }
