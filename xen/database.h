@@ -1,13 +1,27 @@
 #ifndef DATABASE_H_
 #define DATABASE_H_
 
-#include <stdbool.h>
-
+#include "lin.h"
 #include "types.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+uint32_t num_materials = 0;
+struct pbr_material material_table[] = {0};
+
+uint32_t num_geometries = 0;
+struct geometry geometry_table[] = {0};
+
+uint32_t num_positions = 0;
+vec3 position_table[] = {0};
+
+uint32_t num_velocities = 0;
+vec3 velocity_table[] = {0};
+
+uint32_t num_cameras = 0;
+struct camera camera_table[] = {0};
 
 /**
  * @brief Create an entity id.

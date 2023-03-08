@@ -2,25 +2,11 @@
 #define CAMERA_H_
 
 #include "lin.h"
-#include "stdbool.h"
+#include "types.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @brief Camera class for calculating view matrix.
- */
-struct camera {
-  float m_yaw;
-  float m_pitch;
-  float m_movement_speed;
-  float m_mouse_sensetivity;
-  vec3 m_pos;
-  vec3 m_view_dir;
-  vec3 m_up;
-  vec3 m_right;
-};
 
 /**
  * @brief Update camera state based on change in cursor position.
