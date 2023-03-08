@@ -8,6 +8,16 @@
 extern "C" {
 #endif
 
+struct component {
+  eid_t m_entity_id;
+  union {
+    struct pbr_material m_material;
+    struct geometry m_geometry;
+    vec3 m_position;
+    vec3 m_velocity;
+  };
+};
+
 uint32_t num_materials = 0;
 struct pbr_material material_table[] = {0};
 

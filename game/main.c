@@ -13,6 +13,7 @@
 #include "lin.h"
 #include "pbr_deferred.h"
 #include "window.h"
+#include "database.h"
 
 #define MAX_ENTITIES 128
 #define MAX_GEOMS 64
@@ -52,6 +53,9 @@ void handle_keyboard_input(GLFWwindow *w);
 
 // main
 int main() {
+  printf("%ld\n", sizeof(struct component));
+  assert(sizeof(struct component) < 64);
+
   camera.m_mouse_sensetivity = 0.3;
   camera.m_movement_speed = 0.15;
 
