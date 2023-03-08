@@ -1,11 +1,9 @@
 #ifndef TYPES_H_
 #define TYPES_H_
 
-/**
- * Types shared between files.
- */
-
 #include <stdint.h>
+
+#include "lin.h"
 
 #define MAX_NUM_ENTITIES (0xFFFFFFFF)
 
@@ -35,11 +33,9 @@ struct geometry {
   uint32_t m_ebo;
   uint32_t m_num_vertices;
   uint32_t m_num_indices;
-  struct pbr_material m_material;
+
+  // TODO separate this out and make rendering a system.
+  struct pbr_material m_material; 
 };
 
-union component {
-  struct geometry m_geometry;
-};
-
-#endif // TYPES_H_
+#endif  // TYPES_H_
