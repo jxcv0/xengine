@@ -5,15 +5,12 @@
 
 #include "lin.h"
 
-#define MAX_NUM_ENTITIES (0xFFFFFFFF)
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // NOTE: using "m_" to prefix members implies that the member is not intented to
-// be accessed publicly.
-
-/**
- * @brief Entity id.
- */
-typedef uint32_t eid_t;
+// be changed publicly. This also goes for all structures defined elsewhere.
 
 /**
  * @brief data for calculating view matrix.
@@ -34,7 +31,6 @@ struct camera {
  * maps.
  */
 struct pbr_material {
-  eid_t m_entity;
   uint32_t m_diffuse;
   uint32_t m_normal;
   uint32_t m_roughness;
@@ -46,7 +42,6 @@ struct pbr_material {
  * @brief 3D geometry data
  */
 struct geometry {
-  eid_t m_entity;
   uint32_t m_vbo;
   uint32_t m_vao;
   uint32_t m_ebo;
@@ -56,5 +51,9 @@ struct geometry {
   // TODO separate this out and make rendering a system.
   struct pbr_material m_material;
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // TYPES_H_

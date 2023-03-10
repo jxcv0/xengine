@@ -2,11 +2,16 @@
 #define ERROR_H_
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #ifndef NDEBUG
-#define ASSERT(_e, ...) if (!(_e)) { fprintf(stderr, __VA_ARGS__); exit(EXIT_FAILURE); }
+#define ASSERT(_e, ...)           \
+  if (!(_e)) {                    \
+    fprintf(stderr, __VA_ARGS__); \
+    exit(EXIT_FAILURE);           \
+  }
 #else
 #define ASSERT(_e, ...)
 #endif
 
-#endif // ERROR_H_
+#endif  // ERROR_H_
