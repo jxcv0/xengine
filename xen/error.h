@@ -7,6 +7,7 @@
 #ifndef NDEBUG
 #define ASSERT(_e, ...)           \
   if (!(_e)) {                    \
+    fprintf(stderr, "%s:%d: ", __FILE__, __LINE__); \
     fprintf(stderr, __VA_ARGS__); \
     exit(EXIT_FAILURE);           \
   }
