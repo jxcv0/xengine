@@ -21,7 +21,16 @@ extern "C" {
 typedef uint32_t eid_t;
 typedef uint32_t sig_t;
 
-enum component_type { GEOMETRY = 0x0001, MATERIAL = 0x0002 };
+struct component {
+  eid_t m_entity;
+  union {
+    struct geometry m_geom;
+    struct pbr_material m_mat;
+    /* others */
+  };
+};
+
+enum component_type { XEN_GEOMETRY = 0x0001, XEN_MATERIAL = 0x0002 };
 
 /**
  * @brief Create an entity id.
@@ -59,10 +68,28 @@ void get_entities(eid_t *arr, const sig_t sig);
 
 /**
  * @brief Assign a component to an entity.
- * @param id The id the entity.
+ * @param id The id of the entity.
  * @param sig A mask of the component signatures to add.
  */
-void assign_component(const eid_t id, const sig_t sig);
+void assign_components(const eid_t id, const sig_t sig);
+
+/**
+ * @brief Remove a components association with an entity.
+ * @param id The id of the entity
+ * @param sig A mask of the component signatures to remove.
+ */
+void remove_components(const eid_t id, const sig_t sig);
+
+/**
+ * @brief 
+ * @param ids an array of ids to fetch the components of
+ * @
+ */
+struct component *get_components(const eid_t *ids, const size_t n, const sig_t sig);
+
+//
+// get_components(ids, dest, num_entities, XEN_GEOMETRY)
+//
 
 #ifdef __cplusplus
 }

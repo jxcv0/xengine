@@ -11,15 +11,6 @@ struct {
   sig_t m_signature;
 } entity_table[MAX_NUM_ENTITIES] = {0};
 
-struct component {
-  eid_t m_entity;
-  union {
-    struct geometry m_geom;
-    struct pbr_material m_mat;
-    /* others */
-  };
-};
-
 static struct component geometries[MAX_NUM_GEOMETRIES] = {0};
 static size_t num_geometries = 0;
 
@@ -69,13 +60,34 @@ sig_t get_signature(const eid_t id) {
 /**
  * ----------------------------------------------------------------------------
  */
-static void set_signature(const eid_t id, const sig_t sig) {
+static size_t get_id_index(const eid_t id) {
   const size_t n = num_entities;
-  for (size_t i = 0; i < n; i++) {
+  size_t i;
+  for (i = 0; i < n; i++) {
     if (entity_table[i].m_entity == id) {
-      entity_table[i].m_signature |= sig;
-      return;
+      break;
     }
+  }
+  return i;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+static void set_sig_bits(const eid_t id, const sig_t sig) {
+  const size_t i = get_id_index(id);
+  if (i != num_entities) {
+    entity_table[i].m_signature |= sig;
+  }
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+static void unset_sig_bits(const eid_t id, const sig_t sig) {
+  const size_t i = get_id_index(id);
+  if (i != num_entities) {
+    entity_table[i].m_signature ^= sig;
   }
 }
 
@@ -87,7 +99,7 @@ size_t count_entities(const sig_t sig) {
   size_t count = 0;
   const size_t n = num_entities;
   for (size_t i = 0; i < n; i++) {
-    if ((entity_table[i].m_signature & sig) != 0) {
+    if ((entity_table[i].m_signature & sig) == sig) {
       ++count;
     }
   }
@@ -97,8 +109,21 @@ size_t count_entities(const sig_t sig) {
 /**
  * ----------------------------------------------------------------------------
  */
-static void create_component(struct component* arr, size_t* count, const size_t max,
-                    const eid_t id) {
+void get_entities(eid_t* arr, const sig_t sig) {
+  size_t count = 0;
+  const size_t n = num_entities;
+  for (size_t i = 0; i < n; i++) {
+    if ((entity_table[i].m_signature & sig) == sig) {
+      arr[count++] = entity_table[i].m_entity;
+    }
+  }
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+static void create_component(struct component* arr, size_t* count,
+                             const size_t max, const eid_t id) {
   ASSERT(*count != max, "Maximum number of component type reached.\n");
   arr[(*count)++].m_entity = id;
 }
@@ -106,7 +131,7 @@ static void create_component(struct component* arr, size_t* count, const size_t 
 /**
  * ----------------------------------------------------------------------------
  */
-static void delete_component(struct component* arr, size_t* count, const eid_t id) {
+void delete_component(struct component* arr, size_t* count, const eid_t id) {
   const size_t n = *count;
   for (size_t i = 0; i < n; i++) {
     if (arr[i].m_entity == id) {
@@ -121,19 +146,33 @@ static void delete_component(struct component* arr, size_t* count, const eid_t i
 /**
  * ----------------------------------------------------------------------------
  */
-void assign_component(const eid_t id, const sig_t sig) {
-  switch (sig) {
-    case GEOMETRY:
-      create_component(geometries, &num_geometries, MAX_NUM_GEOMETRIES, id);
-      set_signature(id, sig);
-      /* fallthrough */
-
-    case MATERIAL:
-      create_component(materials, &num_materials, MAX_NUM_MATERIALS, id);
-      set_signature(id, sig);
-      /* fallthrough */
-
-    default:
-      break;
+void assign_components(const eid_t id, const sig_t sig) {
+  if ((sig & XEN_GEOMETRY) != 0) {
+    create_component(geometries, &num_geometries, MAX_NUM_GEOMETRIES, id);
+    set_sig_bits(id, XEN_GEOMETRY);
   }
+
+  if ((sig & XEN_MATERIAL) != 0) {
+    create_component(materials, &num_materials, MAX_NUM_MATERIALS, id);
+    set_sig_bits(id, XEN_MATERIAL);
+  }
+
+  /* TODO other component types*/
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+void remove_components(const eid_t id, const sig_t sig) {
+  if ((sig & XEN_GEOMETRY) != 0) {
+    delete_component(geometries, &num_geometries, id);
+    unset_sig_bits(id, XEN_GEOMETRY);
+  }
+
+  if ((sig & XEN_MATERIAL) != 0) {
+    delete_component(materials, &num_materials, id);
+    unset_sig_bits(id, XEN_MATERIAL);
+  }
+
+  /* TODO other component types*/
 }
