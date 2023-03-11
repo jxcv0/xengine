@@ -97,7 +97,8 @@ size_t count_entities(const sig_t sig) {
 /**
  * ----------------------------------------------------------------------------
  */
-static void push_id(struct component* arr, size_t* count, const size_t max, const eid_t id) {
+static void create_component(struct component* arr, size_t* count, const size_t max,
+                    const eid_t id) {
   ASSERT(*count != max, "Maximum number of component type reached.\n");
   arr[(*count)++].m_entity = id;
 }
@@ -105,7 +106,17 @@ static void push_id(struct component* arr, size_t* count, const size_t max, cons
 /**
  * ----------------------------------------------------------------------------
  */
-// static void pop_id();
+static void delete_component(struct component* arr, size_t* count, const eid_t id) {
+  const size_t n = *count;
+  for (size_t i = 0; i < n; i++) {
+    if (arr[i].m_entity == id) {
+      // swap with last then decrement index
+      arr[i] = arr[n];
+      --(*count);
+      return;
+    }
+  }
+}
 
 /**
  * ----------------------------------------------------------------------------
@@ -113,12 +124,12 @@ static void push_id(struct component* arr, size_t* count, const size_t max, cons
 void assign_component(const eid_t id, const sig_t sig) {
   switch (sig) {
     case GEOMETRY:
-      push_id(geometries, &num_geometries, MAX_NUM_GEOMETRIES, id);
+      create_component(geometries, &num_geometries, MAX_NUM_GEOMETRIES, id);
       set_signature(id, sig);
       break;
 
     case MATERIAL:
-      push_id(materials, &num_materials, MAX_NUM_MATERIALS, id);
+      create_component(materials, &num_materials, MAX_NUM_MATERIALS, id);
       set_signature(id, sig);
       break;
 

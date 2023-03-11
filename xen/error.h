@@ -5,11 +5,11 @@
 #include <stdlib.h>
 
 #ifndef NDEBUG
-#define ASSERT(_e, ...)           \
-  if (!(_e)) {                    \
+#define ASSERT(_e, ...)                             \
+  if (!(_e)) {                                      \
     fprintf(stderr, "%s:%d: ", __FILE__, __LINE__); \
-    fprintf(stderr, __VA_ARGS__); \
-    exit(EXIT_FAILURE);           \
+    fprintf(stderr, __VA_ARGS__);                   \
+    exit(EXIT_FAILURE);                             \
   }
 #else
 #define ASSERT(_e, ...)
