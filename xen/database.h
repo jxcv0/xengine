@@ -53,12 +53,14 @@ size_t count_entities(const sig_t sig);
  * @brief Get the entity id of all entities with the components sig.
  * @param arr An array to store the results in. This array is assumed to be big
  * enough.
- * @param sig The mas of the components to include in the search.
+ * @param sig The mask of the components to include in the search.
  */
 void get_entities(eid_t *arr, const sig_t sig);
 
 /**
- * TODO
+ * @brief Assign a component to an entity.
+ * @param id The id the entity.
+ * @param sig A mask of the component signatures to add.
  */
 void assign_component(const eid_t id, const sig_t sig);
 

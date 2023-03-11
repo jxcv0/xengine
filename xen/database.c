@@ -126,12 +126,12 @@ void assign_component(const eid_t id, const sig_t sig) {
     case GEOMETRY:
       create_component(geometries, &num_geometries, MAX_NUM_GEOMETRIES, id);
       set_signature(id, sig);
-      break;
+      /* fallthrough */
 
     case MATERIAL:
       create_component(materials, &num_materials, MAX_NUM_MATERIALS, id);
       set_signature(id, sig);
-      break;
+      /* fallthrough */
 
     default:
       break;
