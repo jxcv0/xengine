@@ -43,13 +43,13 @@ libxen.a: $(patsubst %.c, $(build_dir)/%.o, $(wildcard $(xen_src_dir)/*.c)) $(pa
 libglad.a: 
 	@$(c_comp) $(cflags) -I$(glad_src_dir) $(glad_src_dir)/glad.c -c -o $(build_dir)/glad.o
 	@echo "Building static library $@"
-	@ar rcs $(lib_dir)/$@ $(build_dir)/glad.o
+	@ar rcs $(build_dir)/$@ $(build_dir)/glad.o
 
 libstb.a:
 	@$(c_comp) $(cflags) -I$(stb_src_dir) $(stb_src_dir)/stb_image.c -c -o $(build_dir)/stb_image.o
 	@$(c_comp) $(cflags) -I$(stb_src_dir) $(stb_src_dir)/stb_truetype.c -c -o $(build_dir)/stb_truetype.o
 	@echo "Building static library $@"
-	@ar rcs $(lib_dir)/$@ $(build_dir)/stb_truetype.o $(build_dir)/stb_image.o
+	@ar rcs $(build_dir)/$@ $(build_dir)/stb_truetype.o $(build_dir)/stb_image.o
 
 tests: lin_tests database_tests
 
