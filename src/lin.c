@@ -17,16 +17,6 @@ void print_mat4(const mat4 m) {
 /**
  * ----------------------------------------------------------------------------
  */
-static void col_mat4(const unsigned int c, vec4 v, const mat4 m) {
-  v[0] = m[0][c];
-  v[1] = m[1][c];
-  v[2] = m[2][c];
-  v[3] = m[3][c];
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
 float radians(const float degrees) { return degrees * (M_PI / 180.0f); }
 
 /**
@@ -197,9 +187,9 @@ void scale(mat4 dest, const mat4 m, const vec3 v) {
   temp[1][1] = v[1];
   temp[2][2] = v[2];
   temp[3][0] = m[3][0];
-  temp[3][1] = m[3][0];
-  temp[3][2] = m[3][0];
-  temp[3][3] = m[3][0];
+  temp[3][1] = m[3][1];
+  temp[3][2] = m[3][2];
+  temp[3][3] = m[3][3];
 
   product_mat4(dest, m, temp);
 }
