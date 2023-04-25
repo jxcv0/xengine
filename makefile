@@ -17,7 +17,8 @@ cpp_comp := g++
 sh := "/bin/bash"
 format_cmd := "/usr/bin/clang-format -i -style=Google"
 
-all: game geom_converter tests
+# TODO make tools target
+all: geom_converter tests
 
 $(build_dir)/%.o: %.c
 	@echo "Building object $@"
@@ -28,10 +29,6 @@ $(build_dir)/%.o: %.cpp
 	@echo "Building object $@"
 	@if [ ! -d $(build_dir)/% ]; then mkdir -p $(build_dir)/$(dir $<); fi
 	@$(cpp_comp) $< $(cflags) -Og -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_include_dir) $(libs) -c -o $@
-
-game: libglad.a libstb.a libxen.a
-	@echo "building executable $@"
-	@gcc game/main.c $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_include_dir) $(xen_lib) $(libs) -o $(bin_dir)/game
 
 geom_converter: libglad.a libstb.a libxen.a
 	@$(c_comp) tools/geom_converter.c $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_include_dir) $(xen_lib) $(libs) -lassimp -o $(bin_dir)/geom_converter
@@ -51,19 +48,16 @@ libstb.a:
 	@echo "Building static library $@"
 	@ar rcs $(build_dir)/$@ $(build_dir)/stb_truetype.o $(build_dir)/stb_image.o
 
-tests: lin_tests database_tests
+tests: lin_tests test_game
 
 lin_tests: libxen.a
 	@echo "building executable $@"
 	@$(c_comp) test/$@.c $(cflags) -I$(xen_include_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
 
-database_tests: libxen.a
+test_game: libglad.a libstb.a libxen.a
 	@echo "building executable $@"
-	@$(c_comp) test/$@.c $(cflags) -I$(xen_include_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
+	@$(c_comp) test/$@.c $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_include_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
 
-circular_buffer_tests: libxen.a
-	@echo "building executable $@"
-	@$(cpp_comp) test/$@.cpp $(cflags) -I$(xen_src_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
 
 .PHONY: clean format
 clean:
