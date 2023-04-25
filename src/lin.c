@@ -236,13 +236,14 @@ void rotate(mat4 dest, const mat4 m, vec3 axis, const float angle) {
  * ----------------------------------------------------------------------------
  */
 void scale(mat4 dest, const mat4 m, const vec3 v) {
-  mat4 temp = {0};
+  mat4 temp = IDENTITY_MAT4;
   temp[0][0] = v[0];
   temp[1][1] = v[1];
   temp[2][2] = v[2];
   temp[3][0] = m[3][0];
-  temp[3][1] = m[3][1];
-  temp[3][2] = m[3][2];
-  temp[3][3] = m[3][3];
+  temp[3][1] = m[3][0];
+  temp[3][2] = m[3][0];
+  temp[3][3] = m[3][0];
+
   product_mat4(dest, m, temp);
 }
