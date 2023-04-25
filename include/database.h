@@ -81,11 +81,12 @@ void assign_components(const eid_t id, const sig_t sig);
 void remove_components(const eid_t id, const sig_t sig);
 
 /**
- * @brief 
+ * @brief
  * @param ids an array of ids to fetch the components of
  * @
  */
-struct component *get_components(const eid_t *ids, const size_t n, const sig_t sig);
+struct component *get_components(const eid_t *ids, const size_t n,
+                                 const sig_t sig);
 
 //
 // get_components(ids, dest, num_entities, XEN_GEOMETRY)

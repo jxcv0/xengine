@@ -12,7 +12,6 @@ libs := -Llib -lglad -lstb -lm -ldl -lglfw -fopenmp
 xen_lib := -Lbuild -lxen
 
 c_comp := gcc
-cpp_comp := g++
 
 sh := "/bin/bash"
 format_cmd := "/usr/bin/clang-format -i -style=Google"
@@ -25,15 +24,10 @@ $(build_dir)/%.o: %.c
 	@if [ ! -d $(build_dir)/% ]; then mkdir -p $(build_dir)/$(dir $<); fi
 	@$(c_comp) $< $(cflags) -Og -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_include_dir) $(libs) -c -o $@
 
-$(build_dir)/%.o: %.cpp
-	@echo "Building object $@"
-	@if [ ! -d $(build_dir)/% ]; then mkdir -p $(build_dir)/$(dir $<); fi
-	@$(cpp_comp) $< $(cflags) -Og -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_include_dir) $(libs) -c -o $@
-
 geom_converter: libglad.a libstb.a libxen.a
 	@$(c_comp) tools/geom_converter.c $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_include_dir) $(xen_lib) $(libs) -lassimp -o $(bin_dir)/geom_converter
 
-libxen.a: $(patsubst %.c, $(build_dir)/%.o, $(wildcard $(xen_src_dir)/*.c)) $(patsubst %.cpp, $(build_dir)/%.o, $(wildcard $(xen_src_dir)/*.cpp))
+libxen.a: $(patsubst %.c, $(build_dir)/%.o, $(wildcard $(xen_src_dir)/*.c))
 	@echo "Building static library $@"
 	@ar rcs build/$@ $^
 
@@ -64,5 +58,5 @@ clean:
 	@rm -rf build/*
 	@rm -rf bin/*
 
-format: $(wildcard $(xen_src_dir)/*.h) $(wildcard $(xen_src_dir)/*.c) $(wildcard $(xen_src_dir)/*.cpp)
+format: $(wildcard $(xen_include_dir)/*.h) $(wildcard $(xen_src_dir)/*.c)
 	@clang-format -i -style=Google $^
