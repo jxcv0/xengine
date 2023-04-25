@@ -2,7 +2,8 @@ build_dir := build
 bin_dir := bin
 lib_dir := lib
 
-xen_src_dir := xen
+xen_src_dir := src
+xen_include_dir := include
 stb_src_dir := $(lib_dir)/stb
 glad_src_dir := $(lib_dir)/glad
 
@@ -21,19 +22,19 @@ all: game geom_converter tests
 $(build_dir)/%.o: %.c
 	@echo "Building object $@"
 	@if [ ! -d $(build_dir)/% ]; then mkdir -p $(build_dir)/$(dir $<); fi
-	@$(c_comp) $< $(cflags) -Og -I$(glad_src_dir) -I$(stb_src_dir) -I$(dir $<) $(libs) -c -o $@
+	@$(c_comp) $< $(cflags) -Og -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_include_dir) $(libs) -c -o $@
 
 $(build_dir)/%.o: %.cpp
 	@echo "Building object $@"
 	@if [ ! -d $(build_dir)/% ]; then mkdir -p $(build_dir)/$(dir $<); fi
-	@$(cpp_comp) $< $(cflags) -Og -I$(glad_src_dir) -I$(stb_src_dir) -I$(dir $<) $(libs) -c -o $@
+	@$(cpp_comp) $< $(cflags) -Og -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_include_dir) $(libs) -c -o $@
 
 game: libglad.a libstb.a libxen.a
 	@echo "building executable $@"
-	@gcc game/main.c $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_src_dir) $(xen_lib) $(libs) -o $(bin_dir)/game
+	@gcc game/main.c $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_include_dir) $(xen_lib) $(libs) -o $(bin_dir)/game
 
 geom_converter: libglad.a libstb.a libxen.a
-	@$(c_comp) tools/geom_converter.c $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_src_dir) $(xen_lib) $(libs) -lassimp -o $(bin_dir)/geom_converter
+	@$(c_comp) tools/geom_converter.c $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_include_dir) $(xen_lib) $(libs) -lassimp -o $(bin_dir)/geom_converter
 
 libxen.a: $(patsubst %.c, $(build_dir)/%.o, $(wildcard $(xen_src_dir)/*.c)) $(patsubst %.cpp, $(build_dir)/%.o, $(wildcard $(xen_src_dir)/*.cpp))
 	@echo "Building static library $@"
@@ -54,11 +55,11 @@ tests: lin_tests database_tests
 
 lin_tests: libxen.a
 	@echo "building executable $@"
-	@$(c_comp) test/$@.c $(cflags) -I$(xen_src_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
+	@$(c_comp) test/$@.c $(cflags) -I$(xen_include_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
 
 database_tests: libxen.a
 	@echo "building executable $@"
-	@$(c_comp) test/$@.c $(cflags) -I$(xen_src_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
+	@$(c_comp) test/$@.c $(cflags) -I$(xen_include_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
 
 circular_buffer_tests: libxen.a
 	@echo "building executable $@"
