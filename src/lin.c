@@ -89,51 +89,7 @@ void cross_vec3(vec3 dest, const vec3 v1, const vec3 v2) {
 /**
  * ----------------------------------------------------------------------------
  */
-void matrix_product(float *result, const float *m1, const float *m2, const size_t a, const size_t b, const size_t c) {
-  for (size_t i = 0; i < a; i++) {
-    for (size_t j = 0; j < b; j++) {
-      for (size_t k = 0; k < c; k++) {
-        result[i + k] += m1[i + j] * m2[j + k];
-      }
-    }
-  }
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
 void product_mat4(mat4 dest, const mat4 m1, const mat4 m2) {
-    /*
-  vec4 col0 = {0};
-  vec4 col1 = {0};
-  vec4 col2 = {0};
-  vec4 col3 = {0};
-
-  col_mat4(0, col0, m2);
-  col_mat4(1, col1, m2);
-  col_mat4(2, col2, m2);
-  col_mat4(3, col3, m2);
-
-  dest[0][0] = dot_vec4(m1[0], col0);
-  dest[0][1] = dot_vec4(m1[0], col1);
-  dest[0][2] = dot_vec4(m1[0], col2);
-  dest[0][3] = dot_vec4(m1[0], col3);
-
-  dest[1][0] = dot_vec4(m1[1], col0);
-  dest[1][1] = dot_vec4(m1[1], col1);
-  dest[1][2] = dot_vec4(m1[1], col2);
-  dest[1][3] = dot_vec4(m1[1], col3);
-
-  dest[2][0] = dot_vec4(m1[2], col0);
-  dest[2][1] = dot_vec4(m1[2], col1);
-  dest[2][2] = dot_vec4(m1[2], col2);
-  dest[2][3] = dot_vec4(m1[2], col3);
-
-  dest[3][0] = dot_vec4(m1[3], col0);
-  dest[3][1] = dot_vec4(m1[3], col1);
-  dest[3][2] = dot_vec4(m1[3], col2);
-  dest[3][3] = dot_vec4(m1[3], col3);
-  */
   for (size_t i = 0; i < 4; i++) {
     for (size_t j = 0; j < 4; j++) {
       for (size_t k = 0; k < 4; k++) {

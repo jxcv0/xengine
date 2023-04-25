@@ -192,7 +192,7 @@ void tst_scale(void) {
   m[2][1] = 0.032f;
   m[3][0] = 1.0f;
   m[3][2] = 0.888f;
-  vec3 v = {0, 2, 3};
+  vec3 v = {0.0f, 2.0f, 3.0f};
 
   mat4 result = {0};
   scale(result, m, v);
