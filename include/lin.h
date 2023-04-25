@@ -15,6 +15,13 @@ typedef float vec3[3];
 typedef float vec4[4];
 
 /**
+ * @brief Print a matrix to stdout.
+ *
+ * @param m The matrix to print.
+ */
+void print_mat4(const mat4 m);
+
+/**
  * @brief Convert an angle from degrees to radians. Not exact.
  *
  * @param degrees The angle in degrees.
@@ -116,10 +123,11 @@ void rotate(mat4 dest, const mat4 m, vec3 axis, const float angle);
 /**
  * @brief Scale a tramsformation matrix by a vector v.
  *
+ * @param dest The matrix to store the result.
  * @param m The matrix to transform.
  * @param v The scaling vector.
  */
-void scale(mat4 m, const vec3 v);
+void scale(mat4 dest, const mat4 m, const vec3 v);
 
 #ifdef __cplusplus
 }

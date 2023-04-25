@@ -53,8 +53,8 @@ void tst_cross_vec3(void) {
 }
 
 void tst_product_mat4(void) {
-  mat4 m1 = {{0}};
-  mat4 m2 = {{0}};
+  mat4 m1 = {0};
+  mat4 m2 = {0};
 
   float x = 0.0f;
   for (int i = 0; i < 4; i++) {
@@ -64,7 +64,8 @@ void tst_product_mat4(void) {
       x += 1.0f;
     }
   }
-  mat4 result = {{0}};
+
+  mat4 result = {0};
   product_mat4(result, m1, m2);
   ASSERT_FLOAT_EQ(result[0][0], 56.0f);
   ASSERT_FLOAT_EQ(result[0][1], 62.0f);
@@ -133,7 +134,7 @@ void tst_translate(void) {
 }
 
 void tst_rotate(void) {
-  mat4 dest = {{0}};
+  mat4 dest = {0};
   mat4 m = IDENTITY_MAT4;
   vec3 v = {0.0f, 1.0f, 0.0f};
   rotate(dest, m, v, radians(30.0f));
@@ -192,28 +193,27 @@ void tst_scale(void) {
   m[3][0] = 1.0f;
   m[3][2] = 0.888f;
   vec3 v = {0, 2, 3};
-  scale(m, v);
 
-  for (int i = 0; i < 4; i++) {
-    printf("%f %f %f %f\n", m[i][0], m[i][1], m[i][2], m[i][3]);
-  }
+  mat4 result = {0};
+  scale(result, m, v);
+  print_mat4(result);
 
-  ASSERT_FLOAT_EQ(m[0][0], 0.000000);
-  ASSERT_FLOAT_EQ(m[0][1], 0.000000);
-  ASSERT_FLOAT_EQ(m[0][2], 1.032000);
-  ASSERT_FLOAT_EQ(m[0][3], 0.000000);
-  ASSERT_FLOAT_EQ(m[1][0], 0.000000);
-  ASSERT_FLOAT_EQ(m[1][1], 0.000000);
-  ASSERT_FLOAT_EQ(m[1][2], 0.000000);
-  ASSERT_FLOAT_EQ(m[1][3], 0.000000);
-  ASSERT_FLOAT_EQ(m[2][0], 0.000000);
-  ASSERT_FLOAT_EQ(m[2][1], 0.032000);
-  ASSERT_FLOAT_EQ(m[2][2], 0.000000);
-  ASSERT_FLOAT_EQ(m[2][3], 0.000000);
-  ASSERT_FLOAT_EQ(m[3][0], 1.000000);
-  ASSERT_FLOAT_EQ(m[3][1], 0.000000);
-  ASSERT_FLOAT_EQ(m[3][2], 0.888000);
-  ASSERT_FLOAT_EQ(m[3][3], 0.000000);
+  ASSERT_FLOAT_EQ(result[0][0], 0.000000);
+  ASSERT_FLOAT_EQ(result[0][1], 0.000000);
+  ASSERT_FLOAT_EQ(result[0][2], 0.000000);
+  ASSERT_FLOAT_EQ(result[0][3], 0.000000);
+  ASSERT_FLOAT_EQ(result[1][0], 0.000000);
+  ASSERT_FLOAT_EQ(result[1][1], 0.000000);
+  ASSERT_FLOAT_EQ(result[1][2], 0.000000);
+  ASSERT_FLOAT_EQ(result[1][3], 0.000000);
+  ASSERT_FLOAT_EQ(result[2][0], 0.000000);
+  ASSERT_FLOAT_EQ(result[2][1], 0.096000);
+  ASSERT_FLOAT_EQ(result[2][2], 0.000000);
+  ASSERT_FLOAT_EQ(result[2][3], 0.000000);
+  ASSERT_FLOAT_EQ(result[3][0], 1.000000);
+  ASSERT_FLOAT_EQ(result[3][1], 0.000000);
+  ASSERT_FLOAT_EQ(result[3][2], 0.888000);
+  ASSERT_FLOAT_EQ(result[3][3], 0.000000);
 }
 
 int main() {

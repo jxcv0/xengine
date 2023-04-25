@@ -6,6 +6,17 @@
 /**
  * ----------------------------------------------------------------------------
  */
+void print_mat4(const mat4 m) {
+  printf("{ ");
+  for (int i = 0; i < 4; i++) {
+    printf("{ %f %f %f %f} ", m[i][0], m[i][1], m[i][2], m[i][3]);
+  }
+  printf("}\n");
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
 static void col_mat4(const unsigned int c, vec4 v, const mat4 m) {
   v[0] = m[0][c];
   v[1] = m[1][c];
@@ -78,7 +89,21 @@ void cross_vec3(vec3 dest, const vec3 v1, const vec3 v2) {
 /**
  * ----------------------------------------------------------------------------
  */
+void matrix_product(float *result, const float *m1, const float *m2, const size_t a, const size_t b, const size_t c) {
+  for (size_t i = 0; i < a; i++) {
+    for (size_t j = 0; j < b; j++) {
+      for (size_t k = 0; k < c; k++) {
+        result[i + k] += m1[i + j] * m2[j + k];
+      }
+    }
+  }
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
 void product_mat4(mat4 dest, const mat4 m1, const mat4 m2) {
+    /*
   vec4 col0 = {0};
   vec4 col1 = {0};
   vec4 col2 = {0};
@@ -108,6 +133,14 @@ void product_mat4(mat4 dest, const mat4 m1, const mat4 m2) {
   dest[3][1] = dot_vec4(m1[3], col1);
   dest[3][2] = dot_vec4(m1[3], col2);
   dest[3][3] = dot_vec4(m1[3], col3);
+  */
+  for (size_t i = 0; i < 4; i++) {
+    for (size_t j = 0; j < 4; j++) {
+      for (size_t k = 0; k < 4; k++) {
+        dest[i][k] += m1[i][j] * m2[j][k];
+      }
+    }
+  }
 }
 
 /**
@@ -202,8 +235,8 @@ void rotate(mat4 dest, const mat4 m, vec3 axis, const float angle) {
 /**
  * ----------------------------------------------------------------------------
  */
-void scale(mat4 m, const vec3 v) {
-  mat4 temp = IDENTITY_MAT4;
+void scale(mat4 dest, const mat4 m, const vec3 v) {
+  mat4 temp = {0};
   temp[0][0] = v[0];
   temp[1][1] = v[1];
   temp[2][2] = v[2];
@@ -211,7 +244,5 @@ void scale(mat4 m, const vec3 v) {
   temp[3][1] = m[3][1];
   temp[3][2] = m[3][2];
   temp[3][3] = m[3][3];
-  mat4 result = IDENTITY_MAT4;
-  product_mat4(result, m, temp);
-  memcpy(m, result, sizeof(float) * 16);
+  product_mat4(dest, m, temp);
 }
