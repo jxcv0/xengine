@@ -1,11 +1,11 @@
+#include <assert.h>
 #include <libgen.h>
 #include <stdio.h>
-#include <assert.h>
 #include <string.h>
 
-#include "test.h"
 #include "database.h"
 #include "error.h"
+#include "test.h"
 
 int main() {
   eid_t e1 = create_entity();
@@ -38,7 +38,8 @@ int main() {
   assert(num_with_mat == 4);
   assert(num_with_both == 3);
 
-  // The next 2 bock of of assertions rely on a linear foreward search. This WILL break.
+  // The next 2 bock of of assertions rely on a linear foreward search. This
+  // WILL break.
   eid_t ids_with_geom[num_with_geom];
   memset(ids_with_geom, 0, sizeof(eid_t) * num_with_geom);
   get_entities(ids_with_geom, XEN_GEOMETRY);

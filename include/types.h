@@ -9,8 +9,9 @@
 extern "C" {
 #endif
 
-// NOTE: using "m_" to prefix members implies that the member is not intented to
-// be changed publicly. This also goes for all structures defined elsewhere.
+// NOTE: using "m_" to prefix members implies that the member is not intented
+// to be changed publicly. This also goes for all structures defined
+// elsewhere.
 
 /**
  * @brief data for calculating view matrix.

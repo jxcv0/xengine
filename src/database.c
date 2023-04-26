@@ -109,7 +109,7 @@ size_t count_entities(const sig_t sig) {
 /**
  * ----------------------------------------------------------------------------
  */
-void get_entities(eid_t* arr, const sig_t sig) {
+void get_entities(eid_t *arr, const sig_t sig) {
   size_t count = 0;
   const size_t n = num_entities;
   for (size_t i = 0; i < n; i++) {
@@ -122,7 +122,7 @@ void get_entities(eid_t* arr, const sig_t sig) {
 /**
  * ----------------------------------------------------------------------------
  */
-static void create_component(struct component* arr, size_t* count,
+static void create_component(struct component *arr, size_t *count,
                              const size_t max, const eid_t id) {
   ASSERT(*count != max, "Maximum number of component type reached.\n");
   arr[(*count)++].m_entity = id;
@@ -131,7 +131,7 @@ static void create_component(struct component* arr, size_t* count,
 /**
  * ----------------------------------------------------------------------------
  */
-void delete_component(struct component* arr, size_t* count, const eid_t id) {
+void delete_component(struct component *arr, size_t *count, const eid_t id) {
   const size_t n = *count;
   for (size_t i = 0; i < n; i++) {
     if (arr[i].m_entity == id) {

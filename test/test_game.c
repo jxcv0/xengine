@@ -8,12 +8,12 @@
 
 #include "assets.h"
 #include "camera.h"
+#include "database.h"
 #include "glad.h"
 #include "input.h"
 #include "lin.h"
 #include "pbr_deferred.h"
 #include "window.h"
-#include "database.h"
 
 #define MAX_ENTITIES 128
 #define MAX_GEOMS 64

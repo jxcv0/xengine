@@ -60,8 +60,8 @@ size_t count_entities(const sig_t sig);
 
 /**
  * @brief Get the entity id of all entities with the components sig.
- * @param arr An array to store the results in. This array is assumed to be big
- * enough.
+ * @param arr An array to store the results in. This array is assumed to be
+ * big enough.
  * @param sig The mask of the components to include in the search.
  */
 void get_entities(eid_t *arr, const sig_t sig);
