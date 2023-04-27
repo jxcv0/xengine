@@ -80,14 +80,14 @@ static uint32_t do_texture_loading(const char *filepath) {
 /**
  * ----------------------------------------------------------------------------
  */
-uint32_t load_texture(const char *filename) {
-  size_t namelen = strlen(filename);
-  size_t dirlen = strlen(TEXTURE_DIR);
-  char filepath[namelen + dirlen];
-  strncpy(filepath, TEXTURE_DIR, dirlen + 1);
-  strncpy(&filepath[dirlen], filename, namelen + 1);
-  return do_texture_loading(filepath);
+struct geometry *provision_geometry(struct geometry *arr, const size_t size,
+                                    size_t *count) {
+    if (*count == size) {
+      return NULL;
+    }
+    return &arr[(*count)++];
 }
+
 
 /**
  * ----------------------------------------------------------------------------
@@ -189,6 +189,19 @@ struct pbr_material load_pbr_material(const char *material_name) {
 /**
  * ----------------------------------------------------------------------------
  */
+uint32_t load_texture(const char *filename) {
+  size_t namelen = strlen(filename);
+  size_t dirlen = strlen(TEXTURE_DIR);
+  char filepath[namelen + dirlen];
+  strncpy(filepath, TEXTURE_DIR, dirlen + 1);
+  strncpy(&filepath[dirlen], filename, namelen + 1);
+  return do_texture_loading(filepath);
+}
+
+
+/**
+ * ----------------------------------------------------------------------------
+ */
 void load_model(const char *filepath, alloc_geometries alloc_geom) {
   printf("Loading model from \"%s\".\n", filepath);
 
@@ -250,4 +263,5 @@ void load_model(const char *filepath, alloc_geometries alloc_geom) {
     geom->m_material.m_metallic = do_texture_loading(buffer);
   }
   free(lineptr);
+  fclose(model_file);
 }

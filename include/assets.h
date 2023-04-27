@@ -9,7 +9,7 @@
 #define ASSET_MAX_NAME_LEN 64
 #define TEXTURE_NAME_LEN 64
 #define MAX_ASSETS 128
-#define MAX_MESHES 256
+#define MAX_NUM_GEOMETRIES 256
 
 #define MESH_DIR "assets/meshes/"
 #define TEXTURE_DIR "assets/textures/"
@@ -22,29 +22,14 @@ typedef struct geometry *(*alloc_geometries)(size_t);
 typedef struct pbr_material *(*alloc_pbr_materials)(size_t);
 
 /**
- * @brief Vertex position and texture data.
+ * @brief Get the next available geometry from a geometry array.
+ *
+ * @param arr The array to fetch the geometry from.
+ * @param size The size of the array pointed to by arr.
+ * @param count The current number of elements in use in arr.
+ * @return A pointer to the next available geometry.
  */
-struct vertex {
-  vec3 m_position;
-  vec2 m_tex_coord;
-  vec3 m_normal;
-  vec3 m_tangent;
-  vec3 m_bitangent;
-};
-
-/**
- * @brief Stores the data required to render a mesh.
- */
-struct mesh {
-  uint32_t m_id;
-  uint32_t m_vbo;
-  uint32_t m_vao;
-  uint32_t m_ebo;
-  uint32_t m_num_vertices;
-  uint32_t m_num_indices;
-  uint32_t m_tex_diff;  // TODO link this some other way.
-  uint32_t m_tex_spec;  // TODO see above.
-};
+struct geometry *provision_geometry(struct geometry *arr, const size_t size, size_t *count);
 
 /**
  * @brief TODO
@@ -81,7 +66,6 @@ uint32_t load_texture(const char *filename);
  *
  * @param filepath The path to the .model file
  * @param alloc_geom Geometry allocation function.
- * @param alloc_mat Material allocation function.
  */
 void load_model(const char *filepath, alloc_geometries alloc_geom);
 

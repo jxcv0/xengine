@@ -8,7 +8,6 @@
 
 #include "assets.h"
 #include "camera.h"
-#include "database.h"
 #include "glad.h"
 #include "input.h"
 #include "lin.h"

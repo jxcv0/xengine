@@ -9,9 +9,20 @@
 extern "C" {
 #endif
 
-// NOTE: using "m_" to prefix members implies that the member is not intented
-// to be changed publicly. This also goes for all structures defined
-// elsewhere.
+/**
+ * @brief Stores the data required to render a mesh.
+ * TODO use struct geometry instead.
+ */
+struct mesh {
+  uint32_t m_id;
+  uint32_t m_vbo;
+  uint32_t m_vao;
+  uint32_t m_ebo;
+  uint32_t m_num_vertices;
+  uint32_t m_num_indices;
+  uint32_t m_tex_diff;  // TODO link this some other way.
+  uint32_t m_tex_spec;  // TODO see above.
+};
 
 /**
  * @brief data for calculating view matrix.
@@ -38,6 +49,15 @@ struct pbr_material {
   uint32_t m_metallic;
   // uint32_t m_displacement;
 };
+
+struct vertex {
+  vec3 m_position;
+  vec2 m_tex_coord;
+  vec3 m_normal;
+  vec3 m_tangent;
+  vec3 m_bitangent;
+};
+
 
 /**
  * @brief 3D geometry data
