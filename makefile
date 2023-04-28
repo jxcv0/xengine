@@ -59,4 +59,4 @@ clean:
 	@rm -rf bin/*
 
 format: $(wildcard $(xen_include_dir)/*.h) $(wildcard $(xen_src_dir)/*.c) $(wildcard test/*.c)
-	@clang-format -i -style=Google $^
+	@clang-format -i -style=google $^

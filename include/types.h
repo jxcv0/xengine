@@ -58,7 +58,6 @@ struct vertex {
   vec3 m_bitangent;
 };
 
-
 /**
  * @brief 3D geometry data
  */

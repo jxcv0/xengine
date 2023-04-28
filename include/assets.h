@@ -17,14 +17,35 @@ typedef struct geometry *(*alloc_geometries)(size_t);
 typedef struct pbr_material *(*alloc_pbr_materials)(size_t);
 
 /**
- * @brief Get the next available geometry from a geometry array.
+ * @brief Get the next available geometry from a geometry array. This function
+ * returns an index into a lookup table so that the geometries in the array can
+ * be moved around while still being accessable with the same index.
  *
  * @param arr The array to fetch the geometry from.
+ * @param table The handle to array index lookup table.
  * @param size The size of the array pointed to by arr.
  * @param count The current number of elements in use in arr.
- * @return A pointer to the next available geometry.
+ * @return A handle (index) that can be used to access the geometry in arr. Or
+ * -1 on error.
  */
-struct geometry *provision_geometry(struct geometry *arr, const size_t size, size_t *count);
+int32_t provision_geometry(struct geometry *arr, size_t *table,
+                           const size_t size, size_t *count);
+
+/**
+ * @brief Make a geometry available for reassignment and unmap the indexes in
+ * the index table. This is implemented by swapping the geometry pointed to by
+ * handle with the last geometry, updating the table with the new indexes then
+ * decrementing count.
+ *
+ * @param arr The array to fetch the geometry from.
+ * @param table The handle to array index lookup table.
+ * @param size The size of the array pointed to by arr.
+ * @param count The current number of elements in use in arr.
+ * @param handle The geometry handle to delete.
+ * @return 0 on success. -1 on error.
+ */
+int32_t release_geometry(struct geometry *arr, size_t *table, const size_t size,
+                         size_t *count, int32_t handle);
 
 /**
  * @brief TODO

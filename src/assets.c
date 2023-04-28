@@ -39,6 +39,9 @@ char *findstr(const char *haystack, const char *needle, const size_t len) {
   return NULL;
 }
 
+
+GLint format_table[] = {GL_RGBA, GL_RED, GL_RGBA, GL_RGB, GL_RGBA};
+
 /**
  * ----------------------------------------------------------------------------
  */
@@ -58,19 +61,7 @@ static uint32_t do_texture_loading(const char *filepath) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-  int format;
-  switch (n) {
-    case 1:
-      format = GL_RED;
-      break;
-    case 4:
-      format = GL_RGBA;
-      break;
-    default:
-      format = GL_RGB;
-      break;
-  }
-  glTexImage2D(GL_TEXTURE_2D, 0, format, w, h, 0, format, GL_UNSIGNED_BYTE,
+  glTexImage2D(GL_TEXTURE_2D, 0, format_table[n], w, h, 0, format_table[n], GL_UNSIGNED_BYTE,
                data);
 
   free(data);
@@ -80,14 +71,30 @@ static uint32_t do_texture_loading(const char *filepath) {
 /**
  * ----------------------------------------------------------------------------
  */
-struct geometry *provision_geometry(struct geometry *arr, const size_t size,
-                                    size_t *count) {
-    if (*count == size) {
-      return NULL;
-    }
-    return &arr[(*count)++];
+int32_t provision_geometry(struct geometry *arr, size_t *table,
+                           const size_t size, size_t *count) {
+  return -1;
 }
 
+/**
+ * ----------------------------------------------------------------------------
+ */
+int32_t release_geometry(struct geometry *arr, size_t *table, const size_t size,
+                         size_t *count, int32_t handle) {
+  size_t last;
+  // get the handle of the last geometry
+  for (size_t i = 0; i < *count; i++) {
+    if (table[i] == *count) {
+      last = i;
+    }
+  }
+
+  arr[table[handle]] = arr[table[last]];
+  table[last] = table[handle];
+
+  (*count)--;
+  return 0;
+}
 
 /**
  * ----------------------------------------------------------------------------
@@ -197,7 +204,6 @@ uint32_t load_texture(const char *filename) {
   strncpy(&filepath[dirlen], filename, namelen + 1);
   return do_texture_loading(filepath);
 }
-
 
 /**
  * ----------------------------------------------------------------------------
