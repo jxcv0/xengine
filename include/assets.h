@@ -16,10 +16,42 @@ extern "C" {
 typedef struct geometry *(*alloc_geometries)(size_t);
 typedef struct pbr_material *(*alloc_pbr_materials)(size_t);
 
+typedef uint64_t handle_t;
+
+struct handle_table {
+  handle_t *table;
+  const size_t size;
+  size_t count;
+};
+
 /**
- * @brief Get the next available geometry from a geometry array. This function
- * returns an index into a lookup table so that the geometries in the array can
- * be moved around while still being accessable with the same index.
+ * @brief Initialize a handle table with unique values 0 to tablesize.
+ *
+ * @param handle_table The table to initialize.
+ */
+void init_handle_table(struct handle_table *ht);
+
+/**
+ * @brief Get the next available asset handle from an asset handle table.
+ *
+ * @param handle_table The table to get the next handle from.
+ * @param h A pointer to the handle to assign.
+ * @return 0 on success -1 on error.
+ */
+int get_handle(struct handle_table *ht, handle_t *h);
+
+/**
+ * @brief Return an asset handle to a table.
+ *
+ */
+int release_handle(struct handle_table *ht, handle_t h);
+
+/**
+ * @brief Get the next available geometry from a geometry array.
+ *
+ * @detail This function returns an index into a lookup table so that the
+ * geometries in the array can be moved around while still being accessable with
+ * the same index.
  *
  * @param arr The array to fetch the geometry from.
  * @param table The handle to array index lookup table.
@@ -33,7 +65,9 @@ int32_t provision_geometry(struct geometry *arr, size_t *table,
 
 /**
  * @brief Make a geometry available for reassignment and unmap the indexes in
- * the index table. This is implemented by swapping the geometry pointed to by
+ * the index table.
+ *
+ * @detail This is implemented by swapping the geometry pointed to by
  * handle with the last geometry, updating the table with the new indexes then
  * decrementing count.
  *

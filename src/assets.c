@@ -16,6 +16,47 @@
 /**
  * ----------------------------------------------------------------------------
  */
+void init_handle_table(struct handle_table *ht) {
+  size_t n = ht->size;
+  for (size_t i = 0; i < ht->size; i++) {
+    ht->table[i] = --n;
+  }
+  ht->count = ht->size;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+int get_handle(struct handle_table *ht, handle_t *h) {
+  if (ht->count == 0) {
+    return -1;
+  }
+  *h = ht->table[--ht->count];
+  return 0;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+int release_handle(struct handle_table *ht, handle_t h) {
+  if (h >= ht->size) {
+    return -1;
+  }
+
+  for (size_t i = 0; i < ht->count - 1; i++) {
+    if (ht->table[i] == h) {
+      return -1;
+    }
+  }
+
+  ht->table[ht->count++] == h;
+
+  return 0;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
 bool xenstrncmp(const char *s1, const char *s2, size_t len) {
   for (size_t i = 0; i < len; i++) {
     if (s1[i] != s2[i]) {
@@ -39,7 +80,6 @@ char *findstr(const char *haystack, const char *needle, const size_t len) {
   return NULL;
 }
 
-
 GLint format_table[] = {GL_RGBA, GL_RED, GL_RGBA, GL_RGB, GL_RGBA};
 
 /**
@@ -61,8 +101,8 @@ static uint32_t do_texture_loading(const char *filepath) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-  glTexImage2D(GL_TEXTURE_2D, 0, format_table[n], w, h, 0, format_table[n], GL_UNSIGNED_BYTE,
-               data);
+  glTexImage2D(GL_TEXTURE_2D, 0, format_table[n], w, h, 0, format_table[n],
+               GL_UNSIGNED_BYTE, data);
 
   free(data);
   return id;
