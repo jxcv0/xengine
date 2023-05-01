@@ -18,51 +18,43 @@ typedef struct pbr_material *(*alloc_pbr_materials)(size_t);
 
 typedef uint64_t handle_t;
 
-struct handle_table {
-  handle_t *table;
-  const size_t size;
-  size_t count;
+/**
+ * @brief Maps a handle to an index.
+ */
+struct handle_index_pair {
+  handle_t handle;
+  size_t index;
 };
 
 /**
- * @brief Initialize a handle table with unique values 0 to tablesize.
+ * TODO this might be problematic
  *
- * @param handle_table The table to initialize.
+ * @brief Generate a new unique asset handle
  */
-void init_handle_table(struct handle_table *ht);
+handle_t new_asset_handle(void);
 
 /**
- * @brief Get the next available asset handle from an asset handle table.
+ * @brief Allocate a new geometry.
  *
- * @param handle_table The table to get the next handle from.
- * @param h A pointer to the handle to assign.
- * @return 0 on success -1 on error.
+ * @param arr The array to provision from.
+ * @param table The table to store handle to index mapping.
+ * @param size The number of elements in the arrays arr and table.
+ * @param count A pointer to the variable used to store the number of elements
+ * in arr currently in use.
+ * @return 0 on success, -1 on error.
  */
-int get_handle(struct handle_table *ht, handle_t *h);
+int provision_geometry(struct geometry *arr, struct handle_index_pair *table,
+                       size_t size, size_t *count, handle_t handle);
 
 /**
- * @brief Return an asset handle to a table.
+ * @brief Access a geometry in a geometry array.
  *
+ * @param arr The array in which a geometry is stored.
+ * @param table The handle to index table for the array
  */
-int release_handle(struct handle_table *ht, handle_t h);
-
-/**
- * @brief Get the next available geometry from a geometry array.
- *
- * @detail This function returns an index into a lookup table so that the
- * geometries in the array can be moved around while still being accessable with
- * the same index.
- *
- * @param arr The array to fetch the geometry from.
- * @param table The handle to array index lookup table.
- * @param size The size of the array pointed to by arr.
- * @param count The current number of elements in use in arr.
- * @return A handle (index) that can be used to access the geometry in arr. Or
- * -1 on error.
- */
-int32_t provision_geometry(struct geometry *arr, size_t *table,
-                           const size_t size, size_t *count);
-
+struct geometry *get_geometry(struct geometry *arr,
+                              struct handle_index_pair *table,
+                              const size_t size, handle_t handle);
 /**
  * @brief Make a geometry available for reassignment and unmap the indexes in
  * the index table.

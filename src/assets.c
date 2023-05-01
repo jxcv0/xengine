@@ -16,40 +16,30 @@
 /**
  * ----------------------------------------------------------------------------
  */
-void init_handle_table(struct handle_table *ht) {
-  size_t n = ht->size;
-  for (size_t i = 0; i < ht->size; i++) {
-    ht->table[i] = --n;
-  }
-  ht->count = ht->size;
+handle_t new_asset_handle(void) {
+  static handle_t counter = 1;
+  assert(counter != UINT64_MAX);
+  return counter++;
 }
 
 /**
  * ----------------------------------------------------------------------------
  */
-int get_handle(struct handle_table *ht, handle_t *h) {
-  if (ht->count == 0) {
-    return -1;
-  }
-  *h = ht->table[--ht->count];
-  return 0;
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-int release_handle(struct handle_table *ht, handle_t h) {
-  if (h >= ht->size) {
+int provision_geometry(struct geometry *arr, struct handle_index_pair *table,
+                       size_t size, size_t *count, handle_t handle) {
+  if (*count >= size) {
     return -1;
   }
 
-  for (size_t i = 0; i < ht->count - 1; i++) {
-    if (ht->table[i] == h) {
+  for (size_t i = 0; i < *count; i++) {
+    if (table[i].handle == handle) {
       return -1;
     }
   }
 
-  ht->table[ht->count++] == h;
+  table[*count].handle = handle;
+  table[*count].index = *count;
+  (*count)++;
 
   return 0;
 }
@@ -106,14 +96,6 @@ static uint32_t do_texture_loading(const char *filepath) {
 
   free(data);
   return id;
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-int32_t provision_geometry(struct geometry *arr, size_t *table,
-                           const size_t size, size_t *count) {
-  return -1;
 }
 
 /**
