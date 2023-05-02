@@ -11,14 +11,14 @@ handle_t new_handle(void) {
   return counter++;
 }
 
-int gen_buffer(struct buffer *buf, size_t size, size_t stride) {
-  if (size == 0 || stride == 0 || buf == NULL) {
+int gen_buffer(struct buffer *buf, size_t nmemb, size_t stride) {
+  if (nmemb == 0 || stride == 0 || buf == NULL) {
     return -1;
   }
 
-  buf->map = calloc(size, sizeof(struct pair));
-  buf->data = calloc(size, stride);
-  buf->size = size;
+  buf->map = calloc(nmemb, sizeof(struct pair));
+  buf->data = calloc(nmemb, stride);
+  buf->nmemb = nmemb;
   buf->stride = stride;
   buf->count = 0;
   return 0;
@@ -34,7 +34,7 @@ int buffer_insert(struct buffer *buf, const void *data, handle_t handle) {
     return -1;
   }
 
-  if (buf->count >= buf->size) {
+  if (buf->count >= buf->nmemb) {
     return -1;
   }
 

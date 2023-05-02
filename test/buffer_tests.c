@@ -12,7 +12,7 @@ struct buffer b;
 
 int main() {
   assert(gen_buffer(&b, BUF_SIZE, sizeof(struct some_struct)) == 0);
-  assert(b.size == BUF_SIZE);
+  assert(b.nmemb == BUF_SIZE);
   assert(b.count == 0);
   assert(b.data != NULL);
   assert(b.stride == sizeof(struct some_struct));
