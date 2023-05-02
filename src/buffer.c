@@ -22,6 +22,7 @@ int gen_buffer(struct buffer *buf, size_t nmemb, size_t stride) {
     return -1;
   }
 
+  // TODO use mmap for these so they can be saved to file easily?
   buf->map = calloc(nmemb, sizeof(struct pair));
   buf->data = calloc(nmemb, stride);
   buf->nmemb = nmemb;
