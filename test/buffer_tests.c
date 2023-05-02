@@ -47,6 +47,33 @@ int main() {
   assert(ptr->s == 2);
 
   assert(buffer_delete(&b, h1) != -1);
+
   assert(data[0].s == 2);
+  ptr = buffer_fetch(&b, h3);
+  assert(ptr != NULL);
+  assert(ptr->s == 2);
+
   assert(data[1].s == 1);
+  ptr = buffer_fetch(&b, h2);
+  assert(ptr != NULL);
+  assert(ptr->s == 1);
+
+  assert(buffer_delete(&b, h2) != -1);
+
+  assert(data[0].s == 2);
+  ptr = buffer_fetch(&b, h3);
+  assert(ptr != NULL);
+  assert(ptr->s == 2);
+
+  s.s = 1;
+  assert(buffer_insert(&b, &s, h1) != -1);
+  assert(data[0].s == 2);
+  ptr = buffer_fetch(&b, h3);
+  assert(ptr != NULL);
+  assert(ptr->s == 2);
+
+  assert(data[1].s == 1);
+  ptr = buffer_fetch(&b, h1);
+  assert(ptr != NULL);
+  assert(ptr->s == 1);
 }
