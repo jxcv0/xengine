@@ -5,12 +5,18 @@
 #include <stdlib.h>
 #include <string.h>
 
+/**
+ * ----------------------------------------------------------------------------
+ */
 handle_t new_handle(void) {
   static handle_t counter = 1;
   assert(counter != INT_MAX);
   return counter++;
 }
 
+/**
+ * ----------------------------------------------------------------------------
+ */
 int gen_buffer(struct buffer *buf, size_t nmemb, size_t stride) {
   if (nmemb == 0 || stride == 0 || buf == NULL) {
     return -1;
@@ -24,11 +30,17 @@ int gen_buffer(struct buffer *buf, size_t nmemb, size_t stride) {
   return 0;
 }
 
+/**
+ * ----------------------------------------------------------------------------
+ */
 void delete_buffer(struct buffer *buf) {
   free(buf->map);
   free(buf->data);
 }
 
+/**
+ * ----------------------------------------------------------------------------
+ */
 int buffer_insert(struct buffer *buf, const void *data, handle_t handle) {
   if (buf == NULL || data == NULL) {
     return -1;
@@ -49,6 +61,9 @@ int buffer_insert(struct buffer *buf, const void *data, handle_t handle) {
   return 0;
 }
 
+/**
+ * ----------------------------------------------------------------------------
+ */
 static int find_index(struct buffer *buf, handle_t handle, size_t *index) {
   for (size_t i = 0; i < buf->count; i++) {
     if (buf->map[i].handle == handle) {
@@ -59,6 +74,9 @@ static int find_index(struct buffer *buf, handle_t handle, size_t *index) {
   return -1;
 }
 
+/**
+ * ----------------------------------------------------------------------------
+ */
 static int find_last_handle(struct buffer *buf, handle_t *handle) {
   size_t last_offset = (buf->count - 1) * buf->stride;
   for (size_t i = 0; i < buf->count; i++) {
@@ -70,6 +88,9 @@ static int find_last_handle(struct buffer *buf, handle_t *handle) {
   return -1;
 }
 
+/**
+ * ----------------------------------------------------------------------------
+ */
 int buffer_delete(struct buffer *buf, handle_t handle) {
   size_t index_to_delete;
   if (find_index(buf, handle, &index_to_delete) == -1) {
@@ -99,6 +120,9 @@ int buffer_delete(struct buffer *buf, handle_t handle) {
   return 0;
 }
 
+/**
+ * ----------------------------------------------------------------------------
+ */
 void *buffer_fetch(struct buffer *buf, handle_t handle) {
   size_t index;
   if (find_index(buf, handle, &index) == -1) {
