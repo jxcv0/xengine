@@ -1,14 +1,14 @@
 #include "buffer.h"
 
+#include <assert.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
-#include <limits.h>
-#include <assert.h>
 
 handle_t new_handle(void) {
-    static handle_t counter = 1;
-    assert(counter != INT_MAX);
-    return counter++;
+  static handle_t counter = 1;
+  assert(counter != INT_MAX);
+  return counter++;
 }
 
 int gen_buffer(struct buffer *buf, size_t size, size_t stride) {
@@ -38,12 +38,13 @@ int buffer_insert(struct buffer *buf, const void *data, handle_t handle) {
     return -1;
   }
 
-  size_t index = buf->count++;
+  size_t offset = buf->stride * buf->count;
 
-  buf->map[index].handle = handle;
-  buf->map[index].index = index;
+  buf->map[buf->count].handle = handle;
+  buf->map[buf->count].offset = offset;
 
-  memcpy((buf->data + (index * buf->stride)), data, buf->stride);
+  memcpy((buf->data + offset), data, buf->stride);
+  ++buf->count;
 
   return 0;
 }
@@ -59,9 +60,9 @@ static int find_index(struct buffer *buf, handle_t handle, size_t *index) {
 }
 
 static int find_last_handle(struct buffer *buf, handle_t *handle) {
-  size_t last_index = buf->count - 1;
+  size_t last_offset = (buf->count - 1) * buf->stride;
   for (size_t i = 0; i < buf->count; i++) {
-    if (buf->map[i].index == last_index) {
+    if (buf->map[i].offset == last_offset) {
       *handle = buf->map[i].handle;
       return 0;
     }
@@ -70,25 +71,38 @@ static int find_last_handle(struct buffer *buf, handle_t *handle) {
 }
 
 int buffer_delete(struct buffer *buf, handle_t handle) {
-  size_t index;
-  if (find_index(buf, handle, &index) == -1) {
+  size_t index_to_delete;
+  if (find_index(buf, handle, &index_to_delete) == -1) {
     return -1;
-  }
-
-  size_t offset_to_delete = buf.map[index].index * buf->stride;
-  size_t offset_last = (buf->count - 1) * buf->stride;
-
-  if (offset_to_delete == offset_last) {
-    --buf->count;
-    return 0;
   }
 
   handle_t last_handle;
   if (find_last_handle(buf, &last_handle) == -1) {
     return -1;
   }
-  
-  // ...
+
+  size_t index_of_last;
+  find_index(buf, last_handle, &index_of_last);
+
+  if (index_to_delete == index_of_last) {
+    --buf->count;
+    return 0;
+  }
+
+  size_t offset_of_last = buf->map[index_of_last].offset;
+  size_t offset_to_delete = buf->map[index_to_delete].offset;
+
+  memcpy(buf->data + offset_to_delete, buf->data + offset_of_last, buf->stride);
+  buf->map[index_to_delete] = buf->map[index_of_last];
+  --buf->count;
 
   return 0;
+}
+
+void *buffer_fetch(struct buffer *buf, handle_t handle) {
+  size_t index;
+  if (find_index(buf, handle, &index) == -1) {
+    return NULL;
+  }
+  return buf->data + buf->map[index].offset;
 }

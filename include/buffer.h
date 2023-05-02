@@ -9,8 +9,8 @@ typedef int32_t handle_t;
 struct buffer {
   struct pair {
     handle_t handle;
-    size_t index;
-  } *map;
+    size_t offset;
+  } * map;
 
   void *data;
   size_t size;
