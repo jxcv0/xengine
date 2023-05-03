@@ -5,11 +5,8 @@
 
 #include "lin.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 typedef uint64_t handle_t;
+typedef uint32_t signature_t;
 
 /**
  * @brief Stores the data required to render a mesh.
@@ -73,9 +70,5 @@ struct geometry {
   // TODO separate this out and make rendering a system.
   struct pbr_material m_material;
 };
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif  // TYPES_H_
