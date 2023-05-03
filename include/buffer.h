@@ -4,6 +4,11 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/**
+ * @file buffer.h
+ * Component memory managment.
+ */
+
 typedef int32_t handle_t;
 
 struct buffer {
@@ -28,7 +33,7 @@ handle_t new_handle(void);
  * @param size The size in bytes of each member.
  * @return 0 on success. -1 on error.
  */
-int gen_buffer(struct buffer *buf, size_t nmemb, size_t size);
+int buffer_init(struct buffer *buf, size_t nmemb, size_t size);
 
 /**
  * @brief Free the resources used by buffer.

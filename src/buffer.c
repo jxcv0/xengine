@@ -17,7 +17,7 @@ handle_t new_handle(void) {
 /**
  * ----------------------------------------------------------------------------
  */
-int gen_buffer(struct buffer *buf, size_t nmemb, size_t stride) {
+int buffer_init(struct buffer *buf, size_t nmemb, size_t stride) {
   if (nmemb == 0 || stride == 0 || buf == NULL) {
     return -1;
   }

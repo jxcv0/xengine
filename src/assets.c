@@ -16,37 +16,6 @@
 /**
  * ----------------------------------------------------------------------------
  */
-handle_t new_asset_handle(void) {
-  static handle_t counter = 1;
-  assert(counter != UINT64_MAX);
-  return counter++;
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-int provision_geometry(struct geometry *arr, struct handle_index_pair *table,
-                       size_t size, size_t *count, handle_t handle) {
-  if (*count >= size) {
-    return -1;
-  }
-
-  for (size_t i = 0; i < *count; i++) {
-    if (table[i].handle == handle) {
-      return -1;
-    }
-  }
-
-  table[*count].handle = handle;
-  table[*count].index = *count;
-  (*count)++;
-
-  return 0;
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
 bool xenstrncmp(const char *s1, const char *s2, size_t len) {
   for (size_t i = 0; i < len; i++) {
     if (s1[i] != s2[i]) {
@@ -70,12 +39,12 @@ char *findstr(const char *haystack, const char *needle, const size_t len) {
   return NULL;
 }
 
-GLint format_table[] = {GL_RGBA, GL_RED, GL_RGBA, GL_RGB, GL_RGBA};
 
 /**
  * ----------------------------------------------------------------------------
  */
-static uint32_t do_texture_loading(const char *filepath) {
+static uint32_t prv_load_texture(const char *filepath) {
+  static GLint format_table[] = {GL_RGBA, GL_RED, GL_RGBA, GL_RGB, GL_RGBA};
   printf("Loading texture from \"%s\".\n", filepath);
   // stbi_set_flip_vertically_on_load(true);
   int w, h, n;
@@ -96,26 +65,6 @@ static uint32_t do_texture_loading(const char *filepath) {
 
   free(data);
   return id;
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-int32_t release_geometry(struct geometry *arr, size_t *table, const size_t size,
-                         size_t *count, int32_t handle) {
-  size_t last;
-  // get the handle of the last geometry
-  for (size_t i = 0; i < *count; i++) {
-    if (table[i] == *count) {
-      last = i;
-    }
-  }
-
-  arr[table[handle]] = arr[table[last]];
-  table[last] = table[handle];
-
-  (*count)--;
-  return 0;
 }
 
 /**
@@ -224,18 +173,19 @@ uint32_t load_texture(const char *filename) {
   char filepath[namelen + dirlen];
   strncpy(filepath, TEXTURE_DIR, dirlen + 1);
   strncpy(&filepath[dirlen], filename, namelen + 1);
-  return do_texture_loading(filepath);
+  return prv_load_texture(filepath);
 }
 
 /**
  * ----------------------------------------------------------------------------
  */
-void load_model(const char *filepath, alloc_geometries alloc_geom) {
+int load_model(const char *filepath, alloc_geometries alloc_geom) {
   printf("Loading model from \"%s\".\n", filepath);
 
   FILE *model_file = fopen(filepath, "r");
   if (model_file == NULL) {
     perror("fopen");
+    return -1;
   }
 
   // get the directory
@@ -264,7 +214,7 @@ void load_model(const char *filepath, alloc_geometries alloc_geom) {
     len = end - start;
     strncpy(&buffer[dir_len], start, len);
     buffer[len + dir_len] = '\0';
-    geom->m_material.m_diffuse = do_texture_loading(buffer);
+    geom->m_material.m_diffuse = prv_load_texture(buffer);
 
     // roughness
     start = end + 1;
@@ -272,7 +222,7 @@ void load_model(const char *filepath, alloc_geometries alloc_geom) {
     len = end - start;
     strncpy(&buffer[dir_len], start, len);
     buffer[len + dir_len] = '\0';
-    geom->m_material.m_roughness = do_texture_loading(buffer);
+    geom->m_material.m_roughness = prv_load_texture(buffer);
 
     // normal
     start = end + 1;
@@ -280,7 +230,7 @@ void load_model(const char *filepath, alloc_geometries alloc_geom) {
     len = end - start;
     strncpy(&buffer[dir_len], start, len);
     buffer[len + dir_len] = '\0';
-    geom->m_material.m_normal = do_texture_loading(buffer);
+    geom->m_material.m_normal = prv_load_texture(buffer);
 
     // metallic
     start = end + 1;
@@ -288,8 +238,9 @@ void load_model(const char *filepath, alloc_geometries alloc_geom) {
     len = end - start;
     strncpy(&buffer[dir_len], start, len);
     buffer[len + dir_len] = '\0';
-    geom->m_material.m_metallic = do_texture_loading(buffer);
+    geom->m_material.m_metallic = prv_load_texture(buffer);
   }
   free(lineptr);
   fclose(model_file);
+  return 0;
 }

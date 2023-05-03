@@ -11,7 +11,7 @@ struct some_struct {
 struct buffer b;
 
 int main() {
-  assert(gen_buffer(&b, BUF_SIZE, sizeof(struct some_struct)) == 0);
+  assert(buffer_init(&b, BUF_SIZE, sizeof(struct some_struct)) == 0);
   assert(b.nmemb == BUF_SIZE);
   assert(b.count == 0);
   assert(b.data != NULL);

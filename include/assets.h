@@ -1,6 +1,11 @@
 #ifndef MESH_H_
 #define MESH_H_
 
+/**
+ * @file assets.h
+ * Loading assets from file.
+ */
+
 #include <stddef.h>
 
 #include "lin.h"
@@ -15,63 +20,6 @@ extern "C" {
 
 typedef struct geometry *(*alloc_geometries)(size_t);
 typedef struct pbr_material *(*alloc_pbr_materials)(size_t);
-
-typedef uint64_t handle_t;
-
-/**
- * @brief Maps a handle to an index.
- */
-struct handle_index_pair {
-  handle_t handle;
-  size_t index;
-};
-
-/**
- * TODO this might be problematic
- *
- * @brief Generate a new unique asset handle
- */
-handle_t new_asset_handle(void);
-
-/**
- * @brief Allocate a new geometry.
- *
- * @param arr The array to provision from.
- * @param table The table to store handle to index mapping.
- * @param size The number of elements in the arrays arr and table.
- * @param count A pointer to the variable used to store the number of elements
- * in arr currently in use.
- * @return 0 on success, -1 on error.
- */
-int provision_geometry(struct geometry *arr, struct handle_index_pair *table,
-                       size_t size, size_t *count, handle_t handle);
-
-/**
- * @brief Access a geometry in a geometry array.
- *
- * @param arr The array in which a geometry is stored.
- * @param table The handle to index table for the array
- */
-struct geometry *get_geometry(struct geometry *arr,
-                              struct handle_index_pair *table,
-                              const size_t size, handle_t handle);
-/**
- * @brief Make a geometry available for reassignment and unmap the indexes in
- * the index table.
- *
- * @detail This is implemented by swapping the geometry pointed to by
- * handle with the last geometry, updating the table with the new indexes then
- * decrementing count.
- *
- * @param arr The array to fetch the geometry from.
- * @param table The handle to array index lookup table.
- * @param size The size of the array pointed to by arr.
- * @param count The current number of elements in use in arr.
- * @param handle The geometry handle to delete.
- * @return 0 on success. -1 on error.
- */
-int32_t release_geometry(struct geometry *arr, size_t *table, const size_t size,
-                         size_t *count, int32_t handle);
 
 /**
  * @brief TODO

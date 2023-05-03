@@ -44,17 +44,13 @@ libstb.a:
 	@echo "Building static library $@"
 	@ar rcs $(build_dir)/$@ $(build_dir)/stb_truetype.o $(build_dir)/stb_image.o
 
-tests: test_game lin_tests asset_tests buffer_tests
+tests: test_game lin_tests buffer_tests
 
 test_game: libglad.a libstb.a libxen.a
 	@echo "building executable $@"
 	@$(c_comp) test/$@.c $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_include_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
 
 lin_tests: libxen.a
-	@echo "building executable $@"
-	@$(c_comp) test/$@.c $(cflags) -I$(xen_include_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
-
-asset_tests: libxen.a
 	@echo "building executable $@"
 	@$(c_comp) test/$@.c $(cflags) -I$(xen_include_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
 
