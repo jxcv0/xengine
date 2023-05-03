@@ -1,18 +1,8 @@
 #include "buffer.h"
 
-#include <assert.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <string.h>
-
-/**
- * ----------------------------------------------------------------------------
- */
-handle_t new_handle(void) {
-  static handle_t counter = 1;
-  assert(counter != INT_MAX);
-  return counter++;
-}
 
 /**
  * ----------------------------------------------------------------------------

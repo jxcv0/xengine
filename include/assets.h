@@ -57,7 +57,7 @@ uint32_t load_texture(const char *filename);
  * @param filepath The path to the .model file
  * @param alloc_geom Geometry allocation function.
  */
-void load_model(const char *filepath, alloc_geometries alloc_geom);
+int load_model(const char *filepath, alloc_geometries alloc_geom);
 
 #ifdef __cplusplus
 }

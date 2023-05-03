@@ -1,6 +1,7 @@
 #include <assert.h>
 
 #include "buffer.h"
+#include "ecs.h"
 
 #define BUF_SIZE 16
 

@@ -9,6 +9,8 @@
 extern "C" {
 #endif
 
+typedef uint64_t handle_t;
+
 /**
  * @brief Stores the data required to render a mesh.
  * TODO use struct geometry instead.

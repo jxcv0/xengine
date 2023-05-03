@@ -39,7 +39,6 @@ char *findstr(const char *haystack, const char *needle, const size_t len) {
   return NULL;
 }
 
-
 /**
  * ----------------------------------------------------------------------------
  */
@@ -240,6 +239,7 @@ int load_model(const char *filepath, alloc_geometries alloc_geom) {
     buffer[len + dir_len] = '\0';
     geom->m_material.m_metallic = prv_load_texture(buffer);
   }
+
   free(lineptr);
   fclose(model_file);
   return 0;

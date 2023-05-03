@@ -4,12 +4,12 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "types.h"
+
 /**
  * @file buffer.h
  * Component memory managment.
  */
-
-typedef int32_t handle_t;
 
 struct buffer {
   struct pair {
@@ -22,8 +22,6 @@ struct buffer {
   size_t stride;
   size_t count;
 };
-
-handle_t new_handle(void);
 
 /**
  * @brief Set up a buffer.
