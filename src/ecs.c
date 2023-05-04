@@ -1,8 +1,8 @@
 #include "ecs.h"
 
+#include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <errno.h>
 
 #define ID_UNUSED (1 << 31)
 #define ID_MAX (UINT32_MAX - 1)
@@ -13,16 +13,17 @@ static struct {
   size_t max;
 } entity_buf;
 
-static struct {
-  struct geometry *data;
-  size_t count;
-  size_t max;
-} geometry_buf;
+static struct buffer buffers[MAX_COMPONENT_TYPES];
+static size_t num_buffers;
 
 /**
  * ----------------------------------------------------------------------------
  */
 int ecs_init(size_t nent) {
+  if (nent >= ID_MAX) {
+    return -1;
+  }
+
   entity_buf.data = calloc(nent, sizeof(uint32_t));
   if (entity_buf.data == NULL) {
     return -1;
@@ -40,7 +41,7 @@ int ecs_init(size_t nent) {
  */
 int ecs_create_entity(uint32_t *e) {
   if (entity_buf.data == NULL || e == NULL) {
-      errno = EINVAL;
+    errno = EINVAL;
     return -1;
   }
 
@@ -52,7 +53,7 @@ int ecs_create_entity(uint32_t *e) {
   for (size_t i = 0; i < entity_buf.count; i++) {
     if ((entity_buf.data[i] & ID_UNUSED) != 0) {
       *e = i;
-      entity_buf.data[i] ^= ID_UNUSED;
+      entity_buf.data[i] = 0;
       entity_buf.count++;
       return 0;
     }
@@ -64,9 +65,21 @@ int ecs_create_entity(uint32_t *e) {
  * ----------------------------------------------------------------------------
  */
 void ecs_delete_entity(uint32_t e) {
+  // TODO delete this entities entries in component buffers
+  entity_buf.data[e] = ID_UNUSED;
+  entity_buf.count--;
+}
 
-    // TODO delete this entities entries in component buffers
-    entity_buf.data[e] = ID_UNUSED;
+/**
+ * ----------------------------------------------------------------------------
+ */
+int ecs_add_components(uint32_t e, uint32_t type) {
+  if ((entity_buf.data[0] & ID_UNUSED) != 0) {
+    entity_buf.data[e] |= type;
+    return 0;
+    // TODO provision component for entity
+  }
+  return -1;
 }
 
 /**

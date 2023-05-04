@@ -5,6 +5,8 @@
 
 #include "types.h"
 
+#define MAX_COMPONENT_TYPES 31
+
 // First bit is used to specify if id is unused
 #define GEOMETRY (1 << 0)
 #define MATERIAL (1 << 1)
@@ -20,11 +22,11 @@ int ecs_create_entity(uint32_t *e);
 
 void ecs_delete_entity(uint32_t e);
 
-int ecs_add_component(uint32_t e, uint32_t type);
+int ecs_add_components(uint32_t e, uint32_t type);
 
 void *ecs_component_value(uint32_t e, uint32_t type);
 
-int ecs_set_component(uint32_t e, uint32_t type, const void *val, size_t size);
+int ecs_set_component(uint32_t e, uint32_t type, const void *val);
 
 // TODO systems?
 
