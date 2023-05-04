@@ -2,32 +2,58 @@
 
 #include <assert.h>
 #include <stdint.h>
+#include <stdlib.h>
+
+static int ecs_errno;
+static handle_t counter = 1;
 
 static struct {
-  handle_t handle;
-  signature_t singature;
-} signature_map[MAX_NUM_ENTITIES];
+  uint32_t *data;
+  size_t count;
+  size_t max;
+} entity_buf;
 
-static size_t num_entities = 0;
-static handle_t counter = 1;
+/**
+ * ----------------------------------------------------------------------------
+ */
+int ecs_init(size_t nent) {
+  entity_buf.data = calloc(nent, sizeof(uint32_t));
+  if (entity_buf.data == NULL) {
+    ecs_errno = ECSERR_SYS;
+    return -1;
+  }
+  for (size_t i = 0; i < nent; i++) {
+    entity_buf.data[i] = ID_UNUSED;
+  }
+  entity_buf.count = 0;
+  entity_buf.max = nent;
+  return 0;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+int ecs_create_entity(uint32_t *e) {
+  if (entity_buf.data == NULL || e == NULL ||
+      entity_buf.count == entity_buf.max) {
+    return -1;
+  }
+
+  for (size_t i = 0; i < entity_buf.max; i++) {
+    if ((entity_buf.data[i] & ID_UNUSED) != 0) {
+      *e = i;
+      entity_buf.data[i] ^= ID_UNUSED;
+      entity_buf.count++;
+      return 0;
+    }
+  }
+  return -1;
+}
 
 /**
  * ----------------------------------------------------------------------------
  */
 handle_t new_handle(void) {
   assert(counter != UINT64_MAX);
-  handle_t h = counter++;
-  signature_map[num_entities++].handle = h;
-  return h;
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-void free_handle(handle_t handle) {
-  for (size_t i = 0; i < num_entities; i++) {
-    if (signature_map[i].handle == handle) {
-      signature_map[i] = signature_map[num_entities--];
-    }
-  }
+  return counter++;
 }

@@ -5,6 +5,9 @@
 
 #include "lin.h"
 
+#define HANDLE_UNUSED (UINT64_MAX)
+#define HANDLE_MAX (UINT64_MAX - 1)
+
 typedef uint64_t handle_t;
 typedef uint32_t signature_t;
 
