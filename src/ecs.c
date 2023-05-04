@@ -15,7 +15,7 @@ static handle_t counter = 1;
  * ----------------------------------------------------------------------------
  */
 handle_t new_handle(void) {
-  assert(counter != MAX_NUM_ENTITIES);
+  assert(counter != UINT64_MAX);
   handle_t h = counter++;
   signature_map[num_entities++].handle = h;
   return h;
