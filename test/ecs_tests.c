@@ -4,8 +4,7 @@
 #include "ecs.h"
 
 int main() {
-  assert(ecs_init(16) != -1);
-
+  ecs_init();
   uint32_t e1;
   assert(ecs_archetype(0) == 0x80000000);
   assert(ecs_create_entity(&e1) != -1);

@@ -5,17 +5,18 @@
 
 #include "types.h"
 
+#define MAX_NUM_ENTITIES 128
+
+// Can be changed to 63 if uint64_t is used
 #define MAX_COMPONENT_TYPES 31
 
 #define MAX_NUM_GEOMETRIES 32
 #define MAX_NUM_MATERIALS 32
 #define MAX_NUM_POSITIONS 32
 
-#define GEOMETRY (1 << 0)
-#define MATERIAL (1 << 1)
-#define POSITION (1 << 2)
+enum component_type { GEOMETRY = 0, MATERIAL = 1, POSITION = 2 };
 
-int ecs_init(size_t nent);
+void ecs_init(void);
 
 void ecs_shutdown(void);
 
@@ -25,11 +26,13 @@ void ecs_delete_entity(uint32_t e);
 
 uint32_t ecs_archetype(uint32_t e);
 
-int ecs_add_component(uint32_t e, uint32_t type);
+int ecs_add_component(uint32_t e, enum component_type type);
 
-void *ecs_component(uint32_t e, uint32_t type);
+void ecs_remove_component(uint32_t e, enum component_type type);
 
-int ecs_set_component(uint32_t e, uint32_t type, const void *val);
+void *ecs_component(uint32_t e, enum component_type type);
+
+int ecs_set_component(uint32_t e, enum component_type type, const void *val);
 
 // TODO systems?
 
