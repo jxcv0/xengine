@@ -17,11 +17,8 @@ union component {
   struct geometry geometry;
   struct pbr_material material;
   vec3 position;
-  // ... 
+  // ...
 };
-
-// This table is used to look up a mask based on an index
-static const uint32_t mask_table[] = {GEOMETRY_MASK, MATERIAL_MASK, POSITION_MASK};
 
 static uint32_t entity_buf[MAX_NUM_ENTITIES];
 static size_t num_entities;
@@ -31,9 +28,15 @@ struct index_table {
   size_t index;
 };
 
-static struct geometry geometry_buf[MAX_NUM_GEOMETRIES];
+static union component geometry_buf[MAX_NUM_GEOMETRIES];
 static size_t num_geometries;
 static struct index_table geometry_table[MAX_NUM_GEOMETRIES];
+
+static const uint32_t mask_table[] = {GEOMETRY_MASK, MATERIAL_MASK,
+                                      POSITION_MASK};
+static const union component *buffer_table[] = {geometry_buf};
+static const struct index_table *map_table[] = {geometry_table};
+static const size_t *counter_table[] = {&num_geometries};
 
 /*
 static struct pbr_material material_buf[MAX_NUM_MATERIALS];
@@ -94,15 +97,17 @@ uint32_t ecs_archetype(uint32_t e) { return entity_buf[e]; }
 /**
  * ----------------------------------------------------------------------------
  */
-int ecs_add_component(uint32_t e, enum component_type type) {
-  if ((entity_buf[e] & ID_UNUSED) == 0) {
+int ecs_add_component(uint32_t e, uint32_t type) {
+  if ((entity_buf[e] & ID_UNUSED) != 0) {
     return -1;
   }
 
   entity_buf[e] |= mask_table[type];
-  // insert in buffer
-  geometry_table[num_geometries].entity = e;
-  geometry_table[num_geometries].index = num_geometries++;
+  struct index_table *it = map_table[type];
+  size_t *counter = counter_table[type];
+  it[*counter].entity = e;
+  it[*counter].index = *counter;
+  (*counter)++;
 
   return 0;
 }

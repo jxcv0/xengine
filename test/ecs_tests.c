@@ -11,4 +11,8 @@ int main() {
   assert(ecs_archetype(e1) == 0);
   ecs_delete_entity(e1);
   assert(ecs_archetype(e1) == 0x80000000);
+
+  assert(ecs_create_entity(&e1) != -1);
+  assert(ecs_add_component(e1, GEOMETRY) != -1);
+  assert(ecs_archetype(e1) == 0x1);
 }

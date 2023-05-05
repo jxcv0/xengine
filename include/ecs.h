@@ -14,7 +14,9 @@
 #define MAX_NUM_MATERIALS 32
 #define MAX_NUM_POSITIONS 32
 
-enum component_type { GEOMETRY = 0, MATERIAL = 1, POSITION = 2 };
+#define GEOMETRY 0
+#define MATERIAL 1
+#define POSITION 2
 
 void ecs_init(void);
 
@@ -26,13 +28,13 @@ void ecs_delete_entity(uint32_t e);
 
 uint32_t ecs_archetype(uint32_t e);
 
-int ecs_add_component(uint32_t e, enum component_type type);
+int ecs_add_component(uint32_t e, uint32_t type);
 
-void ecs_remove_component(uint32_t e, enum component_type type);
+void ecs_remove_component(uint32_t e, uint32_t type);
 
-void *ecs_component(uint32_t e, enum component_type type);
+void *ecs_component(uint32_t e, uint32_t type);
 
-int ecs_set_component(uint32_t e, enum component_type type, const void *val);
+int ecs_set_component(uint32_t e, uint32_t type, const void *val);
 
 // TODO systems?
 
