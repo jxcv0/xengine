@@ -67,8 +67,8 @@ struct geometry {
   uint32_t m_vbo;
   uint32_t m_vao;
   uint32_t m_ebo;
-  uint32_t m_num_vertices;
-  uint32_t m_num_indices;
+  size_t m_num_vertices;
+  size_t m_num_indices;
 
   // TODO separate this out and make rendering a system.
   struct pbr_material m_material;

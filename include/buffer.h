@@ -4,16 +4,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "types.h"
-
-/**
- * @file buffer.h
- * Component memory managment.
- */
-
 struct buffer {
   struct pair {
-    handle_t handle;
+    uint32_t handle;
     size_t offset;
   } * map;
 
@@ -49,7 +42,7 @@ void delete_buffer(struct buffer *buf);
  * to retrieve the data.
  * @return 0 on success. -1 on error.
  */
-int buffer_insert(struct buffer *buf, const void *data, handle_t handle);
+int buffer_insert(struct buffer *buf, const void *data, uint32_t handle);
 
 /**
  * @brief Delete a handle and it's associated data from a buffer.
@@ -58,7 +51,7 @@ int buffer_insert(struct buffer *buf, const void *data, handle_t handle);
  * @param handle The handle to the data to delete.
  * @return 0 on success. -1 on error.
  */
-int buffer_delete(struct buffer *buf, handle_t handle);
+int buffer_delete(struct buffer *buf, uint32_t handle);
 
 /**
  * @brief Fetch data from a buffer using a handle.
@@ -68,6 +61,6 @@ int buffer_delete(struct buffer *buf, handle_t handle);
  *
  * @return A pointer to the data associated with handle or NULL on error.
  */
-void *buffer_fetch(struct buffer *buf, handle_t handle);
+void *buffer_fetch(struct buffer *buf, uint32_t handle);
 
 #endif  // BUFFER_H_

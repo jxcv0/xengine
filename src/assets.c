@@ -79,7 +79,7 @@ struct geometry load_geometry(const char *filepath) {
   // vertices
   const char *pos = findstr(file, "VERTICES", file_size);
   assert(pos != NULL);
-  geom.m_num_vertices = (uint32_t)strtol(&pos[9], NULL, 10);
+  geom.m_num_vertices = strtol(&pos[9], NULL, 10);
   assert((pos = strchr(pos, '\n') + 1) != NULL);
   size_t n = sizeof(struct vertex) * geom.m_num_vertices;
   struct vertex *vertices = calloc(geom.m_num_vertices, sizeof(struct vertex));
@@ -89,7 +89,7 @@ struct geometry load_geometry(const char *filepath) {
   // indices
   pos = findstr(file, "INDICES", file_size);
   assert(pos != NULL);
-  geom.m_num_indices = (uint32_t)strtol(&pos[8], NULL, 10);
+  geom.m_num_indices = strtol(&pos[8], NULL, 10);
   assert((pos = strchr(pos, '\n') + 1) != NULL);
   n = sizeof(uint32_t) * geom.m_num_indices;
   uint32_t *indices = calloc(geom.m_num_indices, sizeof(uint32_t));

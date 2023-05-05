@@ -32,7 +32,7 @@ void delete_buffer(struct buffer *buf) {
 /**
  * ----------------------------------------------------------------------------
  */
-int buffer_insert(struct buffer *buf, const void *data, handle_t handle) {
+int buffer_insert(struct buffer *buf, const void *data, uint32_t handle) {
   if (buf == NULL || data == NULL) {
     return -1;
   }
@@ -55,7 +55,7 @@ int buffer_insert(struct buffer *buf, const void *data, handle_t handle) {
 /**
  * ----------------------------------------------------------------------------
  */
-static int find_index(struct buffer *buf, handle_t handle, size_t *index) {
+static int find_index(struct buffer *buf, uint32_t handle, size_t *index) {
   for (size_t i = 0; i < buf->count; i++) {
     if (buf->map[i].handle == handle) {
       *index = i;
@@ -68,7 +68,7 @@ static int find_index(struct buffer *buf, handle_t handle, size_t *index) {
 /**
  * ----------------------------------------------------------------------------
  */
-static int find_last_handle(struct buffer *buf, handle_t *handle) {
+static int find_last_handle(struct buffer *buf, uint32_t *handle) {
   size_t last_offset = (buf->count - 1) * buf->stride;
   for (size_t i = 0; i < buf->count; i++) {
     if (buf->map[i].offset == last_offset) {
@@ -82,13 +82,13 @@ static int find_last_handle(struct buffer *buf, handle_t *handle) {
 /**
  * ----------------------------------------------------------------------------
  */
-int buffer_delete(struct buffer *buf, handle_t handle) {
+int buffer_delete(struct buffer *buf, uint32_t handle) {
   size_t index_to_delete;
   if (find_index(buf, handle, &index_to_delete) == -1) {
     return -1;
   }
 
-  handle_t last_handle;
+  uint32_t last_handle;
   if (find_last_handle(buf, &last_handle) == -1) {
     return -1;
   }
@@ -114,7 +114,7 @@ int buffer_delete(struct buffer *buf, handle_t handle) {
 /**
  * ----------------------------------------------------------------------------
  */
-void *buffer_fetch(struct buffer *buf, handle_t handle) {
+void *buffer_fetch(struct buffer *buf, uint32_t handle) {
   size_t index;
   if (find_index(buf, handle, &index) == -1) {
     return NULL;

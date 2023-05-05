@@ -21,15 +21,15 @@ int main() {
   struct some_struct s;
 
   s.s = 0;
-  handle_t h1 = new_handle();
+  uint32_t h1 = new_handle();
   assert(buffer_insert(&b, &s, h1) != -1);
 
   s.s = 1;
-  handle_t h2 = new_handle();
+  uint32_t h2 = new_handle();
   assert(buffer_insert(&b, &s, h2) != -1);
 
   s.s = 2;
-  handle_t h3 = new_handle();
+  uint32_t h3 = new_handle();
   assert(buffer_insert(&b, &s, h3) != -1);
 
   struct some_struct *data = (struct some_struct *)b.data;

@@ -4,8 +4,14 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "buffer.h"
+
 #define ID_UNUSED (1 << 31)
 #define ID_MAX (UINT32_MAX - 1)
+
+#define GEOMETRY_INDEX 0
+#define MATERIAL_INDEX 1
+#define POSITION_INDEX 2
 
 static struct {
   uint32_t *data;
@@ -13,8 +19,20 @@ static struct {
   size_t max;
 } entity_buf;
 
-static struct buffer buffers[MAX_COMPONENT_TYPES];
-static size_t num_buffers;
+struct index_map {
+  uint32_t entity;
+  size_t index;
+};
+
+static struct geometry geometry_buf[MAX_NUM_GEOMETRIES];
+static size_t num_geometries;
+static struct index_map geometry_map[MAX_NUM_GEOMETRIES];
+
+static struct pbr_material material_buf[MAX_NUM_MATERIALS];
+static size_t num_materials;
+
+static vec3 position_buf[MAX_NUM_POSITIONS];
+static size_t num_positions;
 
 /**
  * ----------------------------------------------------------------------------
@@ -33,6 +51,7 @@ int ecs_init(size_t nent) {
   }
   entity_buf.count = 0;
   entity_buf.max = nent;
+
   return 0;
 }
 
@@ -50,8 +69,8 @@ int ecs_create_entity(uint32_t *e) {
     return -1;
   }
 
-  for (size_t i = 0; i < entity_buf.count; i++) {
-    if ((entity_buf.data[i] & ID_UNUSED) != 0) {
+  for (size_t i = 0; i < entity_buf.max; i++) {
+    if (entity_buf.data[i] & ID_UNUSED) {
       *e = i;
       entity_buf.data[i] = 0;
       entity_buf.count++;
@@ -73,13 +92,29 @@ void ecs_delete_entity(uint32_t e) {
 /**
  * ----------------------------------------------------------------------------
  */
-int ecs_add_components(uint32_t e, uint32_t type) {
-  if ((entity_buf.data[0] & ID_UNUSED) != 0) {
-    entity_buf.data[e] |= type;
-    return 0;
-    // TODO provision component for entity
+uint32_t ecs_archetype(uint32_t e) { return entity_buf.data[e]; }
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+int ecs_add_component(uint32_t e, uint32_t type) {
+  if ((entity_buf.data[e] & ID_UNUSED) == 0) {
+    return -1;
   }
-  return -1;
+
+  switch (type) {
+    case GEOMETRY:
+      if (num_geometries != MAX_NUM_GEOMETRIES) {
+        geometry_buf[num_geometries++];
+      }
+      break;
+
+    default:
+      return -1;
+  }
+
+  entity_buf.data[e] |= type;
+  return 0;
 }
 
 /**
