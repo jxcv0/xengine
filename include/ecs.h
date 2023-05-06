@@ -36,7 +36,7 @@ int ecs_add_component(uint32_t e, uint32_t type);
 
 void ecs_remove_component(uint32_t e, uint32_t type);
 
-void *ecs_component(uint32_t e, uint32_t type);
+int ecs_component(uint32_t e, uint32_t type, void *val);
 
 int ecs_set_component(uint32_t e, uint32_t type, const void *val);
 

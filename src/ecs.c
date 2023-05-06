@@ -172,6 +172,27 @@ void ecs_remove_component(uint32_t e, uint32_t type) {
 /**
  * ----------------------------------------------------------------------------
  */
+int ecs_component(uint32_t e, uint32_t type, void *val) {
+  if (val == NULL) {
+    return -1;
+  }
+
+  struct entry entry = lookup_table[type];
+  size_t *counter = entry.counter;
+  struct index_table *table = entry.table;
+  size_t index;
+  if (index_by_entity(e, table, &index, *counter) == -1) {
+    return -1;
+  }
+
+  size_t buffer_index = table[index].index;
+  val = &entry.buffer[buffer_index];
+  return 0;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
 int ecs_set_component(uint32_t e, uint32_t type, const void *val) {
   (void)e;
   (void)type;

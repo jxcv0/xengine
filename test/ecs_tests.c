@@ -51,8 +51,21 @@ int main() {
   assert(ecs_component_count(MATERIAL) == 2);
   assert(ecs_component_count(POSITION) == 3);
 
-  vec3 pos1 = {1, 2, 3};
-  vec3 pos2 = {3, 2, 1};
+  vec3 pos1 = {1, 1, 1};
+  vec3 pos2 = {2, 2, 2};
+  vec3 pos3 = {3, 3, 3};
+  vec3 pos4 = {4, 4, 4};
   ecs_set_component(e1, POSITION, pos1);
   ecs_set_component(e2, POSITION, pos2);
+  ecs_set_component(e3, POSITION, pos3);
+  ecs_set_component(e4, POSITION, pos4);
+
+  vec3 val;
+  ecs_component(e1, POSITION, val);
+  for (int i = 0; i < 3; i++) {
+      printf("%f\n", val[i]);
+  }
+  for (int i = 0; i < 3; i++) {
+      assert(val[i] == pos1[i]);
+  }
 }
