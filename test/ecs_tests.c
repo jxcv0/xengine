@@ -68,10 +68,16 @@ int main() {
     assert(fabs(p.vec[i] - pos1.vec[i]) < 0.0001);
   };
 
+  // removing item in middle of buffer
   ecs_remove_component(e2, POSITION);
 
   p = ecs_component(e1, POSITION)->position;
   for (int i = 0; i < 3; i++) {
     assert(fabs(p.vec[i] - pos1.vec[i]) < 0.0001);
+  };
+
+  p = ecs_component(e4, POSITION)->position;
+  for (int i = 0; i < 3; i++) {
+    assert(fabs(p.vec[i] - pos4.vec[i]) < 0.0001);
   };
 }
