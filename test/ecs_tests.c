@@ -63,10 +63,15 @@ int main() {
   ecs_component(e3, POSITION)->position = pos3;
   ecs_component(e4, POSITION)->position = pos4;
 
-  component_t *c = ecs_component(e1, POSITION);
-  struct position p = c->position;
+  struct position p = ecs_component(e1, POSITION)->position;
   for (int i = 0; i < 3; i++) {
-    printf("%f, %f\n", p.vec[i], pos1.vec[i]);
+    assert(fabs(p.vec[i] - pos1.vec[i]) < 0.0001);
+  };
+
+  ecs_remove_component(e2, POSITION);
+
+  p = ecs_component(e1, POSITION)->position;
+  for (int i = 0; i < 3; i++) {
     assert(fabs(p.vec[i] - pos1.vec[i]) < 0.0001);
   };
 }

@@ -31,8 +31,6 @@ typedef union component {
 
 void ecs_init(void);
 
-void ecs_shutdown(void);
-
 int ecs_create_entity(uint32_t *e);
 
 void ecs_delete_entity(uint32_t e);
