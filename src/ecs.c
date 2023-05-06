@@ -9,13 +9,6 @@
 #define ID_UNUSED (1 << 31)
 #define ID_MAX (UINT32_MAX - 1)
 
-union component {
-  struct geometry geometry;
-  struct pbr_material material;
-  struct position position;
-  // ...
-};
-
 static uint32_t entity_buf[MAX_NUM_ENTITIES];
 static size_t num_entities;
 
@@ -25,22 +18,22 @@ struct index_table {
 };
 
 // geometry buffer
-static union component geometry_buf[MAX_NUM_GEOMETRIES];
+static component_t geometry_buf[MAX_NUM_GEOMETRIES];
 static size_t num_geometries;
 static struct index_table geometry_table[MAX_NUM_GEOMETRIES];
 
 // material buffer
-static union component material_buf[MAX_NUM_MATERIALS];
+static component_t material_buf[MAX_NUM_MATERIALS];
 static size_t num_materials;
 static struct index_table material_table[MAX_NUM_MATERIALS];
 
 // position buffer
-static union component position_buf[MAX_NUM_MATERIALS];
+static component_t position_buf[MAX_NUM_MATERIALS];
 static size_t num_positions;
 static struct index_table position_table[MAX_NUM_MATERIALS];
 
 struct entry {
-  union component *buffer;
+  component_t *buffer;
   struct index_table *table;
   size_t *counter;
 };
@@ -172,22 +165,17 @@ void ecs_remove_component(uint32_t e, uint32_t type) {
 /**
  * ----------------------------------------------------------------------------
  */
-int ecs_component(uint32_t e, uint32_t type, void *val) {
-  if (val == NULL) {
-    return -1;
-  }
-
+component_t *ecs_component(uint32_t e, uint32_t type) {
   struct entry entry = lookup_table[type];
   size_t *counter = entry.counter;
   struct index_table *table = entry.table;
   size_t index;
   if (index_by_entity(e, table, &index, *counter) == -1) {
-    return -1;
+      return NULL;
   }
 
   size_t buffer_index = table[index].index;
-  val = &entry.buffer[buffer_index];
-  return 0;
+  return &entry.buffer[buffer_index];
 }
 
 /**

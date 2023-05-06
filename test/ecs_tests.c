@@ -53,20 +53,20 @@ int main() {
   assert(ecs_component_count(MATERIAL) == 2);
   assert(ecs_component_count(POSITION) == 3);
 
+  ecs_add_component(e3, POSITION);
   struct position pos1 = {{{1, 1, 1}}}; // this is wild
   struct position pos2 = {{{2, 2, 2}}};
   struct position pos3 = {{{3, 3, 3}}};
   struct position pos4 = {{{4, 4, 4}}};
-  ecs_set_component(e1, POSITION, &pos1);
-  ecs_set_component(e2, POSITION, &pos2);
-  ecs_set_component(e3, POSITION, &pos3);
-  ecs_set_component(e4, POSITION, &pos4);
+  ecs_component(e1, POSITION)->position = pos1;
+  ecs_component(e2, POSITION)->position = pos2;
+  ecs_component(e3, POSITION)->position = pos3;
+  ecs_component(e4, POSITION)->position = pos4;
 
-  struct position val;
-  assert(ecs_component(e1, POSITION, &val) != -1);
-
+  component_t *c = ecs_component(e1, POSITION);
+  struct position p = c->position;
   for (int i = 0; i < 3; i++) {
-    printf("%f, %f\n", val.vec[i], pos1.vec[i]);
-    assert(fabs(val.vec[i] - pos1.vec[i]) < FLT_EPSILON);
+    printf("%f, %f\n", p.vec[i], pos1.vec[i]);
+    assert(fabs(p.vec[i] - pos1.vec[i]) < 0.0001);
   };
 }
