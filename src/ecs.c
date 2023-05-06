@@ -141,20 +141,6 @@ static int index_by_entity(uint32_t e, struct index_table *table, size_t *index,
 /**
  * ----------------------------------------------------------------------------
  */
-static int index_by_component(size_t comp_index, struct index_table *table,
-                              size_t *index, size_t n) {
-  for (size_t i = 0; i < n; i++) {
-    if (table[i].index == comp_index) {
-      *index = i;
-      return 0;
-    }
-  }
-  return -1;
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
 void ecs_remove_component(uint32_t e, uint32_t type) {
   if ((entity_buf[e] & ID_UNUSED) != 0) {
     return;
@@ -168,20 +154,18 @@ void ecs_remove_component(uint32_t e, uint32_t type) {
   if (index_by_entity(e, table, &table_index_delete, *counter) == -1) {
     return;
   }
-  entity_buf[e] &= ~(1 << type);
 
-  size_t table_index_last;
-  if (index_by_component((*counter) - 1, table, &table_index_last, *counter) == -1) {
-  printf("HERE\n");
-    return;
+  if (table_index_delete == *counter) {
+      (*counter)--;
   }
+
+  entity_buf[e] &= ~(1 << type);
 
   size_t buffer_index_delete = table[table_index_delete].index;
   entry.buffer[buffer_index_delete] = entry.buffer[*counter];
 
-  table[table_index_last].index = buffer_index_delete;
-  table[table_index_delete] = table[table_index_last];
-  printf("HERE\n");
+  table[*counter].index = buffer_index_delete;
+  table[table_index_delete] = table[*counter];
   (*counter)--;
 }
 

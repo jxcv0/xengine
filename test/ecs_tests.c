@@ -38,7 +38,8 @@ int main() {
   assert(ecs_component_count(MATERIAL) == 3);
   assert(ecs_component_count(POSITION) == 1);
 
-  ecs_remove_component(e2, GEOMETRY);
+  ecs_remove_component(e2, GEOMETRY); // should do nothing
+
   assert(ecs_identity(e2) == MATERIAL_BIT);
   ecs_remove_component(e4, MATERIAL);
   assert(ecs_identity(e4) == (GEOMETRY_BIT | POSITION_BIT));
@@ -46,9 +47,9 @@ int main() {
   ecs_add_component(e1, POSITION);
   assert(ecs_identity(e1) == (GEOMETRY_BIT | POSITION_BIT));
   assert(ecs_identity(e2) == (MATERIAL_BIT | POSITION_BIT));
-  assert(ecs_component_count(POSITION) == 3);
-  assert(ecs_component_count(GEOMETRY) == 2);
+  assert(ecs_component_count(GEOMETRY) == 3);
   assert(ecs_component_count(MATERIAL) == 2);
+  assert(ecs_component_count(POSITION) == 3);
 
   vec3 pos1 = {1, 2, 3};
   vec3 pos2 = {3, 2, 1};
