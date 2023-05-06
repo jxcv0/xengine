@@ -74,4 +74,15 @@ struct geometry {
   struct pbr_material m_material;
 };
 
+struct position {
+  union {
+    vec3 vec;
+    struct {
+        float x;
+        float y;
+        float z;
+    };
+  };
+};
+
 #endif  // TYPES_H_

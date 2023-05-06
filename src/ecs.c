@@ -12,7 +12,7 @@
 union component {
   struct geometry geometry;
   struct pbr_material material;
-  vec3 position;
+  struct position position;
   // ...
 };
 

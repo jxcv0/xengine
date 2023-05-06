@@ -4,8 +4,10 @@
 #include <string.h>
 
 #include "lin.h"
+#include <float.h>
 
-#define ASSERT_FLOAT_EQ(f1, f2) assert(fabs(f1 - f2) < 0.0001)
+// TODO why does this fail without * 10
+#define ASSERT_FLOAT_EQ(f1, f2) assert(fabs(f1 - f2) < (FLT_EPSILON * 10))
 
 void tst_radians(void) { ASSERT_FLOAT_EQ(radians(3.122f), 0.054489179f); }
 
