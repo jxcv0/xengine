@@ -18,6 +18,10 @@
 #define MATERIAL 1
 #define POSITION 2
 
+#define GEOMETRY_BIT (1 << 0)
+#define MATERIAL_BIT (1 << 1)
+#define POSITION_BIT (1 << 2)
+
 void ecs_init(void);
 
 void ecs_shutdown(void);
@@ -35,6 +39,8 @@ void ecs_remove_component(uint32_t e, uint32_t type);
 void *ecs_component(uint32_t e, uint32_t type);
 
 int ecs_set_component(uint32_t e, uint32_t type, const void *val);
+
+size_t ecs_component_count(uint32_t type);
 
 // TODO systems?
 

@@ -9,10 +9,6 @@
 #define ID_UNUSED (1 << 31)
 #define ID_MAX (UINT32_MAX - 1)
 
-#define GEOMETRY_MASK (1 << 0)
-#define MATERIAL_MASK (1 << 1)
-#define POSITION_MASK (1 << 2)
-
 union component {
   struct geometry geometry;
   struct pbr_material material;
@@ -44,16 +40,15 @@ static size_t num_positions;
 static struct index_table position_table[MAX_NUM_MATERIALS];
 
 struct entry {
-  uint32_t mask;
   union component *buffer;
   struct index_table *table;
   size_t *counter;
 };
 
 static struct entry lookup_table[NUM_COMPONENT_TYPES] = {
-    {GEOMETRY_MASK, geometry_buf, geometry_table, &num_geometries},
-    {MATERIAL_MASK, material_buf, material_table, &num_materials},
-    {POSITION_MASK, position_buf, position_table, &num_positions}
+    {geometry_buf, geometry_table, &num_geometries},
+    {material_buf, material_table, &num_materials},
+    {position_buf, position_table, &num_positions}
     // ...
 };
 
@@ -113,12 +108,13 @@ int ecs_add_component(uint32_t e, uint32_t type) {
     return -1;
   }
 
+  uint32_t mask = (1 << type);
   struct entry entry = lookup_table[type];
-  if (entity_buf[e] & entry.mask) {
+  if (entity_buf[e] & mask) {
     return 0;
   }
 
-  entity_buf[e] |= entry.mask;
+  entity_buf[e] |= mask;
   struct index_table *it = entry.table;
   size_t *counter = entry.counter;
   it[*counter].entity = e;
@@ -160,12 +156,11 @@ static int index_by_component(size_t comp_index, struct index_table *table,
  * ----------------------------------------------------------------------------
  */
 void ecs_remove_component(uint32_t e, uint32_t type) {
-  if ((entity_buf[e] & ID_UNUSED) == 0) {
+  if ((entity_buf[e] & ID_UNUSED) != 0) {
     return;
   }
 
   struct entry entry = lookup_table[type];
-  entity_buf[e] |= entry.mask;
   size_t *counter = entry.counter;
   struct index_table *table = entry.table;
 
@@ -173,9 +168,11 @@ void ecs_remove_component(uint32_t e, uint32_t type) {
   if (index_by_entity(e, table, &table_index_delete, *counter) == -1) {
     return;
   }
+  entity_buf[e] &= ~(1 << type);
 
   size_t table_index_last;
-  if (index_by_component(*counter, table, &table_index_last, *counter) == -1) {
+  if (index_by_component((*counter) - 1, table, &table_index_last, *counter) == -1) {
+  printf("HERE\n");
     return;
   }
 
@@ -184,7 +181,26 @@ void ecs_remove_component(uint32_t e, uint32_t type) {
 
   table[table_index_last].index = buffer_index_delete;
   table[table_index_delete] = table[table_index_last];
+  printf("HERE\n");
   (*counter)--;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+int ecs_set_component(uint32_t e, uint32_t type, const void *val) {
+  (void)e;
+  (void)type;
+  (void)val;
+  return 0;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+
+size_t ecs_component_count(uint32_t type) {
+    return *lookup_table[type].counter;
 }
 
 /**
