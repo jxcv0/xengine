@@ -28,23 +28,34 @@ struct index_table {
   size_t index;
 };
 
+// geometry buffer
 static union component geometry_buf[MAX_NUM_GEOMETRIES];
 static size_t num_geometries;
 static struct index_table geometry_table[MAX_NUM_GEOMETRIES];
 
-static const uint32_t mask_table[] = {GEOMETRY_MASK, MATERIAL_MASK,
-                                      POSITION_MASK};
-static const union component *buffer_table[] = {geometry_buf};
-static const struct index_table *map_table[] = {geometry_table};
-static const size_t *counter_table[] = {&num_geometries};
-
-/*
-static struct pbr_material material_buf[MAX_NUM_MATERIALS];
+// material buffer
+static union component material_buf[MAX_NUM_MATERIALS];
 static size_t num_materials;
+static struct index_table material_table[MAX_NUM_MATERIALS];
 
-static vec3 position_buf[MAX_NUM_POSITIONS];
+// position buffer
+static union component position_buf[MAX_NUM_MATERIALS];
 static size_t num_positions;
-*/
+static struct index_table position_table[MAX_NUM_MATERIALS];
+
+struct entry {
+  uint32_t mask;
+  union component *buffer;
+  struct index_table *table;
+  size_t *counter;
+};
+
+static struct entry lookup_table[NUM_COMPONENT_TYPES] = {
+    {GEOMETRY_MASK, geometry_buf, geometry_table, &num_geometries},
+    {MATERIAL_MASK, material_buf, material_table, &num_materials},
+    {POSITION_MASK, position_buf, position_table, &num_positions}
+    // ...
+};
 
 /**
  * ----------------------------------------------------------------------------
@@ -92,7 +103,7 @@ void ecs_delete_entity(uint32_t e) {
 /**
  * ----------------------------------------------------------------------------
  */
-uint32_t ecs_archetype(uint32_t e) { return entity_buf[e]; }
+uint32_t ecs_identity(uint32_t e) { return entity_buf[e]; }
 
 /**
  * ----------------------------------------------------------------------------
@@ -102,14 +113,78 @@ int ecs_add_component(uint32_t e, uint32_t type) {
     return -1;
   }
 
-  entity_buf[e] |= mask_table[type];
-  struct index_table *it = map_table[type];
-  size_t *counter = counter_table[type];
+  struct entry entry = lookup_table[type];
+  if (entity_buf[e] & entry.mask) {
+    return 0;
+  }
+
+  entity_buf[e] |= entry.mask;
+  struct index_table *it = entry.table;
+  size_t *counter = entry.counter;
   it[*counter].entity = e;
   it[*counter].index = *counter;
   (*counter)++;
 
   return 0;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+static int index_by_entity(uint32_t e, struct index_table *table, size_t *index,
+                           size_t n) {
+  for (size_t i = 0; i < n; i++) {
+    if (table[i].entity == e) {
+      *index = i;
+      return 0;
+    }
+  }
+  return -1;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+static int index_by_component(size_t comp_index, struct index_table *table,
+                              size_t *index, size_t n) {
+  for (size_t i = 0; i < n; i++) {
+    if (table[i].index == comp_index) {
+      *index = i;
+      return 0;
+    }
+  }
+  return -1;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+void ecs_remove_component(uint32_t e, uint32_t type) {
+  if ((entity_buf[e] & ID_UNUSED) == 0) {
+    return;
+  }
+
+  struct entry entry = lookup_table[type];
+  entity_buf[e] |= entry.mask;
+  size_t *counter = entry.counter;
+  struct index_table *table = entry.table;
+
+  size_t table_index_delete;
+  if (index_by_entity(e, table, &table_index_delete, *counter) == -1) {
+    return;
+  }
+
+  size_t table_index_last;
+  if (index_by_component(*counter, table, &table_index_last, *counter) == -1) {
+    return;
+  }
+
+  size_t buffer_index_delete = table[table_index_delete].index;
+  entry.buffer[buffer_index_delete] = entry.buffer[*counter];
+
+  table[table_index_last].index = buffer_index_delete;
+  table[table_index_delete] = table[table_index_last];
+  (*counter)--;
 }
 
 /**

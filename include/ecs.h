@@ -8,7 +8,7 @@
 #define MAX_NUM_ENTITIES 128
 
 // Can be changed to 63 if uint64_t is used
-#define MAX_COMPONENT_TYPES 31
+#define NUM_COMPONENT_TYPES 31
 
 #define MAX_NUM_GEOMETRIES 32
 #define MAX_NUM_MATERIALS 32
@@ -26,7 +26,7 @@ int ecs_create_entity(uint32_t *e);
 
 void ecs_delete_entity(uint32_t e);
 
-uint32_t ecs_archetype(uint32_t e);
+uint32_t ecs_identity(uint32_t e);
 
 int ecs_add_component(uint32_t e, uint32_t type);
 
