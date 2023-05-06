@@ -155,10 +155,11 @@ void ecs_remove_component(uint32_t e, uint32_t type) {
   entity_buf[e] &= ~(1 << type);
 
   size_t buffer_index_delete = table[table_index_delete].index;
-  entry.buffer[buffer_index_delete] = entry.buffer[*counter];
+  size_t last = (*counter) - 1;
+  entry.buffer[buffer_index_delete] = entry.buffer[last];
 
-  table[*counter].index = buffer_index_delete;
-  table[table_index_delete] = table[*counter];
+  table[last].index = buffer_index_delete;
+  table[table_index_delete] = table[last];
   (*counter)--;
 }
 
