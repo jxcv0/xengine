@@ -1,7 +1,6 @@
 #include <assert.h>
 
 #include "buffer.h"
-#include "ecs.h"
 
 #define BUF_SIZE 16
 
@@ -10,6 +9,11 @@ struct some_struct {
 };
 
 struct buffer b;
+
+uint32_t new_handle(void) {
+  static uint32_t counter = 1;
+  return counter++;
+}
 
 int main() {
   assert(buffer_init(&b, BUF_SIZE, sizeof(struct some_struct)) == 0);

@@ -182,25 +182,7 @@ component_t *ecs_component(uint32_t e, uint32_t type) {
 /**
  * ----------------------------------------------------------------------------
  */
-int ecs_set_component(uint32_t e, uint32_t type, const void *val) {
-  (void)e;
-  (void)type;
-  (void)val;
-  return 0;
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-
 size_t ecs_component_count(uint32_t type) {
     return *lookup_table[type].counter;
 }
 
-/**
- * ----------------------------------------------------------------------------
- */
-handle_t new_handle(void) {
-  static handle_t counter = 1;
-  return counter++;
-}

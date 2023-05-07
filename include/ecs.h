@@ -45,10 +45,4 @@ component_t *ecs_component(uint32_t e, uint32_t type);
 
 size_t ecs_component_count(uint32_t type);
 
-// TODO systems?
-
-handle_t new_handle(void);
-
-void free_handle(handle_t handle);
-
 #endif  // ECS_H_
