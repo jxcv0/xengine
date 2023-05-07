@@ -22,12 +22,12 @@
 #define MATERIAL_BIT (1 << 1)
 #define POSITION_BIT (1 << 2)
 
-typedef union component {
+union component {
   struct geometry geometry;
   struct pbr_material material;
   struct position position;
   // ...
-} component_t;
+};
 
 void ecs_init(void);
 
@@ -41,7 +41,7 @@ int ecs_add_component(uint32_t e, uint32_t type);
 
 void ecs_remove_component(uint32_t e, uint32_t type);
 
-component_t *ecs_component(uint32_t e, uint32_t type);
+union component *ecs_component(uint32_t e, uint32_t type);
 
 size_t ecs_component_count(uint32_t type);
 

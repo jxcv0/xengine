@@ -18,22 +18,22 @@ struct index_table {
 };
 
 // geometry buffer
-static component_t geometry_buf[MAX_NUM_GEOMETRIES];
+static union component geometry_buf[MAX_NUM_GEOMETRIES];
 static size_t num_geometries;
 static struct index_table geometry_table[MAX_NUM_GEOMETRIES];
 
 // material buffer
-static component_t material_buf[MAX_NUM_MATERIALS];
+static union component material_buf[MAX_NUM_MATERIALS];
 static size_t num_materials;
 static struct index_table material_table[MAX_NUM_MATERIALS];
 
 // position buffer
-static component_t position_buf[MAX_NUM_MATERIALS];
+static union component position_buf[MAX_NUM_MATERIALS];
 static size_t num_positions;
 static struct index_table position_table[MAX_NUM_MATERIALS];
 
 struct entry {
-  component_t *buffer;
+  union component *buffer;
   struct index_table *table;
   size_t *counter;
 };
@@ -58,13 +58,7 @@ void ecs_init(void) {
  * ----------------------------------------------------------------------------
  */
 int ecs_create_entity(uint32_t *e) {
-  if (e == NULL) {
-    errno = EINVAL;
-    return -1;
-  }
-
-  if (num_entities == MAX_NUM_ENTITIES) {
-    // TODO errno?
+  if (e == NULL || num_entities == MAX_NUM_ENTITIES) {
     return -1;
   }
 
@@ -166,7 +160,7 @@ void ecs_remove_component(uint32_t e, uint32_t type) {
 /**
  * ----------------------------------------------------------------------------
  */
-component_t *ecs_component(uint32_t e, uint32_t type) {
+union component *ecs_component(uint32_t e, uint32_t type) {
   struct entry entry = lookup_table[type];
   size_t *counter = entry.counter;
   struct index_table *table = entry.table;
