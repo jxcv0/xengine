@@ -92,7 +92,6 @@ int main() {
   assert(ecs_count(GEOMETRY_BIT) == 0);
   assert(ecs_count(GEOMETRY_BIT | MATERIAL_BIT) == 0);
   assert(ecs_count(GEOMETRY_BIT | MATERIAL_BIT | POSITION_BIT) == 0);
-  printf("%ld\n", ecs_component_count(GEOMETRY));
   assert(ecs_component_count(GEOMETRY) == 0);
   assert(ecs_component_count(MATERIAL) == 0);
   assert(ecs_component_count(POSITION) == 0);

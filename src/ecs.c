@@ -48,6 +48,21 @@ static struct entry lookup_table[NUM_COMPONENT_TYPES] = {
 /**
  * ----------------------------------------------------------------------------
  */
+static int index_by_entity(uint32_t e, struct index_table *table, size_t *index,
+                           size_t n) {
+  for (size_t i = 0; i < n; i++) {
+    if (table[i].entity == e) {
+      *index = i;
+      return 0;
+    }
+  }
+  return -1;
+}
+
+
+/**
+ * ----------------------------------------------------------------------------
+ */
 void ecs_init(void) {
   for (size_t i = 0; i < MAX_NUM_ENTITIES; i++) {
     entity_buf[i] = ID_UNUSED;
@@ -78,6 +93,12 @@ int ecs_create_entity(uint32_t *e) {
  */
 void ecs_delete_entity(uint32_t e) {
   // TODO delete this entities entries in component buffers
+  uint32_t mask = entity_buf[e];
+  for (size_t i = 0; i < NUM_COMPONENT_TYPES; i++) {
+    if (mask & (1 << i)) {
+        ecs_remove_component(e, i);
+    }
+  }
   entity_buf[e] = ID_UNUSED;
   --num_entities;
 }
@@ -109,20 +130,6 @@ int ecs_add_component(uint32_t e, uint32_t type) {
   (*counter)++;
 
   return 0;
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-static int index_by_entity(uint32_t e, struct index_table *table, size_t *index,
-                           size_t n) {
-  for (size_t i = 0; i < n; i++) {
-    if (table[i].entity == e) {
-      *index = i;
-      return 0;
-    }
-  }
-  return -1;
 }
 
 /**
