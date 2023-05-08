@@ -95,4 +95,41 @@ int main() {
   assert(ecs_component_count(GEOMETRY) == 0);
   assert(ecs_component_count(MATERIAL) == 0);
   assert(ecs_component_count(POSITION) == 0);
+
+  ecs_create_entity(&e1);
+  ecs_create_entity(&e2);
+  ecs_create_entity(&e3);
+  ecs_create_entity(&e4);
+
+  ecs_add_component(e1, GEOMETRY);
+  ecs_add_component(e2, GEOMETRY);
+  ecs_add_component(e3, GEOMETRY);
+
+  ecs_add_component(e1, MATERIAL);
+  ecs_add_component(e2, MATERIAL);
+  ecs_add_component(e3, MATERIAL);
+
+  ecs_add_component(e1, POSITION);
+  ecs_add_component(e2, POSITION);
+  ecs_add_component(e3, POSITION);
+  ecs_add_component(e4, POSITION);
+
+  assert(ecs_component_count(GEOMETRY) == 3);
+  assert(ecs_component_count(MATERIAL) == 3);
+  assert(ecs_component_count(POSITION) == 4);
+
+  assert(ecs_count(GEOMETRY_BIT) == 3);
+  assert(ecs_count(GEOMETRY_BIT | MATERIAL_BIT) == 3);
+  assert(ecs_count(GEOMETRY_BIT | MATERIAL_BIT | POSITION_BIT) == 3);
+  assert(ecs_count(POSITION_BIT) == 4);
+
+  size_t ne = ecs_count(GEOMETRY_BIT | POSITION_BIT) * 2;
+  size_t arr_size = ne * 2;
+  uint32_t e_arr[ne];
+  ecs_entities(GEOMETRY_BIT | POSITION_BIT, e_arr);
+  assert(e_arr[0] == e1);
+  assert(e_arr[1] == e2);
+  assert(e_arr[2] == e3);
+
+  union component arr[arr_size];
 }
