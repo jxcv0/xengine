@@ -51,6 +51,4 @@ size_t ecs_count(uint32_t mask);
 
 void ecs_entities(uint32_t mask, uint32_t *arr);
 
-
-
 #endif  // ECS_H_

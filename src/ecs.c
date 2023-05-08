@@ -59,7 +59,6 @@ static int index_by_entity(uint32_t e, struct index_table *table, size_t *index,
   return -1;
 }
 
-
 /**
  * ----------------------------------------------------------------------------
  */
@@ -92,11 +91,10 @@ int ecs_create_entity(uint32_t *e) {
  * ----------------------------------------------------------------------------
  */
 void ecs_delete_entity(uint32_t e) {
-  // TODO delete this entities entries in component buffers
   uint32_t mask = entity_buf[e];
   for (size_t i = 0; i < NUM_COMPONENT_TYPES; i++) {
     if (mask & (1 << i)) {
-        ecs_remove_component(e, i);
+      ecs_remove_component(e, i);
     }
   }
   entity_buf[e] = ID_UNUSED;
