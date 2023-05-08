@@ -84,4 +84,16 @@ int main() {
   for (int i = 0; i < 3; i++) {
     assert(fabs(p.vec[i] - pos4.vec[i]) < 0.0001);
   };
+
+  ecs_delete_entity(e1);
+  ecs_delete_entity(e2);
+  ecs_delete_entity(e3);
+  ecs_delete_entity(e4);
+  assert(ecs_count(GEOMETRY_BIT) == 0);
+  assert(ecs_count(GEOMETRY_BIT | MATERIAL_BIT) == 0);
+  assert(ecs_count(GEOMETRY_BIT | MATERIAL_BIT | POSITION_BIT) == 0);
+  printf("%ld\n", ecs_component_count(GEOMETRY));
+  assert(ecs_component_count(GEOMETRY) == 0);
+  assert(ecs_component_count(MATERIAL) == 0);
+  assert(ecs_component_count(POSITION) == 0);
 }

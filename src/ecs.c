@@ -176,6 +176,13 @@ union component *ecs_component(uint32_t e, uint32_t type) {
 /**
  * ----------------------------------------------------------------------------
  */
+size_t ecs_component_count(uint32_t type) {
+  return *lookup_table[type].counter;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
 size_t ecs_count(uint32_t mask) {
   size_t count = 0;
   for (size_t j = 0; j < num_entities; j++) {
@@ -189,6 +196,11 @@ size_t ecs_count(uint32_t mask) {
 /**
  * ----------------------------------------------------------------------------
  */
-size_t ecs_component_count(uint32_t type) {
-  return *lookup_table[type].counter;
+void ecs_entities(uint32_t mask, uint32_t *arr) {
+  size_t idx = 0;
+  for (size_t i = 0; i < num_entities; i++) {
+    if ((entity_buf[i] & mask) == mask) {
+      arr[idx++] = i;
+    }
+  }
 }

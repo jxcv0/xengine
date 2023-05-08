@@ -45,9 +45,12 @@ void ecs_remove_component(uint32_t e, uint32_t type);
 
 union component *ecs_component(uint32_t e, uint32_t type);
 
+size_t ecs_component_count(uint32_t type);
+
 size_t ecs_count(uint32_t mask);
 
-size_t ecs_component_count(uint32_t type);
+void ecs_entities(uint32_t mask, uint32_t *arr);
+
 
 
 #endif  // ECS_H_
