@@ -1,9 +1,9 @@
 #include <assert.h>
+#include <float.h>
+#include <math.h>
 #include <stdio.h>
 
 #include "ecs.h"
-#include <math.h>
-#include <float.h>
 
 int main() {
   ecs_init();
@@ -40,7 +40,11 @@ int main() {
   assert(ecs_component_count(MATERIAL) == 3);
   assert(ecs_component_count(POSITION) == 1);
 
-  ecs_remove_component(e2, GEOMETRY); // should do nothing
+  assert(ecs_count(GEOMETRY_BIT) == 3);
+  assert(ecs_count(GEOMETRY_BIT | MATERIAL_BIT) == 2);
+  assert(ecs_count(GEOMETRY_BIT | MATERIAL_BIT | POSITION_BIT) == 1);
+
+  ecs_remove_component(e2, GEOMETRY);  // should do nothing
 
   assert(ecs_identity(e2) == MATERIAL_BIT);
   ecs_remove_component(e4, MATERIAL);
@@ -54,7 +58,7 @@ int main() {
   assert(ecs_component_count(POSITION) == 3);
 
   ecs_add_component(e3, POSITION);
-  struct position pos1 = {{{1, 1, 1}}}; // this is wild
+  struct position pos1 = {{{1, 1, 1}}};  // this is wild
   struct position pos2 = {{{2, 2, 2}}};
   struct position pos3 = {{{3, 3, 3}}};
   struct position pos4 = {{{4, 4, 4}}};

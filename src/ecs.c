@@ -143,7 +143,7 @@ void ecs_remove_component(uint32_t e, uint32_t type) {
   }
 
   if (table_index_delete == *counter) {
-      (*counter)--;
+    (*counter)--;
   }
 
   entity_buf[e] &= ~(1 << type);
@@ -166,7 +166,7 @@ union component *ecs_component(uint32_t e, uint32_t type) {
   struct index_table *table = entry.table;
   size_t index;
   if (index_by_entity(e, table, &index, *counter) == -1) {
-      return NULL;
+    return NULL;
   }
 
   size_t buffer_index = table[index].index;
@@ -176,7 +176,19 @@ union component *ecs_component(uint32_t e, uint32_t type) {
 /**
  * ----------------------------------------------------------------------------
  */
-size_t ecs_component_count(uint32_t type) {
-    return *lookup_table[type].counter;
+size_t ecs_count(uint32_t mask) {
+  size_t count = 0;
+  for (size_t j = 0; j < num_entities; j++) {
+    if ((entity_buf[j] & mask) == mask) {
+      ++count;
+    }
+  }
+  return count;
 }
 
+/**
+ * ----------------------------------------------------------------------------
+ */
+size_t ecs_component_count(uint32_t type) {
+  return *lookup_table[type].counter;
+}

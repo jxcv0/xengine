@@ -1,10 +1,10 @@
 #include <assert.h>
+#include <float.h>
 #include <libgen.h>
 #include <stdio.h>
 #include <string.h>
 
 #include "lin.h"
-#include <float.h>
 
 // TODO why does this fail without * 10
 #define ASSERT_FLOAT_EQ(f1, f2) assert(fabs(f1 - f2) < (FLT_EPSILON * 10))

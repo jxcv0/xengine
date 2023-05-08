@@ -78,9 +78,9 @@ struct position {
   union {
     vec3 vec;
     struct {
-        float x;
-        float y;
-        float z;
+      float x;
+      float y;
+      float z;
     };
   };
 };

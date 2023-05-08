@@ -14,13 +14,15 @@
 #define MAX_NUM_MATERIALS 32
 #define MAX_NUM_POSITIONS 32
 
+// lookup index
 #define GEOMETRY 0
 #define MATERIAL 1
 #define POSITION 2
 
-#define GEOMETRY_BIT (1 << 0)
-#define MATERIAL_BIT (1 << 1)
-#define POSITION_BIT (1 << 2)
+// bitmasks
+#define GEOMETRY_BIT (1 << GEOMETRY)
+#define MATERIAL_BIT (1 << MATERIAL)
+#define POSITION_BIT (1 << POSITION)
 
 union component {
   struct geometry geometry;
@@ -43,6 +45,9 @@ void ecs_remove_component(uint32_t e, uint32_t type);
 
 union component *ecs_component(uint32_t e, uint32_t type);
 
+size_t ecs_count(uint32_t mask);
+
 size_t ecs_component_count(uint32_t type);
+
 
 #endif  // ECS_H_
