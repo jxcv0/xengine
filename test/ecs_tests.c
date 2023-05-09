@@ -23,14 +23,14 @@ int main() {
   ecs_create_entity(&e3);
   ecs_create_entity(&e4);
 
-  ecs_add_component(e2, MATERIAL);
+  assert(ecs_add_component(e2, MATERIAL) != -1);
 
-  ecs_add_component(e3, GEOMETRY);
-  ecs_add_component(e3, MATERIAL);
+  assert(ecs_add_component(e3, GEOMETRY) != -1);
+  assert(ecs_add_component(e3, MATERIAL) != -1);
 
-  ecs_add_component(e4, GEOMETRY);
-  ecs_add_component(e4, MATERIAL);
-  ecs_add_component(e4, POSITION);
+  assert(ecs_add_component(e4, GEOMETRY) != -1);
+  assert(ecs_add_component(e4, MATERIAL) != -1);
+  assert(ecs_add_component(e4, POSITION) != -1);
 
   assert(ecs_identity(e1) == GEOMETRY_BIT);
   assert(ecs_identity(e2) == MATERIAL_BIT);
@@ -119,6 +119,7 @@ int main() {
   assert(ecs_component_count(POSITION) == 4);
 
   assert(ecs_count(GEOMETRY_BIT) == 3);
+  assert(ecs_count(GEOMETRY_BIT | POSITION_BIT) == 3);
   assert(ecs_count(GEOMETRY_BIT | MATERIAL_BIT) == 3);
   assert(ecs_count(GEOMETRY_BIT | MATERIAL_BIT | POSITION_BIT) == 3);
   assert(ecs_count(POSITION_BIT) == 4);
@@ -130,6 +131,13 @@ int main() {
   assert(e_arr[0] == e1);
   assert(e_arr[1] == e2);
   assert(e_arr[2] == e3);
+
+  ecs_component(e1, GEOMETRY)->geometry.m_vbo = 1;
+  ecs_component(e2, GEOMETRY)->geometry.m_vbo = 2;
+  ecs_component(e3, GEOMETRY)->geometry.m_vbo = 3;
+  ecs_component(e1, POSITION)->position.x = 1.0f;
+  ecs_component(e2, POSITION)->position.x = 2.0f;
+  ecs_component(e3, POSITION)->position.x = 3.0f;
 
   union component arr[arr_size];
 }

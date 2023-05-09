@@ -25,6 +25,7 @@
 #define POSITION_BIT (1 << POSITION)
 
 union component {
+  // TODO enum type ?
   struct geometry geometry;
   struct pbr_material material;
   struct position position;
@@ -50,5 +51,8 @@ size_t ecs_component_count(uint32_t type);
 size_t ecs_count(uint32_t mask);
 
 void ecs_entities(uint32_t mask, uint32_t *arr);
+
+void ecs_array(size_t nent, uint32_t *entities, uint32_t type,
+               union component *array);
 
 #endif  // ECS_H_
