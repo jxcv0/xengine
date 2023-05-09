@@ -143,4 +143,14 @@ int main() {
   assert(arr[0].geometry.m_vbo == 1);
   assert(arr[1].geometry.m_vbo == 2);
   assert(arr[2].geometry.m_vbo == 3);
+  for (size_t i = 0; i < ne; i++) {
+    arr[i].geometry.m_vbo += 5;
+  }
+  assert(arr[0].geometry.m_vbo == 6);
+  assert(arr[1].geometry.m_vbo == 7);
+  assert(arr[2].geometry.m_vbo == 8);
+  ecs_write(ne, e_arr, GEOMETRY, arr);
+  assert(ecs_component(e1, GEOMETRY)->geometry.m_vbo == 6);
+  assert(ecs_component(e2, GEOMETRY)->geometry.m_vbo == 7);
+  assert(ecs_component(e3, GEOMETRY)->geometry.m_vbo == 8);
 }

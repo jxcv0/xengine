@@ -220,7 +220,7 @@ void ecs_array(size_t nent, uint32_t *entities, uint32_t type,
     if (index_by_entity(entities[i], table, &index, entry.count) == -1) {
       return;
     }
-    array[i] = entry.buffer[table[index].index];
+    array[i] = buffer[table[index].index];
   }
 }
 
@@ -234,6 +234,6 @@ void ecs_write(size_t nent, uint32_t *entities, uint32_t type,
     if (index_by_entity(entities[i], table, &index, entry.count) == -1) {
       return;
     }
-    entry.buffer[table[index].index] = array[i];
+    buffer[table[index].index] = array[i];
   }
 }
