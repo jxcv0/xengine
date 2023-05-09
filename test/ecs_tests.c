@@ -124,8 +124,7 @@ int main() {
   assert(ecs_count(GEOMETRY_BIT | MATERIAL_BIT | POSITION_BIT) == 3);
   assert(ecs_count(POSITION_BIT) == 4);
 
-  size_t ne = ecs_count(GEOMETRY_BIT | POSITION_BIT) * 2;
-  size_t arr_size = ne * 2;
+  size_t ne = ecs_count(GEOMETRY_BIT | POSITION_BIT);
   uint32_t e_arr[ne];
   ecs_entities(GEOMETRY_BIT | POSITION_BIT, e_arr);
   assert(e_arr[0] == e1);
@@ -139,5 +138,9 @@ int main() {
   ecs_component(e2, POSITION)->position.x = 2.0f;
   ecs_component(e3, POSITION)->position.x = 3.0f;
 
-  union component arr[arr_size];
+  union component arr[ne];
+  ecs_array(ne, e_arr, GEOMETRY, arr);
+  assert(arr[0].geometry.m_vbo == 1);
+  assert(arr[1].geometry.m_vbo == 2);
+  assert(arr[2].geometry.m_vbo == 3);
 }

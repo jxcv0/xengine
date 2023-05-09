@@ -180,9 +180,7 @@ union component *ecs_component(uint32_t e, uint32_t type) {
 /**
  * ----------------------------------------------------------------------------
  */
-size_t ecs_component_count(uint32_t type) {
-  return lookup_table[type].count;
-}
+size_t ecs_component_count(uint32_t type) { return lookup_table[type].count; }
 
 /**
  * ----------------------------------------------------------------------------
@@ -218,7 +216,24 @@ void ecs_array(size_t nent, uint32_t *entities, uint32_t type,
   union component *buffer = entry.buffer;
   struct index_table *table = entry.table;
   for (size_t i = 0; i < nent; i++) {
-      for (size_t j = 0; j < entry.count; j++) {
-      }
+    size_t index;
+    if (index_by_entity(entities[i], table, &index, entry.count) == -1) {
+      return;
+    }
+    array[i] = entry.buffer[table[index].index];
+  }
+}
+
+void ecs_write(size_t nent, uint32_t *entities, uint32_t type,
+               union component *array) {
+  struct entry entry = lookup_table[type];
+  union component *buffer = entry.buffer;
+  struct index_table *table = entry.table;
+  for (size_t i = 0; i < nent; i++) {
+    size_t index;
+    if (index_by_entity(entities[i], table, &index, entry.count) == -1) {
+      return;
+    }
+    entry.buffer[table[index].index] = array[i];
   }
 }
