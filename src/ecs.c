@@ -51,11 +51,25 @@ static struct entry lookup_table[NUM_COMPONENT_TYPES] = {
 /**
  * ----------------------------------------------------------------------------
  */
-static int index_by_entity(uint32_t e, struct index_table *table, size_t *index,
-                           size_t n) {
+static int table_index(uint32_t e, struct index_table *table, size_t *index,
+                       size_t n) {
   for (size_t i = 0; i < n; i++) {
     if (table[i].entity == e) {
       *index = i;
+      return 0;
+    }
+  }
+  return -1;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+static int buffer_index(uint32_t e, struct index_table *table, size_t *index,
+                        size_t n) {
+  for (size_t i = 0; i < n; i++) {
+    if (table[i].entity == e) {
+      *index = table[i].index;
       return 0;
     }
   }
@@ -145,7 +159,7 @@ void ecs_remove_component(uint32_t e, uint32_t type) {
   struct index_table *table = entry->table;
 
   size_t table_index_delete;
-  if (index_by_entity(e, table, &table_index_delete, entry->count) == -1) {
+  if (table_index(e, table, &table_index_delete, entry->count) == -1) {
     return;
   }
 
@@ -169,7 +183,7 @@ union component *ecs_component(uint32_t e, uint32_t type) {
   struct entry entry = lookup_table[type];
   struct index_table *table = entry.table;
   size_t index;
-  if (index_by_entity(e, table, &index, entry.count) == -1) {
+  if (table_index(e, table, &index, entry.count) == -1) {
     return NULL;
   }
 
@@ -217,10 +231,10 @@ void ecs_array(size_t nent, uint32_t *entities, uint32_t type,
   struct index_table *table = entry.table;
   for (size_t i = 0; i < nent; i++) {
     size_t index;
-    if (index_by_entity(entities[i], table, &index, entry.count) == -1) {
+    if (buffer_index(entities[i], table, &index, entry.count) == -1) {
       return;
     }
-    array[i] = buffer[table[index].index];
+    array[i] = buffer[index];
   }
 }
 
@@ -231,9 +245,9 @@ void ecs_write(size_t nent, uint32_t *entities, uint32_t type,
   struct index_table *table = entry.table;
   for (size_t i = 0; i < nent; i++) {
     size_t index;
-    if (index_by_entity(entities[i], table, &index, entry.count) == -1) {
+    if (buffer_index(entities[i], table, &index, entry.count) == -1) {
       return;
     }
-    buffer[table[index].index] = array[i];
+    buffer[index] = array[i];
   }
 }
