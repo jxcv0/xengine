@@ -7,8 +7,8 @@
 #include <string.h>
 
 #include "assets.h"
-#include "buffer.h"
 #include "camera.h"
+#include "ecs.h"
 #include "glad.h"
 #include "input.h"
 #include "lin.h"
@@ -36,8 +36,6 @@ mat4 view_matrix = {0};
 uint32_t num_geoms = 0;
 struct geometry geometry_arr[MAX_GEOMS] = {0};
 
-struct buffer geometry_buffer;
-
 struct geometry *alloc_geom(size_t n) {
   assert(num_geoms < MAX_GEOMS);
   struct geometry *temp = &geometry_arr[num_geoms];
@@ -55,6 +53,7 @@ void handle_keyboard_input(GLFWwindow *w);
 
 // main
 int main() {
+  ecs_init();
   camera.m_mouse_sensetivity = 0.3;
   camera.m_movement_speed = 0.15;
 
@@ -71,11 +70,6 @@ int main() {
       "assets/models/Superheroine_Basemesh_No_Hair/"
       "Superheroine_Basemesh_No_Hair.model",
       alloc_geom);
-
-  if (buffer_init(&geometry_buffer, MAX_GEOMS, sizeof(struct geometry)) == -1) {
-    fprintf(stderr, "Unable to initialize geometry buffer.\n");
-    exit(EXIT_FAILURE);
-  }
 
   struct light l = LIGHT_RANGE_3250;
   l.m_position[0] = 3.0;

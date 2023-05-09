@@ -15,14 +15,6 @@ struct index_table {
   size_t index;
 };
 
-/* TODO Is this faster??
-struct buffer {
-  union component *data`;
-  size_t count;
-  struct index_table *table;
-};
-*/
-
 // geometry buffer
 static union component geometry_buf[MAX_NUM_GEOMETRIES];
 static struct index_table geometry_table[MAX_NUM_GEOMETRIES];
@@ -35,16 +27,22 @@ static struct index_table material_table[MAX_NUM_MATERIALS];
 static union component position_buf[MAX_NUM_MATERIALS];
 static struct index_table position_table[MAX_NUM_MATERIALS];
 
+// queued asset buffer
+static union component queued_asset_buf[MAX_NUM_MATERIALS];
+static struct index_table queued_asset_table[MAX_NUM_MATERIALS];
+
 struct entry {
   union component *buffer;
   struct index_table *table;
   size_t count;
 };
 
+// TODO Each table needs a way of locking
 static struct entry lookup_table[NUM_COMPONENT_TYPES] = {
     {geometry_buf, geometry_table, 0},
     {material_buf, material_table, 0},
-    {position_buf, position_table, 0}
+    {position_buf, position_table, 0},
+    {queued_asset_buf, queued_asset_table, 0}
     // ...
 };
 

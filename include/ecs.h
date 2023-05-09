@@ -1,6 +1,9 @@
 #ifndef ECS_H_
 #define ECS_H_
 
+// TODO rename this. Not really an ecs. just cache friendly memory managment and
+// access.
+
 #include <stddef.h>
 
 #include "types.h"
@@ -13,22 +16,25 @@
 #define MAX_NUM_GEOMETRIES 32
 #define MAX_NUM_MATERIALS 32
 #define MAX_NUM_POSITIONS 32
+#define MAX_NUM_ASSETS 32
 
 // lookup index
 #define GEOMETRY 0
 #define MATERIAL 1
 #define POSITION 2
+#define QUEUED_ASSET 3
 
 // bitmasks
 #define GEOMETRY_BIT (1 << GEOMETRY)
 #define MATERIAL_BIT (1 << MATERIAL)
 #define POSITION_BIT (1 << POSITION)
+#define QUEUED_ASSET_BIT (1 << QUEUED_ASSET)
 
 union component {
-  // TODO enum type ?
   struct geometry geometry;
   struct pbr_material material;
   struct position position;
+  struct asset asset;
   // ...
 };
 
@@ -44,6 +50,7 @@ int ecs_add_component(uint32_t e, uint32_t type);
 
 void ecs_remove_component(uint32_t e, uint32_t type);
 
+// TODO Remove this function. Use _array and _write
 union component *ecs_component(uint32_t e, uint32_t type);
 
 size_t ecs_component_count(uint32_t type);

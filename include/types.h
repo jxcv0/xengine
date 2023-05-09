@@ -8,6 +8,8 @@
 #define HANDLE_UNUSED (UINT64_MAX)
 #define HANDLE_MAX (UINT64_MAX - 1)
 
+#define MAX_ASSET_PATH_LEN 60
+
 typedef uint64_t handle_t;
 typedef uint32_t signature_t;
 
@@ -83,6 +85,16 @@ struct position {
       float z;
     };
   };
+};
+
+enum asset_type {
+  GEOMETRY_ASSET,
+  MATERIAL_ASSET,
+};
+
+struct asset {
+  enum asset_type type;
+  char path[MAX_ASSET_PATH_LEN];
 };
 
 #endif  // TYPES_H_
