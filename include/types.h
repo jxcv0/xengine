@@ -3,16 +3,11 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include "glad.h"
 
 #include "lin.h"
 
-#define HANDLE_UNUSED (UINT64_MAX)
-#define HANDLE_MAX (UINT64_MAX - 1)
-
 #define MAX_ASSET_PATH_LEN 60
-
-typedef uint64_t handle_t;
-typedef uint32_t signature_t;
 
 /**
  * @brief Stores the data required to render a mesh.
@@ -48,10 +43,10 @@ struct camera {
  * maps.
  */
 struct pbr_material {
-  uint32_t m_diffuse;
-  uint32_t m_normal;
-  uint32_t m_roughness;
-  uint32_t m_metallic;
+  GLuint m_diffuse;
+  GLuint m_normal;
+  GLuint m_roughness;
+  GLuint m_metallic;
   // uint32_t m_displacement;
 };
 
@@ -90,7 +85,7 @@ struct position {
 
 enum asset_type {
   GEOMETRY_ASSET,
-  MATERIAL_ASSET,
+  MATERIAL_ASSET
 };
 
 struct asset {
