@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-static cmask_t entity_buf[MAX_NUM_ENTITIES];
+static cmpntmask_t entity_buf[MAX_NUM_ENTITIES];
 static size_t num_entities;
 
 struct index_table {
@@ -75,7 +75,7 @@ static int buffer_index(uint32_t e, struct index_table *table, size_t *index,
  */
 void mem_init(void) {
   for (size_t i = 0; i < MAX_NUM_ENTITIES; i++) {
-    entity_buf[i] = ENTITY_UNUSED;
+    entity_buf[i] = MASK_UNUSED;
   }
 }
 
@@ -88,7 +88,7 @@ int mem_create_entity(uint32_t *e) {
   }
 
   for (size_t i = 0; i < MAX_NUM_ENTITIES; i++) {
-    if (entity_buf[i] & ENTITY_UNUSED) {
+    if (entity_buf[i] & MASK_UNUSED) {
       *e = i;
       entity_buf[i] = 0;
       ++num_entities;
@@ -102,30 +102,30 @@ int mem_create_entity(uint32_t *e) {
  * ----------------------------------------------------------------------------
  */
 void mem_delete_entity(uint32_t e) {
-  cmask_t mask = entity_buf[e];
+  cmpntmask_t mask = entity_buf[e];
   for (size_t i = 0; i < NUM_COMPONENT_TYPES; i++) {
     if (mask & (1 << i)) {
       mem_remove_component(e, i);
     }
   }
-  entity_buf[e] = ENTITY_UNUSED;
+  entity_buf[e] = MASK_UNUSED;
   --num_entities;
 }
 
 /**
  * ----------------------------------------------------------------------------
  */
-uint32_t mem_identity(uint32_t e) { return entity_buf[e]; }
+cmpntmask_t mem_mask(uint32_t e) { return entity_buf[e]; }
 
 /**
  * ----------------------------------------------------------------------------
  */
 int mem_add_component(uint32_t e, uint32_t type) {
-  if ((entity_buf[e] & ENTITY_UNUSED) != 0) {
+  if ((entity_buf[e] & MASK_UNUSED) != 0) {
     return -1;
   }
 
-  cmask_t mask = (1 << type);
+  cmpntmask_t mask = (1 << type);
   struct entry *entry = &lookup_table[type];
   if (entity_buf[e] & mask) {
     return 0;
@@ -145,7 +145,7 @@ int mem_add_component(uint32_t e, uint32_t type) {
  * ----------------------------------------------------------------------------
  */
 void mem_remove_component(uint32_t e, uint32_t type) {
-  if ((entity_buf[e] & ENTITY_UNUSED) != 0) {
+  if ((entity_buf[e] & MASK_UNUSED) != 0) {
     return;
   }
 
@@ -193,7 +193,7 @@ size_t mem_component_count(uint32_t type) { return lookup_table[type].count; }
 /**
  * ----------------------------------------------------------------------------
  */
-size_t mem_count(cmask_t mask) {
+size_t mem_count(cmpntmask_t mask) {
   size_t count = 0;
   for (size_t j = 0; j < num_entities; j++) {
     if ((entity_buf[j] & mask) == mask) {
@@ -206,7 +206,7 @@ size_t mem_count(cmask_t mask) {
 /**
  * ----------------------------------------------------------------------------
  */
-void mem_entities(cmask_t mask, uint32_t *arr) {
+void mem_entities(cmpntmask_t mask, uint32_t *arr) {
   size_t idx = 0;
   for (size_t i = 0; i < num_entities; i++) {
     if ((entity_buf[i] & mask) == mask) {

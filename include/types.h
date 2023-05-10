@@ -6,13 +6,7 @@
 
 #include "lin.h"
 
-#define HANDLE_UNUSED (UINT64_MAX)
-#define HANDLE_MAX (UINT64_MAX - 1)
-
 #define MAX_ASSET_PATH_LEN 60
-
-typedef uint64_t handle_t;
-typedef uint32_t signature_t;
 
 /**
  * @brief Stores the data required to render a mesh.

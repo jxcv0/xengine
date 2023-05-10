@@ -11,15 +11,15 @@ int main() {
   TEST();
   mem_init();
   uint32_t e1;
-  assert(mem_identity(0) == 0x80000000);
+  assert(mem_mask(0) == 0x80000000);
   assert(mem_create_entity(&e1) != -1);
-  assert(mem_identity(e1) == 0);
+  assert(mem_mask(e1) == 0);
   mem_delete_entity(e1);
-  assert(mem_identity(e1) == 0x80000000);
+  assert(mem_mask(e1) == 0x80000000);
 
   mem_create_entity(&e1);
   assert(mem_add_component(e1, GEOMETRY) != -1);
-  assert(mem_identity(e1) == 0x1);
+  assert(mem_mask(e1) == 0x1);
 
   uint32_t e2, e3, e4;
   mem_create_entity(&e2);
@@ -35,10 +35,10 @@ int main() {
   assert(mem_add_component(e4, MATERIAL) != -1);
   assert(mem_add_component(e4, POSITION) != -1);
 
-  assert(mem_identity(e1) == GEOMETRY_BIT);
-  assert(mem_identity(e2) == MATERIAL_BIT);
-  assert(mem_identity(e3) == (GEOMETRY_BIT | MATERIAL_BIT));
-  assert(mem_identity(e4) == (GEOMETRY_BIT | MATERIAL_BIT | POSITION_BIT));
+  assert(mem_mask(e1) == GEOMETRY_BIT);
+  assert(mem_mask(e2) == MATERIAL_BIT);
+  assert(mem_mask(e3) == (GEOMETRY_BIT | MATERIAL_BIT));
+  assert(mem_mask(e4) == (GEOMETRY_BIT | MATERIAL_BIT | POSITION_BIT));
   assert(mem_component_count(GEOMETRY) == 3);
   assert(mem_component_count(MATERIAL) == 3);
   assert(mem_component_count(POSITION) == 1);
@@ -49,13 +49,13 @@ int main() {
 
   mem_remove_component(e2, GEOMETRY);  // should do nothing
 
-  assert(mem_identity(e2) == MATERIAL_BIT);
+  assert(mem_mask(e2) == MATERIAL_BIT);
   mem_remove_component(e4, MATERIAL);
-  assert(mem_identity(e4) == (GEOMETRY_BIT | POSITION_BIT));
+  assert(mem_mask(e4) == (GEOMETRY_BIT | POSITION_BIT));
   mem_add_component(e2, POSITION);
   mem_add_component(e1, POSITION);
-  assert(mem_identity(e1) == (GEOMETRY_BIT | POSITION_BIT));
-  assert(mem_identity(e2) == (MATERIAL_BIT | POSITION_BIT));
+  assert(mem_mask(e1) == (GEOMETRY_BIT | POSITION_BIT));
+  assert(mem_mask(e2) == (MATERIAL_BIT | POSITION_BIT));
   assert(mem_component_count(GEOMETRY) == 3);
   assert(mem_component_count(MATERIAL) == 2);
   assert(mem_component_count(POSITION) == 3);
