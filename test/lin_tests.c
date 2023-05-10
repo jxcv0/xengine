@@ -7,10 +7,7 @@
 #include "lin.h"
 #include "test.h"
 
-void tst_radians(void) {
-  TEST();
-  ASSERT_FLOAT_EQ(radians(3.122f), 0.054489179f);
-}
+void tst_radians(void) { TEST(); ASSERT_FLOAT_EQ(radians(3.122f), 0.054489179f); }
 
 void tst_identity_mat4(void) {
   TEST();
