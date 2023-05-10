@@ -24,7 +24,7 @@ all: geom_converter tests
 $(build_dir)/%.o: %.c
 	@echo "Building object $@"
 	@if [ ! -d $(build_dir)/% ]; then mkdir -p $(build_dir)/$(dir $<); fi
-	@$(c_comp) $< $(cflags) -Og -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_include_dir) $(libs) -c -o $@
+	@$(c_comp) $< $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_include_dir) $(libs) -c -o $@
 
 geom_converter: libglad.a libstb.a libxen.a
 	@$(c_comp) tools/geom_converter.c $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_include_dir) $(xen_lib) $(libs) -lassimp -o $(bin_dir)/geom_converter
@@ -44,7 +44,7 @@ libstb.a:
 	@echo "Building static library $@"
 	@ar rcs $(build_dir)/$@ $(build_dir)/stb_truetype.o $(build_dir)/stb_image.o
 
-tests: test_game lin_tests buffer_tests ecs_tests
+tests: test_game lin_tests buffer_tests mem_tests
 
 test_game: libglad.a libstb.a libxen.a
 	@echo "building executable $@"
@@ -58,7 +58,7 @@ buffer_tests: libxen.a
 	@echo "building executable $@"
 	@$(c_comp) test/$@.c $(cflags) -I$(xen_include_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
 
-ecs_tests: libxen.a
+mem_tests: libxen.a
 	@echo "building executable $@"
 	@$(c_comp) test/$@.c $(cflags) -I$(xen_include_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
 

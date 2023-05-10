@@ -8,7 +8,7 @@
 
 #include "assets.h"
 #include "camera.h"
-#include "ecs.h"
+#include "mem.h"
 #include "glad.h"
 #include "input.h"
 #include "lin.h"
@@ -53,7 +53,7 @@ void handle_keyboard_input(GLFWwindow *w);
 
 // main
 int main() {
-  ecs_init();
+  mem_init();
   camera.m_mouse_sensetivity = 0.3;
   camera.m_movement_speed = 0.15;
 

@@ -1,13 +1,10 @@
-#include "ecs.h"
+#include "mem.h"
 
 #include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
 
-#define ID_UNUSED (1 << 31)
-#define ID_MAX (UINT32_MAX - 1)
-
-static uint32_t entity_buf[MAX_NUM_ENTITIES];
+static cmask_t entity_buf[MAX_NUM_ENTITIES];
 static size_t num_entities;
 
 struct index_table {
@@ -37,7 +34,6 @@ struct entry {
   size_t count;
 };
 
-// TODO Each table needs a way of locking
 static struct entry lookup_table[NUM_COMPONENT_TYPES] = {
     {geometry_buf, geometry_table, 0},
     {material_buf, material_table, 0},
@@ -77,22 +73,22 @@ static int buffer_index(uint32_t e, struct index_table *table, size_t *index,
 /**
  * ----------------------------------------------------------------------------
  */
-void ecs_init(void) {
+void mem_init(void) {
   for (size_t i = 0; i < MAX_NUM_ENTITIES; i++) {
-    entity_buf[i] = ID_UNUSED;
+    entity_buf[i] = ENTITY_UNUSED;
   }
 }
 
 /**
  * ----------------------------------------------------------------------------
  */
-int ecs_create_entity(uint32_t *e) {
+int mem_create_entity(uint32_t *e) {
   if (e == NULL || num_entities == MAX_NUM_ENTITIES) {
     return -1;
   }
 
   for (size_t i = 0; i < MAX_NUM_ENTITIES; i++) {
-    if (entity_buf[i] & ID_UNUSED) {
+    if (entity_buf[i] & ENTITY_UNUSED) {
       *e = i;
       entity_buf[i] = 0;
       ++num_entities;
@@ -105,31 +101,31 @@ int ecs_create_entity(uint32_t *e) {
 /**
  * ----------------------------------------------------------------------------
  */
-void ecs_delete_entity(uint32_t e) {
-  uint32_t mask = entity_buf[e];
+void mem_delete_entity(uint32_t e) {
+  cmask_t mask = entity_buf[e];
   for (size_t i = 0; i < NUM_COMPONENT_TYPES; i++) {
     if (mask & (1 << i)) {
-      ecs_remove_component(e, i);
+      mem_remove_component(e, i);
     }
   }
-  entity_buf[e] = ID_UNUSED;
+  entity_buf[e] = ENTITY_UNUSED;
   --num_entities;
 }
 
 /**
  * ----------------------------------------------------------------------------
  */
-uint32_t ecs_identity(uint32_t e) { return entity_buf[e]; }
+uint32_t mem_identity(uint32_t e) { return entity_buf[e]; }
 
 /**
  * ----------------------------------------------------------------------------
  */
-int ecs_add_component(uint32_t e, uint32_t type) {
-  if ((entity_buf[e] & ID_UNUSED) != 0) {
+int mem_add_component(uint32_t e, uint32_t type) {
+  if ((entity_buf[e] & ENTITY_UNUSED) != 0) {
     return -1;
   }
 
-  uint32_t mask = (1 << type);
+  cmask_t mask = (1 << type);
   struct entry *entry = &lookup_table[type];
   if (entity_buf[e] & mask) {
     return 0;
@@ -148,8 +144,8 @@ int ecs_add_component(uint32_t e, uint32_t type) {
 /**
  * ----------------------------------------------------------------------------
  */
-void ecs_remove_component(uint32_t e, uint32_t type) {
-  if ((entity_buf[e] & ID_UNUSED) != 0) {
+void mem_remove_component(uint32_t e, uint32_t type) {
+  if ((entity_buf[e] & ENTITY_UNUSED) != 0) {
     return;
   }
 
@@ -177,7 +173,7 @@ void ecs_remove_component(uint32_t e, uint32_t type) {
 /**
  * ----------------------------------------------------------------------------
  */
-union component *ecs_component(uint32_t e, uint32_t type) {
+union component *mem_component(uint32_t e, uint32_t type) {
   struct entry entry = lookup_table[type];
   struct index_table *table = entry.table;
   size_t index;
@@ -192,12 +188,12 @@ union component *ecs_component(uint32_t e, uint32_t type) {
 /**
  * ----------------------------------------------------------------------------
  */
-size_t ecs_component_count(uint32_t type) { return lookup_table[type].count; }
+size_t mem_component_count(uint32_t type) { return lookup_table[type].count; }
 
 /**
  * ----------------------------------------------------------------------------
  */
-size_t ecs_count(uint32_t mask) {
+size_t mem_count(cmask_t mask) {
   size_t count = 0;
   for (size_t j = 0; j < num_entities; j++) {
     if ((entity_buf[j] & mask) == mask) {
@@ -210,7 +206,7 @@ size_t ecs_count(uint32_t mask) {
 /**
  * ----------------------------------------------------------------------------
  */
-void ecs_entities(uint32_t mask, uint32_t *arr) {
+void mem_entities(cmask_t mask, uint32_t *arr) {
   size_t idx = 0;
   for (size_t i = 0; i < num_entities; i++) {
     if ((entity_buf[i] & mask) == mask) {
@@ -222,7 +218,7 @@ void ecs_entities(uint32_t mask, uint32_t *arr) {
 /**
  * ----------------------------------------------------------------------------
  */
-void ecs_array(size_t nent, uint32_t *entities, uint32_t type,
+void mem_array(size_t nent, uint32_t *entities, uint32_t type,
                union component *array) {
   struct entry entry = lookup_table[type];
   union component *buffer = entry.buffer;
@@ -236,7 +232,7 @@ void ecs_array(size_t nent, uint32_t *entities, uint32_t type,
   }
 }
 
-void ecs_write(size_t nent, uint32_t *entities, uint32_t type,
+void mem_write(size_t nent, uint32_t *entities, uint32_t type,
                union component *array) {
   struct entry entry = lookup_table[type];
   union component *buffer = entry.buffer;
