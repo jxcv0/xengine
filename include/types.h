@@ -14,14 +14,14 @@
  * TODO use struct geometry instead.
  */
 struct mesh {
-  uint32_t m_id;
-  uint32_t m_vbo;
-  uint32_t m_vao;
-  uint32_t m_ebo;
-  uint32_t m_num_vertices;
-  uint32_t m_num_indices;
-  uint32_t m_tex_diff;  // TODO link this some other way.
-  uint32_t m_tex_spec;  // TODO see above.
+  GLuint m_id;
+  GLuint m_vbo;
+  GLuint m_vao;
+  GLuint m_ebo;
+  GLuint m_num_vertices;
+  GLuint m_num_indices;
+  GLuint m_tex_diff;  // TODO link this some other way.
+  GLuint m_tex_spec;  // TODO see above.
 };
 
 /**
@@ -62,9 +62,9 @@ struct vertex {
  * @brief 3D geometry data
  */
 struct geometry {
-  uint32_t m_vbo;
-  uint32_t m_vao;
-  uint32_t m_ebo;
+  GLuint m_vbo;
+  GLuint m_vao;
+  GLuint m_ebo;
   size_t m_num_vertices;
   size_t m_num_indices;
 

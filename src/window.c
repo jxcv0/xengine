@@ -1,12 +1,12 @@
 #include "window.h"
 
+#include "glad.h"
 #include <GLFW/glfw3.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "checkerr.h"
-#include "glad.h"
 
 static void error_callback(int error, const char *desc) {
   fprintf(stderr, "GLFW (%d): %s\n", error, desc);
@@ -25,8 +25,10 @@ static void size_callback(GLFWwindow *window, int width, int height) {
  */
 void create_window(GLFWwindow **window, const float width, const float height,
                    const char *name) {
-  glfwInit();
   glfwSetErrorCallback(error_callback);
+  if (glfwInit() == GLFW_FALSE) {
+    exit(EXIT_FAILURE);
+  }
   int major, minor, rev;
   glfwGetVersion(&major, &minor, &rev);
   printf("GLFW Version: %d.%d.%d\n", major, minor, rev);
@@ -39,7 +41,6 @@ void create_window(GLFWwindow **window, const float width, const float height,
   *window = glfwCreateWindow(width, height, name, NULL, NULL);
 
   if (*window == NULL) {
-    perror("Unable to create window");
     glfwTerminate();
     exit(EXIT_FAILURE);
   }
@@ -48,7 +49,6 @@ void create_window(GLFWwindow **window, const float width, const float height,
   glfwSetFramebufferSizeCallback(*window, size_callback);
 
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-    perror("Unable to load OpenGL");
     glfwTerminate();
     exit(EXIT_FAILURE);
   }
