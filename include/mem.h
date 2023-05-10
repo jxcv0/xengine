@@ -5,6 +5,7 @@
 
 #include "types.h"
 
+// change to wider int here if more than 31 components required
 typedef uint32_t cmask_t;
 #define NUM_COMPONENT_TYPES ((sizeof(cmask_t) * 8) - 1)
 #define MAX_NUM_ENTITIES 128

@@ -5,13 +5,12 @@
 #include <string.h>
 
 #include "lin.h"
+#include "test.h"
 
-// TODO why does this fail without * 10
-#define ASSERT_FLOAT_EQ(f1, f2) assert(fabs(f1 - f2) < (FLT_EPSILON * 10))
-
-void tst_radians(void) { ASSERT_FLOAT_EQ(radians(3.122f), 0.054489179f); }
+void tst_radians(void) { TEST(); ASSERT_FLOAT_EQ(radians(3.122f), 0.054489179f); }
 
 void tst_identity_mat4(void) {
+  TEST();
   mat4 m;
   identity_mat4(m);
   ASSERT_FLOAT_EQ(m[0][0], 1);
@@ -36,6 +35,7 @@ void tst_identity_mat4(void) {
 }
 
 void tst_normalize_vec(void) {
+  TEST();
   vec3 v = {5, 2, -3};
   normalize_vec3(v);
 
@@ -45,6 +45,7 @@ void tst_normalize_vec(void) {
 }
 
 void tst_cross_vec3(void) {
+  TEST();
   vec3 dest = {0};
   vec3 v1 = {1.0f, 2.0f, 3.0f};
   vec3 v2 = {1.0f, 5.0f, 7.0f};
@@ -55,6 +56,7 @@ void tst_cross_vec3(void) {
 }
 
 void tst_product_mat4(void) {
+  TEST();
   mat4 m1 = {0};
   mat4 m2 = {0};
 
@@ -88,18 +90,21 @@ void tst_product_mat4(void) {
 }
 
 void tst_dot_vec3(void) {
+  TEST();
   vec3 v1 = {1.0f, -3.2f, 0.0f};
   vec3 v2 = {5.4f, 3.2f, -5.0f};
   ASSERT_FLOAT_EQ(dot_vec3(v1, v2), -4.84);
 }
 
 void tst_dot_vec4(void) {
+  TEST();
   vec4 v1 = {1.0f, -3.2f, 0.0f, 1.0f};
   vec4 v2 = {5.4f, 3.2f, -5.0f, -0.5f};
   ASSERT_FLOAT_EQ(dot_vec4(v1, v2), -5.34);
 }
 
 void tst_perspective(void) {
+  TEST();
   mat4 m = {{0}};
   perspective(m, radians(45.0f), (800.0f / 600.0f), 0.1f, 100.0f);
 
@@ -125,6 +130,7 @@ void tst_perspective(void) {
 }
 
 void tst_translate(void) {
+  TEST();
   mat4 m;
   identity_mat4(m);
   vec3 v = {0.1f, 0.1f, 0.1f};
@@ -136,6 +142,7 @@ void tst_translate(void) {
 }
 
 void tst_rotate(void) {
+  TEST();
   mat4 dest = {0};
   mat4 m = IDENTITY_MAT4;
   vec3 v = {0.0f, 1.0f, 0.0f};
@@ -163,6 +170,7 @@ void tst_rotate(void) {
 }
 
 void tst_look_at(void) {
+  TEST();
   vec3 eye = {3.0f, 3.0f, 3.0f};
   vec3 ctr = {1.0f, 0.0f, 1.0f};
   vec3 c = {eye[0] + ctr[0], eye[1] + ctr[1], eye[2] + ctr[2]};
@@ -189,6 +197,7 @@ void tst_look_at(void) {
 }
 
 void tst_scale(void) {
+  TEST();
   mat4 m = {0};
   m[0][2] = 1.032f;
   m[2][1] = 0.032f;
@@ -218,6 +227,7 @@ void tst_scale(void) {
 }
 
 int main() {
+  TEST_BEGIN();
   tst_radians();
   tst_identity_mat4();
   tst_normalize_vec();
@@ -230,8 +240,6 @@ int main() {
   tst_rotate();
   tst_look_at();
   tst_scale();
-
-  char *suite = basename(__FILE__);
-  printf("[%s]: All tests passed.\n", suite);
+  TEST_END();
   return 0;
 }

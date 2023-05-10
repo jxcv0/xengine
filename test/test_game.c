@@ -8,10 +8,10 @@
 
 #include "assets.h"
 #include "camera.h"
-#include "mem.h"
 #include "glad.h"
 #include "input.h"
 #include "lin.h"
+#include "mem.h"
 #include "pbr_deferred.h"
 #include "window.h"
 

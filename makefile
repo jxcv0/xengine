@@ -6,6 +6,7 @@ lib_dir := lib
 
 xen_src_dir := src
 xen_include_dir := include
+xen_test_dir := test
 stb_src_dir := $(lib_dir)/stb
 glad_src_dir := $(lib_dir)/glad
 
@@ -44,23 +45,27 @@ libstb.a:
 	@echo "Building static library $@"
 	@ar rcs $(build_dir)/$@ $(build_dir)/stb_truetype.o $(build_dir)/stb_image.o
 
-tests: test_game lin_tests buffer_tests mem_tests
+tests: test_game lin_tests buffer_tests mem_tests asset_tests
 
 test_game: libglad.a libstb.a libxen.a
 	@echo "building executable $@"
-	@$(c_comp) test/$@.c $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_include_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
+	@$(c_comp) $(xen_test_dir)/$@.c $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_include_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
 
 lin_tests: libxen.a
 	@echo "building executable $@"
-	@$(c_comp) test/$@.c $(cflags) -I$(xen_include_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
+	@$(c_comp) $(xen_test_dir)/$@.c $(cflags) -I$(xen_include_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
 
 buffer_tests: libxen.a
 	@echo "building executable $@"
-	@$(c_comp) test/$@.c $(cflags) -I$(xen_include_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
+	@$(c_comp) $(xen_test_dir)/$@.c $(cflags) -I$(xen_include_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
 
 mem_tests: libxen.a
 	@echo "building executable $@"
-	@$(c_comp) test/$@.c $(cflags) -I$(xen_include_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
+	@$(c_comp) $(xen_test_dir)/$@.c $(cflags) -I$(xen_include_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
+
+asset_tests: libxen.a
+	@echo "building executable $@"
+	@$(c_comp) $(xen_test_dir)/$@.c $(cflags) -I$(xen_include_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
 
 
 .PHONY: clean format

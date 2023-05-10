@@ -4,8 +4,11 @@
 #include <stdio.h>
 
 #include "mem.h"
+#include "test.h"
 
 int main() {
+  TEST_BEGIN();
+  TEST();
   mem_init();
   uint32_t e1;
   assert(mem_identity(0) == 0x80000000);
@@ -153,4 +156,5 @@ int main() {
   assert(mem_component(e1, GEOMETRY)->geometry.m_vbo == 6);
   assert(mem_component(e2, GEOMETRY)->geometry.m_vbo == 7);
   assert(mem_component(e3, GEOMETRY)->geometry.m_vbo == 8);
+  TEST_END();
 }
