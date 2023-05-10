@@ -6,9 +6,9 @@
 #include "types.h"
 
 // change to wider int here if more than 31 components required
-typedef uint32_t cmask_t;
-#define NUM_COMPONENT_TYPES ((sizeof(cmask_t) * 8) - 1)
-#define MAX_NUM_ENTITIES 128
+typedef uint32_t cmpnt_t;
+#define NUM_COMPONENT_TYPES ((sizeof(cmpnt_t) * 8) - 1)
+#define MAX_NUM_ENTITIES 2048
 #define ENTITY_UNUSED (1 << NUM_COMPONENT_TYPES)
 
 #define MAX_NUM_GEOMETRIES 32
@@ -44,23 +44,23 @@ void mem_delete_entity(uint32_t e);
 
 uint32_t mem_identity(uint32_t e);
 
-int mem_add_component(uint32_t e, uint32_t type);
+int mem_add_component(uint32_t e, cmpnt_t type);
 
-void mem_remove_component(uint32_t e, uint32_t type);
+void mem_remove_component(uint32_t e, cmpnt_t type);
 
 // TODO Remove this function. Use _array and _write
-union component *mem_component(uint32_t e, uint32_t type);
+union component *mem_component(uint32_t e, cmpnt_t type);
 
-size_t mem_component_count(uint32_t type);
+size_t mem_component_count(uint32_t cmpnt_t);
 
-size_t mem_count(cmask_t mask);
+size_t mem_count(cmpnt_t mask);
 
-void mem_entities(cmask_t mask, uint32_t *arr);
+void mem_entities(cmpnt_t mask, uint32_t *arr);
 
-void mem_array(size_t nent, uint32_t *entities, uint32_t type,
+void mem_array(size_t nent, uint32_t *entities, cmpnt_t type,
                union component *array);
 
-void mem_write(size_t nent, uint32_t *entities, uint32_t type,
+void mem_write(size_t nent, uint32_t *entities, cmpnt_t type,
                union component *array);
 
 #endif  // MEM_H_
