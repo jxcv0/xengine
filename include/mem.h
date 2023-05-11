@@ -20,7 +20,7 @@ typedef uint32_t cmpnt_t;
 #define GEOMETRY 0
 #define MATERIAL 1
 #define POSITION 2
-#define QUEUED_ASSET 3 
+#define QUEUED_ASSET 3
 
 // bitmasks
 #define GEOMETRY_BIT (1 << GEOMETRY)

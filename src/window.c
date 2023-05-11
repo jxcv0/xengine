@@ -1,12 +1,12 @@
 #include "window.h"
 
-#include "glad.h"
 #include <GLFW/glfw3.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "checkerr.h"
+#include "glad.h"
 
 static void error_callback(int error, const char *desc) {
   fprintf(stderr, "GLFW (%d): %s\n", error, desc);

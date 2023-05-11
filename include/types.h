@@ -3,8 +3,8 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include "glad.h"
 
+#include "glad.h"
 #include "lin.h"
 
 #define MAX_ASSET_PATH_LEN 60
@@ -83,10 +83,7 @@ struct position {
   };
 };
 
-enum asset_type {
-  GEOMETRY_ASSET,
-  MATERIAL_ASSET
-};
+enum asset_type { GEOMETRY_ASSET, MATERIAL_ASSET };
 
 struct assetinfo {
   enum asset_type type;

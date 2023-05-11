@@ -67,7 +67,8 @@ int main() {
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
   struct geometry pbr_test_sphere;
-  if (load_geometry(&pbr_test_sphere, "assets/meshes/pbr_test_sphere.geom") == -1) {
+  if (load_geometry(&pbr_test_sphere, "assets/meshes/pbr_test_sphere.geom") ==
+      -1) {
     exit(EXIT_FAILURE);
   }
   if (load_pbr_material(&pbr_test_sphere.m_material, "ravine_rock") == -1) {

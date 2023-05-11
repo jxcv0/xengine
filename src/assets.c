@@ -9,7 +9,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "glad.h"
 #include "stb_image.h"
 
 /**
@@ -45,31 +44,12 @@ static char *load_file(const char *filepath) {
   return buff;
 }
 
-
 /**
  * ----------------------------------------------------------------------------
  */
-bool xenstrncmp(const char *s1, const char *s2, size_t len) {
-  for (size_t i = 0; i < len; i++) {
-    if (s1[i] != s2[i]) {
-      return false;
-    }
-  }
-  return true;
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-char *findstr(const char *haystack, const char *needle, const size_t len) {
-  size_t needle_len = strlen(needle);
-  for (size_t i = 0; i < len; i++) {
-    const char *p = &haystack[i];
-    if (xenstrncmp(p, needle, needle_len)) {
-      return (char *)p;
-    }
-  }
-  return NULL;
+int load_obj_file(struct geometry *geom, struct pbr_material *mat,
+                  const char *filepath) {
+  return 0;
 }
 
 /**
@@ -103,7 +83,9 @@ static GLuint prv_load_texture(const char *filepath) {
  * ----------------------------------------------------------------------------
  */
 int load_geometry(struct geometry *geom, const char *filepath) {
-  if (geom == NULL) { return -1; }
+  if (geom == NULL) {
+    return -1;
+  }
 
   printf("Loading geometry from \"%s\".\n", filepath);
   char *file = load_file(filepath);
@@ -203,7 +185,9 @@ int load_geometry(struct geometry *geom, const char *filepath) {
  * ----------------------------------------------------------------------------
  */
 int load_pbr_material(struct pbr_material *mat, const char *material_name) {
-  if (mat == NULL) { return -1; }
+  if (mat == NULL) {
+    return -1;
+  }
 
   char buff[64] = {0};
   size_t n = strlen(material_name);
