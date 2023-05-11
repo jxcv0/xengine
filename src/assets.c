@@ -10,8 +10,41 @@
 #include <string.h>
 
 #include "glad.h"
-#include "mmapfile.h"
 #include "stb_image.h"
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+static char *load_file(const char *filepath) {
+  FILE *file = fopen(filepath, "rb");
+  if (file == NULL) {
+    perror("fopen");
+    return NULL;
+  }
+
+  if (fseek(file, 0, SEEK_END) == -1) {
+    perror("fseek");
+    return NULL;
+  }
+
+  long filesize = ftell(file);
+  if (filesize == -1) {
+    perror("ftell");
+    return NULL;
+  }
+
+  char *buff = malloc(filesize + 1);  // + 1 for '\0'
+  rewind(file);
+
+  size_t nread = fread(buff, filesize, 1, file);
+  (void)nread;
+
+  fclose(file);
+  buff[filesize] = '\0';
+
+  return buff;
+}
+
 
 /**
  * ----------------------------------------------------------------------------
@@ -42,7 +75,7 @@ char *findstr(const char *haystack, const char *needle, const size_t len) {
 /**
  * ----------------------------------------------------------------------------
  */
-static uint32_t prv_load_texture(const char *filepath) {
+static GLuint prv_load_texture(const char *filepath) {
   static GLint format_table[] = {GL_RGBA, GL_RED, GL_RGBA, GL_RGB, GL_RGBA};
   printf("Loading texture from \"%s\".\n", filepath);
   // stbi_set_flip_vertically_on_load(true);
@@ -69,43 +102,74 @@ static uint32_t prv_load_texture(const char *filepath) {
 /**
  * ----------------------------------------------------------------------------
  */
-struct geometry load_geometry(const char *filepath) {
+int load_geometry(struct geometry *geom, const char *filepath) {
+  if (geom == NULL) { return -1; }
+
   printf("Loading geometry from \"%s\".\n", filepath);
-  size_t file_size = 0;
-  const char *file = map_file(&file_size, filepath);
+  char *file = load_file(filepath);
 
-  struct geometry geom = {0};
-
+  printf("%s\n", file);
+  return -1;
   // vertices
-  const char *pos = findstr(file, "VERTICES", file_size);
-  assert(pos != NULL);
-  geom.m_num_vertices = strtol(&pos[9], NULL, 10);
-  assert((pos = strchr(pos, '\n') + 1) != NULL);
-  size_t n = sizeof(struct vertex) * geom.m_num_vertices;
-  struct vertex *vertices = calloc(geom.m_num_vertices, sizeof(struct vertex));
+  char *pos = strstr(file, "VERTICES");
+  if (pos == NULL) {
+    fprintf(stderr, "VERTICES tag not found.\n");
+    free(file);
+    return -1;
+  }
+
+  geom->m_num_vertices = strtol(&pos[9], NULL, 10);
+  if (pos == NULL) {
+    free(file);
+    return -1;
+  }
+
+  size_t n = sizeof(struct vertex) * geom->m_num_vertices;
+  struct vertex *vertices = calloc(geom->m_num_vertices, sizeof(struct vertex));
+  if (vertices == NULL) {
+    perror("calloc");
+    free(file);
+    return -1;
+  }
+
   memcpy(vertices, pos, n);
   pos += n;
 
-  // indices
-  pos = findstr(file, "INDICES", file_size);
-  assert(pos != NULL);
-  geom.m_num_indices = strtol(&pos[8], NULL, 10);
-  assert((pos = strchr(pos, '\n') + 1) != NULL);
-  n = sizeof(uint32_t) * geom.m_num_indices;
-  uint32_t *indices = calloc(geom.m_num_indices, sizeof(uint32_t));
+  pos = strstr(file, "INDICES");
+  if (pos == NULL) {
+    fprintf(stderr, "INDICES tag not found.\n");
+    free(file);
+    return -1;
+  }
+
+  geom->m_num_indices = strtol(&pos[8], NULL, 10);
+  if (pos == NULL) {
+    free(file);
+    return -1;
+  }
+
+  n = sizeof(uint32_t) * geom->m_num_indices;
+  uint32_t *indices = calloc(geom->m_num_indices, sizeof(uint32_t));
+  if (indices == NULL) {
+    perror("calloc");
+    free(vertices);
+    free(file);
+    return -1;
+  }
+
   memcpy(indices, pos, n);
 
-  glGenBuffers(1, &geom.m_vbo);
-  glGenBuffers(1, &geom.m_ebo);
-  glGenVertexArrays(1, &geom.m_vao);
-  glBindVertexArray(geom.m_vao);
+  glGenBuffers(1, &geom->m_vbo);
+  glGenBuffers(1, &geom->m_ebo);
+  glGenVertexArrays(1, &geom->m_vao);
+  glBindVertexArray(geom->m_vao);
 
-  glBindBuffer(GL_ARRAY_BUFFER, geom.m_vbo);
-  glBufferData(GL_ARRAY_BUFFER, geom.m_num_vertices * sizeof(struct vertex),
+  glBindBuffer(GL_ARRAY_BUFFER, geom->m_vbo);
+  glBufferData(GL_ARRAY_BUFFER, geom->m_num_vertices * sizeof(struct vertex),
                vertices, GL_STATIC_DRAW);
 
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geom.m_ebo);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, geom.m_num_indices * sizeof(uint32_t),
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geom->m_ebo);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, geom->m_num_indices * sizeof(uint32_t),
                indices, GL_STATIC_DRAW);
 
   glEnableVertexAttribArray(0);
@@ -128,118 +192,49 @@ struct geometry load_geometry(const char *filepath) {
   glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
                         (void *)(offsetof(struct vertex, m_tex_coord)));
 
-  unmap_file((void *)file, file_size);
   free(vertices);
   free(indices);
+  free(file);
 
-  return geom;
+  return 0;
 }
 
 /**
  * ----------------------------------------------------------------------------
  */
-struct pbr_material load_pbr_material(const char *material_name) {
+int load_pbr_material(struct pbr_material *mat, const char *material_name) {
+  if (mat == NULL) { return -1; }
+
   char buff[64] = {0};
-  struct pbr_material mat = {0};
   size_t n = strlen(material_name);
   strncpy(buff, material_name, n);
 
   strncpy(&buff[n], "_diffuse.png", 13);
-  mat.m_diffuse = load_texture(buff);
+  mat->m_diffuse = load_texture(buff);
 
   strncpy(&buff[n], "_normal.png", 12);
-  mat.m_normal = load_texture(buff);
+  mat->m_normal = load_texture(buff);
 
   strncpy(&buff[n], "_roughness.png", 15);
-  mat.m_roughness = load_texture(buff);
+  mat->m_roughness = load_texture(buff);
 
   strncpy(&buff[n], "_metallic.png", 14);
-  mat.m_metallic = load_texture(buff);
+  mat->m_metallic = load_texture(buff);
 
   // strncpy(&buff[n], "_displacement.png", 18);
   // mat.m_displacement = load_texture(buff);
 
-  return mat;
+  return 0;
 }
 
 /**
  * ----------------------------------------------------------------------------
  */
-uint32_t load_texture(const char *filename) {
+GLuint load_texture(const char *filename) {
   size_t namelen = strlen(filename);
   size_t dirlen = strlen(TEXTURE_DIR);
   char filepath[namelen + dirlen];
   strncpy(filepath, TEXTURE_DIR, dirlen + 1);
   strncpy(&filepath[dirlen], filename, namelen + 1);
   return prv_load_texture(filepath);
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-int load_model(const char *filepath, alloc_geometries alloc_geom) {
-  printf("Loading model from \"%s\".\n", filepath);
-
-  FILE *model_file = fopen(filepath, "r");
-  if (model_file == NULL) {
-    perror("fopen");
-    return -1;
-  }
-
-  // get the directory
-  char *dir_end = strrchr(filepath, '/');
-  size_t dir_len = (dir_end - filepath) + 1;  // + 1 for '/'
-
-  char buffer[256];
-  strncpy(buffer, filepath, dir_len);
-
-  size_t lineptr_len = 0;
-  char *lineptr;
-  ssize_t nread = -1;
-  while ((nread = getline(&lineptr, &lineptr_len, model_file)) != -1) {
-    // geometry
-    char *start = lineptr;
-    char *end = strchr(start, ' ');
-    size_t len = end - start;
-    strncpy(&buffer[dir_len], start, len);
-    buffer[len + dir_len] = '\0';
-    struct geometry *geom = alloc_geom(1);
-    *geom = load_geometry(buffer);
-
-    // diffuse
-    start = end + 1;
-    end = strchr(start, ' ');
-    len = end - start;
-    strncpy(&buffer[dir_len], start, len);
-    buffer[len + dir_len] = '\0';
-    geom->m_material.m_diffuse = prv_load_texture(buffer);
-
-    // roughness
-    start = end + 1;
-    end = strchr(start, ' ');
-    len = end - start;
-    strncpy(&buffer[dir_len], start, len);
-    buffer[len + dir_len] = '\0';
-    geom->m_material.m_roughness = prv_load_texture(buffer);
-
-    // normal
-    start = end + 1;
-    end = strchr(start, ' ');
-    len = end - start;
-    strncpy(&buffer[dir_len], start, len);
-    buffer[len + dir_len] = '\0';
-    geom->m_material.m_normal = prv_load_texture(buffer);
-
-    // metallic
-    start = end + 1;
-    end = strchr(start, '\n');
-    len = end - start;
-    strncpy(&buffer[dir_len], start, len);
-    buffer[len + dir_len] = '\0';
-    geom->m_material.m_metallic = prv_load_texture(buffer);
-  }
-
-  free(lineptr);
-  fclose(model_file);
-  return 0;
 }
