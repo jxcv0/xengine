@@ -88,7 +88,7 @@ enum asset_type {
   MATERIAL_ASSET
 };
 
-struct asset {
+struct assetinfo {
   enum asset_type type;
   char path[MAX_ASSET_PATH_LEN];
 };

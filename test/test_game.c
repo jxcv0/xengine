@@ -66,10 +66,8 @@ int main() {
   perspective(projection_matrix, radians(60),
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
-  load_model(
-      "assets/models/Superheroine_Basemesh_No_Hair/"
-      "Superheroine_Basemesh_No_Hair.model",
-      alloc_geom);
+  struct geometry pbr_test_sphere = load_geometry("assets/meshes/pbr_test_sphere.geom");
+  pbr_test_sphere.m_material = load_pbr_material("ravine_rock");
 
   struct light l = LIGHT_RANGE_3250;
   l.m_position[0] = 3.0;
@@ -109,7 +107,7 @@ int main() {
 
     // TODO update model_matrices
     pbrd_render_geometries(projection_matrix, view_matrix, identities,
-                           geometry_arr, num_geoms);
+                           &pbr_test_sphere, 1);
     pbrd_render_lighting(&l, 1, camera.m_pos, window_width, window_height);
 
     glfwSwapBuffers(window);

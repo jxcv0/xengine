@@ -32,7 +32,7 @@ union component {
   struct geometry geometry;
   struct pbr_material material;
   struct position position;
-  struct asset asset;
+  struct assetinfo asset;
   // ...
 };
 
