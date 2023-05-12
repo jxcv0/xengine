@@ -37,8 +37,7 @@ static char *load_file(const char *filepath) {
   char *buff = malloc(filesize + 1);  // + 1 for '\0'
   rewind(file);
 
-  size_t nread = fread(buff, filesize, 1, file);
-  (void)nread;
+  fread(buff, filesize, 1, file);
 
   fclose(file);
   buff[filesize] = '\0';
@@ -66,17 +65,46 @@ static void count_vline(char c, size_t *nv, size_t *nvn, size_t *nvt) {
 /**
  * ----------------------------------------------------------------------------
  */
-static void parse_vline(char *line, char c, size_t nposn, size_t nnorm,
-                        size_t ntex, float *posn[3], float *norm[3],
-                        float *tex[2]) {
-  switch (c) {
-    case ' ':
-      break;
-    case 'n':
-      break;
-    case 't':
-      break;
+static void parse_v3(char *line, vec3 *v) {
+  char *endptr = line;
+  for (size_t i = 0; i < 3; i++) {
+    (*v)[i] = strtof(endptr, &endptr);
+    printf("%f ", (*v)[i]);
   }
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+static void parse_v2(char *line, vec2 *v) {
+  char *endptr = line;
+  for (size_t i = 0; i < 2; i++) {
+    (*v)[i] = strtof(endptr, &endptr);
+    printf("%f ", (*v)[i]);
+  }
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+static char *parse_vlines(char *vstart, size_t nposn, size_t nnorm, size_t ntex,
+                          vec3 *posn, vec3 *norm, vec2 *tex) {
+  for (size_t i = 0; i < nposn; i++) {
+    parse_v3(&vstart[2], &posn[i]);
+    vstart = strchr(vstart, '\n') + 1;  // might not need this
+  }
+
+  for (size_t i = 0; i < nnorm; i++) {
+    parse_v3(&vstart[3], &norm[i]);
+    vstart = strchr(vstart, '\n') + 1;
+  }
+
+  for (size_t i = 0; i < ntex; i++) {
+    parse_v2(&vstart[3], &tex[i]);
+    vstart = strchr(vstart, '\n') + 1;
+  }
+
+  return vstart;
 }
 
 /**
@@ -120,17 +148,17 @@ int load_obj_file(struct geometry *geom, struct pbr_material *mat,
     }
   } while ((ptr = strchr(ptr, '\n')) != NULL);
 
- // TODO this can be one malloc
-  vec3 *vertices = calloc(nv, sizeof(vec3));
-  vec3 *normals = calloc(nvn, sizeof(vec3));
-  vec3 *texcoords = calloc(nvt, sizeof(vec2));
+  // TODO this can be one malloc
+  vec3 *vertices = malloc(sizeof(vec3) * nv);
+  vec3 *normals = malloc(sizeof(vec3) * nvn);
+  vec2 *texcoords = malloc(sizeof(vec2) * nvt);
 
   ptr = file;
   do {
     ++ptr;
     switch (ptr[0]) {
       case 'v':
-        parse_vline(ptr, ptr[1], nv, nvn, nvt, vertices, normals, texcoords);
+        ptr = parse_vlines(ptr, nv, nvn, nvt, vertices, normals, texcoords);
         break;
       case 'f':
         break;
