@@ -43,33 +43,33 @@ struct camera {
  * maps.
  */
 struct pbr_material {
-  GLuint m_diffuse;
-  GLuint m_normal;
-  GLuint m_roughness;
-  GLuint m_metallic;
-  // uint32_t m_displacement;
+  GLuint diffuse;
+  GLuint normal;
+  GLuint roughness;
+  GLuint metallic;
+  // uint32_t displacement;
 };
 
 struct vertex {
-  vec3 m_position;
-  vec2 m_tex_coord;
-  vec3 m_normal;
-  vec3 m_tangent;
-  vec3 m_bitangent;
+  vec3 position;
+  vec2 tex_coord;
+  vec3 normal;
+  vec3 tangent;
+  vec3 bitangent;
 };
 
 /**
  * @brief 3D geometry data
  */
 struct geometry {
-  GLuint m_vbo;
-  GLuint m_vao;
-  GLuint m_ebo;
-  size_t m_num_vertices;
-  size_t m_num_indices;
+  GLuint vbo;
+  GLuint vao;
+  GLuint ebo;
+  size_t num_vertices;
+  size_t num_indices;
 
   // TODO separate this out and make rendering a system.
-  struct pbr_material m_material;
+  struct pbr_material material;
 };
 
 struct position {

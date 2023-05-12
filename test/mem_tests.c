@@ -134,27 +134,27 @@ int main() {
   assert(e_arr[1] == e2);
   assert(e_arr[2] == e3);
 
-  mem_component(e1, GEOMETRY)->geometry.m_vbo = 1;
-  mem_component(e2, GEOMETRY)->geometry.m_vbo = 2;
-  mem_component(e3, GEOMETRY)->geometry.m_vbo = 3;
+  mem_component(e1, GEOMETRY)->geometry.vbo = 1;
+  mem_component(e2, GEOMETRY)->geometry.vbo = 2;
+  mem_component(e3, GEOMETRY)->geometry.vbo = 3;
   mem_component(e1, POSITION)->position.x = 1.0f;
   mem_component(e2, POSITION)->position.x = 2.0f;
   mem_component(e3, POSITION)->position.x = 3.0f;
 
   union component arr[ne];
   mem_array(ne, e_arr, GEOMETRY, arr);
-  assert(arr[0].geometry.m_vbo == 1);
-  assert(arr[1].geometry.m_vbo == 2);
-  assert(arr[2].geometry.m_vbo == 3);
+  assert(arr[0].geometry.vbo == 1);
+  assert(arr[1].geometry.vbo == 2);
+  assert(arr[2].geometry.vbo == 3);
   for (size_t i = 0; i < ne; i++) {
-    arr[i].geometry.m_vbo += 5;
+    arr[i].geometry.vbo += 5;
   }
-  assert(arr[0].geometry.m_vbo == 6);
-  assert(arr[1].geometry.m_vbo == 7);
-  assert(arr[2].geometry.m_vbo == 8);
+  assert(arr[0].geometry.vbo == 6);
+  assert(arr[1].geometry.vbo == 7);
+  assert(arr[2].geometry.vbo == 8);
   mem_write(ne, e_arr, GEOMETRY, arr);
-  assert(mem_component(e1, GEOMETRY)->geometry.m_vbo == 6);
-  assert(mem_component(e2, GEOMETRY)->geometry.m_vbo == 7);
-  assert(mem_component(e3, GEOMETRY)->geometry.m_vbo == 8);
+  assert(mem_component(e1, GEOMETRY)->geometry.vbo == 6);
+  assert(mem_component(e2, GEOMETRY)->geometry.vbo == 7);
+  assert(mem_component(e3, GEOMETRY)->geometry.vbo == 8);
   TEST_END();
 }

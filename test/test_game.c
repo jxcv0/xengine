@@ -71,7 +71,7 @@ int main() {
       -1) {
     exit(EXIT_FAILURE);
   }
-  if (load_pbr_material(&pbr_test_sphere.m_material, "ravine_rock") == -1) {
+  if (load_pbr_material(&pbr_test_sphere.material, "ravine_rock") == -1) {
     exit(EXIT_FAILURE);
   }
 

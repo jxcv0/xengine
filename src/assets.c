@@ -22,12 +22,14 @@ static char *load_file(const char *filepath) {
   }
 
   if (fseek(file, 0, SEEK_END) == -1) {
+    fclose(file);
     perror("fseek");
     return NULL;
   }
 
   long filesize = ftell(file);
   if (filesize == -1) {
+    fclose(file);
     perror("ftell");
     return NULL;
   }
@@ -47,8 +49,94 @@ static char *load_file(const char *filepath) {
 /**
  * ----------------------------------------------------------------------------
  */
+static void count_vline(char c, size_t *nv, size_t *nvn, size_t *nvt) {
+  switch (c) {
+    case ' ':
+      ++(*nv);
+      break;
+    case 'n':
+      ++(*nvn);
+      break;
+    case 't':
+      ++(*nvt);
+      break;
+  }
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+static void parse_vline(char *line, char c, size_t nposn, size_t nnorm,
+                        size_t ntex, float *posn[3], float *norm[3],
+                        float *tex[2]) {
+  switch (c) {
+    case ' ':
+    case 'n':
+    case 't':
+  }
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+static void handle_usemtl(char *line, struct pbr_material *mat) {}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
 int load_obj_file(struct geometry *geom, struct pbr_material *mat,
                   const char *filepath) {
+  char *file = load_file(filepath);
+  if (file == NULL) {
+    return -1;
+  }
+
+  size_t nv = 0;
+  size_t nvn = 0;
+  size_t nvt = 0;
+  size_t nf = 0;
+
+  char *ptr = file;
+  do {
+    ++ptr;
+    switch (ptr[0]) {
+      case 'v':
+        count_vline(ptr[1], &nv, &nvn, &nvt);
+        break;
+      case 'f':
+        ++nf;
+        break;
+      case 'u':
+        // multiple materials not supported.
+        if (mat != NULL) {
+          handle_usemtl(ptr, mat);
+        }
+        break;
+      default:
+        break;
+    }
+  } while ((ptr = strchr(file, '\n')) != NULL);
+
+  vec3 *vertices = calloc(nf, sizeof(vec3));
+
+  ptr = file;
+  do {
+    ++ptr;
+    switch (ptr[0]) {
+      case 'v':
+        parse_vline(ptr, ptr[1], nv, nvn, nvt, vertices, NULL, NULL);
+        break;
+      case 'f':
+        ++nf;
+        break;
+      default:
+        break;
+    }
+  } while ((ptr = strchr(file, '\n')) != NULL);
+
+  free(file);
+  free(vertices);
+
   return 0;
 }
 
@@ -100,14 +188,14 @@ int load_geometry(struct geometry *geom, const char *filepath) {
     return -1;
   }
 
-  geom->m_num_vertices = strtol(&pos[9], NULL, 10);
+  geom->num_vertices = strtol(&pos[9], NULL, 10);
   if (pos == NULL) {
     free(file);
     return -1;
   }
 
-  size_t n = sizeof(struct vertex) * geom->m_num_vertices;
-  struct vertex *vertices = calloc(geom->m_num_vertices, sizeof(struct vertex));
+  size_t n = sizeof(struct vertex) * geom->num_vertices;
+  struct vertex *vertices = calloc(geom->num_vertices, sizeof(struct vertex));
   if (vertices == NULL) {
     perror("calloc");
     free(file);
@@ -124,14 +212,14 @@ int load_geometry(struct geometry *geom, const char *filepath) {
     return -1;
   }
 
-  geom->m_num_indices = strtol(&pos[8], NULL, 10);
+  geom->num_indices = strtol(&pos[8], NULL, 10);
   if (pos == NULL) {
     free(file);
     return -1;
   }
 
-  n = sizeof(uint32_t) * geom->m_num_indices;
-  uint32_t *indices = calloc(geom->m_num_indices, sizeof(uint32_t));
+  n = sizeof(uint32_t) * geom->num_indices;
+  uint32_t *indices = calloc(geom->num_indices, sizeof(uint32_t));
   if (indices == NULL) {
     perror("calloc");
     free(vertices);
@@ -141,38 +229,38 @@ int load_geometry(struct geometry *geom, const char *filepath) {
 
   memcpy(indices, pos, n);
 
-  glGenBuffers(1, &geom->m_vbo);
-  glGenBuffers(1, &geom->m_ebo);
-  glGenVertexArrays(1, &geom->m_vao);
-  glBindVertexArray(geom->m_vao);
+  glGenBuffers(1, &geom->vbo);
+  glGenBuffers(1, &geom->ebo);
+  glGenVertexArrays(1, &geom->vao);
+  glBindVertexArray(geom->vao);
 
-  glBindBuffer(GL_ARRAY_BUFFER, geom->m_vbo);
-  glBufferData(GL_ARRAY_BUFFER, geom->m_num_vertices * sizeof(struct vertex),
+  glBindBuffer(GL_ARRAY_BUFFER, geom->vbo);
+  glBufferData(GL_ARRAY_BUFFER, geom->num_vertices * sizeof(struct vertex),
                vertices, GL_STATIC_DRAW);
 
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geom->m_ebo);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, geom->m_num_indices * sizeof(uint32_t),
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geom->ebo);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, geom->num_indices * sizeof(uint32_t),
                indices, GL_STATIC_DRAW);
 
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-                        (void *)(offsetof(struct vertex, m_position)));
+                        (void *)(offsetof(struct vertex, position)));
 
   glEnableVertexAttribArray(1);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-                        (void *)(offsetof(struct vertex, m_tangent)));
+                        (void *)(offsetof(struct vertex, tangent)));
 
   glEnableVertexAttribArray(2);
   glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-                        (void *)(offsetof(struct vertex, m_bitangent)));
+                        (void *)(offsetof(struct vertex, bitangent)));
 
   glEnableVertexAttribArray(3);
   glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-                        (void *)(offsetof(struct vertex, m_normal)));
+                        (void *)(offsetof(struct vertex, normal)));
 
   glEnableVertexAttribArray(4);
   glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-                        (void *)(offsetof(struct vertex, m_tex_coord)));
+                        (void *)(offsetof(struct vertex, tex_coord)));
 
   free(vertices);
   free(indices);
@@ -194,19 +282,19 @@ int load_pbr_material(struct pbr_material *mat, const char *material_name) {
   strncpy(buff, material_name, n);
 
   strncpy(&buff[n], "_diffuse.png", 13);
-  mat->m_diffuse = load_texture(buff);
+  mat->diffuse = load_texture(buff);
 
   strncpy(&buff[n], "_normal.png", 12);
-  mat->m_normal = load_texture(buff);
+  mat->normal = load_texture(buff);
 
   strncpy(&buff[n], "_roughness.png", 15);
-  mat->m_roughness = load_texture(buff);
+  mat->roughness = load_texture(buff);
 
   strncpy(&buff[n], "_metallic.png", 14);
-  mat->m_metallic = load_texture(buff);
+  mat->metallic = load_texture(buff);
 
   // strncpy(&buff[n], "_displacement.png", 18);
-  // mat.m_displacement = load_texture(buff);
+  // mat.displacement = load_texture(buff);
 
   return 0;
 }
