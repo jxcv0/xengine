@@ -12,24 +12,24 @@
 // we want this all in the same block of memory.
 static struct {
   // geometry
-  uint32_t g_buff;
-  uint32_t g_position;
+  GLuint g_buff;
+  GLuint g_position;
 
   // normal matrix
-  uint32_t g_tangent;
-  uint32_t g_bitangent;
-  uint32_t g_normal;
+  GLuint g_tangent;
+  GLuint g_bitangent;
+  GLuint g_normal;
 
   // textures
-  uint32_t g_tex_diff;
-  uint32_t g_tex_norm;
+  GLuint g_tex_diff;
+  GLuint g_tex_norm;
 
   // depth
-  uint32_t g_depth;
+  GLuint g_depth;
 
   // lighting
-  uint32_t quad_vbo;
-  uint32_t quad_vao;
+  GLuint quad_vbo;
+  GLuint quad_vao;
 
   shader_t deferred_geometry;
   shader_t deferred_lighting;
@@ -51,32 +51,32 @@ static void load_pbrd_shaders(void) {
   const char *geom_file = g;
   const char *frag_file = f;
 
-  uint32_t vert_id = glCreateShader(GL_VERTEX_SHADER);
+  GLuint vert_id = glCreateShader(GL_VERTEX_SHADER);
   glShaderSource(vert_id, 1, &vert_file, NULL);
   glCompileShader(vert_id);
   check_compile(vert_id);
 
-  uint32_t tesc_id = glCreateShader(GL_TESS_CONTROL_SHADER);
+  GLuint tesc_id = glCreateShader(GL_TESS_CONTROL_SHADER);
   glShaderSource(tesc_id, 1, &tesc_file, NULL);
   glCompileShader(tesc_id);
   check_compile(tesc_id);
 
-  uint32_t tese_id = glCreateShader(GL_TESS_EVALUATION_SHADER);
+  GLuint tese_id = glCreateShader(GL_TESS_EVALUATION_SHADER);
   glShaderSource(tese_id, 1, &tese_file, NULL);
   glCompileShader(tese_id);
   check_compile(tese_id);
 
-  uint32_t geom_id = glCreateShader(GL_GEOMETRY_SHADER);
+  GLuint geom_id = glCreateShader(GL_GEOMETRY_SHADER);
   glShaderSource(geom_id, 1, &geom_file, NULL);
   glCompileShader(geom_id);
   check_compile(geom_id);
 
-  uint32_t frag_id = glCreateShader(GL_FRAGMENT_SHADER);
+  GLuint frag_id = glCreateShader(GL_FRAGMENT_SHADER);
   glShaderSource(frag_id, 1, &frag_file, NULL);
   glCompileShader(frag_id);
   check_compile(frag_id);
 
-  uint32_t program_id = glCreateProgram();
+  GLuint program_id = glCreateProgram();
   glAttachShader(program_id, vert_id);
   glAttachShader(program_id, tesc_id);
   glAttachShader(program_id, tese_id);
@@ -207,19 +207,19 @@ void pbrd_render_geometries(const mat4 projection, const mat4 view,
 
     const struct geometry *geom = &geometries[i];
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, geom->m_material.m_diffuse);
+    glBindTexture(GL_TEXTURE_2D, geom->material.diffuse);
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, geom->m_material.m_roughness);
+    glBindTexture(GL_TEXTURE_2D, geom->material.roughness);
     glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, geom->m_material.m_normal);
+    glBindTexture(GL_TEXTURE_2D, geom->material.normal);
     glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, geom->m_material.m_metallic);
+    glBindTexture(GL_TEXTURE_2D, geom->material.metallic);
     // glActiveTexture(GL_TEXTURE4);
-    // glBindTexture(GL_TEXTURE_2D, materials[i].m_displacement);
+    // glBindTexture(GL_TEXTURE_2D, materials[i].displacement);
 
-    glBindVertexArray(geometries[i].m_vao);
+    glBindVertexArray(geometries[i].vao);
 
-    glDrawElements(GL_PATCHES, geometries[i].m_num_indices, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_PATCHES, geometries[i].num_indices, GL_UNSIGNED_INT, 0);
   }
 }
 
@@ -251,15 +251,15 @@ void pbrd_render_lighting(struct light *lights, const uint32_t n,
   char light[32];
   for (uint32_t i = 0; i < n; i++) {
     sprintf(light, "lights[%d].m_position", i);
-    shader_set_uniform_3fv(pbr.deferred_lighting, light, lights[i].m_position);
+    shader_set_uniform_3fv(pbr.deferred_lighting, light, lights[i].position);
     sprintf(light, "lights[%d].m_color", i);
-    shader_set_uniform_3fv(pbr.deferred_lighting, light, lights[i].m_color);
+    shader_set_uniform_3fv(pbr.deferred_lighting, light, lights[i].color);
     sprintf(light, "lights[%d].m_constant", i);
-    shader_set_uniform_1f(pbr.deferred_lighting, light, lights[i].m_constant);
+    shader_set_uniform_1f(pbr.deferred_lighting, light, lights[i].constant);
     sprintf(light, "lights[%d].m_linear", i);
-    shader_set_uniform_1f(pbr.deferred_lighting, light, lights[i].m_linear);
+    shader_set_uniform_1f(pbr.deferred_lighting, light, lights[i].linear);
     sprintf(light, "lights[%d].m_quadratic", i);
-    shader_set_uniform_1f(pbr.deferred_lighting, light, lights[i].m_quadratic);
+    shader_set_uniform_1f(pbr.deferred_lighting, light, lights[i].quadratic);
   }
 
   // render quad

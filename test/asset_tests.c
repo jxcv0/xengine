@@ -1,6 +1,7 @@
+#include <assert.h>
+
 #include "assets.h"
 #include "test.h"
-#include <assert.h>
 
 void tst_load_obj(void) {
   TEST();

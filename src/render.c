@@ -122,12 +122,12 @@ void render_geometries(const struct renderer *r, const mat4 projection,
     shader_set_uniform_1i(r->geom_shader, "tex_spec", 1);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, meshes[i].m_tex_diff);
+    glBindTexture(GL_TEXTURE_2D, meshes[i].tex_diff);
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, meshes[i].m_tex_spec);
-    glBindVertexArray(meshes[i].m_vao);
+    glBindTexture(GL_TEXTURE_2D, meshes[i].tex_spec);
+    glBindVertexArray(meshes[i].vao);
 
-    glDrawElements(GL_TRIANGLES, meshes[i].m_num_indices, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, meshes[i].num_indices, GL_UNSIGNED_INT, 0);
   }
 }
 
@@ -156,15 +156,15 @@ void render_lighting(struct renderer *r, struct light *lights, const uint32_t n,
   char light[32];
   for (uint32_t i = 0; i < n; i++) {
     sprintf(light, "lights[%d].m_position", i);
-    shader_set_uniform_3fv(r->light_shader, light, lights[i].m_position);
+    shader_set_uniform_3fv(r->light_shader, light, lights[i].position);
     sprintf(light, "lights[%d].m_color", i);
-    shader_set_uniform_3fv(r->light_shader, light, lights[i].m_color);
+    shader_set_uniform_3fv(r->light_shader, light, lights[i].color);
     sprintf(light, "lights[%d].m_constant", i);
-    shader_set_uniform_1f(r->light_shader, light, lights[i].m_constant);
+    shader_set_uniform_1f(r->light_shader, light, lights[i].constant);
     sprintf(light, "lights[%d].m_linear", i);
-    shader_set_uniform_1f(r->light_shader, light, lights[i].m_linear);
+    shader_set_uniform_1f(r->light_shader, light, lights[i].linear);
     sprintf(light, "lights[%d].m_quadratic", i);
-    shader_set_uniform_1f(r->light_shader, light, lights[i].m_quadratic);
+    shader_set_uniform_1f(r->light_shader, light, lights[i].quadratic);
   }
 
   // render quad

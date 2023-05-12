@@ -14,14 +14,14 @@
  * TODO use struct geometry instead.
  */
 struct mesh {
-  GLuint m_id;
-  GLuint m_vbo;
-  GLuint m_vao;
-  GLuint m_ebo;
-  GLuint m_num_vertices;
-  GLuint m_num_indices;
-  GLuint m_tex_diff;  // TODO link this some other way.
-  GLuint m_tex_spec;  // TODO see above.
+  GLuint id;
+  GLuint vbo;
+  GLuint vao;
+  GLuint ebo;
+  GLuint num_vertices;
+  GLuint num_indices;
+  GLuint tex_diff;  // TODO link this some other way.
+  GLuint tex_spec;  // TODO see above.
 };
 
 /**
