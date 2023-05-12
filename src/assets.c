@@ -110,6 +110,32 @@ static char *parse_vlines(char *vstart, size_t nposn, size_t nnorm, size_t ntex,
 /**
  * ----------------------------------------------------------------------------
  */
+static char *parse_flines(char *fstart, size_t nverts, vec3 *posn, vec3 *norms,
+                          vec2 *tex, struct vertex *vertices) {
+  for (size_t i = 0; i < nverts; i++) {
+    fstart = strpbrk(fstart, " \n") + 1;
+    size_t indices[3];
+    if (*fstart == ' ') {
+      char *endptr = fstart;
+      for (int j = 0; j < 3; j++) {
+        indices[j] = strtol(endptr, &endptr, 10) - 1;
+      }
+    } else {
+      // calc tangent and bitangent for last 3
+      ++fstart;
+      continue;
+    }
+    // TODO copy these properly
+    vertices[i].position = posn[indices[0]];
+    vertices[i].tex_coord = tex[indices[1]];
+    vertices[i].normal = norms[indices[2]];
+  }
+  return fstart;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
 static void handle_usemtl(char *line, struct pbr_material *mat) {}
 
 /**
@@ -137,6 +163,27 @@ int load_obj_file(struct geometry *geom, struct pbr_material *mat,
       case 'f':
         ++nf;
         break;
+      default:
+        break;
+    }
+  } while ((ptr = strchr(ptr, '\n')) != NULL);
+
+  // TODO this can be one malloc
+  vec3 *posn = malloc(sizeof(vec3) * nv);
+  vec3 *norms = malloc(sizeof(vec3) * nvn);
+  vec2 *tex = malloc(sizeof(vec2) * nvt);
+  struct vertex *vertices = malloc(sizeof(struct vertex) * nf * 3);  // triangulated
+
+  ptr = file;
+  do {
+    ++ptr;
+    switch (ptr[0]) {
+      case 'v':
+        ptr = parse_vlines(ptr, nv, nvn, nvt, posn, norms, tex);
+        break;
+      case 'f':
+        ptr = parse_flines(ptr, nf * 3, posn, norms, tex, vertices);
+        break;
       case 'u':
         // multiple materials not supported.
         if (mat != NULL) {
@@ -148,29 +195,11 @@ int load_obj_file(struct geometry *geom, struct pbr_material *mat,
     }
   } while ((ptr = strchr(ptr, '\n')) != NULL);
 
-  // TODO this can be one malloc
-  vec3 *vertices = malloc(sizeof(vec3) * nv);
-  vec3 *normals = malloc(sizeof(vec3) * nvn);
-  vec2 *texcoords = malloc(sizeof(vec2) * nvt);
-
-  ptr = file;
-  do {
-    ++ptr;
-    switch (ptr[0]) {
-      case 'v':
-        ptr = parse_vlines(ptr, nv, nvn, nvt, vertices, normals, texcoords);
-        break;
-      case 'f':
-        break;
-      default:
-        break;
-    }
-  } while ((ptr = strchr(ptr, '\n')) != NULL);
-
   free(file);
+  free(verts);
+  free(norms);
+  free(tex);
   free(vertices);
-  free(normals);
-  free(texcoords);
 
   return 0;
 }
