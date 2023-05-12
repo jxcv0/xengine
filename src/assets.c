@@ -71,8 +71,11 @@ static void parse_vline(char *line, char c, size_t nposn, size_t nnorm,
                         float *tex[2]) {
   switch (c) {
     case ' ':
+      break;
     case 'n':
+      break;
     case 't':
+      break;
   }
 }
 
@@ -115,27 +118,31 @@ int load_obj_file(struct geometry *geom, struct pbr_material *mat,
       default:
         break;
     }
-  } while ((ptr = strchr(file, '\n')) != NULL);
+  } while ((ptr = strchr(ptr, '\n')) != NULL);
 
-  vec3 *vertices = calloc(nf, sizeof(vec3));
+ // TODO this can be one malloc
+  vec3 *vertices = calloc(nv, sizeof(vec3));
+  vec3 *normals = calloc(nvn, sizeof(vec3));
+  vec3 *texcoords = calloc(nvt, sizeof(vec2));
 
   ptr = file;
   do {
     ++ptr;
     switch (ptr[0]) {
       case 'v':
-        parse_vline(ptr, ptr[1], nv, nvn, nvt, vertices, NULL, NULL);
+        parse_vline(ptr, ptr[1], nv, nvn, nvt, vertices, normals, texcoords);
         break;
       case 'f':
-        ++nf;
         break;
       default:
         break;
     }
-  } while ((ptr = strchr(file, '\n')) != NULL);
+  } while ((ptr = strchr(ptr, '\n')) != NULL);
 
   free(file);
   free(vertices);
+  free(normals);
+  free(texcoords);
 
   return 0;
 }

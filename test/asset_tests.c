@@ -6,9 +6,9 @@
 void tst_load_obj(void) {
   TEST();
   struct geometry geom;
-  assert(load_obj_file(&geom, NULL, "assets/meshes/test_cube_cube.obj"));
+  assert(load_obj_file(&geom, NULL, "assets/meshes/test_cube.obj") != 0);
   assert(geom.num_vertices == 8);
-  assert(geom.num_indices == 6);
+  assert(geom.num_indices == 12);
 }
 
 int main() {
