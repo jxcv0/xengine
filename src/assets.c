@@ -110,25 +110,32 @@ static char *parse_vlines(char *vstart, size_t nposn, size_t nnorm, size_t ntex,
 /**
  * ----------------------------------------------------------------------------
  */
-static char *parse_flines(char *fstart, size_t nverts, vec3 *posn, vec3 *norms,
+static char *parse_flines(char *fstart, size_t nf, vec3 *posn, vec3 *norms,
                           vec2 *tex, struct vertex *vertices) {
-  for (size_t i = 0; i < nverts; i++) {
+  size_t nverts = 0;
+  for (size_t i = 0; i < nf; i++) {
     fstart = strpbrk(fstart, " \n") + 1;
     size_t indices[3];
+    printf("%ld\n", i);
     if (*fstart == ' ') {
       char *endptr = fstart;
       for (int j = 0; j < 3; j++) {
         indices[j] = strtol(endptr, &endptr, 10) - 1;
       }
     } else {
-      // calc tangent and bitangent for last 3
+      // calc tangent and bitangent for last 3 verts
       ++fstart;
       continue;
     }
-    // TODO copy these properly
-    vertices[i].position = posn[indices[0]];
-    vertices[i].tex_coord = tex[indices[1]];
-    vertices[i].normal = norms[indices[2]];
+
+    for (int i = 0; i < 3; i++) {
+      vertices[nverts].position[i] = posn[indices[0]][i];
+      vertices[nverts].normal[i]  = norms[indices[2]][i];
+    }
+    
+    vertices[nverts].tex_coord[0] = tex[indices[1]][0];
+    vertices[nverts].tex_coord[1]  = tex[indices[1]][1];
+    ++nverts;
   }
   return fstart;
 }
@@ -182,7 +189,7 @@ int load_obj_file(struct geometry *geom, struct pbr_material *mat,
         ptr = parse_vlines(ptr, nv, nvn, nvt, posn, norms, tex);
         break;
       case 'f':
-        ptr = parse_flines(ptr, nf * 3, posn, norms, tex, vertices);
+        ptr = parse_flines(ptr, nf, posn, norms, tex, vertices);
         break;
       case 'u':
         // multiple materials not supported.
@@ -196,7 +203,7 @@ int load_obj_file(struct geometry *geom, struct pbr_material *mat,
   } while ((ptr = strchr(ptr, '\n')) != NULL);
 
   free(file);
-  free(verts);
+  free(posn);
   free(norms);
   free(tex);
   free(vertices);
