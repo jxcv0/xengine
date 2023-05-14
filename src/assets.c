@@ -1,6 +1,7 @@
 #include "assets.h"
 
 #include <assert.h>
+#include <ctype.h>
 #include <libgen.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -113,30 +114,24 @@ static char *parse_vlines(char *vstart, size_t nposn, size_t nnorm, size_t ntex,
 static char *parse_flines(char *fstart, size_t nf, vec3 *posn, vec3 *norms,
                           vec2 *tex, struct vertex *vertices) {
   size_t nverts = 0;
-  for (size_t i = 0; i < nf; i++) {
-    fstart = strpbrk(fstart, " \n") + 1;
-    size_t indices[3];
-    printf("%ld\n", i);
-    if (*fstart == ' ') {
-      char *endptr = fstart;
-      for (int j = 0; j < 3; j++) {
-        indices[j] = strtol(endptr, &endptr, 10) - 1;
+  while(fstart != '\0') {
+    int i = 0;
+    size_t indices[9] = {0};
+    for (char *c = fstart; *c != '\0' && *c != '\n'; c++) {
+      if (!isdigit(*c)) {
+        continue;
       }
-    } else {
-      // calc tangent and bitangent for last 3 verts
-      ++fstart;
-      continue;
-    }
 
-    for (int i = 0; i < 3; i++) {
-      vertices[nverts].position[i] = posn[indices[0]][i];
-      vertices[nverts].normal[i]  = norms[indices[2]][i];
+      while (isdigit(*c)) {
+        indices[ii] = (indices[ii] * 10) + (*c - '0');
+        ++c;
+      }
+      ++i;
     }
-    
-    vertices[nverts].tex_coord[0] = tex[indices[1]][0];
-    vertices[nverts].tex_coord[1]  = tex[indices[1]][1];
-    ++nverts;
+    nverts += 3;
+    fstart = ++c;
   }
+
   return fstart;
 }
 
@@ -179,7 +174,8 @@ int load_obj_file(struct geometry *geom, struct pbr_material *mat,
   vec3 *posn = malloc(sizeof(vec3) * nv);
   vec3 *norms = malloc(sizeof(vec3) * nvn);
   vec2 *tex = malloc(sizeof(vec2) * nvt);
-  struct vertex *vertices = malloc(sizeof(struct vertex) * nf * 3);  // triangulated
+  struct vertex *vertices =
+      malloc(sizeof(struct vertex) * nf * 3);  // triangulated
 
   ptr = file;
   do {
