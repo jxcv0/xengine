@@ -70,7 +70,6 @@ static void parse_v3(char *line, vec3 *v) {
   char *endptr = line;
   for (size_t i = 0; i < 3; i++) {
     (*v)[i] = strtof(endptr, &endptr);
-    printf("%f ", (*v)[i]);
   }
 }
 
@@ -81,7 +80,6 @@ static void parse_v2(char *line, vec2 *v) {
   char *endptr = line;
   for (size_t i = 0; i < 2; i++) {
     (*v)[i] = strtof(endptr, &endptr);
-    printf("%f ", (*v)[i]);
   }
 }
 
@@ -114,20 +112,27 @@ static char *parse_vlines(char *vstart, size_t nposn, size_t nnorm, size_t ntex,
 static char *parse_flines(char *fstart, size_t nf, vec3 *posn, vec3 *norms,
                           vec2 *tex, struct vertex *vertices) {
   size_t nverts = 0;
-  while(fstart != '\0') {
+  while(*fstart != '\0') {
     int i = 0;
     size_t indices[9] = {0};
-    for (char *c = fstart; *c != '\0' && *c != '\n'; c++) {
+    char *c = fstart;
+    for (; *c != '\0' && *c != '\n' && i < 9; c++) {
       if (!isdigit(*c)) {
         continue;
       }
 
       while (isdigit(*c)) {
-        indices[ii] = (indices[ii] * 10) + (*c - '0');
+        indices[i] = (indices[i] * 10) + (*c - '0');
         ++c;
       }
       ++i;
     }
+    
+    /**
+    struct vertex v[3];
+    v[0].
+    */
+
     nverts += 3;
     fstart = ++c;
   }
