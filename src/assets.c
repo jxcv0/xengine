@@ -90,7 +90,7 @@ static char *parse_vlines(char *vstart, size_t nposn, size_t nnorm, size_t ntex,
                           vec3 *posn, vec3 *norm, vec2 *tex) {
   for (size_t i = 0; i < nposn; i++) {
     parse_v3(&vstart[2], &posn[i]);
-    vstart = strchr(vstart, '\n') + 1;  // might not need this
+    vstart = strchr(vstart, '\n') + 1;
   }
 
   for (size_t i = 0; i < nnorm; i++) {
@@ -109,7 +109,7 @@ static char *parse_vlines(char *vstart, size_t nposn, size_t nnorm, size_t ntex,
 /**
  * ----------------------------------------------------------------------------
  */
-static char *parse_flines(char *fstart, size_t nf, vec3 *posn, vec3 *norms,
+static char *parse_flines(char *fstart, vec3 *posn, vec3 *norms,
                           vec2 *tex, struct vertex *vertices) {
   size_t nverts = 0;
   while(*fstart != '\0') {
@@ -128,14 +128,14 @@ static char *parse_flines(char *fstart, size_t nf, vec3 *posn, vec3 *norms,
       ++i;
     }
     
-    /**
-    struct vertex v[3];
-    v[0].
-    */
-
-    nverts += 3;
+    for (int i = 0, j = 0; i < 3; i++, nverts++) {
+      copy_vec3(vertices[nverts].position, posn[indices[j++] - 1]);
+      copy_vec2(vertices[nverts].tex_coord, tex[indices[j++] - 1]);
+      copy_vec3(vertices[nverts].normal, norms[indices[j++] - 1]);
+    }
     fstart = ++c;
   }
+  printf("%ld\n", nverts);
 
   return fstart;
 }
@@ -190,7 +190,7 @@ int load_obj_file(struct geometry *geom, struct pbr_material *mat,
         ptr = parse_vlines(ptr, nv, nvn, nvt, posn, norms, tex);
         break;
       case 'f':
-        ptr = parse_flines(ptr, nf, posn, norms, tex, vertices);
+        ptr = parse_flines(ptr, posn, norms, tex, vertices);
         break;
       case 'u':
         // multiple materials not supported.

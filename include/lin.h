@@ -53,6 +53,20 @@ void normalize_vec3(vec3 vec);
 float dot_vec3(const vec3 v1, const vec3 v2);
 
 /**
+ * @brief Copy a vec3 at src into dest.
+ * @param dest The destination vector.
+ * @param src The source vector.
+ */
+void copy_vec3(vec3 dest, const vec3 src);
+
+/**
+ * @brief Copy a vec2 at src into dest.
+ * @param dest The destination vector.
+ * @param src The source vector.
+ */
+void copy_vec2(vec2 dest, const vec2 src);
+
+/**
  * @brief Get the dot product of 2 vec4's
  *
  * @param v1 The first vec4.
