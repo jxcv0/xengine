@@ -181,14 +181,6 @@ static char *parse_flines(char *fstart, vec3 *posn, vec3 *norms, vec2 *tex,
 /**
  * ----------------------------------------------------------------------------
  */
-static void handle_usemtl(char *line, struct pbr_material *mat) {
-  (void)line;
-  (void)mat;
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
 /*
 static int cmpvertex(struct vertex v1, struct vertex v2) {
  if (cmp_vec3(v1.position, v2.position) &&
@@ -202,8 +194,24 @@ static int cmpvertex(struct vertex v1, struct vertex v2) {
 /**
  * ----------------------------------------------------------------------------
  */
-int load_obj_file(struct geometry *geom, struct pbr_material *mat,
-                  const char *filepath) {
+static char *load_mtl(struct pbr_material *mat, const char *usemtl_line) {
+  const char *start = usemtl_line + 7;
+  const char *end = strchr(start, '\n');
+  printf("\n");
+  fwrite(start, end - start, 1, stdout);
+  printf("\n");
+  return end;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+int load_obj(struct geometry *geom, struct pbr_material *mat,
+             const char *filepath) {
+  if (geom == NULL || mat == NULL) {
+    return -1;
+  }
+
   char *file = load_file(filepath);
   if (file == NULL) {
     return -1;
@@ -233,8 +241,7 @@ int load_obj_file(struct geometry *geom, struct pbr_material *mat,
   vec3 *posn = malloc(sizeof(vec3) * nv);
   vec3 *norms = malloc(sizeof(vec3) * nvn);
   vec2 *tex = malloc(sizeof(vec2) * nvt);
-  struct vertex *vertices =
-      malloc(sizeof(struct vertex) * nf * 3);  // triangulated
+  struct vertex *vertices = malloc(sizeof(struct vertex) * nf * 3);
   GLuint *indices = malloc(sizeof(GLuint) * nf * 3);
 
   ptr = file;
@@ -248,15 +255,48 @@ int load_obj_file(struct geometry *geom, struct pbr_material *mat,
         ptr = parse_flines(ptr, posn, norms, tex, vertices, indices);
         break;
       case 'u':
-        // multiple materials not supported.
-        if (mat != NULL) {
-          handle_usemtl(ptr, mat);
+        if (strncmp(ptr, "usemtl", 6) == 0) {
+          // multiple materials not supported. Assume this cant fail.
+          ptr = load_mtl(mat, ptr);
         }
         break;
       default:
         break;
     }
   } while ((ptr = strchr(ptr, '\n')) != NULL);
+
+  glGenBuffers(1, &geom->vbo);
+  glGenBuffers(1, &geom->ebo);
+  glGenVertexArrays(1, &geom->vao);
+  glBindVertexArray(geom->vao);
+
+  glBindBuffer(GL_ARRAY_BUFFER, geom->vbo);
+  glBufferData(GL_ARRAY_BUFFER, geom->num_vertices * sizeof(struct vertex),
+               vertices, GL_STATIC_DRAW);
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geom->ebo);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, geom->num_indices * sizeof(uint32_t),
+               indices, GL_STATIC_DRAW);
+
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
+                        (void *)(offsetof(struct vertex, position)));
+
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
+                        (void *)(offsetof(struct vertex, tangent)));
+
+  glEnableVertexAttribArray(2);
+  glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
+                        (void *)(offsetof(struct vertex, bitangent)));
+
+  glEnableVertexAttribArray(3);
+  glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
+                        (void *)(offsetof(struct vertex, normal)));
+
+  glEnableVertexAttribArray(4);
+  glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
+                        (void *)(offsetof(struct vertex, tex_coord)));
 
   free(file);
   free(posn);

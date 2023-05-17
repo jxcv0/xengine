@@ -66,12 +66,9 @@ int main() {
   perspective(projection_matrix, radians(60),
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
-  struct geometry pbr_test_sphere;
-  if (load_geometry(&pbr_test_sphere, "assets/meshes/pbr_test_sphere.geom") ==
-      -1) {
-    exit(EXIT_FAILURE);
-  }
-  if (load_pbr_material(&pbr_test_sphere.material, "ravine_rock") == -1) {
+  struct geometry test_cube;
+  struct pbr_material test_mat;
+  if (load_obj(&test_cube, &test_mat, "assets/meshes/test_cube.obj") == -1) {
     exit(EXIT_FAILURE);
   }
 
@@ -113,7 +110,7 @@ int main() {
 
     // TODO update model_matrices
     pbrd_render_geometries(projection_matrix, view_matrix, identities,
-                           &pbr_test_sphere, 1);
+                           &test_cube, 1);
     pbrd_render_lighting(&l, 1, camera.m_pos, window_width, window_height);
 
     glfwSwapBuffers(window);
