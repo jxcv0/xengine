@@ -1,5 +1,7 @@
 #include "lin.h"
 
+#include <float.h>
+#include <limits.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -13,7 +15,7 @@
 void print_mat4(const mat4 m) {
   printf("{ ");
   for (int i = 0; i < 4; i++) {
-    printf("{ %f %f %f %f} ", m[i][0], m[i][1], m[i][2], m[i][3]);
+    printf("{ %f %f %f %f } ", m[i][0], m[i][1], m[i][2], m[i][3]);
   }
   printf("}\n");
 }
@@ -77,9 +79,33 @@ void copy_vec3(vec3 dest, const vec3 src) {
 /**
  * ----------------------------------------------------------------------------
  */
+int cmp_vec3(vec3 v1, vec3 v2) {
+  for (int i = 0; i < 3; i++) {
+    if (fabs(v1[i] - v2[i]) > FLT_EPSILON) {
+      return 0;
+    }
+  }
+  return 1;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
 void copy_vec2(vec2 dest, const vec2 src) {
   dest[0] = src[0];
   dest[1] = src[1];
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+int cmp_vec2(vec2 v1, vec2 v2) {
+  for (int i = 0; i < 2; i++) {
+    if (fabs(v1[i] - v2[i]) > FLT_EPSILON) {
+      return 0;
+    }
+  }
+  return 1;
 }
 
 /**

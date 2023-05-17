@@ -109,12 +109,12 @@ static char *parse_vlines(char *vstart, size_t nposn, size_t nnorm, size_t ntex,
 /**
  * ----------------------------------------------------------------------------
  */
-static char *parse_flines(char *fstart, vec3 *posn, vec3 *norms,
-                          vec2 *tex, struct vertex *vertices) {
+static char *parse_flines(char *fstart, vec3 *posn, vec3 *norms, vec2 *tex,
+                          struct vertex *vertices, GLuint *indices) {
   size_t nverts = 0;
-  while(*fstart != '\0') {
+  while (*fstart != '\0') {
     int i = 0;
-    size_t indices[9] = {0};
+    size_t fidx[9] = {0};
     char *c = fstart;
     for (; *c != '\0' && *c != '\n' && i < 9; c++) {
       if (!isdigit(*c)) {
@@ -122,20 +122,58 @@ static char *parse_flines(char *fstart, vec3 *posn, vec3 *norms,
       }
 
       while (isdigit(*c)) {
-        indices[i] = (indices[i] * 10) + (*c - '0');
+        fidx[i] = (fidx[i] * 10) + (*c - '0');
         ++c;
       }
       ++i;
     }
-    
+
+    assert((fidx[2] == fidx[5]) && (fidx[5] == fidx[8]));
     for (int i = 0, j = 0; i < 3; i++, nverts++) {
-      copy_vec3(vertices[nverts].position, posn[indices[j++] - 1]);
-      copy_vec2(vertices[nverts].tex_coord, tex[indices[j++] - 1]);
-      copy_vec3(vertices[nverts].normal, norms[indices[j++] - 1]);
+      copy_vec3(vertices[nverts].position, posn[fidx[j++] - 1]);
+      copy_vec2(vertices[nverts].tex_coord, tex[fidx[j++] - 1]);
+      copy_vec3(vertices[nverts].normal, norms[fidx[j++] - 1]);
     }
+
+    // tangent + bitangent
+    vec3 e1, e2;
+    e1[0] = vertices[nverts - 2].position[0] - vertices[nverts - 3].position[0];
+    e1[1] = vertices[nverts - 2].position[1] - vertices[nverts - 3].position[1];
+    e1[2] = vertices[nverts - 2].position[2] - vertices[nverts - 3].position[2];
+    e2[0] = vertices[nverts - 1].position[0] - vertices[nverts - 3].position[0];
+    e2[1] = vertices[nverts - 1].position[1] - vertices[nverts - 3].position[1];
+    e2[2] = vertices[nverts - 1].position[2] - vertices[nverts - 3].position[2];
+
+    vec3 duv1, duv2;
+    duv1[0] =
+        vertices[nverts - 2].tex_coord[0] - vertices[nverts - 3].tex_coord[0];
+    duv1[1] =
+        vertices[nverts - 2].tex_coord[1] - vertices[nverts - 3].tex_coord[1];
+    duv2[0] =
+        vertices[nverts - 1].tex_coord[0] - vertices[nverts - 3].tex_coord[0];
+    duv2[1] =
+        vertices[nverts - 1].tex_coord[1] - vertices[nverts - 3].tex_coord[1];
+
+    float f = 1.0f / (duv1[0] * duv2[1] - duv2[0] * duv1[1]);
+    for (int i = 1; i <= 3; i++) {
+      vertices[nverts - i].tangent[0] = f * (duv2[1] * e1[0] - duv1[1] * e2[0]);
+      vertices[nverts - i].tangent[1] = f * (duv2[1] * e1[1] - duv1[1] * e2[1]);
+      vertices[nverts - i].tangent[2] = f * (duv2[1] * e1[2] - duv1[1] * e2[2]);
+      vertices[nverts - i].bitangent[0] =
+          f * (-duv2[0] * e1[0] - duv1[0] * e2[0]);
+      vertices[nverts - i].bitangent[1] =
+          f * (-duv2[0] * e1[1] - duv1[0] * e2[1]);
+      vertices[nverts - i].bitangent[2] =
+          f * (-duv2[0] * e1[2] - duv1[0] * e2[2]);
+    }
+
     fstart = ++c;
   }
-  printf("%ld\n", nverts);
+
+  // TODO do proper indices
+  for (size_t i = 0; i < nverts; i++) {
+    indices[i] = i;
+  }
 
   return fstart;
 }
@@ -143,7 +181,23 @@ static char *parse_flines(char *fstart, vec3 *posn, vec3 *norms,
 /**
  * ----------------------------------------------------------------------------
  */
-static void handle_usemtl(char *line, struct pbr_material *mat) {}
+static void handle_usemtl(char *line, struct pbr_material *mat) {
+  (void)line;
+  (void)mat;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+/*
+static int cmpvertex(struct vertex v1, struct vertex v2) {
+ if (cmp_vec3(v1.position, v2.position) &&
+     cmp_vec2(v1.tex_coord, v2.tex_coord) && cmp_vec3(v1.normal, v2.normal)) {
+   return 1;
+ }
+ return 0;
+}
+*/
 
 /**
  * ----------------------------------------------------------------------------
@@ -181,6 +235,7 @@ int load_obj_file(struct geometry *geom, struct pbr_material *mat,
   vec2 *tex = malloc(sizeof(vec2) * nvt);
   struct vertex *vertices =
       malloc(sizeof(struct vertex) * nf * 3);  // triangulated
+  GLuint *indices = malloc(sizeof(GLuint) * nf * 3);
 
   ptr = file;
   do {
@@ -190,7 +245,7 @@ int load_obj_file(struct geometry *geom, struct pbr_material *mat,
         ptr = parse_vlines(ptr, nv, nvn, nvt, posn, norms, tex);
         break;
       case 'f':
-        ptr = parse_flines(ptr, posn, norms, tex, vertices);
+        ptr = parse_flines(ptr, posn, norms, tex, vertices, indices);
         break;
       case 'u':
         // multiple materials not supported.
@@ -208,6 +263,7 @@ int load_obj_file(struct geometry *geom, struct pbr_material *mat,
   free(norms);
   free(tex);
   free(vertices);
+  free(indices);
 
   return 0;
 }
