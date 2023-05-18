@@ -32,10 +32,10 @@ struct camera {
   float m_pitch;
   float m_movement_speed;
   float m_mouse_sensetivity;
-  vec3 m_pos;
-  vec3 m_view_dir;
-  vec3 m_up;
-  vec3 m_right;
+  float m_pos[3];
+  float m_view_dir[3];
+  float m_up[3];
+  float m_right[3];
 };
 
 /**
@@ -47,15 +47,15 @@ struct pbr_material {
   GLuint normal;
   GLuint roughness;
   GLuint metallic;
-  // uint32_t displacement;
+  // GLuint displacement;
 };
 
 struct vertex {
-  vec3 position;
-  vec2 tex_coord;
-  vec3 normal;
-  vec3 tangent;
-  vec3 bitangent;
+  float position[3];
+  float tex_coord[2];
+  float normal[3];
+  float tangent[3];
+  float bitangent[3];
 };
 
 /**
@@ -74,7 +74,7 @@ struct geometry {
 
 struct position {
   union {
-    vec3 vec;
+    float vec[3];
     struct {
       float x;
       float y;

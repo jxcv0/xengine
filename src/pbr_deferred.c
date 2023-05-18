@@ -187,6 +187,7 @@ int pbrd_init(const uint32_t scr_w, const uint32_t scr_h) {
 void pbrd_render_geometries(const mat4 projection, const mat4 view,
                             const mat4 *model_matrices,
                             const struct geometry *geometries,
+                            const struct pbr_material *materials,
                             const uint32_t n) {
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -205,15 +206,14 @@ void pbrd_render_geometries(const mat4 projection, const mat4 view,
     shader_set_uniform_1i(pbr.deferred_geometry, "tex_metallic", 3);
     // shader_set_uniform_1i(pbr.deferred_geometry, "tex_displacement", 4);
 
-    const struct geometry *geom = &geometries[i];
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, geom->material.diffuse);
+    glBindTexture(GL_TEXTURE_2D, materials[i].diffuse);
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, geom->material.roughness);
+    glBindTexture(GL_TEXTURE_2D, materials[i].roughness);
     glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, geom->material.normal);
+    glBindTexture(GL_TEXTURE_2D, materials[i].normal);
     glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, geom->material.metallic);
+    glBindTexture(GL_TEXTURE_2D, materials[i].metallic);
     // glActiveTexture(GL_TEXTURE4);
     // glBindTexture(GL_TEXTURE_2D, materials[i].displacement);
 

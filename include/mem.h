@@ -7,6 +7,7 @@
 
 // change to wider int here if more than 31 components required
 typedef uint32_t cmpnt_t;
+
 #define NUM_COMPONENT_TYPES ((sizeof(cmpnt_t) * 8) - 1)
 #define MAX_NUM_ENTITIES 2048
 #define ENTITY_UNUSED (1 << NUM_COMPONENT_TYPES)

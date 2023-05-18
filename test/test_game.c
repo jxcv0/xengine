@@ -66,16 +66,20 @@ int main() {
   perspective(projection_matrix, radians(60),
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
-  struct geometry test_cube;
-  struct pbr_material test_mat;
-  if (load_obj(&test_cube, "test_cube.mesh") == -1) {
+  uint32_t e1;
+  mem_create_entity(&e1);
+  mem_add_component(e1, GEOMETRY);
+  mem_add_component(e1, MATERIAL);
+
+  if (load_obj((struct geometry *)mem_component(e1, GEOMETRY),
+               "test_cube.mesh") == -1) {
     exit(EXIT_FAILURE);
   }
 
-  if (load_pbr_material(&test_mat, "ravine_rock") == -1) {
+  if (load_pbr_material((struct pbr_material *)mem_component(e1, MATERIAL),
+                        "ravine_rock") == -1) {
     exit(EXIT_FAILURE);
   }
-  test_cube.material = test_mat;
 
   struct light l = LIGHT_RANGE_3250;
   l.position[0] = 3.0;
@@ -106,6 +110,7 @@ int main() {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
       glfwSetWindowShouldClose(window, true);
     }
+
     get_cursor_position(&mouse_pos, window);
     vec2 cursor_offset;
     get_cursor_offset(cursor_offset, &mouse_pos);
@@ -115,7 +120,9 @@ int main() {
 
     // TODO update model_matrices
     pbrd_render_geometries(projection_matrix, view_matrix, identities,
-                           &test_cube, 1);
+                           (struct geometry *)mem_component(e1, GEOMETRY),
+                           (struct pbr_material *)mem_component(e1, MATERIAL),
+                           1);
     pbrd_render_lighting(&l, 1, camera.m_pos, window_width, window_height);
 
     glfwSwapBuffers(window);
