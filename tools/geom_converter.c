@@ -62,13 +62,14 @@ int main(int argc, char *argv[]) {
 }
 
 void process_node(struct aiNode *node, const struct aiScene *scene) {
-  if (node->mNumMeshes != 1) {
-      fprintf(stderr, "Only single mesh models supported. %u found.\n", node->mNumMeshes);
-      exit(EXIT_FAILURE);
+  for (unsigned int i = 0; i < node->mNumMeshes; i++) {
+    struct aiMesh *m = scene->mMeshes[node->mMeshes[i]];
+    process_mesh(m, scene);
   }
 
-  struct aiMesh *m = scene->mMeshes[node->mMeshes[0]];
-  process_mesh(m, scene);
+  for (unsigned int i = 0; i < node->mNumChildren; i++) {
+    process_node(node->mChildren[i], scene);
+  }
 }
 
 void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
