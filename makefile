@@ -71,5 +71,5 @@ clean:
 	@rm -rf build/*
 	@rm -rf bin/*
 
-format: $(wildcard $(xen_include_dir)/*.h) $(wildcard $(xen_src_dir)/*.c) $(wildcard test/*.c)
+format: $(wildcard $(xen_include_dir)/*.h) $(wildcard $(xen_src_dir)/*.c) $(wildcard test/*.c) $(wildcard tools/*.c)
 	@clang-format -i -style=google $^

@@ -1,4 +1,3 @@
-#include <glad.h>
 #include <assert.h>
 #include <assimp/cimport.h>
 #include <assimp/material.h>
@@ -6,13 +5,14 @@
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 #include <assimp/types.h>
+#include <glad.h>
+#include <libgen.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <libgen.h>
 
 #include "assets.h"
 
@@ -29,20 +29,20 @@ char *process_material(struct aiMaterial *mat, enum aiTextureType);
 
 int main(int argc, char *argv[]) {
   if (argc != 3) {
-      printf("Usage:\n\tgeom_converter <infile> <outfile>\n");
-      exit(EXIT_FAILURE);
+    printf("Usage:\n\tgeom_converter <infile> <outfile>\n");
+    exit(EXIT_FAILURE);
   }
 
   infile = fopen(argv[1], "rb");
   if (infile == NULL) {
-      perror("Unable to open input file");
-      exit(EXIT_FAILURE);
+    perror("Unable to open input file");
+    exit(EXIT_FAILURE);
   }
 
   outfile = fopen(argv[2], "wb+");
   if (outfile == NULL) {
-      perror("Unable to open output file");
-      exit(EXIT_FAILURE);
+    perror("Unable to open output file");
+    exit(EXIT_FAILURE);
   }
 
   const struct aiScene *scene =
@@ -62,21 +62,30 @@ int main(int argc, char *argv[]) {
 }
 
 void process_node(struct aiNode *node, const struct aiScene *scene) {
+  if (scene->mNumMeshes != 1) {
+    fprintf(stderr,
+            "Only files with a single mesh are supported. Scene contains %u "
+            "meshes.\n",
+            scene->mNumMeshes);
+    exit(EXIT_FAILURE);
+  }
+
   for (unsigned int i = 0; i < node->mNumMeshes; i++) {
+    printf("Processing mesh %u of %u.\n", i + 1, node->mNumMeshes);
     struct aiMesh *m = scene->mMeshes[node->mMeshes[i]];
     process_mesh(m, scene);
   }
 
   for (unsigned int i = 0; i < node->mNumChildren; i++) {
+    printf("Processing child node %u of %u.\n", i + 1, node->mNumChildren);
     process_node(node->mChildren[i], scene);
   }
 }
 
 void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
-  (void) scene;
+  (void)scene;
   size_t num_vertices = mesh->mNumVertices;
   size_t num_indices = mesh->mNumFaces * 3;
-
 
   size_t vertices_size = sizeof(struct vertex) * num_vertices;
   size_t indices_size = sizeof(GLuint) * num_indices;
