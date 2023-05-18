@@ -15,7 +15,7 @@
 /**
  * ----------------------------------------------------------------------------
  */
-static char *load_file(const char *filepath) {
+static char *load_file(const char *filepath, size_t *size) {
   FILE *file = fopen(filepath, "rb");
   if (file == NULL) {
     perror("fopen");
@@ -38,7 +38,7 @@ static char *load_file(const char *filepath) {
   char *buff = malloc(filesize + 1);  // + 1 for '\0'
   rewind(file);
 
-  fread(buff, filesize, 1, file);
+  *size = fread(buff, filesize, 1, file);
 
   fclose(file);
   buff[filesize] = '\0';
@@ -49,353 +49,48 @@ static char *load_file(const char *filepath) {
 /**
  * ----------------------------------------------------------------------------
  */
-static void count_vline(char c, size_t *nv, size_t *nvn, size_t *nvt) {
-  switch (c) {
-    case ' ':
-      ++(*nv);
-      break;
-    case 'n':
-      ++(*nvn);
-      break;
-    case 't':
-      ++(*nvt);
-      break;
-  }
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-static void parse_v3(char *line, vec3 *v) {
-  char *endptr = line;
-  for (size_t i = 0; i < 3; i++) {
-    (*v)[i] = strtof(endptr, &endptr);
-  }
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-static void parse_v2(char *line, vec2 *v) {
-  char *endptr = line;
-  for (size_t i = 0; i < 2; i++) {
-    (*v)[i] = strtof(endptr, &endptr);
-  }
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-static char *parse_vlines(char *vstart, size_t nposn, size_t nnorm, size_t ntex,
-                          vec3 *posn, vec3 *norm, vec2 *tex) {
-  for (size_t i = 0; i < nposn; i++) {
-    parse_v3(&vstart[2], &posn[i]);
-    vstart = strchr(vstart, '\n') + 1;
-  }
-
-  for (size_t i = 0; i < nnorm; i++) {
-    parse_v3(&vstart[3], &norm[i]);
-    vstart = strchr(vstart, '\n') + 1;
-  }
-
-  for (size_t i = 0; i < ntex; i++) {
-    parse_v2(&vstart[3], &tex[i]);
-    vstart = strchr(vstart, '\n') + 1;
-  }
-
-  return vstart;
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-static char *parse_flines(char *fstart, vec3 *posn, vec3 *norms, vec2 *tex,
-                          struct vertex *vertices, GLuint *indices) {
-  size_t nverts = 0;
-  while (*fstart != '\0') {
-    int i = 0;
-    size_t fidx[9] = {0};
-    char *c = fstart;
-    for (; *c != '\0' && *c != '\n' && i < 9; c++) {
-      if (!isdigit(*c)) {
-        continue;
-      }
-
-      while (isdigit(*c)) {
-        fidx[i] = (fidx[i] * 10) + (*c - '0');
-        ++c;
-      }
-      ++i;
-    }
-
-    assert((fidx[2] == fidx[5]) && (fidx[5] == fidx[8]));
-    for (int i = 0, j = 0; i < 3; i++, nverts++) {
-      copy_vec3(vertices[nverts].position, posn[fidx[j++] - 1]);
-      copy_vec2(vertices[nverts].tex_coord, tex[fidx[j++] - 1]);
-      copy_vec3(vertices[nverts].normal, norms[fidx[j++] - 1]);
-    }
-
-    // tangent + bitangent
-    vec3 e1, e2;
-    e1[0] = vertices[nverts - 2].position[0] - vertices[nverts - 3].position[0];
-    e1[1] = vertices[nverts - 2].position[1] - vertices[nverts - 3].position[1];
-    e1[2] = vertices[nverts - 2].position[2] - vertices[nverts - 3].position[2];
-    e2[0] = vertices[nverts - 1].position[0] - vertices[nverts - 3].position[0];
-    e2[1] = vertices[nverts - 1].position[1] - vertices[nverts - 3].position[1];
-    e2[2] = vertices[nverts - 1].position[2] - vertices[nverts - 3].position[2];
-
-    vec3 duv1, duv2;
-    duv1[0] =
-        vertices[nverts - 2].tex_coord[0] - vertices[nverts - 3].tex_coord[0];
-    duv1[1] =
-        vertices[nverts - 2].tex_coord[1] - vertices[nverts - 3].tex_coord[1];
-    duv2[0] =
-        vertices[nverts - 1].tex_coord[0] - vertices[nverts - 3].tex_coord[0];
-    duv2[1] =
-        vertices[nverts - 1].tex_coord[1] - vertices[nverts - 3].tex_coord[1];
-
-    float f = 1.0f / (duv1[0] * duv2[1] - duv2[0] * duv1[1]);
-    for (int i = 1; i <= 3; i++) {
-      vertices[nverts - i].tangent[0] = f * (duv2[1] * e1[0] - duv1[1] * e2[0]);
-      vertices[nverts - i].tangent[1] = f * (duv2[1] * e1[1] - duv1[1] * e2[1]);
-      vertices[nverts - i].tangent[2] = f * (duv2[1] * e1[2] - duv1[1] * e2[2]);
-      vertices[nverts - i].bitangent[0] =
-          f * (-duv2[0] * e1[0] - duv1[0] * e2[0]);
-      vertices[nverts - i].bitangent[1] =
-          f * (-duv2[0] * e1[1] - duv1[0] * e2[1]);
-      vertices[nverts - i].bitangent[2] =
-          f * (-duv2[0] * e1[2] - duv1[0] * e2[2]);
-    }
-
-    fstart = ++c;
-  }
-
-  // TODO do proper indices
-  for (size_t i = 0; i < nverts; i++) {
-    indices[i] = i;
-  }
-
-  return fstart;
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-/*
-static int cmpvertex(struct vertex v1, struct vertex v2) {
- if (cmp_vec3(v1.position, v2.position) &&
-     cmp_vec2(v1.tex_coord, v2.tex_coord) && cmp_vec3(v1.normal, v2.normal)) {
-   return 1;
- }
- return 0;
-}
-*/
-
-/**
- * ----------------------------------------------------------------------------
- */
-static char *load_mtl(struct pbr_material *mat, const char *usemtl_line) {
-  const char *start = usemtl_line + 7;
-  const char *end = strchr(start, '\n');
-  printf("\n");
-  fwrite(start, end - start, 1, stdout);
-  printf("\n");
-  return end;
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-int load_obj(struct geometry *geom, struct pbr_material *mat,
-             const char *filepath) {
-  if (geom == NULL || mat == NULL) {
-    return -1;
-  }
-
-  char *file = load_file(filepath);
-  if (file == NULL) {
-    return -1;
-  }
-
-  size_t nv = 0;
-  size_t nvn = 0;
-  size_t nvt = 0;
-  size_t nf = 0;
-
-  char *ptr = file;
-  do {
-    ++ptr;
-    switch (ptr[0]) {
-      case 'v':
-        count_vline(ptr[1], &nv, &nvn, &nvt);
-        break;
-      case 'f':
-        ++nf;
-        break;
-      default:
-        break;
-    }
-  } while ((ptr = strchr(ptr, '\n')) != NULL);
-
-  // TODO this can be one malloc
-  vec3 *posn = malloc(sizeof(vec3) * nv);
-  vec3 *norms = malloc(sizeof(vec3) * nvn);
-  vec2 *tex = malloc(sizeof(vec2) * nvt);
-  struct vertex *vertices = malloc(sizeof(struct vertex) * nf * 3);
-  GLuint *indices = malloc(sizeof(GLuint) * nf * 3);
-
-  ptr = file;
-  do {
-    ++ptr;
-    switch (ptr[0]) {
-      case 'v':
-        ptr = parse_vlines(ptr, nv, nvn, nvt, posn, norms, tex);
-        break;
-      case 'f':
-        ptr = parse_flines(ptr, posn, norms, tex, vertices, indices);
-        break;
-      case 'u':
-        if (strncmp(ptr, "usemtl", 6) == 0) {
-          // multiple materials not supported. Assume this cant fail.
-          ptr = load_mtl(mat, ptr);
-        }
-        break;
-      default:
-        break;
-    }
-  } while ((ptr = strchr(ptr, '\n')) != NULL);
-
-  glGenBuffers(1, &geom->vbo);
-  glGenBuffers(1, &geom->ebo);
-  glGenVertexArrays(1, &geom->vao);
-  glBindVertexArray(geom->vao);
-
-  glBindBuffer(GL_ARRAY_BUFFER, geom->vbo);
-  glBufferData(GL_ARRAY_BUFFER, geom->num_vertices * sizeof(struct vertex),
-               vertices, GL_STATIC_DRAW);
-
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geom->ebo);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, geom->num_indices * sizeof(uint32_t),
-               indices, GL_STATIC_DRAW);
-
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-                        (void *)(offsetof(struct vertex, position)));
-
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-                        (void *)(offsetof(struct vertex, tangent)));
-
-  glEnableVertexAttribArray(2);
-  glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-                        (void *)(offsetof(struct vertex, bitangent)));
-
-  glEnableVertexAttribArray(3);
-  glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-                        (void *)(offsetof(struct vertex, normal)));
-
-  glEnableVertexAttribArray(4);
-  glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-                        (void *)(offsetof(struct vertex, tex_coord)));
-
-  free(file);
-  free(posn);
-  free(norms);
-  free(tex);
-  free(vertices);
-  free(indices);
-
-  return 0;
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-static GLuint prv_load_texture(const char *filepath) {
-  static GLint format_table[] = {GL_RGBA, GL_RED, GL_RGBA, GL_RGB, GL_RGBA};
-  printf("Loading texture from \"%s\".\n", filepath);
-  // stbi_set_flip_vertically_on_load(true);
-  int w, h, n;
-  unsigned char *data = stbi_load(filepath, &w, &h, &n, 0);
-  assert(data != NULL);  // filename may not exist.
-
-  uint32_t id;
-  glGenTextures(1, &id);
-  glBindTexture(GL_TEXTURE_2D, id);
-
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-  glTexImage2D(GL_TEXTURE_2D, 0, format_table[n], w, h, 0, format_table[n],
-               GL_UNSIGNED_BYTE, data);
-
-  free(data);
-  return id;
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-int load_geometry(struct geometry *geom, const char *filepath) {
-  if (geom == NULL) {
-    return -1;
-  }
-
+int load_obj(struct geometry *geom, const char *filepath) {
   printf("Loading geometry from \"%s\".\n", filepath);
-  char *file = load_file(filepath);
+  size_t filesize;
+  char *file = load_file(filepath, &filesize);
 
-  printf("%s\n", file);
-  return -1;
-  // vertices
-  char *pos = strstr(file, "VERTICES");
-  if (pos == NULL) {
+  if (strncmp(file, "VERTICES", 8) != 0) {
     fprintf(stderr, "VERTICES tag not found.\n");
-    free(file);
     return -1;
   }
 
-  geom->num_vertices = strtol(&pos[9], NULL, 10);
-  if (pos == NULL) {
-    free(file);
-    return -1;
-  }
+  geom->num_vertices = strtol(&file[9], NULL, 10);
 
-  size_t n = sizeof(struct vertex) * geom->num_vertices;
-  struct vertex *vertices = calloc(geom->num_vertices, sizeof(struct vertex));
+  size_t verts_size = sizeof(struct vertex) * geom->num_vertices;
+  struct vertex *vertices = malloc(verts_size);
   if (vertices == NULL) {
-    perror("calloc");
+    perror("malloc");
     free(file);
     return -1;
   }
 
-  memcpy(vertices, pos, n);
-  pos += n;
+  char *verts_start = strchr(file, '\n') + 1;
+  memcpy(vertices, verts_start, verts_size);
 
-  pos = strstr(file, "INDICES");
-  if (pos == NULL) {
+  char *indices_tag = verts_start + verts_size + 1;
+  if (strncmp(indices_tag, "INDICES", 7) != 0) {
     fprintf(stderr, "INDICES tag not found.\n");
-    free(file);
     return -1;
   }
 
-  geom->num_indices = strtol(&pos[8], NULL, 10);
-  if (pos == NULL) {
-    free(file);
-    return -1;
-  }
+  geom->num_indices = strtol(&indices_tag[8], NULL, 10);
 
-  n = sizeof(uint32_t) * geom->num_indices;
-  uint32_t *indices = calloc(geom->num_indices, sizeof(uint32_t));
+  size_t indices_size = sizeof(GLuint) * geom->num_indices;
+  GLuint *indices = malloc(indices_size);
   if (indices == NULL) {
-    perror("calloc");
+    perror("malloc");
     free(vertices);
     free(file);
     return -1;
   }
 
-  memcpy(indices, pos, n);
+  char *indices_start = strchr(indices_tag, '\n') + 1;
+  memcpy(indices, indices_start, indices_size);
 
   glGenBuffers(1, &geom->vbo);
   glGenBuffers(1, &geom->ebo);
@@ -465,6 +160,33 @@ int load_pbr_material(struct pbr_material *mat, const char *material_name) {
   // mat.displacement = load_texture(buff);
 
   return 0;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+static GLuint prv_load_texture(const char *filepath) {
+  static GLint format_table[] = {GL_RGBA, GL_RED, GL_RGBA, GL_RGB, GL_RGBA};
+  printf("Loading texture from \"%s\".\n", filepath);
+  // stbi_set_flip_vertically_on_load(true);
+  int w, h, n;
+  unsigned char *data = stbi_load(filepath, &w, &h, &n, 0);
+  assert(data != NULL);  // filename may not exist.
+
+  uint32_t id;
+  glGenTextures(1, &id);
+  glBindTexture(GL_TEXTURE_2D, id);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+  glTexImage2D(GL_TEXTURE_2D, 0, format_table[n], w, h, 0, format_table[n],
+               GL_UNSIGNED_BYTE, data);
+
+  free(data);
+  return id;
 }
 
 /**

@@ -93,7 +93,6 @@ void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
   GLuint *indices = malloc(indices_size);
 
   char *mesh_name = mesh->mName.data;
-
   printf("Loading mesh: %s.\n", mesh_name);
   printf("Copying %d vertices.\n", mesh->mNumVertices);
 
@@ -139,11 +138,11 @@ void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
 
   printf("Writing to output file...\n");
 
-  fprintf(outfile, "VERTICES %ld\n", vertices_size);
+  fprintf(outfile, "VERTICES %ld\n", num_vertices);
   fwrite(vertices, sizeof(struct vertex), num_vertices, outfile);
   fprintf(outfile, "\n");
 
-  fprintf(outfile, "INDICES %ld\n", indices_size);
+  fprintf(outfile, "INDICES %ld\n", num_indices);
   fwrite(indices, sizeof(GLuint), num_indices, outfile);
   fprintf(outfile, "\n");
 }

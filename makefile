@@ -18,7 +18,7 @@ c_comp := gcc
 format_cmd := "/usr/bin/clang-format -i -style=Google"
 
 # TODO make tools target
-all: tests
+all: geom_converter tests
 
 $(build_dir)/%.o: %.c
 	@echo "Building object $@"

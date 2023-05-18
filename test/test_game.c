@@ -68,9 +68,14 @@ int main() {
 
   struct geometry test_cube;
   struct pbr_material test_mat;
-  if (load_obj(&test_cube, &test_mat, "assets/meshes/test_cube.obj") == -1) {
+  if (load_obj(&test_cube, "test_cube.mesh") == -1) {
     exit(EXIT_FAILURE);
   }
+
+  if (load_pbr_material(&test_mat, "ravine_rock") == -1) {
+    exit(EXIT_FAILURE);
+  }
+  test_cube.material = test_mat;
 
   struct light l = LIGHT_RANGE_3250;
   l.position[0] = 3.0;
