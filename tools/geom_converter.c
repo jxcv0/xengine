@@ -138,11 +138,7 @@ void process_mesh(struct aiMesh *mesh, const struct aiScene *scene) {
 
   printf("Writing to output file...\n");
 
-  fprintf(outfile, "VERTICES %ld\n", num_vertices);
+  fprintf(outfile, "%ld %ld\n", num_vertices, num_indices);
   fwrite(vertices, sizeof(struct vertex), num_vertices, outfile);
-  fprintf(outfile, "\n");
-
-  fprintf(outfile, "INDICES %ld\n", num_indices);
   fwrite(indices, sizeof(GLuint), num_indices, outfile);
-  fprintf(outfile, "\n");
 }

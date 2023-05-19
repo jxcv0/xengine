@@ -47,50 +47,29 @@ static char *load_file(const char *filepath) {
  * ----------------------------------------------------------------------------
  */
 int load_obj(struct geometry *geom, const char *filepath) {
-  printf("Loading geometry from \"%s\".\n", filepath);
   char *file = load_file(filepath);
 
   if (file == NULL) {
     return -1;
   }
 
-  if (strncmp(file, "VERTICES", 8) != 0) {
-    fprintf(stderr, "VERTICES tag not found.\n");
-    return -1;
+  size_t header[2];
+  char *endptr = file;
+  for (int i = 0; i < 2; i++) {
+    header[i] = strtol(endptr, &endptr, 10);
+    printf("%ld\n", header[i]);
   }
 
-  geom->num_vertices = strtol(&file[9], NULL, 10);
-
-  size_t verts_size = sizeof(struct vertex) * geom->num_vertices;
+  size_t verts_size = sizeof(struct vertex) * header[0];
+  size_t indices_size = sizeof(GLuint) * header[1];
   struct vertex *vertices = malloc(verts_size);
-  if (vertices == NULL) {
-    perror("malloc");
-    free(file);
-    return -1;
-  }
-
-  char *verts_start = strchr(file, '\n') + 1;
-  memcpy(vertices, verts_start, verts_size);
-
-  char *indices_tag = verts_start + verts_size + 1;
-  if (strncmp(indices_tag, "INDICES", 7) != 0) {
-    fprintf(stderr, "INDICES tag not found.\n");
-    return -1;
-  }
-
-  geom->num_indices = strtol(&indices_tag[8], NULL, 10);
-
-  size_t indices_size = sizeof(GLuint) * geom->num_indices;
   GLuint *indices = malloc(indices_size);
-  if (indices == NULL) {
-    perror("malloc");
-    free(vertices);
-    free(file);
-    return -1;
-  }
 
-  char *indices_start = strchr(indices_tag, '\n') + 1;
-  memcpy(indices, indices_start, indices_size);
+  memcpy(vertices, endptr + 1, verts_size);
+  memcpy(indices, endptr + 1 + verts_size, indices_size);
+
+  geom->num_vertices = header[0];
+  geom->num_indices = header[1];
 
   glGenBuffers(1, &geom->vbo);
   glGenBuffers(1, &geom->ebo);
