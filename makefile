@@ -18,15 +18,12 @@ c_comp := gcc
 format_cmd := "/usr/bin/clang-format -i -style=Google"
 
 # TODO make tools target
-all: geom_converter tests
+all: tools tests
 
 $(build_dir)/%.o: %.c
 	@echo "Building object $@"
 	@if [ ! -d $(build_dir)/% ]; then mkdir -p $(build_dir)/$(dir $<); fi
 	@$(c_comp) $< $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_include_dir) $(libs) -c -o $@
-
-geom_converter: libglad.a libstb.a libxen.a
-	@$(c_comp) tools/geom_converter.c $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_include_dir) $(xen_lib) $(libs) -lassimp -o $(bin_dir)/geom_converter
 
 libxen.a: $(patsubst %.c, $(build_dir)/%.o, $(wildcard $(xen_src_dir)/*.c))
 	@echo "Building static library $@"
@@ -42,6 +39,14 @@ libstb.a:
 	@$(c_comp) $(cflags) -I$(stb_src_dir) $(stb_src_dir)/stb_truetype.c -c -o $(build_dir)/stb_truetype.o
 	@echo "Building static library $@"
 	@ar rcs $(build_dir)/$@ $(build_dir)/stb_truetype.o $(build_dir)/stb_image.o
+
+tools: geom_converter tex_converter
+
+geom_converter: libglad.a libstb.a libxen.a
+	@$(c_comp) tools/geom_converter.c $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_include_dir) $(xen_lib) $(libs) -lassimp -o $(bin_dir)/$@
+
+tex_converter: libglad.a libstb.a libxen.a
+	@$(c_comp) tools/tex_converter.c $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_include_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
 
 tests: test_game lin_tests buffer_tests mem_tests asset_tests
 

@@ -28,6 +28,7 @@ typedef uint32_t cmpnt_t;
 // bitmasks
 #define GEOMETRY_BIT (1 << GEOMETRY)
 #define MATERIAL_BIT (1 << MATERIAL)
+#define MODEL_MATRIX_BIT (1 << MODEL_MATRIX)
 #define POSITION_BIT (1 << POSITION)
 #define LOAD_REQUEST_BIT (1 << LOAD_REQUEST)
 

@@ -9,9 +9,18 @@ static uint32_t entity_buf[MAX_NUM_ENTITIES];
 /**
  * ----------------------------------------------------------------------------
  */
+void sys_update_model_matrices(void) {
+  cmpnt_t mask = POSITION_BIT | MODEL_MATRIX_BIT;
+  size_t nent = mem_count(mask);
+  mem_entities(mask, entity_buf);
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
 void sys_render_geometries(struct renderer *r, float projection[4][4],
                            float view[4][4]) {
-  uint32_t mask = GEOMETRY_BIT | MATERIAL_BIT | MODEL_MATRIX;
+  cmpnt_t mask = GEOMETRY_BIT | MATERIAL_BIT | MODEL_MATRIX_BIT;
   size_t nent = mem_count(mask);
   mem_entities(mask, entity_buf);
 
@@ -35,7 +44,7 @@ void sys_render_geometries(struct renderer *r, float projection[4][4],
 
   for (size_t i = 0; i < nent; i++) {
     shader_set_uniform_m4fv(r->deferred_geometry, "model",
-                            (float(*)[4])model_buf[i].model_matrix.elem);
+                            model_buf[i].model_matrix.elem);
     shader_set_uniform_1i(r->deferred_geometry, "tex_diffuse", 0);
     shader_set_uniform_1i(r->deferred_geometry, "tex_roughness", 1);
     shader_set_uniform_1i(r->deferred_geometry, "tex_normal", 2);

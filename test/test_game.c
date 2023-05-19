@@ -37,17 +37,6 @@ mat4 view_matrix = {0};
 uint32_t num_geoms = 0;
 struct geometry geometry_arr[MAX_GEOMS] = {0};
 
-struct geometry *alloc_geom(size_t n) {
-  assert(num_geoms < MAX_GEOMS);
-  struct geometry *temp = &geometry_arr[num_geoms];
-  num_geoms += n;
-  return temp;
-}
-
-struct pbr_material *alloc_mat(size_t n) {
-  return calloc(n, sizeof(struct pbr_material));
-};
-
 void update_view_matrix();
 void handle_mouse_movement(GLFWwindow *w, double x, double y);
 void handle_keyboard_input(GLFWwindow *w);
@@ -80,8 +69,16 @@ int main() {
     exit(EXIT_FAILURE);
   }
 
-  if (load_pbr_material((struct pbr_material *)mem_component(e1, MATERIAL),
-                        "ravine_rock") == -1) {
+  /*
+    if (load_pbr_material((struct pbr_material *)mem_component(e1, MATERIAL),
+                          "ravine_rock") == -1) {
+      exit(EXIT_FAILURE);
+    }
+    */
+
+  if (load_mtl((struct pbr_material *)mem_component(e1, MATERIAL),
+               "ravine_rock_diffuse", "ravine_rock_normal",
+               "ravine_rock_roughness", "ravine_rock_metallic") == -1) {
     exit(EXIT_FAILURE);
   }
 

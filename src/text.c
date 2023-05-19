@@ -14,7 +14,7 @@ stbtt_bakedchar baked_chars[96];
 /**
  * ----------------------------------------------------------------------------
  */
-void init_ttf(const char *filepath) {
+void init_ttf(char *filepath) {
   unsigned char *ttf_buffer = load_file_into_mem_u(filepath);
   unsigned char temp_buffer[1024 * 1024];
 
@@ -42,9 +42,8 @@ void init_ttf(const char *filepath) {
 /**
  * ----------------------------------------------------------------------------
  */
-void render_text(const GLuint shader, const mat4 projection,
-                 const vec2 position, const vec4 color, const char *txt,
-                 size_t n) {
+void render_text(GLuint shader, mat4 projection, vec2 position, vec4 color,
+                 char *txt, size_t n) {
   glUseProgram(shader);
   glBindTexture(GL_TEXTURE_2D, texture);
   glBindVertexArray(vao);

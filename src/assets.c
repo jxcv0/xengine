@@ -15,7 +15,7 @@
 /**
  * ----------------------------------------------------------------------------
  */
-static char *load_file(const char *filepath, size_t *size) {
+static char *load_file(const char *filepath) {
   FILE *file = fopen(filepath, "rb");
   if (file == NULL) {
     perror("fopen");
@@ -38,7 +38,7 @@ static char *load_file(const char *filepath, size_t *size) {
   char *buff = malloc(filesize + 1);  // + 1 for '\0'
   rewind(file);
 
-  *size = fread(buff, filesize, 1, file);
+  fread(buff, filesize, 1, file);
 
   fclose(file);
   buff[filesize] = '\0';
@@ -51,8 +51,11 @@ static char *load_file(const char *filepath, size_t *size) {
  */
 int load_obj(struct geometry *geom, const char *filepath) {
   printf("Loading geometry from \"%s\".\n", filepath);
-  size_t filesize;
-  char *file = load_file(filepath, &filesize);
+  char *file = load_file(filepath);
+
+  if (file == NULL) {
+    return -1;
+  }
 
   if (strncmp(file, "VERTICES", 8) != 0) {
     fprintf(stderr, "VERTICES tag not found.\n");
@@ -132,6 +135,45 @@ int load_obj(struct geometry *geom, const char *filepath) {
   return 0;
 }
 
+int load_mtl(struct pbr_material *mat, const char *diffuse, const char *normal,
+             const char *roughness, const char *metallic) {
+  if (mat == NULL) {
+    return -1;
+  }
+
+  char *arr[] = {load_file(diffuse), load_file(normal), load_file(roughness),
+                 load_file(metallic)};
+
+  for (int i = 0; i < 4; i++) {
+    assert(arr[i] != NULL);
+
+    size_t whn[3];
+    char *endptr = arr[i];
+    for (int i = 0; i < 3; i++) {
+      whn[i] = strtol(endptr, &endptr, 10);
+    }
+
+    static GLint format_table[] = {GL_RGBA, GL_RED, GL_RGBA, GL_RGB, GL_RGBA};
+    // stbi_set_flip_vertically_on_load(true);
+
+    glGenTextures(1, &mat->arr[i]);
+    glBindTexture(GL_TEXTURE_2D, mat->arr[i]);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, format_table[whn[2]], whn[0], whn[1], 0,
+                 format_table[whn[2]], GL_UNSIGNED_BYTE, endptr + 1);
+  }
+
+  for (int i = 0; i < 4; i++) {
+    free(arr[i]);
+  }
+  return 0;
+}
+
 /**
  * ----------------------------------------------------------------------------
  */
@@ -172,6 +214,7 @@ static GLuint prv_load_texture(const char *filepath) {
   int w, h, n;
   unsigned char *data = stbi_load(filepath, &w, &h, &n, 0);
   assert(data != NULL);  // filename may not exist.
+  printf("nchann = %d\n", n);
 
   uint32_t id;
   glGenTextures(1, &id);

@@ -41,13 +41,19 @@ struct camera {
 /**
  * @brief Contains ID's of diffuse, normal, roughness and metallic image
  * maps.
+ *
+ * WARNING: the order of the members is important see assets.c:load_mtl
  */
 struct pbr_material {
-  GLuint diffuse;
-  GLuint normal;
-  GLuint roughness;
-  GLuint metallic;
-  // GLuint displacement;
+  union {
+    GLuint arr[4];
+    struct {
+      GLuint diffuse;
+      GLuint normal;
+      GLuint roughness;
+      GLuint metallic;
+    };
+  };
 };
 
 struct vertex {
