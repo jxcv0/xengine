@@ -57,7 +57,6 @@ int load_obj(struct geometry *geom, const char *filepath) {
   char *endptr = file;
   for (int i = 0; i < 2; i++) {
     header[i] = strtol(endptr, &endptr, 10);
-    printf("%ld\n", header[i]);
   }
 
   size_t verts_size = sizeof(struct vertex) * header[0];
@@ -111,25 +110,37 @@ int load_obj(struct geometry *geom, const char *filepath) {
   return 0;
 }
 
+/**
+ * ----------------------------------------------------------------------------
+ */
 int load_mtl(struct pbr_material *mat, const char *diffuse, const char *normal,
              const char *roughness, const char *metallic) {
   if (mat == NULL) {
     return -1;
   }
 
-  char *arr[] = {load_file(diffuse), load_file(normal), load_file(roughness),
-                 load_file(metallic)};
+  const char *in[] = {diffuse, normal, roughness, metallic};
+  char *arr[4];
+  for (int i = 0; i < 4; i++) {
+    char *file = load_file(in[i]);
+    if (file == NULL) {
+      for (int j = 0; j < i; j++) {
+        free(arr[j]);
+      }
+      return -1;
+    }
+    arr[i] = file;
+  }
 
   for (int i = 0; i < 4; i++) {
-    assert(arr[i] != NULL);
-
     size_t whn[3];
     char *endptr = arr[i];
     for (int i = 0; i < 3; i++) {
       whn[i] = strtol(endptr, &endptr, 10);
     }
 
-    static GLint format_table[] = {GL_RGBA, GL_RED, GL_RGBA, GL_RGB, GL_RGBA};
+    static const GLint format_table[] = {GL_RGBA, GL_RED, GL_RGBA, GL_RGB,
+                                         GL_RGBA};
 
     glGenTextures(1, &mat->arr[i]);
     glBindTexture(GL_TEXTURE_2D, mat->arr[i]);

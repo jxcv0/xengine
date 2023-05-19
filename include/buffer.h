@@ -8,7 +8,7 @@ struct buffer {
   struct pair {
     uint32_t handle;
     size_t offset;
-  } *map;
+  } * map;
 
   void *data;
   size_t nmemb;
