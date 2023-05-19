@@ -69,13 +69,6 @@ int main() {
     exit(EXIT_FAILURE);
   }
 
-  /*
-    if (load_pbr_material((struct pbr_material *)mem_component(e1, MATERIAL),
-                          "ravine_rock") == -1) {
-      exit(EXIT_FAILURE);
-    }
-    */
-
   if (load_mtl((struct pbr_material *)mem_component(e1, MATERIAL),
                "assets/textures/ravine_rock_diffuse",
                "assets/textures/ravine_rock_normal",

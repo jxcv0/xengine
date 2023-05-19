@@ -13,6 +13,20 @@ void sys_update_model_matrices(void) {
   cmpnt_t mask = POSITION_BIT | MODEL_MATRIX_BIT;
   size_t nent = mem_count(mask);
   mem_entities(mask, entity_buf);
+
+  union component *pos_buf = malloc(sizeof(union component) * nent);
+  union component *model_buf = malloc(sizeof(union component) * nent);
+  mem_array(nent, entity_buf, POSITION, pos_buf);
+  mem_array(nent, entity_buf, MODEL_MATRIX, modle_buf);
+
+  for (size_t i = 0; i < nent; i++) {
+    translate(model_buf[i], pos_buf[i]);
+  }
+
+  mem_write(nent, entity_buf, POSITION, pos_buf);
+  mem_write(nent, entity_buf, MODEL_MATRIX, modle_buf);
+  free(geom_buf);
+  free(mat_buf);
 }
 
 /**
@@ -67,4 +81,5 @@ void sys_render_geometries(struct renderer *r, float projection[4][4],
 
   free(geom_buf);
   free(mat_buf);
+  free(model_buf);
 }
