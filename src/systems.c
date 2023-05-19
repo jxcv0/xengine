@@ -21,8 +21,8 @@ void sys_render_geometries(struct renderer *r, float projection[4][4],
   union component *model_buf = malloc(sizeof(union component) * nent);
 
   mem_array(nent, entity_buf, GEOMETRY, geom_buf);
-  mem_array(nent, entity_buf, MATERIAL, geom_buf);
-  mem_array(nent, entity_buf, MODEL_MATRIX, geom_buf);
+  mem_array(nent, entity_buf, MATERIAL, mat_buf);
+  mem_array(nent, entity_buf, MODEL_MATRIX, model_buf);
 
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

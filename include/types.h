@@ -67,9 +67,6 @@ struct geometry {
   GLuint ebo;
   size_t num_vertices;
   size_t num_indices;
-
-  // TODO separate this out and make rendering a system.
-  struct pbr_material material;
 };
 
 struct model_matrix {

@@ -127,11 +127,7 @@ int main() {
     update_view_matrix();
 
     // TODO update model_matrices
-    // sys_render_geometries(&r, projection_matrix, view_matrix);
-    pbrd_render_geometries(&r, projection_matrix, view_matrix, identities[0],
-                           (struct geometry *)mem_component(e1, GEOMETRY),
-                           (struct pbr_material *)mem_component(e1, MATERIAL),
-                           1);
+    sys_render_geometries(&r, projection_matrix, view_matrix);
     pbrd_render_lighting(&r, &l, 1, camera.m_pos, window_width, window_height);
 
     glfwSwapBuffers(window);
