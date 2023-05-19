@@ -2,15 +2,12 @@
 
 #include <assert.h>
 #include <ctype.h>
-#include <libgen.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "stb_image.h"
 
 /**
  * ----------------------------------------------------------------------------
@@ -154,7 +151,6 @@ int load_mtl(struct pbr_material *mat, const char *diffuse, const char *normal,
     }
 
     static GLint format_table[] = {GL_RGBA, GL_RED, GL_RGBA, GL_RGB, GL_RGBA};
-    // stbi_set_flip_vertically_on_load(true);
 
     glGenTextures(1, &mat->arr[i]);
     glBindTexture(GL_TEXTURE_2D, mat->arr[i]);
@@ -172,74 +168,4 @@ int load_mtl(struct pbr_material *mat, const char *diffuse, const char *normal,
     free(arr[i]);
   }
   return 0;
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-int load_pbr_material(struct pbr_material *mat, const char *material_name) {
-  if (mat == NULL) {
-    return -1;
-  }
-
-  char buff[64] = {0};
-  size_t n = strlen(material_name);
-  strncpy(buff, material_name, n);
-
-  strncpy(&buff[n], "_diffuse.png", 13);
-  mat->diffuse = load_texture(buff);
-
-  strncpy(&buff[n], "_normal.png", 12);
-  mat->normal = load_texture(buff);
-
-  strncpy(&buff[n], "_roughness.png", 15);
-  mat->roughness = load_texture(buff);
-
-  strncpy(&buff[n], "_metallic.png", 14);
-  mat->metallic = load_texture(buff);
-
-  // strncpy(&buff[n], "_displacement.png", 18);
-  // mat.displacement = load_texture(buff);
-
-  return 0;
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-static GLuint prv_load_texture(const char *filepath) {
-  static GLint format_table[] = {GL_RGBA, GL_RED, GL_RGBA, GL_RGB, GL_RGBA};
-  printf("Loading texture from \"%s\".\n", filepath);
-  // stbi_set_flip_vertically_on_load(true);
-  int w, h, n;
-  unsigned char *data = stbi_load(filepath, &w, &h, &n, 0);
-  assert(data != NULL);  // filename may not exist.
-  printf("nchann = %d\n", n);
-
-  uint32_t id;
-  glGenTextures(1, &id);
-  glBindTexture(GL_TEXTURE_2D, id);
-
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-  glTexImage2D(GL_TEXTURE_2D, 0, format_table[n], w, h, 0, format_table[n],
-               GL_UNSIGNED_BYTE, data);
-
-  free(data);
-  return id;
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-GLuint load_texture(const char *filename) {
-  size_t namelen = strlen(filename);
-  size_t dirlen = strlen(TEXTURE_DIR);
-  char filepath[namelen + dirlen];
-  strncpy(filepath, TEXTURE_DIR, dirlen + 1);
-  strncpy(&filepath[dirlen], filename, namelen + 1);
-  return prv_load_texture(filepath);
 }
