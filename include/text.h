@@ -8,7 +8,7 @@
 
 void init_ttf(const char *filepath);
 
-void render_text(const shader_t shader, const mat4 projection,
+void render_text(const GLuint shader, const mat4 projection,
                  const vec2 position, const vec4 color, const char *txt,
                  size_t n);
 

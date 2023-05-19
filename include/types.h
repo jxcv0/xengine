@@ -7,7 +7,7 @@
 #include "glad.h"
 #include "lin.h"
 
-#define MAX_ASSET_PATH_LEN 60
+#define MAX_ASSET_PATH_LEN 32
 
 /**
  * @brief Stores the data required to render a mesh.
@@ -72,6 +72,10 @@ struct geometry {
   struct pbr_material material;
 };
 
+struct model_matrix {
+  float elem[4][4];
+};
+
 struct position {
   union {
     float vec[3];
@@ -83,11 +87,9 @@ struct position {
   };
 };
 
-enum asset_type { GEOMETRY_ASSET, MATERIAL_ASSET };
-
-struct assetinfo {
-  enum asset_type type;
-  char path[MAX_ASSET_PATH_LEN];
+struct loadreq {
+  char mesh_path[MAX_ASSET_PATH_LEN];
+  char mtl_math[MAX_ASSET_PATH_LEN];
 };
 
 #endif  // TYPES_H_

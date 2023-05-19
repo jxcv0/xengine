@@ -20,8 +20,8 @@ extern "C" {
 struct renderer {
   uint32_t scr_w;
   uint32_t scr_h;
-  shader_t geom_shader;
-  shader_t light_shader;
+  GLuint geom_shader;
+  GLuint light_shader;
   uint32_t g_buff;
   uint32_t g_pos;
   uint32_t g_norm;
@@ -39,8 +39,7 @@ struct renderer {
  * @param scr_h The screen height in pixels.
  * @return 0 on success. -1 if framebuffer is incomplete.
  */
-int renderer_init(struct renderer *r, const uint32_t scr_w,
-                  const uint32_t scr_h);
+int renderer_init(struct renderer *r, uint32_t scr_w, uint32_t scr_h);
 
 /**
  * @brief Render data to G-Buffer
@@ -52,9 +51,8 @@ int renderer_init(struct renderer *r, const uint32_t scr_w,
  * @param meshes Mesh data to render.
  * @param n The number of model matrices and meshes.
  */
-void render_geometries(const struct renderer *r, const mat4 projection,
-                       const mat4 view, const vec3 *positions,
-                       const struct mesh *meshes, const uint32_t n);
+void render_geometries(struct renderer *r, mat4 projection, mat4 view,
+                       vec3 *positions, struct mesh *meshes, uint32_t n);
 
 /**
  * @brief Render lighting.
@@ -64,8 +62,8 @@ void render_geometries(const struct renderer *r, const mat4 projection,
  * @param n The number of lights.
  * @param view_pos The view position.
  */
-void render_lighting(struct renderer *r, struct light *lights, const uint32_t n,
-                     const vec3 view_pos);
+void render_lighting(struct renderer *r, struct light *lights, uint32_t n,
+                     vec3 view_pos);
 
 #ifdef __cplusplus
 }

@@ -15,35 +15,55 @@ typedef uint32_t cmpnt_t;
 #define MAX_NUM_GEOMETRIES 32
 #define MAX_NUM_MATERIALS 32
 #define MAX_NUM_POSITIONS 32
-#define MAX_NUM_ASSETS 32
+#define MAX_NUM_MODEL_MATRICES 32
+#define MAX_NUM_LOAD_REQUESTS 32
 
 // lookup index
 #define GEOMETRY 0
 #define MATERIAL 1
-#define POSITION 2
-#define QUEUED_ASSET 3
+#define MODEL_MATRIX 2
+#define POSITION 3
+#define LOAD_REQUEST 4
 
 // bitmasks
 #define GEOMETRY_BIT (1 << GEOMETRY)
 #define MATERIAL_BIT (1 << MATERIAL)
 #define POSITION_BIT (1 << POSITION)
-#define QUEUED_ASSET_BIT (1 << QUEUED_ASSET)
+#define LOAD_REQUEST_BIT (1 << LOAD_REQUEST)
 
 union component {
   struct geometry geometry;
   struct pbr_material material;
   struct position position;
-  struct assetinfo asset;
+  struct model_matrix model_matrix;
+  struct loadreq load;
   // ...
 };
 
+/**
+ * @brief Initialize the memory subsystem.
+ */
 void mem_init(void);
 
+/**
+ * @brief Create an entity.
+ * @param e A pointer to the entity handle to initialize.
+ * @return 0 on success, -1 on failure.
+ */
 int mem_create_entity(uint32_t *e);
 
+/**
+ * @brief Delete an entity.
+ * @details If the entity does not exist then this function does nothing.
+ */
 void mem_delete_entity(uint32_t e);
 
-uint32_t mem_identity(uint32_t e);
+/**
+ * @brief Get the identity (component mask) of an entity.
+ * @param e The entity.
+ * @return A mask of all the components this entity has an instance of.
+ */
+cmpnt_t mem_identity(uint32_t e);
 
 int mem_add_component(uint32_t e, cmpnt_t type);
 
@@ -54,6 +74,11 @@ union component *mem_component(uint32_t e, cmpnt_t type);
 
 size_t mem_component_count(uint32_t cmpnt_t);
 
+/**
+ * @brief Count the number of entities who's identity matches mask.
+ * @param Mask The component bitmask.
+ * @return The number of entities.
+ */
 size_t mem_count(cmpnt_t mask);
 
 void mem_entities(cmpnt_t mask, uint32_t *arr);

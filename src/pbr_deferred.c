@@ -4,41 +4,14 @@
 #include <stdlib.h>
 
 #include "glad.h"
-#include "shader.h"
 #include "utils.h"
 
 #define MAX_NUM_LIGHTS 8
 
-// we want this all in the same block of memory.
-static struct {
-  // geometry
-  GLuint g_buff;
-  GLuint g_position;
-
-  // normal matrix
-  GLuint g_tangent;
-  GLuint g_bitangent;
-  GLuint g_normal;
-
-  // textures
-  GLuint g_tex_diff;
-  GLuint g_tex_norm;
-
-  // depth
-  GLuint g_depth;
-
-  // lighting
-  GLuint quad_vbo;
-  GLuint quad_vao;
-
-  shader_t deferred_geometry;
-  shader_t deferred_lighting;
-} pbr;
-
 /**
  * ----------------------------------------------------------------------------
  */
-static void load_pbrd_shaders(void) {
+static void load_pbrd_shaders(struct renderer *r) {
   char *v = load_file_into_mem("glsl/pbrd_geom.vert");
   char *c = load_file_into_mem("glsl/pbrd_geom.tesc");
   char *e = load_file_into_mem("glsl/pbrd_geom.tese");
@@ -98,62 +71,62 @@ static void load_pbrd_shaders(void) {
   free(g);
   free(f);
 
-  pbr.deferred_geometry = program_id;
-  pbr.deferred_lighting =
+  r->deferred_geometry = program_id;
+  r->deferred_lighting =
       load_shader_vf("glsl/pbrd_light.vert", "glsl/pbrd_light.frag");
 }
 
 /**
  * ----------------------------------------------------------------------------
  */
-int pbrd_init(const uint32_t scr_w, const uint32_t scr_h) {
-  load_pbrd_shaders();
+int pbrd_init(struct renderer *r, const uint32_t scr_w, const uint32_t scr_h) {
+  load_pbrd_shaders(r);
   glPatchParameteri(GL_PATCH_VERTICES, 3);
 
   // set up G-Buffer
-  glGenFramebuffers(1, &pbr.g_buff);
-  glBindFramebuffer(GL_FRAMEBUFFER, pbr.g_buff);
+  glGenFramebuffers(1, &r->g_buff);
+  glBindFramebuffer(GL_FRAMEBUFFER, r->g_buff);
 
   // vertex position buffer
-  glGenTextures(1, &pbr.g_position);
-  glBindTexture(GL_TEXTURE_2D, pbr.g_position);
+  glGenTextures(1, &r->g_position);
+  glBindTexture(GL_TEXTURE_2D, r->g_position);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, scr_w, scr_h, 0, GL_RGB, GL_FLOAT,
                NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-                         pbr.g_position, 0);
+                         r->g_position, 0);
 
   // normal
-  glGenTextures(1, &pbr.g_normal);
-  glBindTexture(GL_TEXTURE_2D, pbr.g_normal);
+  glGenTextures(1, &r->g_normal);
+  glBindTexture(GL_TEXTURE_2D, r->g_normal);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, scr_w, scr_h, 0, GL_RGBA, GL_FLOAT,
                NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D,
-                         pbr.g_normal, 0);
+                         r->g_normal, 0);
 
   // diffuse
-  glGenTextures(1, &pbr.g_tex_diff);
-  glBindTexture(GL_TEXTURE_2D, pbr.g_tex_diff);
+  glGenTextures(1, &r->g_tex_diff);
+  glBindTexture(GL_TEXTURE_2D, r->g_tex_diff);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, scr_w, scr_h, 0, GL_RGBA,
                GL_UNSIGNED_BYTE, NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D,
-                         pbr.g_tex_diff, 0);
+                         r->g_tex_diff, 0);
 
   const uint32_t attachments[3] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1,
                                    GL_COLOR_ATTACHMENT2};
   glDrawBuffers(3, attachments);
 
   // depth buffer
-  glGenRenderbuffers(1, &pbr.g_depth);
-  glBindRenderbuffer(GL_RENDERBUFFER, pbr.g_depth);
+  glGenRenderbuffers(1, &r->g_depth);
+  glBindRenderbuffer(GL_RENDERBUFFER, r->g_depth);
   glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, scr_w, scr_h);
   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-                            GL_RENDERBUFFER, pbr.g_depth);
+                            GL_RENDERBUFFER, r->g_depth);
 
   const float quad_verts[] = {
       -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
@@ -168,10 +141,10 @@ int pbrd_init(const uint32_t scr_w, const uint32_t scr_h) {
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
   // set up lighting shader
-  glGenVertexArrays(1, &pbr.quad_vao);
-  glGenBuffers(1, &pbr.quad_vbo);
-  glBindVertexArray(pbr.quad_vao);
-  glBindBuffer(GL_ARRAY_BUFFER, pbr.quad_vbo);
+  glGenVertexArrays(1, &r->quad_vao);
+  glGenBuffers(1, &r->quad_vbo);
+  glBindVertexArray(r->quad_vao);
+  glBindBuffer(GL_ARRAY_BUFFER, r->quad_vbo);
   glBufferData(GL_ARRAY_BUFFER, sizeof(quad_verts), quad_verts, GL_STATIC_DRAW);
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
@@ -184,26 +157,26 @@ int pbrd_init(const uint32_t scr_w, const uint32_t scr_h) {
 /**
  * ----------------------------------------------------------------------------
  */
-void pbrd_render_geometries(const mat4 projection, const mat4 view,
-                            const mat4 *model_matrices,
-                            const struct geometry *geometries,
-                            const struct pbr_material *materials,
-                            const uint32_t n) {
+void pbrd_render_geometries(struct renderer *r, float projection[4][4],
+                            float view[4][4], float *model_matrices[4][4],
+                            struct geometry *geometries,
+                            struct pbr_material *materials, size_t n) {
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  glBindFramebuffer(GL_FRAMEBUFFER, pbr.g_buff);
+  glBindFramebuffer(GL_FRAMEBUFFER, r->g_buff);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glUseProgram(pbr.deferred_geometry);
-  shader_set_uniform_m4fv(pbr.deferred_geometry, "projection", projection);
-  shader_set_uniform_m4fv(pbr.deferred_geometry, "view", view);
+  glUseProgram(r->deferred_geometry);
+  shader_set_uniform_m4fv(r->deferred_geometry, "projection", projection);
+  shader_set_uniform_m4fv(r->deferred_geometry, "view", view);
 
-  for (uint32_t i = 0; i < n; i++) {
-    shader_set_uniform_m4fv(pbr.deferred_geometry, "model", model_matrices[i]);
-    shader_set_uniform_1i(pbr.deferred_geometry, "tex_diffuse", 0);
-    shader_set_uniform_1i(pbr.deferred_geometry, "tex_roughness", 1);
-    shader_set_uniform_1i(pbr.deferred_geometry, "tex_normal", 2);
-    shader_set_uniform_1i(pbr.deferred_geometry, "tex_metallic", 3);
+  for (size_t i = 0; i < n; i++) {
+    shader_set_uniform_m4fv(r->deferred_geometry, "model",
+                            (float(*)[4])model_matrices[i]);
+    shader_set_uniform_1i(r->deferred_geometry, "tex_diffuse", 0);
+    shader_set_uniform_1i(r->deferred_geometry, "tex_roughness", 1);
+    shader_set_uniform_1i(r->deferred_geometry, "tex_normal", 2);
+    shader_set_uniform_1i(r->deferred_geometry, "tex_metallic", 3);
     // shader_set_uniform_1i(pbr.deferred_geometry, "tex_displacement", 4);
 
     glActiveTexture(GL_TEXTURE0);
@@ -223,50 +196,53 @@ void pbrd_render_geometries(const mat4 projection, const mat4 view,
   }
 }
 
-void pbrd_render_lighting(struct light *lights, const uint32_t n,
-                          const vec3 view_pos, const uint32_t scr_w,
-                          const uint32_t scr_h) {
+/**
+ * ----------------------------------------------------------------------------
+ */
+void pbrd_render_lighting(struct renderer *r, struct light *lights,
+                          size_t nlights, float view_pos[3], uint32_t scr_w,
+                          uint32_t scr_h) {
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  glUseProgram(pbr.deferred_lighting);
+  glUseProgram(r->deferred_lighting);
 
   glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, pbr.g_position);
+  glBindTexture(GL_TEXTURE_2D, r->g_position);
 
   glActiveTexture(GL_TEXTURE1);
-  glBindTexture(GL_TEXTURE_2D, pbr.g_normal);
+  glBindTexture(GL_TEXTURE_2D, r->g_normal);
 
   glActiveTexture(GL_TEXTURE2);
-  glBindTexture(GL_TEXTURE_2D, pbr.g_tex_diff);
+  glBindTexture(GL_TEXTURE_2D, r->g_tex_diff);
 
-  shader_set_uniform_1i(pbr.deferred_lighting, "g_position", 0);
-  shader_set_uniform_1i(pbr.deferred_lighting, "g_normal", 1);
-  shader_set_uniform_1i(pbr.deferred_lighting, "g_tex_diff", 2);
+  shader_set_uniform_1i(r->deferred_lighting, "g_position", 0);
+  shader_set_uniform_1i(r->deferred_lighting, "g_normal", 1);
+  shader_set_uniform_1i(r->deferred_lighting, "g_tex_diff", 2);
 
-  shader_set_uniform_3fv(pbr.deferred_lighting, "view_pos", view_pos);
-  shader_set_uniform_1ui(pbr.deferred_lighting, "num_lights", n);
+  shader_set_uniform_3fv(r->deferred_lighting, "view_pos", view_pos);
+  shader_set_uniform_1ui(r->deferred_lighting, "num_lights", nlights);
 
   // TODO This can be made faster without the formatting
-  char light[32];
-  for (uint32_t i = 0; i < n; i++) {
-    sprintf(light, "lights[%d].m_position", i);
-    shader_set_uniform_3fv(pbr.deferred_lighting, light, lights[i].position);
-    sprintf(light, "lights[%d].m_color", i);
-    shader_set_uniform_3fv(pbr.deferred_lighting, light, lights[i].color);
-    sprintf(light, "lights[%d].m_constant", i);
-    shader_set_uniform_1f(pbr.deferred_lighting, light, lights[i].constant);
-    sprintf(light, "lights[%d].m_linear", i);
-    shader_set_uniform_1f(pbr.deferred_lighting, light, lights[i].linear);
-    sprintf(light, "lights[%d].m_quadratic", i);
-    shader_set_uniform_1f(pbr.deferred_lighting, light, lights[i].quadratic);
+  char light[64];
+  for (size_t i = 0; i < nlights; i++) {
+    sprintf(light, "lights[%ld].m_position", i);
+    shader_set_uniform_3fv(r->deferred_lighting, light, lights[i].position);
+    sprintf(light, "lights[%ld].m_color", i);
+    shader_set_uniform_3fv(r->deferred_lighting, light, lights[i].color);
+    sprintf(light, "lights[%ld].m_constant", i);
+    shader_set_uniform_1f(r->deferred_lighting, light, lights[i].constant);
+    sprintf(light, "lights[%ld].m_linear", i);
+    shader_set_uniform_1f(r->deferred_lighting, light, lights[i].linear);
+    sprintf(light, "lights[%ld].m_quadratic", i);
+    shader_set_uniform_1f(r->deferred_lighting, light, lights[i].quadratic);
   }
 
   // render quad
-  glBindVertexArray(pbr.quad_vao);
+  glBindVertexArray(r->quad_vao);
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-  glBindFramebuffer(GL_READ_FRAMEBUFFER, pbr.g_buff);
+  glBindFramebuffer(GL_READ_FRAMEBUFFER, r->g_buff);
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
   glBlitFramebuffer(0, 0, scr_w, scr_h, 0, 0, scr_w, scr_h, GL_DEPTH_BUFFER_BIT,
                     GL_NEAREST);

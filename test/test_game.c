@@ -13,6 +13,7 @@
 #include "lin.h"
 #include "mem.h"
 #include "pbr_deferred.h"
+#include "systems.h"
 #include "window.h"
 
 #define MAX_ENTITIES 128
@@ -51,6 +52,8 @@ void update_view_matrix();
 void handle_mouse_movement(GLFWwindow *w, double x, double y);
 void handle_keyboard_input(GLFWwindow *w);
 
+struct renderer r;
+
 // main
 int main() {
   mem_init();
@@ -61,7 +64,7 @@ int main() {
   omp_set_dynamic(0);
 
   create_window(&window, window_width, window_height, "game");
-  pbrd_init(window_width, window_height);
+  pbrd_init(&r, window_width, window_height);
 
   perspective(projection_matrix, radians(60),
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
@@ -70,9 +73,10 @@ int main() {
   mem_create_entity(&e1);
   mem_add_component(e1, GEOMETRY);
   mem_add_component(e1, MATERIAL);
+  mem_add_component(e1, MODEL_MATRIX);
 
-  if (load_obj((struct geometry *)mem_component(e1, GEOMETRY),
-               "test_cube.mesh") == -1) {
+  if (load_obj((struct geometry *)mem_component(e1, GEOMETRY), "suzanne") ==
+      -1) {
     exit(EXIT_FAILURE);
   }
 
@@ -80,6 +84,9 @@ int main() {
                         "ravine_rock") == -1) {
     exit(EXIT_FAILURE);
   }
+
+  float identity[4][4] = IDENTITY_MAT4;
+  memcpy(mem_component(e1, MODEL_MATRIX), identity, sizeof(identity));
 
   struct light l = LIGHT_RANGE_3250;
   l.position[0] = 3.0;
@@ -106,6 +113,7 @@ int main() {
     memcpy(identities[i], model_matrix, sizeof(mat4));
   }
 
+  printf("union component: %ld\n", sizeof(union component));
   while (!glfwWindowShouldClose(window)) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
       glfwSetWindowShouldClose(window, true);
@@ -119,11 +127,12 @@ int main() {
     update_view_matrix();
 
     // TODO update model_matrices
-    pbrd_render_geometries(projection_matrix, view_matrix, identities,
+    // sys_render_geometries(&r, projection_matrix, view_matrix);
+    pbrd_render_geometries(&r, projection_matrix, view_matrix, identities[0],
                            (struct geometry *)mem_component(e1, GEOMETRY),
                            (struct pbr_material *)mem_component(e1, MATERIAL),
                            1);
-    pbrd_render_lighting(&l, 1, camera.m_pos, window_width, window_height);
+    pbrd_render_lighting(&r, &l, 1, camera.m_pos, window_width, window_height);
 
     glfwSwapBuffers(window);
     glfwPollEvents();

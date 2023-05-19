@@ -13,8 +13,7 @@
 /**
  * ----------------------------------------------------------------------------
  */
-int renderer_init(struct renderer *r, const uint32_t scr_w,
-                  const uint32_t scr_h) {
+int renderer_init(struct renderer *r, uint32_t scr_w, uint32_t scr_h) {
   r->scr_w = scr_w;
   r->scr_h = scr_h;
   r->geom_shader =
@@ -100,9 +99,8 @@ int renderer_init(struct renderer *r, const uint32_t scr_w,
 /**
  * ----------------------------------------------------------------------------
  */
-void render_geometries(const struct renderer *r, const mat4 projection,
-                       const mat4 view, const vec3 *positions,
-                       const struct mesh *meshes, const uint32_t n) {
+void render_geometries(struct renderer *r, mat4 projection, mat4 view,
+                       vec3 *positions, struct mesh *meshes, uint32_t n) {
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -134,8 +132,8 @@ void render_geometries(const struct renderer *r, const mat4 projection,
 /**
  * ----------------------------------------------------------------------------
  */
-void render_lighting(struct renderer *r, struct light *lights, const uint32_t n,
-                     const vec3 view_pos) {
+void render_lighting(struct renderer *r, struct light *lights, uint32_t n,
+                     vec3 view_pos) {
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

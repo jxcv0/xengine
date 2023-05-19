@@ -21,12 +21,16 @@ static union component material_buf[MAX_NUM_MATERIALS];
 static struct index_table material_table[MAX_NUM_MATERIALS];
 
 // position buffer
-static union component position_buf[MAX_NUM_MATERIALS];
-static struct index_table position_table[MAX_NUM_MATERIALS];
+static union component position_buf[MAX_NUM_POSITIONS];
+static struct index_table position_table[MAX_NUM_POSITIONS];
 
-// queued asset buffer
-static union component queued_asset_buf[MAX_NUM_MATERIALS];
-static struct index_table queued_asset_table[MAX_NUM_MATERIALS];
+// model matrix buffer
+static union component model_matrix_buf[MAX_NUM_MODEL_MATRICES];
+static struct index_table model_matrix_table[MAX_NUM_MODEL_MATRICES];
+
+// load request buffer
+static union component loadreq_buf[MAX_NUM_LOAD_REQUESTS];
+static struct index_table loadreq_table[MAX_NUM_LOAD_REQUESTS];
 
 struct entry {
   union component *buffer;
@@ -34,11 +38,13 @@ struct entry {
   size_t count;
 };
 
+// TODO should each of these have a mutex?
 static struct entry lookup_table[NUM_COMPONENT_TYPES] = {
     {geometry_buf, geometry_table, 0},
     {material_buf, material_table, 0},
     {position_buf, position_table, 0},
-    {queued_asset_buf, queued_asset_table, 0}
+    {model_matrix_buf, model_matrix_table, 0},
+    {loadreq_buf, loadreq_table, 0}
     // ...
 };
 
@@ -115,7 +121,7 @@ void mem_delete_entity(uint32_t e) {
 /**
  * ----------------------------------------------------------------------------
  */
-uint32_t mem_identity(uint32_t e) { return entity_buf[e]; }
+cmpnt_t mem_identity(uint32_t e) { return entity_buf[e]; }
 
 /**
  * ----------------------------------------------------------------------------
@@ -128,6 +134,7 @@ int mem_add_component(uint32_t e, cmpnt_t type) {
   cmpnt_t mask = (1 << type);
   struct entry *entry = &lookup_table[type];
   if (entity_buf[e] & mask) {
+    // entity alread has this component
     return 0;
   }
 
