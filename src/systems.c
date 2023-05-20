@@ -17,16 +17,16 @@ void sys_update_model_matrices(void) {
   union component *pos_buf = malloc(sizeof(union component) * nent);
   union component *model_buf = malloc(sizeof(union component) * nent);
   mem_array(nent, entity_buf, POSITION, pos_buf);
-  mem_array(nent, entity_buf, MODEL_MATRIX, modle_buf);
+  mem_array(nent, entity_buf, MODEL_MATRIX, model_buf);
 
   for (size_t i = 0; i < nent; i++) {
-    translate(model_buf[i], pos_buf[i]);
+    translate(model_buf[i].model_matrix.elem, pos_buf[i].position.vec);
   }
 
   mem_write(nent, entity_buf, POSITION, pos_buf);
-  mem_write(nent, entity_buf, MODEL_MATRIX, modle_buf);
-  free(geom_buf);
-  free(mat_buf);
+  mem_write(nent, entity_buf, MODEL_MATRIX, model_buf);
+  free(pos_buf);
+  free(model_buf);
 }
 
 /**
