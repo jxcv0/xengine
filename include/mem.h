@@ -23,21 +23,30 @@ typedef uint32_t cmpnt_t;
 #define MATERIAL 1
 #define MODEL_MATRIX 2
 #define POSITION 3
-#define LOAD_REQUEST 4
+#define GEOM_LOAD_REQUEST 4
+#define MAT_LOAD_REQUEST 5
+// #define ANIM_LOAD_REQUEST 6
+// #define AUDIO_LOAD_REQUEST 7
 
 // bitmasks
 #define GEOMETRY_BIT (1 << GEOMETRY)
 #define MATERIAL_BIT (1 << MATERIAL)
 #define MODEL_MATRIX_BIT (1 << MODEL_MATRIX)
 #define POSITION_BIT (1 << POSITION)
-#define LOAD_REQUEST_BIT (1 << LOAD_REQUEST)
+#define GEOM_LOAD_REQUEST_BIT (1 << GEOM_LOAD_REQUEST);
+#define MAT_LOAD_REQUEST_BIT (1 << MAT_LOAD_REQUEST);
+// #define ANIM_LOAD_REQUEST_BIT (1 << ANIM_LOAD_REQUEST);
+// #define AUDIO_LOAD_REQUEST_BIT (1 << AUDIO_LOAD_REQUEST);
 
 union component {
   struct geometry geometry;
   struct pbr_material material;
   struct position position;
   struct model_matrix model_matrix;
-  struct loadreq load;
+  struct loadreq load_geom;
+  struct loadreq load_mat;
+  // struct loadreq load_geom;
+  // struct loadreq load_geom;
   // ...
 };
 

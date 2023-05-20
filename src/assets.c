@@ -61,8 +61,8 @@ int load_obj(struct geometry *geom, const char *filepath) {
 
   size_t verts_size = sizeof(struct vertex) * header[0];
   size_t indices_size = sizeof(GLuint) * header[1];
-  void *mem = malloc(verts_size + indices_size);
 
+  void *mem = malloc(verts_size + indices_size);
   struct vertex *vertices = mem;
   GLuint *indices = mem + verts_size;
 

@@ -91,8 +91,7 @@ struct position {
 };
 
 struct loadreq {
-  char mesh_path[MAX_ASSET_PATH_LEN];
-  char mtl_math[MAX_ASSET_PATH_LEN];
+  char path[MAX_ASSET_PATH_LEN];
 };
 
 #endif  // TYPES_H_

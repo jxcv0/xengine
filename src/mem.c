@@ -28,9 +28,13 @@ static struct index_table position_table[MAX_NUM_POSITIONS];
 static union component model_matrix_buf[MAX_NUM_MODEL_MATRICES];
 static struct index_table model_matrix_table[MAX_NUM_MODEL_MATRICES];
 
-// load request buffer
-static union component loadreq_buf[MAX_NUM_LOAD_REQUESTS];
-static struct index_table loadreq_table[MAX_NUM_LOAD_REQUESTS];
+// geometry request buffer
+static union component geomreq_buf[MAX_NUM_LOAD_REQUESTS];
+static struct index_table geomreq_table[MAX_NUM_LOAD_REQUESTS];
+
+// material request buffer
+static union component matreq_buf[MAX_NUM_LOAD_REQUESTS];
+static struct index_table matreq_table[MAX_NUM_LOAD_REQUESTS];
 
 struct entry {
   union component *buffer;
@@ -44,6 +48,7 @@ static struct entry lookup_table[NUM_COMPONENT_TYPES] = {
     {material_buf, material_table, 0},
     {position_buf, position_table, 0},
     {model_matrix_buf, model_matrix_table, 0},
+    {geomreq_buf, geomreq_table, 0},
     {loadreq_buf, loadreq_table, 0}
     // ...
 };

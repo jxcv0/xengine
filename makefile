@@ -10,7 +10,7 @@ xen_test_dir := test
 stb_src_dir := $(lib_dir)/stb
 glad_src_dir := $(lib_dir)/glad
 
-cflags := -std=c2x -Wall -Wextra -ggdb -O0
+cflags := -std=c17 -Wall -Wextra -ggdb -O0
 libs := -L$(build_dir) -lglad -lstb -lm -ldl -lglfw -fopenmp
 xen_lib := -L$(build_dir) -lxen
 
