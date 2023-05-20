@@ -18,13 +18,9 @@ int load_obj(struct geometry *geom, const char *filepath);
 /**
  * @brief Load a material from a xengine binary file.
  * @param mat The material structure to store the image buffer handles.
- * @param diffuse Filepath of diffuse texture.
- * @param normal Filepath of normal texture.
- * @param roughness Filepath of roughness texture.
- * @param metallic Filepath of metallic texture.
+ * @param filepath The file to load the material from.
  * @return 0 on success, -1 on failure.
  */
-int load_mtl(struct pbr_material *mat, const char *diffuse, const char *normal,
-             const char *roughness, const char *metallic);
+int load_mtl(struct pbr_material *mat, const char *filepath);
 
 #endif  // ASSETS_H_

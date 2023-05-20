@@ -113,35 +113,25 @@ int load_obj(struct geometry *geom, const char *filepath) {
 /**
  * ----------------------------------------------------------------------------
  */
-int load_mtl(struct pbr_material *mat, const char *diffuse, const char *normal,
-             const char *roughness, const char *metallic) {
-  if (mat == NULL) {
+int load_mtl(struct pbr_material *mat, const char *filepath) {
+  char *file = load_file(filepath);
+
+  if (file == NULL) {
     return -1;
   }
 
-  const char *in[] = {diffuse, normal, roughness, metallic};
-  char *arr[4];
+  size_t sizes[4][3];
+  char *endptr = file;
   for (int i = 0; i < 4; i++) {
-    char *file = load_file(in[i]);
-    if (file == NULL) {
-      for (int j = 0; j < i; j++) {
-        free(arr[j]);
-      }
-      return -1;
+    for (int j = 0; j < 3; j++) {
+      sizes[i][j] = strtol(endptr, &endptr, 10);
     }
-    arr[i] = file;
   }
 
+  size_t offset = 0;
   for (int i = 0; i < 4; i++) {
-    size_t whn[3];
-    char *endptr = arr[i];
-    for (int i = 0; i < 3; i++) {
-      whn[i] = strtol(endptr, &endptr, 10);
-    }
-
     static const GLint format_table[] = {GL_RGBA, GL_RED, GL_RGBA, GL_RGB,
                                          GL_RGBA};
-
     glGenTextures(1, &mat->arr[i]);
     glBindTexture(GL_TEXTURE_2D, mat->arr[i]);
 
@@ -150,12 +140,12 @@ int load_mtl(struct pbr_material *mat, const char *diffuse, const char *normal,
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, format_table[whn[2]], whn[0], whn[1], 0,
-                 format_table[whn[2]], GL_UNSIGNED_BYTE, endptr + 1);
+    glTexImage2D(GL_TEXTURE_2D, 0, format_table[sizes[i][2]], sizes[i][0], sizes[i][1], 0,
+                 format_table[sizes[i][2]], GL_UNSIGNED_BYTE, endptr + 1 + offset);
+    offset += sizes[i][0] * sizes[i][1] * sizes[i][2];
   }
 
-  for (int i = 0; i < 4; i++) {
-    free(arr[i]);
-  }
+  free(file);
+
   return 0;
 }

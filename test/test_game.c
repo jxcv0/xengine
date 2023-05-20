@@ -70,10 +70,7 @@ int main() {
   }
 
   if (load_mtl((struct pbr_material *)mem_component(e1, MATERIAL),
-               "assets/textures/ravine_rock_diffuse",
-               "assets/textures/ravine_rock_normal",
-               "assets/textures/ravine_rock_roughness",
-               "assets/textures/ravine_rock_metallic") == -1) {
+               "assets/textures/ravine_rock") == -1) {
     exit(EXIT_FAILURE);
   }
 
