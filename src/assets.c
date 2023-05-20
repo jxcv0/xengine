@@ -61,11 +61,12 @@ int load_obj(struct geometry *geom, const char *filepath) {
 
   size_t verts_size = sizeof(struct vertex) * header[0];
   size_t indices_size = sizeof(GLuint) * header[1];
-  struct vertex *vertices = malloc(verts_size);
-  GLuint *indices = malloc(indices_size);
+  void *mem = malloc(verts_size + indices_size);
 
-  memcpy(vertices, endptr + 1, verts_size);
-  memcpy(indices, endptr + 1 + verts_size, indices_size);
+  struct vertex *vertices = mem;
+  GLuint *indices = mem + verts_size;
+
+  memcpy(mem, endptr + 1, verts_size + indices_size);
 
   geom->num_vertices = header[0];
   geom->num_indices = header[1];
@@ -103,8 +104,7 @@ int load_obj(struct geometry *geom, const char *filepath) {
   glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
                         (void *)(offsetof(struct vertex, tex_coord)));
 
-  free(vertices);
-  free(indices);
+  free(mem);
   free(file);
 
   return 0;
