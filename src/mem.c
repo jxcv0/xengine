@@ -49,7 +49,7 @@ static struct entry lookup_table[NUM_COMPONENT_TYPES] = {
     {position_buf, position_table, 0},
     {model_matrix_buf, model_matrix_table, 0},
     {geomreq_buf, geomreq_table, 0},
-    {loadreq_buf, loadreq_table, 0}
+    {matreq_buf, matreq_table, 0}
     // ...
 };
 
