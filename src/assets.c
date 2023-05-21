@@ -12,7 +12,7 @@
 /**
  * ----------------------------------------------------------------------------
  */
-static char *load_file(const char *filepath) {
+char *load_file(const char *filepath) {
   FILE *file = fopen(filepath, "rb");
   if (file == NULL) {
     perror("fopen");
@@ -41,6 +41,23 @@ static char *load_file(const char *filepath) {
   buff[filesize] = '\0';
 
   return buff;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+char *compress(const char *data, size_t len) {
+  for (size_t i = 0; i < len; i++) {
+    size_t wstart = COMP_WINDOW_LEN < i ? i - COMP_WINDOW_LEN : 0;
+    size_t wlen = i -  wstart;
+
+    for (size_t j = 0; j < wlen; j++) {
+      // size_t cmplen = 
+    }
+
+    // printf("%ld %ld\n", wstart, wlen);
+  }
+  return data;
 }
 
 /**

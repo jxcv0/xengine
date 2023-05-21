@@ -2,19 +2,18 @@
 
 #include "assets.h"
 #include "test.h"
+#include <string.h>
 
-void tst_load_obj(void) {
+void tst_compress(void) {
   TEST();
-  // struct geometry geom;
-  // assert(load_obj(&geom, NULL, "assets/meshes/test_cube.obj") != -1);
-  // assert(geom.num_vertices == 8);
-  // assert(geom.num_vertices == 12);
-  // assert(geom.num_indices == 12);
+  char *in = load_file("comptest.txt");
+  const char *out = compress(in, strlen(in));
+  printf("%s\n", out);
 }
 
 int main() {
   TEST_BEGIN();
-  tst_load_obj();
+  tst_compress();
   TEST_END();
   return 0;
 }

@@ -6,6 +6,23 @@
 #include "types.h"
 
 #define TEXTURE_DIR "assets/textures/"
+#define COMP_WINDOW_LEN 64
+
+/**
+ * @brief Load a file from disk into memory.
+ * 
+ * @param filepath The path of the file to load.
+ * @return A null terminated string of the file contents.
+ */
+char *load_file(const char *filepath);
+
+char *compress(const char *data, size_t len);
+char *decompress(const char *data, size_t len);
+
+/**
+ * TODO
+ */
+int write_file(char *file, const char *filepath);
 
 /**
  * @brief Load a 3D object from a xengine binary file.
