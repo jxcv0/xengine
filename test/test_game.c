@@ -64,8 +64,8 @@ int main() {
   mem_add_component(e1, MATERIAL);
   mem_add_component(e1, MODEL_MATRIX);
 
-  if (load_obj((struct geometry *)mem_component(e1, GEOMETRY),
-               "suzanne") == -1) {
+  if (load_obj((struct geometry *)mem_component(e1, GEOMETRY), "suzanne") ==
+      -1) {
     exit(EXIT_FAILURE);
   }
 

@@ -29,7 +29,8 @@ int main(int argc, const char *argv[]) {
   int sizes[4][3];
   unsigned char *data[4];
   for (int i = 0; i < 4; i++) {
-    data[i] = stbi_load(argv[i + 1], &sizes[i][0], &sizes[i][1], &sizes[i][2], 0);
+    data[i] =
+        stbi_load(argv[i + 1], &sizes[i][0], &sizes[i][1], &sizes[i][2], 0);
     if (data[i] == NULL) {
       printf("Unable to load input file: '%s'.\n", argv[i]);
       exit(EXIT_FAILURE);

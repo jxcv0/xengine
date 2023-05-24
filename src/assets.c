@@ -46,18 +46,78 @@ char *load_file(const char *filepath) {
 /**
  * ----------------------------------------------------------------------------
  */
-char *compress(const char *data, size_t len) {
-  for (size_t i = 0; i < len; i++) {
-    size_t wstart = COMP_WINDOW_LEN < i ? i - COMP_WINDOW_LEN : 0;
-    size_t wlen = i -  wstart;
-
-    for (size_t j = 0; j < wlen; j++) {
-      // size_t cmplen = 
-    }
-
-    // printf("%ld %ld\n", wstart, wlen);
+char *load_file_size(const char *filepath, size_t *len) {
+  FILE *file = fopen(filepath, "rb");
+  if (file == NULL) {
+    perror("fopen");
+    return NULL;
   }
-  return data;
+
+  if (fseek(file, 0, SEEK_END) == -1) {
+    fclose(file);
+    perror("fseek");
+    return NULL;
+  }
+
+  long filesize = ftell(file);
+  if (filesize == -1) {
+    fclose(file);
+    perror("ftell");
+    return NULL;
+  }
+
+  char *buff = malloc(filesize + 1);  // + 1 for '\0'
+  rewind(file);
+
+  *len = fread(buff, 1, filesize, file);
+  printf("%ld\n", *len);
+
+  fclose(file);
+  buff[filesize] = '\0';
+
+  return buff;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+struct lz77tok *compress_lz77(const char *data, size_t len, size_t *ntoks) {
+  struct lz77tok *toks = malloc(sizeof(struct lz77tok) * len);
+  size_t n = 0;
+  for (size_t i = 0; i < len;) {
+    struct lz77tok tok = {.start = 0, .len = 0, .next = data[i]};
+
+    const char *input = data + i;
+    for (size_t j = 1; j <= i && j <= UINT8_MAX; j++) {
+      const char *win = input - j;
+      for (size_t k = 1; k <= j; k++) {
+        if (memcmp(input, win, k) == 0 && k > tok.len) {
+          tok.start = j;
+          tok.len = k;
+          tok.next = input[k];
+        }
+      }
+    }
+    i += tok.len + 1;
+    toks[n++] = tok;
+  }
+  *ntoks = n;
+  return toks;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+char *decompress_lz77(struct lz77tok *toks, size_t ntoks, size_t n) {
+  char *out = malloc(n);
+  size_t idx = 0;
+  for (size_t i = 0; i < ntoks; i++) {
+    memcpy(out + idx, out + (idx - toks[i].start), toks[i].len);
+    idx += toks[i].len;
+    out[idx++] = toks[i].next;
+  }
+
+  return out;
 }
 
 /**
@@ -157,8 +217,9 @@ int load_mtl(struct pbr_material *mat, const char *filepath) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, format_table[sizes[i][2]], sizes[i][0], sizes[i][1], 0,
-                 format_table[sizes[i][2]], GL_UNSIGNED_BYTE, endptr + 1 + offset);
+    glTexImage2D(GL_TEXTURE_2D, 0, format_table[sizes[i][2]], sizes[i][0],
+                 sizes[i][1], 0, format_table[sizes[i][2]], GL_UNSIGNED_BYTE,
+                 endptr + 1 + offset);
     offset += sizes[i][0] * sizes[i][1] * sizes[i][2];
   }
 

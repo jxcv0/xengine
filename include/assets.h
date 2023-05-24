@@ -8,16 +8,25 @@
 #define TEXTURE_DIR "assets/textures/"
 #define COMP_WINDOW_LEN 64
 
+struct lz77tok {
+  uint8_t start;
+  uint8_t len;
+  char next;
+};
+
 /**
  * @brief Load a file from disk into memory.
- * 
+ *
  * @param filepath The path of the file to load.
  * @return A null terminated string of the file contents.
  */
 char *load_file(const char *filepath);
 
-char *compress(const char *data, size_t len);
-char *decompress(const char *data, size_t len);
+char *load_file_size(const char *filepath, size_t *len);
+
+struct lz77tok *compress_lz77(const char *data, size_t len, size_t *ntoks);
+
+char *decompress_lz77(struct lz77tok *toks, size_t ntoks, size_t n);
 
 /**
  * TODO
