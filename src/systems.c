@@ -45,7 +45,7 @@ void sys_load_meshes(void) {
     if (load_obj(&geom.geometry, buf[i].request.path) == 0) {
       mem_add_component(entity_buf[i], GEOMETRY);
       mem_remove_component(entity_buf[i], GEOM_LOAD_REQUEST);
-      *mem_component(entity_buf[i], GEOMETRY) = geom;
+      mem_set_component(entity_buf[i], GEOMETRY, geom);
     }
   }
 

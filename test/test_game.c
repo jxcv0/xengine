@@ -60,14 +60,13 @@ int main() {
 
   uint32_t e1;
   mem_create_entity(&e1);
-  mem_add_component(e1, GEOMETRY);
+  mem_add_component(e1, GEOM_LOAD_REQUEST);
   mem_add_component(e1, MATERIAL);
   mem_add_component(e1, MODEL_MATRIX);
 
-  if (load_obj((struct geometry *)mem_component(e1, GEOMETRY), "suzanne") ==
-      -1) {
-    exit(EXIT_FAILURE);
-  }
+  union component lr;
+  strcpy(lr.request.path, "suzanne");
+  mem_set_component(e1, GEOM_LOAD_REQUEST, lr);
 
   if (load_mtl((struct pbr_material *)mem_component(e1, MATERIAL),
                "assets/textures/ravine_rock.mtl") == -1) {
@@ -116,6 +115,7 @@ int main() {
     update_view_matrix();
 
     // TODO update model_matrices
+    sys_load_meshes();
     sys_render_geometries(&r, projection_matrix, view_matrix);
     pbrd_render_lighting(&r, &l, 1, camera.m_pos, window_width, window_height);
 
