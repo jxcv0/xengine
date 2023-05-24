@@ -61,18 +61,34 @@ int main() {
   assert(mem_component_count(POSITION) == 3);
 
   mem_add_component(e3, POSITION);
-  struct position pos1 = {{{1, 1, 1}}};  // this is wild
-  struct position pos2 = {{{2, 2, 2}}};
-  struct position pos3 = {{{3, 3, 3}}};
-  struct position pos4 = {{{4, 4, 4}}};
-  mem_component(e1, POSITION)->position = pos1;
-  mem_component(e2, POSITION)->position = pos2;
-  mem_component(e3, POSITION)->position = pos3;
-  mem_component(e4, POSITION)->position = pos4;
+  union component pos1;
+  pos1.position.x = 1.0f;
+  pos1.position.y = 1.0f;
+  pos1.position.z = 1.0f;
+
+  union component pos2;
+  pos2.position.x = 2.0f;
+  pos2.position.y = 2.0f;
+  pos2.position.z = 2.0f;
+
+  union component pos3;
+  pos3.position.x = 3.0f;
+  pos3.position.y = 3.0f;
+  pos3.position.z = 3.0f;
+
+  union component pos4;
+  pos4.position.x = 4.0f;
+  pos4.position.y = 4.0f;
+  pos4.position.z = 4.0f;
+
+  mem_set_component(e1, POSITION, pos1);
+  mem_set_component(e2, POSITION, pos2);
+  mem_set_component(e3, POSITION, pos3);
+  mem_set_component(e4, POSITION, pos4);
 
   struct position p = mem_component(e1, POSITION)->position;
   for (int i = 0; i < 3; i++) {
-    assert(fabs(p.vec[i] - pos1.vec[i]) < 0.0001);
+    assert(fabs(p.vec[i] - pos1.position.vec[i]) < 0.0001);
   };
 
   // removing item in middle of buffer
@@ -80,12 +96,12 @@ int main() {
 
   p = mem_component(e1, POSITION)->position;
   for (int i = 0; i < 3; i++) {
-    assert(fabs(p.vec[i] - pos1.vec[i]) < 0.0001);
+    assert(fabs(p.vec[i] - pos1.position.vec[i]) < 0.0001);
   };
 
   p = mem_component(e4, POSITION)->position;
   for (int i = 0; i < 3; i++) {
-    assert(fabs(p.vec[i] - pos4.vec[i]) < 0.0001);
+    assert(fabs(p.vec[i] - pos4.position.vec[i]) < 0.0001);
   };
 
   mem_delete_entity(e1);

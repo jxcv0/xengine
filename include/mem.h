@@ -43,8 +43,7 @@ union component {
   struct pbr_material material;
   struct position position;
   struct model_matrix model_matrix;
-  struct loadreq load_geom;
-  struct loadreq load_mat;
+  struct loadreq request;
   // struct loadreq load_geom;
   // struct loadreq load_geom;
   // ...
@@ -78,6 +77,8 @@ cmpnt_t mem_identity(uint32_t e);
 int mem_add_component(uint32_t e, cmpnt_t type);
 
 void mem_remove_component(uint32_t e, cmpnt_t type);
+
+int mem_set_component(uint32_t e, cmpnt_t type, union component cmpnt);
 
 // TODO Remove this function. Use _array and _write
 union component *mem_component(uint32_t e, cmpnt_t type);

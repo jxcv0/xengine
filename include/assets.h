@@ -31,7 +31,7 @@ char *decompress_lz77(struct lz77tok *toks, size_t ntoks, size_t n);
 /**
  * TODO
  */
-int write_file(char *file, const char *filepath);
+int write_file(char *bytes, const char *filepath);
 
 /**
  * @brief Load a 3D object from a xengine binary file.

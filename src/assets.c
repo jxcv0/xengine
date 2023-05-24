@@ -86,11 +86,10 @@ struct lz77tok *compress_lz77(const char *data, size_t len, size_t *ntoks) {
   size_t n = 0;
   for (size_t i = 0; i < len;) {
     struct lz77tok tok = {.start = 0, .len = 0, .next = data[i]};
-
     const char *input = data + i;
-    for (size_t j = 1; j <= i && j <= UINT8_MAX; j++) {
+    for (size_t j = 1; j <= i && j <= 64; j++) {
       const char *win = input - j;
-      for (size_t k = 1; k <= j; k++) {
+      for (size_t k = 1; k <= 64; k++) {
         if (memcmp(input, win, k) == 0 && k > tok.len) {
           tok.start = j;
           tok.len = k;

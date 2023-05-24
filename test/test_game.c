@@ -70,7 +70,7 @@ int main() {
   }
 
   if (load_mtl((struct pbr_material *)mem_component(e1, MATERIAL),
-               "assets/textures/ravine_rock") == -1) {
+               "assets/textures/ravine_rock.mtl") == -1) {
     exit(EXIT_FAILURE);
   }
 

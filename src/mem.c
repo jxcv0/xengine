@@ -182,6 +182,17 @@ void mem_remove_component(uint32_t e, cmpnt_t type) {
   --entry->count;
 }
 
+int mem_set_component(uint32_t e, cmpnt_t type, union component cmpnt) {
+  struct entry entry = lookup_table[type];
+  struct index_table *table = entry.table;
+  size_t index;
+  if (buffer_index(e, table, &index, entry.count) == -1) {
+    return -1;
+  }
+  entry.buffer[index] = cmpnt;
+  return 0;
+}
+
 /**
  * ----------------------------------------------------------------------------
  */
@@ -189,12 +200,10 @@ union component *mem_component(uint32_t e, cmpnt_t type) {
   struct entry entry = lookup_table[type];
   struct index_table *table = entry.table;
   size_t index;
-  if (table_index(e, table, &index, entry.count) == -1) {
+  if (buffer_index(e, table, &index, entry.count) == -1) {
     return NULL;
   }
-
-  size_t buffer_index = table[index].index;
-  return &entry.buffer[buffer_index];
+  return entry.buffer + index;
 }
 
 /**
