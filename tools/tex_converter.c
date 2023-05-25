@@ -26,11 +26,12 @@ int main(int argc, const char *argv[]) {
     }
   }
 
-  int sizes[4][3];
+  uint32_t sizes[4][3];
   unsigned char *data[4];
   for (int i = 0; i < 4; i++) {
-    data[i] =
-        stbi_load(argv[i + 1], &sizes[i][0], &sizes[i][1], &sizes[i][2], 0);
+    data[i] = stbi_load(argv[i + 1], (int *)&sizes[i][0], (int *)&sizes[i][1],
+                        (int *)&sizes[i][2], 0);
+    printf("Loaded img - %u x %u x %u\n", sizes[i][0], sizes[i][1], sizes[i][2]);
     if (data[i] == NULL) {
       printf("Unable to load input file: '%s'.\n", argv[i]);
       exit(EXIT_FAILURE);
@@ -43,13 +44,10 @@ int main(int argc, const char *argv[]) {
     exit(EXIT_FAILURE);
   }
 
-  fprintf(out, "%d %d %d %d %d %d %d %d %d %d %d %d\n", sizes[0][0],
-          sizes[0][1], sizes[0][2], sizes[1][0], sizes[1][1], sizes[1][2],
-          sizes[2][0], sizes[2][1], sizes[2][2], sizes[3][0], sizes[3][1],
-          sizes[3][2]);
+  fwrite(sizes, sizeof(uint32_t), 12, out);
 
   for (int i = 0; i < 4; i++) {
-    int imglen = sizes[i][0] * sizes[i][1] * sizes[i][2];
+    size_t imglen = sizes[i][0] * sizes[i][1] * sizes[i][2];
     fwrite(data[i], sizeof(unsigned char), imglen, out);
   }
 

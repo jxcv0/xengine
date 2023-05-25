@@ -123,29 +123,21 @@ char *decompress_lz77(struct lz77tok *toks, size_t ntoks, size_t n) {
  * ----------------------------------------------------------------------------
  */
 int load_obj(struct geometry *geom, const char *filepath) {
-  char *file = load_file(filepath);
-
-  if (file == NULL) {
+  FILE *file;
+  if ((file = fopen(filepath, "rb")) == NULL) {
     return -1;
   }
 
-  size_t header[2];
-  char *endptr = file;
-  for (int i = 0; i < 2; i++) {
-    header[i] = strtol(endptr, &endptr, 10);
-  }
+  fread(&geom->num_vertices, sizeof(size_t), 1, file);
+  fread(&geom->num_indices, sizeof(size_t), 1, file);
 
-  size_t verts_size = sizeof(struct vertex) * header[0];
-  size_t indices_size = sizeof(GLuint) * header[1];
+  size_t verts_size = sizeof(struct vertex) * geom->num_vertices;
+  size_t indices_size = sizeof(GLuint) * geom->num_vertices;
 
   void *mem = malloc(verts_size + indices_size);
   struct vertex *vertices = mem;
   GLuint *indices = mem + verts_size;
-
-  memcpy(mem, endptr + 1, verts_size + indices_size);
-
-  geom->num_vertices = header[0];
-  geom->num_indices = header[1];
+  fread(mem, 1, verts_size + indices_size, file);
 
   glGenBuffers(1, &geom->vbo);
   glGenBuffers(1, &geom->ebo);
@@ -181,7 +173,7 @@ int load_obj(struct geometry *geom, const char *filepath) {
                         (void *)(offsetof(struct vertex, tex_coord)));
 
   free(mem);
-  free(file);
+  fclose(file);
 
   return 0;
 }
@@ -190,19 +182,21 @@ int load_obj(struct geometry *geom, const char *filepath) {
  * ----------------------------------------------------------------------------
  */
 int load_mtl(struct pbr_material *mat, const char *filepath) {
-  char *file = load_file(filepath);
-
-  if (file == NULL) {
+  FILE *file;
+  if ((file = fopen(filepath, "rb")) == NULL) {
     return -1;
   }
 
-  size_t sizes[4][3];
-  char *endptr = file;
+  uint32_t sizes[4][3];
+  fread(sizes, sizeof(uint32_t), 12, file);
+
+  size_t imgsize = 0;
   for (int i = 0; i < 4; i++) {
-    for (int j = 0; j < 3; j++) {
-      sizes[i][j] = strtol(endptr, &endptr, 10);
-    }
+    imgsize += sizes[i][0] * sizes[i][1] * sizes[i][2];
   }
+
+  unsigned char *imgdata = malloc(imgsize);
+  fread(imgdata, 1, imgsize, file);
 
   size_t offset = 0;
   for (int i = 0; i < 4; i++) {
@@ -218,11 +212,12 @@ int load_mtl(struct pbr_material *mat, const char *filepath) {
 
     glTexImage2D(GL_TEXTURE_2D, 0, format_table[sizes[i][2]], sizes[i][0],
                  sizes[i][1], 0, format_table[sizes[i][2]], GL_UNSIGNED_BYTE,
-                 endptr + 1 + offset);
+                 imgdata + offset);
     offset += sizes[i][0] * sizes[i][1] * sizes[i][2];
   }
 
-  free(file);
+  free(imgdata);
+  fclose(file);
 
   return 0;
 }
