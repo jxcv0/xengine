@@ -54,17 +54,14 @@ int main() {
   uint32_t e1;
   mem_create_entity(&e1);
   mem_add_component(e1, MESH_LOAD_REQUEST);
-  mem_add_component(e1, MATERIAL);
+  mem_add_component(e1, MAT_LOAD_REQUEST);
   mem_add_component(e1, MODEL_MATRIX);
 
   union component lr;
   strcpy(lr.request.path, "suzanne");
   mem_set_component(e1, MESH_LOAD_REQUEST, lr);
-
-  if (load_mtl((struct pbr_material *)mem_component(e1, MATERIAL),
-               "assets/textures/ravine_rock.mtl") == -1) {
-    exit(EXIT_FAILURE);
-  }
+  strcpy(lr.request.path, "assets/textures/ravine_rock.mtl");
+  mem_set_component(e1, MAT_LOAD_REQUEST, lr);
 
   float identity[4][4] = IDENTITY_MAT4;
   memcpy(mem_component(e1, MODEL_MATRIX), identity, sizeof(identity));
@@ -94,7 +91,6 @@ int main() {
     memcpy(identities[i], model_matrix, sizeof(mat4));
   }
 
-  printf("union component: %ld\n", sizeof(union component));
   while (!glfwWindowShouldClose(window)) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
       glfwSetWindowShouldClose(window, true);
@@ -108,7 +104,8 @@ int main() {
     update_view_matrix();
 
     // TODO update model_matrices
-    sys_load_meshes();
+    sys_load(MESH_LOAD_REQUEST);
+    sys_load(MAT_LOAD_REQUEST);
     sys_render_geometries(&r, projection_matrix, view_matrix);
     pbrd_render_lighting(&r, &l, 1, camera.m_pos, window_width, window_height);
 

@@ -18,7 +18,6 @@ void sys_update_model_matrices(void) {
   union component *model_buf = malloc(sizeof(union component) * nent);
   mem_array(nent, entity_buf, POSITION, pos_buf);
   mem_array(nent, entity_buf, MODEL_MATRIX, model_buf);
-
   for (size_t i = 0; i < nent; i++) {
     translate(model_buf[i].model_matrix.elem, pos_buf[i].position.vec);
   }
@@ -32,21 +31,43 @@ void sys_update_model_matrices(void) {
 /**
  * ----------------------------------------------------------------------------
  */
-void sys_load_meshes(void) {
-  cmpnt_t mask = MESH_LOAD_REQUEST_BIT;
+void sys_load(cmpnt_t component_type) {
+  cmpnt_t result_type;
+  switch (component_type) {
+    case MESH_LOAD_REQUEST:
+      result_type = MESH;
+      break;
+    case MAT_LOAD_REQUEST:
+      result_type = MATERIAL;
+      break;
+    default:
+      return;
+  }
+  cmpnt_t mask = (1 << component_type);
   size_t nent = mem_count(mask);
   mem_entities(mask, entity_buf);
 
   union component *buf = malloc(sizeof(union component) * nent);
-  mem_array(nent, entity_buf, MESH_LOAD_REQUEST, buf);
+  mem_array(nent, entity_buf, component_type, buf);
 
   for (size_t i = 0; i < nent; i++) {
     union component comp;
-    if (load_obj(&comp.mesh, buf[i].request.path) == 0) {
-      mem_add_component(entity_buf[i], MESH);
-      mem_remove_component(entity_buf[i], MESH_LOAD_REQUEST);
-      mem_set_component(entity_buf[i], MESH, comp);
+    switch (result_type) {
+      case MESH:
+        if (load_obj(&comp.mesh, buf[i].request.path) != 0) {
+          continue;
+        }
+        break;
+
+      case MATERIAL:
+        if (load_mtl(&comp.material, buf[i].request.path) != 0) {
+          continue;
+        }
+        break;
     }
+    mem_add_component(entity_buf[i], result_type);
+    mem_remove_component(entity_buf[i], component_type);
+    mem_set_component(entity_buf[i], result_type, comp);
   }
 
   free(buf);
@@ -103,8 +124,8 @@ void sys_render_geometries(struct renderer *r, float projection[4][4],
 
     glBindVertexArray(mesh_buf[i].mesh.vao);
 
-    glDrawElements(GL_TRIANGLES, mesh_buf[i].mesh.num_indices,
-                   GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, mesh_buf[i].mesh.num_indices, GL_UNSIGNED_INT,
+                   0);
   }
 
   free(mesh_buf);

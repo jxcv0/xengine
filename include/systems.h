@@ -6,7 +6,7 @@
 
 void sys_update_model_matrices(void);
 
-void sys_load_meshes(void);
+void sys_load(cmpnt_t component_type);
 
 void sys_load_materials(void);
 
