@@ -159,7 +159,7 @@ int pbrd_init(struct renderer *r, const uint32_t scr_w, const uint32_t scr_h) {
  */
 void pbrd_render_geometries(struct renderer *r, float projection[4][4],
                             float view[4][4], float *model_matrices[4][4],
-                            struct geometry *geometries,
+                            struct mesh *geometries,
                             struct pbr_material *materials, size_t n) {
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

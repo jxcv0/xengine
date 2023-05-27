@@ -31,7 +31,8 @@ int main(int argc, const char *argv[]) {
   for (int i = 0; i < 4; i++) {
     data[i] = stbi_load(argv[i + 1], (int *)&sizes[i][0], (int *)&sizes[i][1],
                         (int *)&sizes[i][2], 0);
-    printf("Loaded img - %u x %u x %u\n", sizes[i][0], sizes[i][1], sizes[i][2]);
+    printf("Loaded img - %u x %u x %u\n", sizes[i][0], sizes[i][1],
+           sizes[i][2]);
     if (data[i] == NULL) {
       printf("Unable to load input file: '%s'.\n", argv[i]);
       exit(EXIT_FAILURE);

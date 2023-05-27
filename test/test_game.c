@@ -25,17 +25,10 @@ GLFWwindow *window;
 const float window_width = 800;
 const float window_height = 600;
 
-// struct light light_array[MAX_NUM_LIGHTS] = {0};
-vec3 positions[MAX_ENTITIES] = {0};
-mat4 model_matrices[MAX_ENTITIES] = {0};
-
 struct camera camera;
 struct mouse_pos mouse_pos = {0};
 mat4 projection_matrix = {0};
 mat4 view_matrix = {0};
-
-uint32_t num_geoms = 0;
-struct geometry geometry_arr[MAX_GEOMS] = {0};
 
 void update_view_matrix();
 void handle_mouse_movement(GLFWwindow *w, double x, double y);
@@ -60,13 +53,13 @@ int main() {
 
   uint32_t e1;
   mem_create_entity(&e1);
-  mem_add_component(e1, GEOM_LOAD_REQUEST);
+  mem_add_component(e1, MESH_LOAD_REQUEST);
   mem_add_component(e1, MATERIAL);
   mem_add_component(e1, MODEL_MATRIX);
 
   union component lr;
   strcpy(lr.request.path, "suzanne");
-  mem_set_component(e1, GEOM_LOAD_REQUEST, lr);
+  mem_set_component(e1, MESH_LOAD_REQUEST, lr);
 
   if (load_mtl((struct pbr_material *)mem_component(e1, MATERIAL),
                "assets/textures/ravine_rock.mtl") == -1) {

@@ -7,6 +7,7 @@
 
 #define TEXTURE_DIR "assets/textures/"
 #define COMP_WINDOW_LEN 64
+#define MAX_LOADED_ASSETS 32
 
 struct lz77tok {
   uint8_t start;
@@ -39,7 +40,7 @@ int write_file(char *bytes, const char *filepath);
  * @param filepath The filepath to load the object from.
  * @return 0 on success, -1 on failure.
  */
-int load_obj(struct geometry *geom, const char *filepath);
+int load_obj(struct mesh *geom, const char *filepath);
 
 /**
  * @brief Load a material from a xengine binary file.

@@ -18,7 +18,7 @@ int main() {
   assert(mem_identity(e1) == 0x80000000);
 
   mem_create_entity(&e1);
-  assert(mem_add_component(e1, GEOMETRY) != -1);
+  assert(mem_add_component(e1, MESH) != -1);
   assert(mem_identity(e1) == 0x1);
 
   uint32_t e2, e3, e4;
@@ -28,35 +28,35 @@ int main() {
 
   assert(mem_add_component(e2, MATERIAL) != -1);
 
-  assert(mem_add_component(e3, GEOMETRY) != -1);
+  assert(mem_add_component(e3, MESH) != -1);
   assert(mem_add_component(e3, MATERIAL) != -1);
 
-  assert(mem_add_component(e4, GEOMETRY) != -1);
+  assert(mem_add_component(e4, MESH) != -1);
   assert(mem_add_component(e4, MATERIAL) != -1);
   assert(mem_add_component(e4, POSITION) != -1);
 
-  assert(mem_identity(e1) == GEOMETRY_BIT);
+  assert(mem_identity(e1) == MESH_BIT);
   assert(mem_identity(e2) == MATERIAL_BIT);
-  assert(mem_identity(e3) == (GEOMETRY_BIT | MATERIAL_BIT));
-  assert(mem_identity(e4) == (GEOMETRY_BIT | MATERIAL_BIT | POSITION_BIT));
-  assert(mem_component_count(GEOMETRY) == 3);
+  assert(mem_identity(e3) == (MESH_BIT | MATERIAL_BIT));
+  assert(mem_identity(e4) == (MESH_BIT | MATERIAL_BIT | POSITION_BIT));
+  assert(mem_component_count(MESH) == 3);
   assert(mem_component_count(MATERIAL) == 3);
   assert(mem_component_count(POSITION) == 1);
 
-  assert(mem_count(GEOMETRY_BIT) == 3);
-  assert(mem_count(GEOMETRY_BIT | MATERIAL_BIT) == 2);
-  assert(mem_count(GEOMETRY_BIT | MATERIAL_BIT | POSITION_BIT) == 1);
+  assert(mem_count(MESH_BIT) == 3);
+  assert(mem_count(MESH_BIT | MATERIAL_BIT) == 2);
+  assert(mem_count(MESH_BIT | MATERIAL_BIT | POSITION_BIT) == 1);
 
-  mem_remove_component(e2, GEOMETRY);  // should do nothing
+  mem_remove_component(e2, MESH);  // should do nothing
 
   assert(mem_identity(e2) == MATERIAL_BIT);
   mem_remove_component(e4, MATERIAL);
-  assert(mem_identity(e4) == (GEOMETRY_BIT | POSITION_BIT));
+  assert(mem_identity(e4) == (MESH_BIT | POSITION_BIT));
   mem_add_component(e2, POSITION);
   mem_add_component(e1, POSITION);
-  assert(mem_identity(e1) == (GEOMETRY_BIT | POSITION_BIT));
+  assert(mem_identity(e1) == (MESH_BIT | POSITION_BIT));
   assert(mem_identity(e2) == (MATERIAL_BIT | POSITION_BIT));
-  assert(mem_component_count(GEOMETRY) == 3);
+  assert(mem_component_count(MESH) == 3);
   assert(mem_component_count(MATERIAL) == 2);
   assert(mem_component_count(POSITION) == 3);
 
@@ -108,10 +108,10 @@ int main() {
   mem_delete_entity(e2);
   mem_delete_entity(e3);
   mem_delete_entity(e4);
-  assert(mem_count(GEOMETRY_BIT) == 0);
-  assert(mem_count(GEOMETRY_BIT | MATERIAL_BIT) == 0);
-  assert(mem_count(GEOMETRY_BIT | MATERIAL_BIT | POSITION_BIT) == 0);
-  assert(mem_component_count(GEOMETRY) == 0);
+  assert(mem_count(MESH_BIT) == 0);
+  assert(mem_count(MESH_BIT | MATERIAL_BIT) == 0);
+  assert(mem_count(MESH_BIT | MATERIAL_BIT | POSITION_BIT) == 0);
+  assert(mem_component_count(MESH) == 0);
   assert(mem_component_count(MATERIAL) == 0);
   assert(mem_component_count(POSITION) == 0);
 
@@ -120,9 +120,9 @@ int main() {
   mem_create_entity(&e3);
   mem_create_entity(&e4);
 
-  mem_add_component(e1, GEOMETRY);
-  mem_add_component(e2, GEOMETRY);
-  mem_add_component(e3, GEOMETRY);
+  mem_add_component(e1, MESH);
+  mem_add_component(e2, MESH);
+  mem_add_component(e3, MESH);
 
   mem_add_component(e1, MATERIAL);
   mem_add_component(e2, MATERIAL);
@@ -133,44 +133,44 @@ int main() {
   mem_add_component(e3, POSITION);
   mem_add_component(e4, POSITION);
 
-  assert(mem_component_count(GEOMETRY) == 3);
+  assert(mem_component_count(MESH) == 3);
   assert(mem_component_count(MATERIAL) == 3);
   assert(mem_component_count(POSITION) == 4);
 
-  assert(mem_count(GEOMETRY_BIT) == 3);
-  assert(mem_count(GEOMETRY_BIT | POSITION_BIT) == 3);
-  assert(mem_count(GEOMETRY_BIT | MATERIAL_BIT) == 3);
-  assert(mem_count(GEOMETRY_BIT | MATERIAL_BIT | POSITION_BIT) == 3);
+  assert(mem_count(MESH_BIT) == 3);
+  assert(mem_count(MESH_BIT | POSITION_BIT) == 3);
+  assert(mem_count(MESH_BIT | MATERIAL_BIT) == 3);
+  assert(mem_count(MESH_BIT | MATERIAL_BIT | POSITION_BIT) == 3);
   assert(mem_count(POSITION_BIT) == 4);
 
-  size_t ne = mem_count(GEOMETRY_BIT | POSITION_BIT);
+  size_t ne = mem_count(MESH_BIT | POSITION_BIT);
   uint32_t e_arr[ne];
-  mem_entities(GEOMETRY_BIT | POSITION_BIT, e_arr);
+  mem_entities(MESH_BIT | POSITION_BIT, e_arr);
   assert(e_arr[0] == e1);
   assert(e_arr[1] == e2);
   assert(e_arr[2] == e3);
 
-  mem_component(e1, GEOMETRY)->geometry.vbo = 1;
-  mem_component(e2, GEOMETRY)->geometry.vbo = 2;
-  mem_component(e3, GEOMETRY)->geometry.vbo = 3;
+  mem_component(e1, MESH)->mesh.vbo = 1;
+  mem_component(e2, MESH)->mesh.vbo = 2;
+  mem_component(e3, MESH)->mesh.vbo = 3;
   mem_component(e1, POSITION)->position.x = 1.0f;
   mem_component(e2, POSITION)->position.x = 2.0f;
   mem_component(e3, POSITION)->position.x = 3.0f;
 
   union component arr[ne];
-  mem_array(ne, e_arr, GEOMETRY, arr);
-  assert(arr[0].geometry.vbo == 1);
-  assert(arr[1].geometry.vbo == 2);
-  assert(arr[2].geometry.vbo == 3);
+  mem_array(ne, e_arr, MESH, arr);
+  assert(arr[0].mesh.vbo == 1);
+  assert(arr[1].mesh.vbo == 2);
+  assert(arr[2].mesh.vbo == 3);
   for (size_t i = 0; i < ne; i++) {
-    arr[i].geometry.vbo += 5;
+    arr[i].mesh.vbo += 5;
   }
-  assert(arr[0].geometry.vbo == 6);
-  assert(arr[1].geometry.vbo == 7);
-  assert(arr[2].geometry.vbo == 8);
-  mem_write(ne, e_arr, GEOMETRY, arr);
-  assert(mem_component(e1, GEOMETRY)->geometry.vbo == 6);
-  assert(mem_component(e2, GEOMETRY)->geometry.vbo == 7);
-  assert(mem_component(e3, GEOMETRY)->geometry.vbo == 8);
+  assert(arr[0].mesh.vbo == 6);
+  assert(arr[1].mesh.vbo == 7);
+  assert(arr[2].mesh.vbo == 8);
+  mem_write(ne, e_arr, MESH, arr);
+  assert(mem_component(e1, MESH)->mesh.vbo == 6);
+  assert(mem_component(e2, MESH)->mesh.vbo == 7);
+  assert(mem_component(e3, MESH)->mesh.vbo == 8);
   TEST_END();
 }

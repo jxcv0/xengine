@@ -10,21 +10,6 @@
 #define MAX_ASSET_PATH_LEN 32
 
 /**
- * @brief Stores the data required to render a mesh.
- * TODO use struct geometry instead.
- */
-struct mesh {
-  GLuint id;
-  GLuint vbo;
-  GLuint vao;
-  GLuint ebo;
-  GLuint num_vertices;
-  GLuint num_indices;
-  GLuint tex_diff;  // TODO link this some other way.
-  GLuint tex_spec;  // TODO see above.
-};
-
-/**
  * @brief data for calculating view matrix.
  */
 struct camera {
@@ -42,7 +27,7 @@ struct camera {
  * @brief Contains ID's of diffuse, normal, roughness and metallic image
  * maps.
  *
- * WARNING: the order of the members is important see assets.c:load_mtl
+ * NOTE: the order of the members is important see assets.c:load_mtl
  */
 struct pbr_material {
   union {
@@ -57,6 +42,7 @@ struct pbr_material {
 };
 
 struct vertex {
+  // uint32_t bone_ids[MAX_BONE_INFLUENCE];
   float position[3];
   float tex_coord[2];
   float normal[3];
@@ -67,7 +53,7 @@ struct vertex {
 /**
  * @brief 3D geometry data
  */
-struct geometry {
+struct mesh {
   GLuint vbo;
   GLuint vao;
   GLuint ebo;

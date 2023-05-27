@@ -13,7 +13,7 @@ struct index_table {
 };
 
 // geometry buffer
-static union component geometry_buf[MAX_NUM_GEOMETRIES];
+static union component mesh_buf[MAX_NUM_GEOMETRIES];
 static struct index_table geometry_table[MAX_NUM_GEOMETRIES];
 
 // material buffer
@@ -44,7 +44,7 @@ struct entry {
 
 // TODO should each of these have a mutex?
 static struct entry lookup_table[NUM_COMPONENT_TYPES] = {
-    {geometry_buf, geometry_table, 0},
+    {mesh_buf, geometry_table, 0},
     {material_buf, material_table, 0},
     {position_buf, position_table, 0},
     {model_matrix_buf, model_matrix_table, 0},

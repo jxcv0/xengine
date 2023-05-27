@@ -84,7 +84,7 @@ void create_editor_window(GLFWwindow **window, const float width,
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
   glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
-  // glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+  glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
   *window = glfwCreateWindow(width, height, name, NULL, NULL);
 

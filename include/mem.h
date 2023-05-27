@@ -19,33 +19,31 @@ typedef uint32_t cmpnt_t;
 #define MAX_NUM_LOAD_REQUESTS 32
 
 // lookup index
-#define GEOMETRY 0
+#define MESH 0
 #define MATERIAL 1
 #define MODEL_MATRIX 2
 #define POSITION 3
-#define GEOM_LOAD_REQUEST 4
+#define MESH_LOAD_REQUEST 4
 #define MAT_LOAD_REQUEST 5
 // #define ANIM_LOAD_REQUEST 6
 // #define AUDIO_LOAD_REQUEST 7
 
 // bitmasks
-#define GEOMETRY_BIT (1 << GEOMETRY)
+#define MESH_BIT (1 << MESH)
 #define MATERIAL_BIT (1 << MATERIAL)
 #define MODEL_MATRIX_BIT (1 << MODEL_MATRIX)
 #define POSITION_BIT (1 << POSITION)
-#define GEOM_LOAD_REQUEST_BIT (1 << GEOM_LOAD_REQUEST);
+#define MESH_LOAD_REQUEST_BIT (1 << MESH_LOAD_REQUEST);
 #define MAT_LOAD_REQUEST_BIT (1 << MAT_LOAD_REQUEST);
 // #define ANIM_LOAD_REQUEST_BIT (1 << ANIM_LOAD_REQUEST);
 // #define AUDIO_LOAD_REQUEST_BIT (1 << AUDIO_LOAD_REQUEST);
 
 union component {
-  struct geometry geometry;
+  struct mesh mesh;
   struct pbr_material material;
   struct position position;
   struct model_matrix model_matrix;
   struct loadreq request;
-  // struct loadreq load_geom;
-  // struct loadreq load_geom;
   // ...
 };
 

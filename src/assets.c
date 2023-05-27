@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+char loaded_assets[MAX_LOADED_ASSETS][MAX_ASSET_PATH_LEN];
+
 /**
  * ----------------------------------------------------------------------------
  */
@@ -122,7 +124,7 @@ char *decompress_lz77(struct lz77tok *toks, size_t ntoks, size_t n) {
 /**
  * ----------------------------------------------------------------------------
  */
-int load_obj(struct geometry *geom, const char *filepath) {
+int load_obj(struct mesh *geom, const char *filepath) {
   FILE *file;
   if ((file = fopen(filepath, "rb")) == NULL) {
     return -1;
