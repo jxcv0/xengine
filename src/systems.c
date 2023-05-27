@@ -33,19 +33,19 @@ void sys_update_model_matrices(void) {
  * ----------------------------------------------------------------------------
  */
 void sys_load_meshes(void) {
-  cmpnt_t mask = GEOM_LOAD_REQUEST_BIT;
+  cmpnt_t mask = MESH_LOAD_REQUEST_BIT;
   size_t nent = mem_count(mask);
   mem_entities(mask, entity_buf);
 
   union component *buf = malloc(sizeof(union component) * nent);
-  mem_array(nent, entity_buf, GEOM_LOAD_REQUEST, buf);
+  mem_array(nent, entity_buf, MESH_LOAD_REQUEST, buf);
 
   for (size_t i = 0; i < nent; i++) {
-    union component geom;
-    if (load_obj(&geom.geometry, buf[i].request.path) == 0) {
-      mem_add_component(entity_buf[i], GEOMETRY);
-      mem_remove_component(entity_buf[i], GEOM_LOAD_REQUEST);
-      mem_set_component(entity_buf[i], GEOMETRY, geom);
+    union component comp;
+    if (load_obj(&comp.mesh, buf[i].request.path) == 0) {
+      mem_add_component(entity_buf[i], MESH);
+      mem_remove_component(entity_buf[i], MESH_LOAD_REQUEST);
+      mem_set_component(entity_buf[i], MESH, comp);
     }
   }
 
@@ -62,16 +62,16 @@ void sys_load_materials(void) {}
  */
 void sys_render_geometries(struct renderer *r, float projection[4][4],
                            float view[4][4]) {
-  cmpnt_t mask = GEOMETRY_BIT | MATERIAL_BIT | MODEL_MATRIX_BIT;
+  cmpnt_t mask = MESH_BIT | MATERIAL_BIT | MODEL_MATRIX_BIT;
   size_t nent = mem_count(mask);
   mem_entities(mask, entity_buf);
 
   // TODO some kind of persistent (static?) resizable buffer
-  union component *geom_buf = malloc(sizeof(union component) * nent);
+  union component *mesh_buf = malloc(sizeof(union component) * nent);
   union component *mat_buf = malloc(sizeof(union component) * nent);
   union component *model_buf = malloc(sizeof(union component) * nent);
 
-  mem_array(nent, entity_buf, GEOMETRY, geom_buf);
+  mem_array(nent, entity_buf, MESH, mesh_buf);
   mem_array(nent, entity_buf, MATERIAL, mat_buf);
   mem_array(nent, entity_buf, MODEL_MATRIX, model_buf);
 
@@ -101,13 +101,13 @@ void sys_render_geometries(struct renderer *r, float projection[4][4],
     glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_2D, mat_buf[i].material.metallic);
 
-    glBindVertexArray(geom_buf[i].geometry.vao);
+    glBindVertexArray(mesh_buf[i].mesh.vao);
 
-    glDrawElements(GL_PATCHES, geom_buf[i].geometry.num_indices,
+    glDrawElements(GL_TRIANGLES, mesh_buf[i].mesh.num_indices,
                    GL_UNSIGNED_INT, 0);
   }
 
-  free(geom_buf);
+  free(mesh_buf);
   free(mat_buf);
   free(model_buf);
 }

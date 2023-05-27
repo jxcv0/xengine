@@ -13,15 +13,15 @@
  */
 static void load_pbrd_shaders(struct renderer *r) {
   char *v = load_file_into_mem("glsl/pbrd_geom.vert");
-  char *c = load_file_into_mem("glsl/pbrd_geom.tesc");
-  char *e = load_file_into_mem("glsl/pbrd_geom.tese");
-  char *g = load_file_into_mem("glsl/pbrd_geom.geom");
+  // char *c = load_file_into_mem("glsl/pbrd_geom.tesc");
+  // char *e = load_file_into_mem("glsl/pbrd_geom.tese");
+  // char *g = load_file_into_mem("glsl/pbrd_geom.geom");
   char *f = load_file_into_mem("glsl/pbrd_geom.frag");
 
   const char *vert_file = v;
-  const char *tesc_file = c;
-  const char *tese_file = e;
-  const char *geom_file = g;
+  // const char *tesc_file = c;
+  // const char *tese_file = e;
+  // const char *geom_file = g;
   const char *frag_file = f;
 
   GLuint vert_id = glCreateShader(GL_VERTEX_SHADER);
@@ -29,6 +29,7 @@ static void load_pbrd_shaders(struct renderer *r) {
   glCompileShader(vert_id);
   check_compile(vert_id);
 
+  /*
   GLuint tesc_id = glCreateShader(GL_TESS_CONTROL_SHADER);
   glShaderSource(tesc_id, 1, &tesc_file, NULL);
   glCompileShader(tesc_id);
@@ -43,6 +44,7 @@ static void load_pbrd_shaders(struct renderer *r) {
   glShaderSource(geom_id, 1, &geom_file, NULL);
   glCompileShader(geom_id);
   check_compile(geom_id);
+  */
 
   GLuint frag_id = glCreateShader(GL_FRAGMENT_SHADER);
   glShaderSource(frag_id, 1, &frag_file, NULL);
@@ -51,24 +53,24 @@ static void load_pbrd_shaders(struct renderer *r) {
 
   GLuint program_id = glCreateProgram();
   glAttachShader(program_id, vert_id);
-  glAttachShader(program_id, tesc_id);
-  glAttachShader(program_id, tese_id);
-  glAttachShader(program_id, geom_id);
+  // glAttachShader(program_id, tesc_id);
+  // glAttachShader(program_id, tese_id);
+  // glAttachShader(program_id, geom_id);
   glAttachShader(program_id, frag_id);
 
   glLinkProgram(program_id);
   check_link(program_id);
 
   glDeleteShader(vert_id);
-  glDeleteShader(tesc_id);
-  glDeleteShader(tese_id);
-  glDeleteShader(geom_id);
+  // glDeleteShader(tesc_id);
+  // glDeleteShader(tese_id);
+  // glDeleteShader(geom_id);
   glDeleteShader(frag_id);
 
   free(v);
-  free(c);
-  free(e);
-  free(g);
+  // free(c);
+  // free(e);
+  // free(g);
   free(f);
 
   r->deferred_geometry = program_id;
@@ -81,7 +83,7 @@ static void load_pbrd_shaders(struct renderer *r) {
  */
 int pbrd_init(struct renderer *r, const uint32_t scr_w, const uint32_t scr_h) {
   load_pbrd_shaders(r);
-  glPatchParameteri(GL_PATCH_VERTICES, 3);
+  // glPatchParameteri(GL_PATCH_VERTICES, 3);
 
   // set up G-Buffer
   glGenFramebuffers(1, &r->g_buff);
@@ -192,7 +194,7 @@ void pbrd_render_geometries(struct renderer *r, float projection[4][4],
 
     glBindVertexArray(geometries[i].vao);
 
-    glDrawElements(GL_PATCHES, geometries[i].num_indices, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, geometries[i].num_indices, GL_UNSIGNED_INT, 0);
   }
 }
 
