@@ -58,7 +58,7 @@ int main() {
   mem_add_component(e1, MODEL_MATRIX);
 
   union component lr;
-  strcpy(lr.request.path, "suzanne");
+  strcpy(lr.request.path, "assets/meshes/suzanne.mesh");
   mem_set_component(e1, MESH_LOAD_REQUEST, lr);
   strcpy(lr.request.path, "assets/textures/ravine_rock.mtl");
   mem_set_component(e1, MAT_LOAD_REQUEST, lr);

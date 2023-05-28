@@ -46,8 +46,8 @@ int main(int argc, char *argv[]) {
   }
 
   const struct aiScene *scene =
-      aiImportFile(argv[1], aiProcess_Triangulate | aiProcess_GenSmoothNormals |
-                                aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+      aiImportFile(argv[1], aiProcess_GenSmoothNormals | aiProcess_FlipUVs |
+                                aiProcess_CalcTangentSpace);
 
   if (scene == NULL) {
     fprintf(stderr, "%s\n", aiGetErrorString());

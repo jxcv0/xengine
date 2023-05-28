@@ -8,6 +8,7 @@
 #include "lin.h"
 
 #define MAX_ASSET_PATH_LEN 32
+#define MAX_BONE_INFLUENCE 4
 
 /**
  * @brief data for calculating view matrix.
@@ -42,12 +43,13 @@ struct pbr_material {
 };
 
 struct vertex {
-  // uint32_t bone_ids[MAX_BONE_INFLUENCE];
   float position[3];
   float tex_coord[2];
   float normal[3];
   float tangent[3];
   float bitangent[3];
+  uint32_t bone_ids[MAX_BONE_INFLUENCE];
+  float bone_weights[MAX_BONE_INFLUENCE];
 };
 
 /**
