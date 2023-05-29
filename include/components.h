@@ -10,6 +10,17 @@
 #define MAX_ASSET_PATH_LEN 32
 #define MAX_BONE_INFLUENCE 4
 
+enum component_type {
+  MESH = 0,
+  MATERIAL = 1,
+  MODEL_MATRIX = 2,
+  POSITION = 3,
+  MESH_LOAD_REQUEST = 4,
+  MAT_LOAD_REQUEST = 5
+  // ANIM_LOAD_REQUEST 6
+  // AUDIO_LOAD_REQUEST 7
+};
+
 /**
  * @brief data for calculating view matrix.
  */
@@ -90,6 +101,5 @@ union component {
   struct loadreq request;
   // ...
 };
-
 
 #endif  // TYPES_H_

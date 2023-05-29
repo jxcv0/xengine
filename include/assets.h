@@ -1,9 +1,9 @@
 #ifndef ASSETS_H_
 #define ASSETS_H_
 
+#include "components.h"
 #include "glad.h"
 #include "lin.h"
-#include "components.h"
 
 #define TEXTURE_DIR "assets/textures/"
 #define COMP_WINDOW_LEN 64
@@ -49,5 +49,15 @@ int load_obj(struct mesh *mesh, const char *filepath);
  * @return 0 on success, -1 on failure.
  */
 int load_mtl(struct pbr_material *mat, const char *filepath);
+
+/**
+ * @brief Request that the asset system load an asset in a background thread.
+ *
+ * @param type The type of the component to load.
+ * @param dest The destination component.
+ * @param filepath The path to the file to load.
+ */
+void load_asset_async(enum component_type type, union component *dest,
+                      const char *filepath);
 
 #endif  // ASSETS_H_

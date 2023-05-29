@@ -18,16 +18,6 @@ typedef uint32_t cmpnt_t;
 #define MAX_NUM_MODEL_MATRICES 32
 #define MAX_NUM_LOAD_REQUESTS 32
 
-// lookup index
-#define MESH 0
-#define MATERIAL 1
-#define MODEL_MATRIX 2
-#define POSITION 3
-#define MESH_LOAD_REQUEST 4
-#define MAT_LOAD_REQUEST 5
-// #define ANIM_LOAD_REQUEST 6
-// #define AUDIO_LOAD_REQUEST 7
-
 // bitmasks
 #define MESH_BIT (1 << MESH)
 #define MATERIAL_BIT (1 << MATERIAL)

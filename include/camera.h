@@ -1,8 +1,8 @@
 #ifndef CAMERA_H_
 #define CAMERA_H_
 
-#include "lin.h"
 #include "components.h"
+#include "lin.h"
 
 /**
  * @brief Update camera state based on change in cursor position.
