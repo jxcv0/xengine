@@ -82,4 +82,14 @@ struct loadreq {
   char path[MAX_ASSET_PATH_LEN];
 };
 
+union component {
+  struct mesh mesh;
+  struct pbr_material material;
+  struct position position;
+  struct model_matrix model_matrix;
+  struct loadreq request;
+  // ...
+};
+
+
 #endif  // TYPES_H_

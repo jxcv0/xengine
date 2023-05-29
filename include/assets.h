@@ -3,7 +3,7 @@
 
 #include "glad.h"
 #include "lin.h"
-#include "types.h"
+#include "components.h"
 
 #define TEXTURE_DIR "assets/textures/"
 #define COMP_WINDOW_LEN 64

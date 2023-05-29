@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 
-#include "types.h"
+#include "components.h"
 
 // change to wider int here if more than 31 components required
 typedef uint32_t cmpnt_t;
@@ -37,15 +37,6 @@ typedef uint32_t cmpnt_t;
 #define MAT_LOAD_REQUEST_BIT (1 << MAT_LOAD_REQUEST);
 // #define ANIM_LOAD_REQUEST_BIT (1 << ANIM_LOAD_REQUEST);
 // #define AUDIO_LOAD_REQUEST_BIT (1 << AUDIO_LOAD_REQUEST);
-
-union component {
-  struct mesh mesh;
-  struct pbr_material material;
-  struct position position;
-  struct model_matrix model_matrix;
-  struct loadreq request;
-  // ...
-};
 
 /**
  * @brief Initialize the memory subsystem.

@@ -2,11 +2,7 @@
 #define CAMERA_H_
 
 #include "lin.h"
-#include "types.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "components.h"
 
 /**
  * @brief Update camera state based on change in cursor position.
@@ -27,9 +23,5 @@ void process_mouse_movement(struct camera *camera, const vec2 cursor_offset);
  */
 void update_3rd_person_camera(struct camera *camera, const vec2 cursor_offset,
                               const float rad, const vec3 centre);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif  // CAMERA_H_
