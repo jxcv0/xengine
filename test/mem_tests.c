@@ -88,7 +88,7 @@ int main() {
 
   struct position p = mem_component(e1, POSITION)->position;
   for (int i = 0; i < 3; i++) {
-    assert(fabs(p.vec[i] - pos1.position.vec[i]) < 0.0001);
+    assert(fabs(p.elem[i] - pos1.position.elem[i]) < 0.0001);
   };
 
   // removing item in middle of buffer
@@ -96,12 +96,12 @@ int main() {
 
   p = mem_component(e1, POSITION)->position;
   for (int i = 0; i < 3; i++) {
-    assert(fabs(p.vec[i] - pos1.position.vec[i]) < 0.0001);
+    assert(fabs(p.elem[i] - pos1.position.elem[i]) < 0.0001);
   };
 
   p = mem_component(e4, POSITION)->position;
   for (int i = 0; i < 3; i++) {
-    assert(fabs(p.vec[i] - pos4.position.vec[i]) < 0.0001);
+    assert(fabs(p.elem[i] - pos4.position.elem[i]) < 0.0001);
   };
 
   mem_delete_entity(e1);

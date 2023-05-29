@@ -78,7 +78,6 @@ void mem_remove_component(uint32_t e, cmpnt_t type);
 
 int mem_set_component(uint32_t e, cmpnt_t type, union component cmpnt);
 
-// TODO Remove this function. Use _array and _write
 union component *mem_component(uint32_t e, cmpnt_t type);
 
 size_t mem_component_count(uint32_t cmpnt_t);

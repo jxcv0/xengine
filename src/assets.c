@@ -8,8 +8,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
-char loaded_assets[MAX_LOADED_ASSETS][MAX_ASSET_PATH_LEN];
+/* TODO Asset cache
+static char loaded_asset_paths[MAX_LOADED_ASSETS][MAX_ASSET_PATH_LEN];
+
+static struct {
+  union {
+    struct mesh as_mesh;
+    struct pbr_material as_material;
+  };
+} loaded_assets;
+*/
 
 /**
  * ----------------------------------------------------------------------------

@@ -69,7 +69,7 @@ struct model_matrix {
 
 struct position {
   union {
-    float vec[3];
+    float elem[3];
     struct {
       float x;
       float y;

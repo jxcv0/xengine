@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#define MAX_NUM_THREADS 8
+
 static uint32_t entity_buf[MAX_NUM_ENTITIES];
 
 /**
@@ -19,7 +21,7 @@ void sys_update_model_matrices(void) {
   mem_array(nent, entity_buf, POSITION, pos_buf);
   mem_array(nent, entity_buf, MODEL_MATRIX, model_buf);
   for (size_t i = 0; i < nent; i++) {
-    translate(model_buf[i].model_matrix.elem, pos_buf[i].position.vec);
+    translate(model_buf[i].model_matrix.elem, pos_buf[i].position.elem);
   }
 
   mem_write(nent, entity_buf, POSITION, pos_buf);
@@ -72,11 +74,6 @@ void sys_load(cmpnt_t component_type) {
 
   free(buf);
 }
-
-/**
- * ----------------------------------------------------------------------------
- */
-void sys_load_materials(void) {}
 
 /**
  * ----------------------------------------------------------------------------
