@@ -17,7 +17,6 @@ xen_lib := -L$(build_dir) -lxen
 c_comp := gcc
 format_cmd := "/usr/bin/clang-format -i -style=Google"
 
-# TODO make tools target
 all: tools tests
 
 $(build_dir)/%.o: %.c

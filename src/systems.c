@@ -8,6 +8,9 @@
 
 static uint32_t entity_buf[MAX_NUM_ENTITIES];
 
+// TODO This buffer is enormous
+static union component component_buffers[4][MAX_NUM_ENTITIES];
+
 /**
  * ----------------------------------------------------------------------------
  */
@@ -16,8 +19,9 @@ void sys_update_model_matrices(void) {
   size_t nent = mem_count(mask);
   mem_entities(mask, entity_buf);
 
-  union component *pos_buf = malloc(sizeof(union component) * nent);
-  union component *model_buf = malloc(sizeof(union component) * nent);
+  union component *pos_buf = component_buffers[0];
+  union component *model_buf = component_buffers[1];
+
   mem_array(nent, entity_buf, POSITION, pos_buf);
   mem_array(nent, entity_buf, MODEL_MATRIX, model_buf);
   for (size_t i = 0; i < nent; i++) {
@@ -26,8 +30,6 @@ void sys_update_model_matrices(void) {
 
   mem_write(nent, entity_buf, POSITION, pos_buf);
   mem_write(nent, entity_buf, MODEL_MATRIX, model_buf);
-  free(pos_buf);
-  free(model_buf);
 }
 
 /**
@@ -49,7 +51,7 @@ void sys_load(cmpnt_t component_type) {
   size_t nent = mem_count(mask);
   mem_entities(mask, entity_buf);
 
-  union component *buf = malloc(sizeof(union component) * nent);
+  union component *buf = component_buffers[0];
   mem_array(nent, entity_buf, component_type, buf);
 
   for (size_t i = 0; i < nent; i++) {
@@ -72,7 +74,6 @@ void sys_load(cmpnt_t component_type) {
     mem_set_component(entity_buf[i], result_type, comp);
   }
 
-  free(buf);
 }
 
 /**
@@ -84,10 +85,9 @@ void sys_render_geometries(struct renderer *r, float projection[4][4],
   size_t nent = mem_count(mask);
   mem_entities(mask, entity_buf);
 
-  // TODO some kind of persistent (static?) resizable buffer
-  union component *mesh_buf = malloc(sizeof(union component) * nent);
-  union component *mat_buf = malloc(sizeof(union component) * nent);
-  union component *model_buf = malloc(sizeof(union component) * nent);
+  union component *mesh_buf = component_buffers[1];
+  union component *mat_buf = component_buffers[2];
+  union component *model_buf = component_buffers[3];
 
   mem_array(nent, entity_buf, MESH, mesh_buf);
   mem_array(nent, entity_buf, MATERIAL, mat_buf);
@@ -124,8 +124,4 @@ void sys_render_geometries(struct renderer *r, float projection[4][4],
     glDrawElements(GL_TRIANGLES, mesh_buf[i].mesh.num_indices, GL_UNSIGNED_INT,
                    0);
   }
-
-  free(mesh_buf);
-  free(mat_buf);
-  free(model_buf);
 }
