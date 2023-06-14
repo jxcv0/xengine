@@ -15,11 +15,11 @@ int main() {
   assert(create_entity(&e1) != -1);
   assert(get_identity(e1) == 0);
   delete_entity(e1);
-  assert(get_identity(e1) == 0x80000000);
+  assert(get_identity(e1) == ENTITY_UNUSED);
 
   create_entity(&e1);
   assert(add_component(e1, MESH) != -1);
-  assert(get_identity(e1) == 0x1);
+  assert(get_identity(e1) == (1UL << MESH));
 
   uint32_t e2, e3, e4;
   create_entity(&e2);
@@ -38,7 +38,11 @@ int main() {
   uint64_t mesh_bit = (1LL << MESH);
   uint64_t mat_bit = (1LL << MATERIAL);
   uint64_t pos_bit = (1LL << POSITION);
-  
+
+  uint64_t a[] = {MESH, MATERIAL, POSITION};
+  uint64_t m = create_mask(3, a);
+
+  assert(m == (mesh_bit | mat_bit | pos_bit ));
 
   assert(get_identity(e1) == mesh_bit);
   assert(get_identity(e2) == mat_bit);
@@ -49,7 +53,7 @@ int main() {
   assert(get_component_count(POSITION) == 1);
 
   assert(get_num_entities(mesh_bit) == 3);
-  assert(get_num_entities(mesh_bit | pos_bit) == 2);
+  assert(get_num_entities(mesh_bit | mat_bit) == 2);
   assert(get_num_entities(mesh_bit | mat_bit | pos_bit) == 1);
 
   remove_component(e2, MESH);  // should do nothing

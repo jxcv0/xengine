@@ -7,7 +7,7 @@
 
 #define NUM_COMPONENT_TYPES 63
 #define MAX_NUM_ENTITIES 2048
-#define ENTITY_UNUSED (1LU << NUM_COMPONENT_TYPES)
+#define ENTITY_UNUSED 1
 
 #define MAX_NUM_GEOMETRIES 32
 #define MAX_NUM_MATERIALS 32
@@ -22,7 +22,7 @@ void init_mem_subsys(void);
 
 /**
  * @brief Create a mask from an array of components.
- * 
+ *
  * @param n The number of members in the components array
  * @param components An array of component types.
  * @return A The identity (bitmask) of entities that have all the components in
@@ -90,9 +90,9 @@ size_t get_num_entities(uint64_t mask);
 void get_entities(uint64_t mask, uint32_t *arr);
 
 void query(size_t nent, uint32_t *entities, uint64_t type,
-              union component *array);
+           union component *array);
 
 void update(size_t nent, uint32_t *entities, uint64_t type,
-               union component *array);
+            union component *array);
 
 #endif  // MEM_H_

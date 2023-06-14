@@ -8,10 +8,10 @@
 
 #include "assets.h"
 #include "camera.h"
+#include "gamestate.h"
 #include "glad.h"
 #include "input.h"
 #include "lin.h"
-#include "gamestate.h"
 #include "pbr_deferred.h"
 #include "systems.h"
 #include "text.h"

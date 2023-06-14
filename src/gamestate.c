@@ -149,7 +149,9 @@ void delete_entity(uint32_t e) {
 /**
  * ----------------------------------------------------------------------------
  */
-uint64_t get_identity(uint32_t e) { return entity_buf[e]; }
+uint64_t get_identity(uint32_t e) {
+  return entity_buf[e];
+}
 
 /**
  * ----------------------------------------------------------------------------
@@ -159,19 +161,17 @@ int add_component(uint32_t e, uint64_t type) {
     return -1;
   }
 
-  uint64_t mask = (1 << type);
-  struct entry *entry = &lookup_table[type];
-  if (entity_buf[e] & mask) {
-    // entity alread has this component
-    return 0;
-  }
+  uint64_t mask = (1LU << type);
+  if ((entity_buf[e] & mask) == 0) {
+    struct entry *entry = &lookup_table[type];
+    entity_buf[e] |= mask;
 
-  entity_buf[e] |= mask;
-  struct index_table *it = entry->table;
-  size_t count = entry->count;
-  it[count].entity = e;
-  it[count].index = count;
-  ++entry->count;
+    struct index_table *it = entry->table;
+    size_t count = entry->count;
+    it[count].entity = e;
+    it[count].index = count;
+    ++entry->count;
+  }
 
   return 0;
 }
@@ -193,7 +193,7 @@ void remove_component(uint32_t e, uint64_t type) {
   }
 
   if (table_index_delete != entry->count) {
-    entity_buf[e] &= ~(1 << type);
+    entity_buf[e] &= ~(1LU << type);
 
     size_t buffer_index_delete = table[table_index_delete].index;
     size_t last = (entry->count) - 1;
@@ -263,7 +263,7 @@ void get_entities(uint64_t mask, uint32_t *arr) {
  * ----------------------------------------------------------------------------
  */
 void query(size_t nent, uint32_t *entities, uint64_t type,
-              union component *array) {
+           union component *array) {
   struct entry entry = lookup_table[type];
   union component *buffer = entry.buffer;
   struct index_table *table = entry.table;
@@ -274,8 +274,11 @@ void query(size_t nent, uint32_t *entities, uint64_t type,
   }
 }
 
+/**
+ * ----------------------------------------------------------------------------
+ */
 void update(size_t nent, uint32_t *entities, uint64_t type,
-               union component *array) {
+            union component *array) {
   struct entry entry = lookup_table[type];
   union component *buffer = entry.buffer;
   struct index_table *table = entry.table;
