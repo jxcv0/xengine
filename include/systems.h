@@ -1,12 +1,12 @@
 #ifndef SYSTEMS_H_
 #define SYSTEMS_H_
 
-#include "mem.h"
+#include "gamestate.h"
 #include "pbr_deferred.h"
 
 void sys_update_model_matrices(void);
 
-void sys_load(cmpnt_t component_type);
+void sys_load(uint64_t component_type);
 
 void sys_load_materials(void);
 

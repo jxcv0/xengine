@@ -2,12 +2,13 @@
 #define LIN_H_
 
 #include <math.h>
+#include <stddef.h>
 
-#define IDENTITY_MAT4 {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#define IDENTITY_MAT4_INITIALIZER                            \
+  {                                                          \
+    {1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, { 0, 0, 0, 1 } \
+  }
+static const float IDENTITY_MAT4[4][4] = IDENTITY_MAT4_INITIALIZER;
 
 typedef float mat4[4][4];
 typedef float vec2[2];
@@ -20,6 +21,11 @@ typedef float vec4[4];
  * @param m The matrix to print.
  */
 void print_mat4(const mat4 m);
+
+/**
+ * @brief TODO
+ */
+void print_vec(const float *v, size_t n);
 
 /**
  * @brief Convert an angle from degrees to radians. Not exact.
@@ -107,7 +113,12 @@ void cross_vec3(vec3 dest, const vec3 v1, const vec3 v2);
  * @param m1 The first mat4.
  * @param m2 The second mat4.
  */
-void product_mat4(mat4 dest, const mat4 m1, const mat4 m2);
+void product_mat4(float dest[4][4], const float m1[4][4], const float m2[4][4]);
+
+/**
+ * @brief TODO
+ */
+void product_vec4(float dest[4], const float mat[4][4], const float vec[4]);
 
 /**
  * @brief Create perspective matrix.
@@ -148,7 +159,7 @@ void translate(mat4 m, const vec3 v);
  * @param axis The axis of the rotation.
  * @param angle The rotation angle in degrees.
  */
-void rotate(mat4 dest, const mat4 m, vec3 axis, const float angle);
+void rotate(float dest[4][4], const float m[4][4], float axis[3], float angle);
 
 /**
  * @brief Scale a tramsformation matrix by a vector v.
@@ -158,9 +169,5 @@ void rotate(mat4 dest, const mat4 m, vec3 axis, const float angle);
  * @param v The scaling vector.
  */
 void scale(mat4 dest, const mat4 m, const vec3 v);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif  // LIN_H_

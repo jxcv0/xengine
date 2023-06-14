@@ -18,7 +18,7 @@ void init_ttf(char *filepath) {
   unsigned char *ttf_buffer = load_file_into_mem_u(filepath);
   unsigned char temp_buffer[1024 * 1024];
 
-  // TODO stb recoments not using this
+  // TODO stb recommends not using this
   stbtt_BakeFontBitmap(ttf_buffer, 0, 64, temp_buffer, 1024, 1024, 32, 96,
                        baked_chars);
   free(ttf_buffer);
@@ -42,8 +42,8 @@ void init_ttf(char *filepath) {
 /**
  * ----------------------------------------------------------------------------
  */
-void render_text(GLuint shader, mat4 projection, vec2 position, vec4 color,
-                 char *txt, size_t n) {
+void render_text(GLuint shader, float projection[4][4], float xpos, float ypos,
+                 float color[4], char *txt, size_t n) {
   glUseProgram(shader);
   glBindTexture(GL_TEXTURE_2D, texture);
   glBindVertexArray(vao);
@@ -51,15 +51,12 @@ void render_text(GLuint shader, mat4 projection, vec2 position, vec4 color,
   shader_set_uniform_m4fv(shader, "projection", projection);
   shader_set_uniform_4fv(shader, "text_color", color);
 
-  float xpos = position[0];
-  float ypos = position[1];
-
   for (size_t i = 0; i < n; i++) {
     char c = txt[i];
     if (c >= 32) {
       stbtt_aligned_quad quad;
 
-      // TODO stb recoments not using this
+      // TODO stb recommends not using this
       stbtt_GetBakedQuad(baked_chars, 1024, 1024, c - 32, &xpos, &ypos, &quad,
                          1);
 
@@ -70,16 +67,6 @@ void render_text(GLuint shader, mat4 projection, vec2 position, vec4 color,
                               {quad.x1, quad.y1, quad.s1, quad.t1},
                               {quad.x0, quad.y0, quad.s0, quad.t0},
                               {quad.x0, quad.y1, quad.s0, quad.t1}};
-
-      /*
-      for (int i = 0; i < 6; i++) {
-        for (int j = 0; j < 4; j++) {
-          printf("%f ", vertices[i][j]);
-        }
-        printf("\n");
-      }
-      printf("\n");
-      */
 
       glBindBuffer(GL_ARRAY_BUFFER, vbo);
       glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);

@@ -1,11 +1,22 @@
-#include "mem.h"
+#include "gamestate.h"
 
+#include <assert.h>
 #include <errno.h>
 #include <pthread.h>
 #include <stdint.h>
 #include <stdlib.h>
 
-static cmpnt_t entity_buf[MAX_NUM_ENTITIES];
+// bitmasks
+#define MESH_BIT (1LU << MESH)
+#define MATERIAL_BIT (1LU << MATERIAL)
+#define MODEL_MATRIX_BIT (1LU << MODEL_MATRIX)
+#define POSITION_BIT (1LU << POSITION)
+#define MESH_LOAD_REQUEST_BIT (1LU << MESH_LOAD_REQUEST);
+#define MAT_LOAD_REQUEST_BIT (1LU << MAT_LOAD_REQUEST);
+// #define ANIM_LOAD_REQUEST_BIT (1LU << ANIM_LOAD_REQUEST);
+// #define AUDIO_LOAD_REQUEST_BIT (1LU << AUDIO_LOAD_REQUEST);
+
+static uint64_t entity_buf[MAX_NUM_ENTITIES];
 static size_t num_entities;
 
 struct index_table {
@@ -85,7 +96,7 @@ static int buffer_index(uint32_t e, struct index_table *table, size_t *index,
 /**
  * ----------------------------------------------------------------------------
  */
-void mem_init(void) {
+void init_mem_subsys(void) {
   for (size_t i = 0; i < MAX_NUM_ENTITIES; i++) {
     entity_buf[i] = ENTITY_UNUSED;
   }
@@ -94,7 +105,18 @@ void mem_init(void) {
 /**
  * ----------------------------------------------------------------------------
  */
-int mem_create_entity(uint32_t *e) {
+uint64_t create_mask(size_t n, uint64_t *components) {
+  uint64_t mask = 0;
+  for (size_t i = 0; i < n; i++) {
+    mask |= (1LU << components[i]);
+  }
+  return mask;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+int create_entity(uint32_t *e) {
   if (e == NULL || num_entities == MAX_NUM_ENTITIES) {
     return -1;
   }
@@ -113,11 +135,11 @@ int mem_create_entity(uint32_t *e) {
 /**
  * ----------------------------------------------------------------------------
  */
-void mem_delete_entity(uint32_t e) {
-  cmpnt_t mask = entity_buf[e];
+void delete_entity(uint32_t e) {
+  uint64_t mask = entity_buf[e];
   for (size_t i = 0; i < NUM_COMPONENT_TYPES; i++) {
-    if (mask & (1 << i)) {
-      mem_remove_component(e, i);
+    if (mask & (1LU << i)) {
+      remove_component(e, i);
     }
   }
   entity_buf[e] = ENTITY_UNUSED;
@@ -127,17 +149,17 @@ void mem_delete_entity(uint32_t e) {
 /**
  * ----------------------------------------------------------------------------
  */
-cmpnt_t mem_identity(uint32_t e) { return entity_buf[e]; }
+uint64_t get_identity(uint32_t e) { return entity_buf[e]; }
 
 /**
  * ----------------------------------------------------------------------------
  */
-int mem_add_component(uint32_t e, cmpnt_t type) {
+int add_component(uint32_t e, uint64_t type) {
   if ((entity_buf[e] & ENTITY_UNUSED) != 0) {
     return -1;
   }
 
-  cmpnt_t mask = (1 << type);
+  uint64_t mask = (1 << type);
   struct entry *entry = &lookup_table[type];
   if (entity_buf[e] & mask) {
     // entity alread has this component
@@ -157,7 +179,7 @@ int mem_add_component(uint32_t e, cmpnt_t type) {
 /**
  * ----------------------------------------------------------------------------
  */
-void mem_remove_component(uint32_t e, cmpnt_t type) {
+void remove_component(uint32_t e, uint64_t type) {
   if ((entity_buf[e] & ENTITY_UNUSED) != 0) {
     return;
   }
@@ -183,7 +205,7 @@ void mem_remove_component(uint32_t e, cmpnt_t type) {
   --entry->count;
 }
 
-int mem_set_component(uint32_t e, cmpnt_t type, union component cmpnt) {
+int set_component(uint32_t e, uint64_t type, union component cmpnt) {
   struct entry entry = lookup_table[type];
   struct index_table *table = entry.table;
   size_t index;
@@ -197,7 +219,7 @@ int mem_set_component(uint32_t e, cmpnt_t type, union component cmpnt) {
 /**
  * ----------------------------------------------------------------------------
  */
-union component *mem_component(uint32_t e, cmpnt_t type) {
+union component *get_component(uint32_t e, uint64_t type) {
   struct entry entry = lookup_table[type];
   struct index_table *table = entry.table;
   size_t index;
@@ -210,12 +232,12 @@ union component *mem_component(uint32_t e, cmpnt_t type) {
 /**
  * ----------------------------------------------------------------------------
  */
-size_t mem_component_count(cmpnt_t type) { return lookup_table[type].count; }
+size_t get_component_count(uint64_t type) { return lookup_table[type].count; }
 
 /**
  * ----------------------------------------------------------------------------
  */
-size_t mem_count(cmpnt_t mask) {
+size_t get_num_entities(uint64_t mask) {
   size_t count = 0;
   for (size_t j = 0; j < num_entities; j++) {
     if ((entity_buf[j] & mask) == mask) {
@@ -228,7 +250,7 @@ size_t mem_count(cmpnt_t mask) {
 /**
  * ----------------------------------------------------------------------------
  */
-void mem_entities(cmpnt_t mask, uint32_t *arr) {
+void get_entities(uint64_t mask, uint32_t *arr) {
   size_t idx = 0;
   for (size_t i = 0; i < num_entities; i++) {
     if ((entity_buf[i] & mask) == mask) {
@@ -240,21 +262,19 @@ void mem_entities(cmpnt_t mask, uint32_t *arr) {
 /**
  * ----------------------------------------------------------------------------
  */
-void mem_array(size_t nent, uint32_t *entities, cmpnt_t type,
-               union component *array) {
+void query(size_t nent, uint32_t *entities, uint64_t type,
+              union component *array) {
   struct entry entry = lookup_table[type];
   union component *buffer = entry.buffer;
   struct index_table *table = entry.table;
   for (size_t i = 0; i < nent; i++) {
     size_t index;
-    if (buffer_index(entities[i], table, &index, entry.count) == -1) {
-      return;
-    }
+    assert(buffer_index(entities[i], table, &index, entry.count) != -1);
     array[i] = buffer[index];
   }
 }
 
-void mem_write(size_t nent, uint32_t *entities, cmpnt_t type,
+void update(size_t nent, uint32_t *entities, uint64_t type,
                union component *array) {
   struct entry entry = lookup_table[type];
   union component *buffer = entry.buffer;

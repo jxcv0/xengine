@@ -92,6 +92,27 @@ void tst_product_mat4(void) {
   ASSERT_FLOAT_EQ(result[3][3], 506.0);
 }
 
+void tst_product_vec4(void) {
+  TEST();
+  float mat[4][4] = {0};
+
+  float x = 0.0f;
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 4; j++) {
+      mat[i][j] = x;
+      x += 1.0f;
+    }
+  }
+
+  float vec[4] = {1.0f, 2.0f, 3.0f, 4.0f};
+  float result[4] = {0};
+  product_vec4(result, mat, vec);
+  ASSERT_FLOAT_EQ(result[0], 20.0f);
+  ASSERT_FLOAT_EQ(result[1], 60.0f);
+  ASSERT_FLOAT_EQ(result[2], 100.0f);
+  ASSERT_FLOAT_EQ(result[3], 140.0f);
+}
+
 void tst_dot_vec3(void) {
   TEST();
   vec3 v1 = {1.0f, -3.2f, 0.0f};
@@ -144,10 +165,10 @@ void tst_translate(void) {
   ASSERT_FLOAT_EQ(m[3][2], 0.1f);
 }
 
-void tst_rotate(void) {
+void tst_rotate1(void) {
   TEST();
   mat4 dest = {0};
-  mat4 m = IDENTITY_MAT4;
+  mat4 m = IDENTITY_MAT4_INITIALIZER;
   vec3 v = {0.0f, 1.0f, 0.0f};
   rotate(dest, m, v, radians(30.0f));
 
@@ -170,6 +191,24 @@ void tst_rotate(void) {
   ASSERT_FLOAT_EQ(dest[3][1], 0.0f);
   ASSERT_FLOAT_EQ(dest[3][2], 0.0f);
   ASSERT_FLOAT_EQ(dest[3][3], 1.0f);
+}
+
+void tst_rotate2(void) {
+  TEST();
+  float A[4] = {1.0f, 0.0f, 0.0f, 1.0f};
+
+  float rotation[4][4] = {0};
+  float ra[3] = {0.0f, 0.0f, 1.0f};
+
+  rotate(rotation, IDENTITY_MAT4, ra, radians(-90.0f));
+
+  float result[4] = {0};
+  product_vec4(result, rotation, A);
+  print_vec(result, 4);
+  ASSERT_FLOAT_EQ(result[0], 0.0f);
+  ASSERT_FLOAT_EQ(result[1], 1.0f);
+  ASSERT_FLOAT_EQ(result[2], 0.0f);
+  ASSERT_FLOAT_EQ(result[3], 1.0f);
 }
 
 void tst_look_at(void) {
@@ -236,11 +275,13 @@ int main() {
   tst_normalize_vec();
   tst_cross_vec3();
   tst_product_mat4();
+  tst_product_vec4();
   tst_dot_vec3();
   tst_dot_vec4();
   tst_perspective();
   tst_translate();
-  tst_rotate();
+  tst_rotate1();
+  tst_rotate2();
   tst_look_at();
   tst_scale();
   TEST_END();

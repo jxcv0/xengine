@@ -15,28 +15,31 @@ static union component component_buffers[4][MAX_NUM_ENTITIES];
  * ----------------------------------------------------------------------------
  */
 void sys_update_model_matrices(void) {
-  cmpnt_t mask = POSITION_BIT | MODEL_MATRIX_BIT;
-  size_t nent = mem_count(mask);
-  mem_entities(mask, entity_buf);
+  uint64_t components[] = {POSITION, MODEL_MATRIX};
+  uint64_t mask = create_mask(2, components);
+  size_t nent = get_num_entities(mask);
+  get_entities(mask, entity_buf);
 
   union component *pos_buf = component_buffers[0];
   union component *model_buf = component_buffers[1];
 
-  mem_array(nent, entity_buf, POSITION, pos_buf);
-  mem_array(nent, entity_buf, MODEL_MATRIX, model_buf);
+  query(nent, entity_buf, POSITION, pos_buf);
+  query(nent, entity_buf, MODEL_MATRIX, model_buf);
+
+#pragma omp parallel for num_threads(MAX_NUM_THREADS) schedule(static, 1)
   for (size_t i = 0; i < nent; i++) {
     translate(model_buf[i].model_matrix.elem, pos_buf[i].position.elem);
   }
 
-  mem_write(nent, entity_buf, POSITION, pos_buf);
-  mem_write(nent, entity_buf, MODEL_MATRIX, model_buf);
+  update(nent, entity_buf, POSITION, pos_buf);
+  update(nent, entity_buf, MODEL_MATRIX, model_buf);
 }
 
 /**
  * ----------------------------------------------------------------------------
  */
-void sys_load(cmpnt_t component_type) {
-  cmpnt_t result_type;
+void sys_load(uint64_t component_type) {
+  uint64_t result_type;
   switch (component_type) {
     case MESH_LOAD_REQUEST:
       result_type = MESH;
@@ -47,12 +50,12 @@ void sys_load(cmpnt_t component_type) {
     default:
       return;
   }
-  cmpnt_t mask = (1 << component_type);
-  size_t nent = mem_count(mask);
-  mem_entities(mask, entity_buf);
+  uint64_t mask = (1 << component_type);
+  size_t nent = get_num_entities(mask);
+  get_entities(mask, entity_buf);
 
   union component *buf = component_buffers[0];
-  mem_array(nent, entity_buf, component_type, buf);
+  query(nent, entity_buf, component_type, buf);
 
   for (size_t i = 0; i < nent; i++) {
     union component comp;
@@ -69,11 +72,10 @@ void sys_load(cmpnt_t component_type) {
         }
         break;
     }
-    mem_add_component(entity_buf[i], result_type);
-    mem_remove_component(entity_buf[i], component_type);
-    mem_set_component(entity_buf[i], result_type, comp);
+    add_component(entity_buf[i], result_type);
+    remove_component(entity_buf[i], component_type);
+    set_component(entity_buf[i], result_type, comp);
   }
-
 }
 
 /**
@@ -81,17 +83,18 @@ void sys_load(cmpnt_t component_type) {
  */
 void sys_render_geometries(struct renderer *r, float projection[4][4],
                            float view[4][4]) {
-  cmpnt_t mask = MESH_BIT | MATERIAL_BIT | MODEL_MATRIX_BIT;
-  size_t nent = mem_count(mask);
-  mem_entities(mask, entity_buf);
+  uint64_t components[] = {MESH, MATERIAL, MODEL_MATRIX};
+  uint64_t mask = create_mask(3, components);
+  size_t nent = get_num_entities(mask);
+  get_entities(mask, entity_buf);
 
   union component *mesh_buf = component_buffers[1];
   union component *mat_buf = component_buffers[2];
   union component *model_buf = component_buffers[3];
 
-  mem_array(nent, entity_buf, MESH, mesh_buf);
-  mem_array(nent, entity_buf, MATERIAL, mat_buf);
-  mem_array(nent, entity_buf, MODEL_MATRIX, model_buf);
+  query(nent, entity_buf, MESH, mesh_buf);
+  query(nent, entity_buf, MATERIAL, mat_buf);
+  query(nent, entity_buf, MODEL_MATRIX, model_buf);
 
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

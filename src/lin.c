@@ -23,6 +23,17 @@ void print_mat4(const mat4 m) {
 /**
  * ----------------------------------------------------------------------------
  */
+void print_vec(const float *v, size_t n) {
+  printf("{ ");
+  for (size_t i = 0; i < n; i++) {
+    printf("%f ", v[i]);
+  }
+  printf("}\n");
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
 float radians(const float degrees) { return degrees * (M_PI / 180.0f); }
 
 /**
@@ -126,12 +137,24 @@ void cross_vec3(vec3 dest, const vec3 v1, const vec3 v2) {
 /**
  * ----------------------------------------------------------------------------
  */
-void product_mat4(mat4 dest, const mat4 m1, const mat4 m2) {
+void product_mat4(float dest[4][4], const float m1[4][4],
+                  const float m2[4][4]) {
   for (size_t i = 0; i < 4; i++) {
     for (size_t j = 0; j < 4; j++) {
       for (size_t k = 0; k < 4; k++) {
         dest[i][k] += m1[i][j] * m2[j][k];
       }
+    }
+  }
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+void product_vec4(float dest[4], const float mat[4][4], const float vec[4]) {
+  for (size_t i = 0; i < 4; i++) {
+    for (size_t j = 0; j < 4; j++) {
+      dest[i] += mat[i][j] * vec[j];
     }
   }
 }
@@ -195,7 +218,8 @@ void translate(mat4 m, const vec3 v) {
 /**
  * ----------------------------------------------------------------------------
  */
-void rotate(mat4 dest, const mat4 m, vec3 axis, const float angle) {
+void rotate(float dest[4][4], const float m[4][4], float axis[3],
+            const float angle) {
   const float c = cos(angle);
   const float s = sin(angle);
 
@@ -229,7 +253,7 @@ void rotate(mat4 dest, const mat4 m, vec3 axis, const float angle) {
  * ----------------------------------------------------------------------------
  */
 void scale(mat4 dest, const mat4 m, const vec3 v) {
-  mat4 temp = IDENTITY_MAT4;
+  mat4 temp = IDENTITY_MAT4_INITIALIZER;
   temp[0][0] = v[0];
   temp[1][1] = v[1];
   temp[2][2] = v[2];

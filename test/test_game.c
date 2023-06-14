@@ -11,9 +11,10 @@
 #include "glad.h"
 #include "input.h"
 #include "lin.h"
-#include "mem.h"
+#include "gamestate.h"
 #include "pbr_deferred.h"
 #include "systems.h"
+#include "text.h"
 #include "window.h"
 
 #define MAX_ENTITIES 128
@@ -36,9 +37,8 @@ void handle_keyboard_input(GLFWwindow *w);
 
 struct renderer r;
 
-// main
 int main() {
-  mem_init();
+  init_mem_subsys();
   camera.m_mouse_sensetivity = 0.3;
   camera.m_movement_speed = 0.15;
 
@@ -52,19 +52,26 @@ int main() {
               ((float)window_width / (float)window_height), 0.1f, 100.0f);
 
   uint32_t e1;
-  mem_create_entity(&e1);
-  mem_add_component(e1, MESH_LOAD_REQUEST);
-  mem_add_component(e1, MAT_LOAD_REQUEST);
-  mem_add_component(e1, MODEL_MATRIX);
+  create_entity(&e1);
+  add_component(e1, MESH_LOAD_REQUEST);
+  add_component(e1, MAT_LOAD_REQUEST);
+  add_component(e1, MODEL_MATRIX);
 
   union component lr;
   strcpy(lr.request.path, "assets/meshes/suzanne.mesh");
-  mem_set_component(e1, MESH_LOAD_REQUEST, lr);
+  set_component(e1, MESH_LOAD_REQUEST, lr);
   strcpy(lr.request.path, "assets/textures/ravine_rock.mtl");
-  mem_set_component(e1, MAT_LOAD_REQUEST, lr);
+  set_component(e1, MAT_LOAD_REQUEST, lr);
 
-  float identity[4][4] = IDENTITY_MAT4;
-  memcpy(mem_component(e1, MODEL_MATRIX), identity, sizeof(identity));
+  float identity[4][4] = IDENTITY_MAT4_INITIALIZER;
+  union component matrix;
+  memcpy(&matrix, identity, sizeof(identity));
+  vec3 rot = {0, 0, 1};
+  vec3 pos = {0, 0, 0};
+  translate(matrix.model_matrix.elem, pos);
+  rotate(matrix.model_matrix.elem, matrix.model_matrix.elem, rot,
+         radians(90.0f));
+  set_component(e1, MODEL_MATRIX, matrix);
 
   struct light l = LIGHT_RANGE_3250;
   l.position[0] = 3.0;
@@ -80,16 +87,8 @@ int main() {
   mouse_pos.m_last_pos[1] = window_height / 2.0f;
   camera.m_yaw = 275;
 
-  mat4 identities[4] = {0};
-  for (int i = 0; i < 4; i++) {
-    mat4 identity = IDENTITY_MAT4;
-    mat4 model_matrix = {0};
-    vec3 rot = {1, 0, 0};
-    vec3 pos = {0, 0, 0};
-    rotate(model_matrix, identity, rot, radians(-90));
-    translate(model_matrix, pos);
-    memcpy(identities[i], model_matrix, sizeof(mat4));
-  }
+  // TODO
+  init_ttf("assets/fonts/Consolas.ttf");
 
   while (!glfwWindowShouldClose(window)) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -99,9 +98,18 @@ int main() {
     get_cursor_position(&mouse_pos, window);
     vec2 cursor_offset;
     get_cursor_offset(cursor_offset, &mouse_pos);
-    update_3rd_person_camera(&camera, cursor_offset, 3, camera_centre);
+    update_3rd_person_camera(&camera, cursor_offset, 6, camera_centre);
     // handle_keyboard_input(window);
     update_view_matrix();
+    float identity[4][4] = IDENTITY_MAT4_INITIALIZER;
+    union component matrix;
+    memcpy(&matrix, identity, sizeof(identity));
+    vec3 rot = {0, 0, 1};
+    vec3 pos = {0, 0, 0};
+    translate(matrix.model_matrix.elem, pos);
+    rotate(matrix.model_matrix.elem, matrix.model_matrix.elem, rot,
+           radians(90.0f));
+    set_component(e1, MODEL_MATRIX, matrix);
 
     // TODO update model_matrices
     sys_load(MESH_LOAD_REQUEST);
