@@ -204,7 +204,6 @@ void tst_rotate2(void) {
 
   float result[4] = {0};
   product_vec4(result, rotation, A);
-  print_vec(result, 4);
   ASSERT_FLOAT_EQ(result[0], 0.0f);
   ASSERT_FLOAT_EQ(result[1], 1.0f);
   ASSERT_FLOAT_EQ(result[2], 0.0f);

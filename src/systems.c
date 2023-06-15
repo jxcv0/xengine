@@ -26,7 +26,7 @@ void sys_update_model_matrices(void) {
   query(nent, entity_buf, POSITION, pos_buf);
   query(nent, entity_buf, MODEL_MATRIX, model_buf);
 
-#pragma omp parallel for num_threads(MAX_NUM_THREADS) schedule(static, 1)
+#pragma omp parallel for num_threads(MAX_NUM_THREADS) schedule(static)
   for (size_t i = 0; i < nent; i++) {
     translate(model_buf[i].model_matrix.elem, pos_buf[i].position.elem);
   }
@@ -56,7 +56,7 @@ void sys_load(uint64_t component_type) {
 
   union component *buf = component_buffers[0];
   query(nent, entity_buf, component_type, buf);
-#pragma omp parallel for num_threads(MAX_NUM_THREADS) schedule(static, 1)
+#pragma omp parallel for num_threads(MAX_NUM_THREADS) schedule(static)
   for (size_t i = 0; i < nent; i++) {
     union component comp;
     switch (result_type) {

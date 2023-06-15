@@ -148,7 +148,7 @@ int load_obj(struct mesh *geom, const char *filepath) {
 
   void *mem = malloc(verts_size + indices_size);
   struct vertex *vertices = mem;
-  GLuint *indices = mem + verts_size;
+  GLuint *indices = (GLuint *)mem + verts_size;
   fread(mem, 1, verts_size + indices_size, file);
 
   glGenBuffers(1, &geom->vbo);

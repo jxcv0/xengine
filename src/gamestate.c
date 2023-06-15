@@ -263,14 +263,14 @@ void get_entities(uint64_t mask, uint32_t *arr) {
  * ----------------------------------------------------------------------------
  */
 void query(size_t nent, uint32_t *entities, uint64_t type,
-           union component *array) {
+           union component *set) {
   struct entry entry = lookup_table[type];
   union component *buffer = entry.buffer;
   struct index_table *table = entry.table;
   for (size_t i = 0; i < nent; i++) {
     size_t index;
     assert(buffer_index(entities[i], table, &index, entry.count) != -1);
-    array[i] = buffer[index];
+    set[i] = buffer[index];
   }
 }
 
@@ -278,7 +278,7 @@ void query(size_t nent, uint32_t *entities, uint64_t type,
  * ----------------------------------------------------------------------------
  */
 void update(size_t nent, uint32_t *entities, uint64_t type,
-            union component *array) {
+            union component *set) {
   struct entry entry = lookup_table[type];
   union component *buffer = entry.buffer;
   struct index_table *table = entry.table;
@@ -287,6 +287,6 @@ void update(size_t nent, uint32_t *entities, uint64_t type,
     if (buffer_index(entities[i], table, &index, entry.count) == -1) {
       return;
     }
-    buffer[index] = array[i];
+    buffer[index] = set[i];
   }
 }

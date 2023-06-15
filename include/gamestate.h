@@ -89,10 +89,18 @@ size_t get_num_entities(uint64_t mask);
 
 void get_entities(uint64_t mask, uint32_t *arr);
 
+/**
+ * @brief Generate a set of components of the same type belonging to entities.
+ * The component at index n of array belongs to the entity at index n of entities.
+ *
+ * @param nent The number of entities in the entities array.
+ * @param type The type of the components.
+ * @param set The destination array of components.
+ */
 void query(size_t nent, uint32_t *entities, uint64_t type,
-           union component *array);
+           union component *set);
 
 void update(size_t nent, uint32_t *entities, uint64_t type,
-            union component *array);
+            union component *set);
 
 #endif  // MEM_H_
