@@ -102,4 +102,6 @@ union component {
   // ...
 };
 
+_Static_assert(sizeof(union component) == 64);
+
 #endif  // TYPES_H_

@@ -20,13 +20,12 @@ format_cmd := "/usr/bin/clang-format -i -style=Google"
 all: tools tests
 
 $(build_dir)/%.o: %.c
-	@echo "Building object $@"
-	@if [ ! -d $(build_dir)/% ]; then mkdir -p $(build_dir)/$(dir $<); fi
-	@$(c_comp) $< $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_include_dir) $(libs) -c -o $@
+	@echo "Building object $(build_dir)/$(notdir $@)"
+	@$(c_comp) $< $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_include_dir) $(libs) -c -o $(build_dir)/$(notdir $@)
 
 libxen.a: $(patsubst %.c, $(build_dir)/%.o, $(wildcard $(xen_src_dir)/*.c))
 	@echo "Building static library $@"
-	@ar rcs build/$@ $^
+	@ar rcs $(build_dir)/$@ $(patsubst %, $(build_dir)/%, $(notdir $^))
 
 libglad.a: 
 	@$(c_comp) $(cflags) -I$(glad_src_dir) $(glad_src_dir)/glad.c -c -o $(build_dir)/glad.o
