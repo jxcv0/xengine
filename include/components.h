@@ -102,6 +102,6 @@ union component {
   // ...
 };
 
-_Static_assert(sizeof(union component) == 64);
+_Static_assert(sizeof(union component) == 64, "union component size exceeds L1 CLS");
 
 #endif  // TYPES_H_

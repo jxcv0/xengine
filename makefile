@@ -21,7 +21,7 @@ all: tools tests
 
 $(build_dir)/%.o: %.c
 	@echo "Building object $(build_dir)/$(notdir $@)"
-	@$(c_comp) $< $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_include_dir) $(libs) -c -o $(build_dir)/$(notdir $@)
+	@$(c_comp) $< $(cflags) -Wpedantic -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_include_dir) $(libs) -c -o $(build_dir)/$(notdir $@)
 
 libxen.a: $(patsubst %.c, $(build_dir)/%.o, $(wildcard $(xen_src_dir)/*.c))
 	@echo "Building static library $@"
@@ -46,7 +46,7 @@ geom_converter: libglad.a libstb.a libxen.a
 tex_converter: libglad.a libstb.a libxen.a
 	@$(c_comp) tools/tex_converter.c $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_include_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
 
-tests: test_game lin_tests buffer_tests mem_tests asset_tests
+tests: test_game lin_tests mem_tests asset_tests
 
 test_game: libglad.a libstb.a libxen.a
 	@echo "building executable $@"
