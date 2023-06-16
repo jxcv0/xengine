@@ -15,23 +15,26 @@ static union component component_buffers[4][MAX_NUM_ENTITIES];
  * ----------------------------------------------------------------------------
  */
 void sys_update_model_matrices(void) {
-  uint64_t components[] = {POSITION, MODEL_MATRIX};
-  uint64_t mask = create_mask(2, components);
+  uint64_t components[] = {POSITION, ROTATION, MODEL_MATRIX};
+  uint64_t mask = create_mask(3, components);
   size_t nent = get_num_entities(mask);
   get_entities(mask, entity_buf);
 
   union component *pos_buf = component_buffers[0];
-  union component *model_buf = component_buffers[1];
+  union component *rot_buf = component_buffers[1];
+  union component *model_buf = component_buffers[2];
 
   query(nent, entity_buf, POSITION, pos_buf);
+  query(nent, entity_buf, ROTATION, model_buf);
   query(nent, entity_buf, MODEL_MATRIX, model_buf);
 
 #pragma omp parallel for num_threads(MAX_NUM_THREADS) schedule(static)
   for (size_t i = 0; i < nent; i++) {
-    translate(model_buf[i].model_matrix.elem, pos_buf[i].position.elem);
+    translate(model_buf[i].as_model_matrix.elem, pos_buf[i].as_position.elem);
   }
 
   update(nent, entity_buf, POSITION, pos_buf);
+  update(nent, entity_buf, ROTATION, pos_buf);
   update(nent, entity_buf, MODEL_MATRIX, model_buf);
 }
 
@@ -61,13 +64,13 @@ void sys_load(uint64_t component_type) {
     union component comp;
     switch (result_type) {
       case MESH:
-        if (load_obj(&comp.mesh, buf[i].request.path) != 0) {
+        if (load_obj(&comp.as_mesh, buf[i].as_request.path) != 0) {
           continue;
         }
         break;
 
       case MATERIAL:
-        if (load_mtl(&comp.material, buf[i].request.path) != 0) {
+        if (load_mtl(&comp.as_material, buf[i].as_request.path) != 0) {
           continue;
         }
         break;
@@ -107,24 +110,24 @@ void sys_render_geometries(struct renderer *r, float projection[4][4],
 
   for (size_t i = 0; i < nent; i++) {
     shader_set_uniform_m4fv(r->deferred_geometry, "model",
-                            model_buf[i].model_matrix.elem);
+                            model_buf[i].as_model_matrix.elem);
     shader_set_uniform_1i(r->deferred_geometry, "tex_diffuse", 0);
     shader_set_uniform_1i(r->deferred_geometry, "tex_roughness", 1);
     shader_set_uniform_1i(r->deferred_geometry, "tex_normal", 2);
     shader_set_uniform_1i(r->deferred_geometry, "tex_metallic", 3);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, mat_buf[i].material.diffuse);
+    glBindTexture(GL_TEXTURE_2D, mat_buf[i].as_material.diffuse);
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, mat_buf[i].material.roughness);
+    glBindTexture(GL_TEXTURE_2D, mat_buf[i].as_material.roughness);
     glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, mat_buf[i].material.normal);
+    glBindTexture(GL_TEXTURE_2D, mat_buf[i].as_material.normal);
     glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, mat_buf[i].material.metallic);
+    glBindTexture(GL_TEXTURE_2D, mat_buf[i].as_material.metallic);
 
-    glBindVertexArray(mesh_buf[i].mesh.vao);
+    glBindVertexArray(mesh_buf[i].as_mesh.vao);
 
-    glDrawElements(GL_TRIANGLES, mesh_buf[i].mesh.num_indices, GL_UNSIGNED_INT,
-                   0);
+    glDrawElements(GL_TRIANGLES, mesh_buf[i].as_mesh.num_indices,
+                   GL_UNSIGNED_INT, 0);
   }
 }

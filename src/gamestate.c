@@ -6,16 +6,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-// bitmasks
-#define MESH_BIT (1LU << MESH)
-#define MATERIAL_BIT (1LU << MATERIAL)
-#define MODEL_MATRIX_BIT (1LU << MODEL_MATRIX)
-#define POSITION_BIT (1LU << POSITION)
-#define MESH_LOAD_REQUEST_BIT (1LU << MESH_LOAD_REQUEST);
-#define MAT_LOAD_REQUEST_BIT (1LU << MAT_LOAD_REQUEST);
-// #define ANIM_LOAD_REQUEST_BIT (1LU << ANIM_LOAD_REQUEST);
-// #define AUDIO_LOAD_REQUEST_BIT (1LU << AUDIO_LOAD_REQUEST);
-
 static uint64_t entity_buf[MAX_NUM_ENTITIES];
 static size_t num_entities;
 
@@ -149,9 +139,7 @@ void delete_entity(uint32_t e) {
 /**
  * ----------------------------------------------------------------------------
  */
-uint64_t get_identity(uint32_t e) {
-  return entity_buf[e];
-}
+uint64_t get_identity(uint32_t e) { return entity_buf[e]; }
 
 /**
  * ----------------------------------------------------------------------------

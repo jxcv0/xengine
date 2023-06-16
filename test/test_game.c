@@ -58,9 +58,9 @@ int main() {
   add_component(e1, MODEL_MATRIX);
 
   union component lr;
-  strcpy(lr.request.path, "assets/meshes/suzanne.mesh");
+  strcpy(lr.as_request.path, "assets/meshes/suzanne.mesh");
   set_component(e1, MESH_LOAD_REQUEST, lr);
-  strcpy(lr.request.path, "assets/textures/ravine_rock.mtl");
+  strcpy(lr.as_request.path, "assets/textures/ravine_rock.mtl");
   set_component(e1, MAT_LOAD_REQUEST, lr);
 
   float identity[4][4] = IDENTITY_MAT4_INITIALIZER;
@@ -68,9 +68,9 @@ int main() {
   memcpy(&matrix, identity, sizeof(identity));
   vec3 rot = {0, 0, 1};
   vec3 pos = {0, 0, 0};
-  translate(matrix.model_matrix.elem, pos);
-  rotate(matrix.model_matrix.elem, matrix.model_matrix.elem, rot,
-         radians(90.0f));
+  translate(matrix.as_model_matrix.elem, pos);
+  create_rotation_matrix(matrix.as_model_matrix.elem,
+                         matrix.as_model_matrix.elem, rot, radians(90.0f));
   set_component(e1, MODEL_MATRIX, matrix);
 
   struct light l = LIGHT_RANGE_3250;
@@ -106,9 +106,9 @@ int main() {
     memcpy(&matrix, identity, sizeof(identity));
     vec3 rot = {0, 0, 1};
     vec3 pos = {0, 0, 0};
-    translate(matrix.model_matrix.elem, pos);
-    rotate(matrix.model_matrix.elem, matrix.model_matrix.elem, rot,
-           radians(90.0f));
+    translate(matrix.as_model_matrix.elem, pos);
+    create_rotation_matrix(matrix.as_model_matrix.elem,
+                           matrix.as_model_matrix.elem, rot, radians(90.0f));
     set_component(e1, MODEL_MATRIX, matrix);
 
     // TODO update model_matrices

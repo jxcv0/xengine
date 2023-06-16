@@ -168,9 +168,10 @@ void tst_translate(void) {
 void tst_rotate1(void) {
   TEST();
   mat4 dest = {0};
-  mat4 m = IDENTITY_MAT4_INITIALIZER;
+  mat4 m;
+  identity_mat4(m);
   vec3 v = {0.0f, 1.0f, 0.0f};
-  rotate(dest, m, v, radians(30.0f));
+  create_rotation_matrix(dest, m, v, radians(30.0f));
 
   ASSERT_FLOAT_EQ(dest[0][0], 0.86602539f);
   ASSERT_FLOAT_EQ(dest[0][1], 0.0f);
@@ -200,7 +201,8 @@ void tst_rotate2(void) {
   float rotation[4][4] = {0};
   float ra[3] = {0.0f, 0.0f, 1.0f};
 
-  rotate(rotation, IDENTITY_MAT4, ra, radians(-90.0f));
+  float i[4][4] = IDENTITY_MAT4_INITIALIZER;
+  create_rotation_matrix(rotation, i, ra, radians(-90.0f));
 
   float result[4] = {0};
   product_vec4(result, rotation, A);

@@ -8,7 +8,6 @@
   {                                                          \
     {1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, { 0, 0, 0, 1 } \
   }
-static const float IDENTITY_MAT4[4][4] = IDENTITY_MAT4_INITIALIZER;
 
 typedef float mat4[4][4];
 typedef float vec2[2];
@@ -113,12 +112,12 @@ void cross_vec3(vec3 dest, const vec3 v1, const vec3 v2);
  * @param m1 The first mat4.
  * @param m2 The second mat4.
  */
-void product_mat4(float dest[4][4], const float m1[4][4], const float m2[4][4]);
+void product_mat4(float dest[4][4], float m1[4][4], float m2[4][4]);
 
 /**
  * @brief TODO
  */
-void product_vec4(float dest[4], const float mat[4][4], const float vec[4]);
+void product_vec4(float dest[4], float mat[4][4], float vec[4]);
 
 /**
  * @brief Create perspective matrix.
@@ -152,14 +151,15 @@ void look_at(mat4 mat, const vec3 eye, const vec3 ctr, const vec3 up);
 void translate(mat4 m, const vec3 v);
 
 /**
- * @brief Rotate a transformation matrix.
+ * @brief Create a rotation matrix.
  *
  * @param dest The matrix to store the result.
  * @param m The matrix to apply the rotation to.
  * @param axis The axis of the rotation.
  * @param angle The rotation angle in degrees.
  */
-void rotate(float dest[4][4], const float m[4][4], float axis[3], float angle);
+void create_rotation_matrix(float dest[4][4], float m[4][4], float axis[3],
+                            float angle);
 
 /**
  * @brief Scale a tramsformation matrix by a vector v.
@@ -168,6 +168,6 @@ void rotate(float dest[4][4], const float m[4][4], float axis[3], float angle);
  * @param m The matrix to transform.
  * @param v The scaling vector.
  */
-void scale(mat4 dest, const mat4 m, const vec3 v);
+void scale(float dest[4][4], float m[4][4], float v[3]);
 
 #endif  // LIN_H_

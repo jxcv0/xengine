@@ -91,7 +91,8 @@ void get_entities(uint64_t mask, uint32_t *arr);
 
 /**
  * @brief Generate a set of components of the same type belonging to entities.
- * The component at index n of array belongs to the entity at index n of entities.
+ * The component at index n of array belongs to the entity at index n of
+ * entities.
  *
  * @param nent The number of entities in the entities array.
  * @param type The type of the components.

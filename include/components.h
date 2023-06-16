@@ -15,8 +15,10 @@ enum component_type {
   MATERIAL = 1,
   MODEL_MATRIX = 2,
   POSITION = 3,
-  MESH_LOAD_REQUEST = 4,
-  MAT_LOAD_REQUEST = 5
+  ROTATION = 4,
+  MESH_LOAD_REQUEST = 5,
+  MAT_LOAD_REQUEST = 6,
+  SPIN = 7
   // ANIM_LOAD_REQUEST 6
   // AUDIO_LOAD_REQUEST 7
 };
@@ -89,19 +91,32 @@ struct position {
   };
 };
 
+struct rotation {
+  float axis[3];
+  float angle;
+};
+
 struct loadreq {
   char path[MAX_ASSET_PATH_LEN];
 };
 
+struct spin {
+  int axis;  // x y z
+  float rate;
+};
+
 union component {
-  struct mesh mesh;
-  struct pbr_material material;
-  struct position position;
-  struct model_matrix model_matrix;
-  struct loadreq request;
+  struct mesh as_mesh;
+  struct pbr_material as_material;
+  struct position as_position;
+  struct model_matrix as_model_matrix;
+  struct loadreq as_request;
+  struct rotation as_rotation;
+  struct spin as_spin;
   // ...
 };
 
-_Static_assert(sizeof(union component) == 64, "union component size exceeds L1 CLS");
+_Static_assert(sizeof(union component) == 64,
+               "union component size exceeds L1 CLS");
 
 #endif  // TYPES_H_
