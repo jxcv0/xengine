@@ -93,17 +93,19 @@ int main() {
       glfwSetWindowShouldClose(window, true);
     }
 
+		union component *rot = get_component(e1, ROTATION);
+		rot->as_rotation.radians += 0.001f;
+
     get_cursor_position(&mouse_pos, window);
     vec2 cursor_offset;
     get_cursor_offset(cursor_offset, &mouse_pos);
-    update_3rd_person_camera(&camera, cursor_offset, 6, camera_centre);
+    update_3rd_person_camera(&camera, cursor_offset, 3, camera_centre);
     // handle_keyboard_input(window);
     update_view_matrix();
     float identity[4][4] = IDENTITY_MAT4_INITIALIZER;
     union component matrix;
     memcpy(&matrix, identity, sizeof(identity));
 
-    // TODO update model_matrices
     sys_load(MESH_LOAD_REQUEST);
     sys_load(MAT_LOAD_REQUEST);
 		sys_update_model_matrices();

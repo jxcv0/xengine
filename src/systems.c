@@ -14,28 +14,6 @@ static union component component_buffers[4][MAX_NUM_ENTITIES];
 /**
  * ----------------------------------------------------------------------------
  */
-void sys_update_spinners(void) {
-  uint64_t components[] = {SPIN, ROTATION};
-  uint64_t mask = create_mask(2, components);
-  size_t nent = get_num_entities(mask);
-  get_entities(mask, entity_buf);
-
-  union component *spin_buf = component_buffers[0];
-  union component *rotation_buf = component_buffers[1];
-
-  query(nent, entity_buf, SPIN, spin_buf);
-  query(nent, entity_buf, ROTATION, rotation_buf);
-
-  for (size_t i = 0; i < nent; i++) {
-  }
-
-  update(nent, entity_buf, SPIN, spin_buf);
-  update(nent, entity_buf, ROTATION, rotation_buf);
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
 void sys_update_model_matrices(void) {
   uint64_t components[] = {POSITION, ROTATION, MODEL_MATRIX};
   uint64_t mask = create_mask(3, components);
@@ -50,7 +28,7 @@ void sys_update_model_matrices(void) {
   query(nent, entity_buf, ROTATION, rot_buf);
   query(nent, entity_buf, MODEL_MATRIX, model_buf);
 
-// #pragma omp parallel for num_threads(MAX_NUM_THREADS) schedule(static)
+#pragma omp parallel for num_threads(MAX_NUM_THREADS) schedule(static)
   for (size_t i = 0; i < nent; i++) {
     struct position pos = pos_buf[i].as_position;
     struct rotation rot = rot_buf[i].as_rotation;

@@ -106,7 +106,6 @@ union component {
   struct model_matrix as_model_matrix;
   struct loadreq as_request;
   struct rotation as_rotation;
-  struct spin as_spin;
   // ...
 };
 
