@@ -56,6 +56,8 @@ int main() {
   add_component(e1, MESH_LOAD_REQUEST);
   add_component(e1, MAT_LOAD_REQUEST);
   add_component(e1, MODEL_MATRIX);
+  add_component(e1, POSITION);
+  add_component(e1, ROTATION);
 
   union component lr;
   strcpy(lr.as_request.path, "assets/meshes/suzanne.mesh");
@@ -63,15 +65,11 @@ int main() {
   strcpy(lr.as_request.path, "assets/textures/ravine_rock.mtl");
   set_component(e1, MAT_LOAD_REQUEST, lr);
 
-  float identity[4][4] = IDENTITY_MAT4_INITIALIZER;
-  union component matrix;
-  memcpy(&matrix, identity, sizeof(identity));
-  vec3 rot = {0, 0, 1};
-  vec3 pos = {0, 0, 0};
-  translate(matrix.as_model_matrix.elem, pos);
-  create_rotation_matrix(matrix.as_model_matrix.elem,
-                         matrix.as_model_matrix.elem, rot, radians(90.0f));
-  set_component(e1, MODEL_MATRIX, matrix);
+	union component e1_pos = {0};
+	union component e1_rot = {0};
+	e1_rot.as_rotation.axis[2] = 1.0f;
+  set_component(e1, POSITION, e1_pos);
+  set_component(e1, ROTATION, e1_rot);
 
   struct light l = LIGHT_RANGE_3250;
   l.position[0] = 3.0;
@@ -104,16 +102,11 @@ int main() {
     float identity[4][4] = IDENTITY_MAT4_INITIALIZER;
     union component matrix;
     memcpy(&matrix, identity, sizeof(identity));
-    vec3 rot = {0, 0, 1};
-    vec3 pos = {0, 0, 0};
-    translate(matrix.as_model_matrix.elem, pos);
-    create_rotation_matrix(matrix.as_model_matrix.elem,
-                           matrix.as_model_matrix.elem, rot, radians(90.0f));
-    set_component(e1, MODEL_MATRIX, matrix);
 
     // TODO update model_matrices
     sys_load(MESH_LOAD_REQUEST);
     sys_load(MAT_LOAD_REQUEST);
+		sys_update_model_matrices();
     sys_render_geometries(&r, projection_matrix, view_matrix);
     pbrd_render_lighting(&r, &l, 1, camera.m_pos, window_width, window_height);
 

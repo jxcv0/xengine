@@ -18,7 +18,6 @@ enum component_type {
   ROTATION = 4,
   MESH_LOAD_REQUEST = 5,
   MAT_LOAD_REQUEST = 6,
-  SPIN = 7
   // ANIM_LOAD_REQUEST 6
   // AUDIO_LOAD_REQUEST 7
 };
@@ -93,16 +92,11 @@ struct position {
 
 struct rotation {
   float axis[3];
-  float angle;
+  float radians;
 };
 
 struct loadreq {
   char path[MAX_ASSET_PATH_LEN];
-};
-
-struct spin {
-  int axis;  // x y z
-  float rate;
 };
 
 union component {

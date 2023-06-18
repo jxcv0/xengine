@@ -26,6 +26,10 @@ static struct index_table material_table[MAX_NUM_MATERIALS];
 static union component position_buf[MAX_NUM_POSITIONS];
 static struct index_table position_table[MAX_NUM_POSITIONS];
 
+// rotation buffer
+static union component rotation_buf[MAX_NUM_POSITIONS];
+static struct index_table rotation_table[MAX_NUM_POSITIONS];
+
 // model matrix buffer
 static union component model_matrix_buf[MAX_NUM_MODEL_MATRICES];
 static struct index_table model_matrix_table[MAX_NUM_MODEL_MATRICES];
@@ -49,9 +53,10 @@ static struct entry lookup_table[NUM_COMPONENT_TYPES] = {
     {mesh_buf, geometry_table, 0},
     {material_buf, material_table, 0},
     {position_buf, position_table, 0},
+    {rotation_buf, rotation_table, 0},
     {model_matrix_buf, model_matrix_table, 0},
     {geomreq_buf, geomreq_table, 0},
-    {matreq_buf, matreq_table, 0}
+    {matreq_buf, matreq_table, 0},
     // ...
 };
 
