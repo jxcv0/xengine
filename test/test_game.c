@@ -67,7 +67,7 @@ int main() {
 
 	union component e1_pos = {0};
 	union component e1_rot = {0};
-	e1_rot.as_rotation.axis[2] = 1.0f;
+	e1_rot.as_rotation.axis[0] = 1.0f;
   set_component(e1, POSITION, e1_pos);
   set_component(e1, ROTATION, e1_rot);
 
@@ -94,7 +94,9 @@ int main() {
     }
 
 		union component *rot = get_component(e1, ROTATION);
-		rot->as_rotation.radians += 0.001f;
+		union component *mm = get_component(e1, ROTATION);
+		print_mat4(mm->as_model_matrix.elem);
+		rot->as_rotation.radians += radians(0.01f);
 
     get_cursor_position(&mouse_pos, window);
     vec2 cursor_offset;
@@ -102,9 +104,6 @@ int main() {
     update_3rd_person_camera(&camera, cursor_offset, 3, camera_centre);
     // handle_keyboard_input(window);
     update_view_matrix();
-    float identity[4][4] = IDENTITY_MAT4_INITIALIZER;
-    union component matrix;
-    memcpy(&matrix, identity, sizeof(identity));
 
     sys_load(MESH_LOAD_REQUEST);
     sys_load(MAT_LOAD_REQUEST);

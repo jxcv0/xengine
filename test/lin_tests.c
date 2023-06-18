@@ -9,7 +9,7 @@
 
 void tst_radians(void) {
   TEST();
-  ASSERT_FLOAT_EQ(radians(3.122f), 0.054489179f);
+  ASSERT_FLOAT_EQ(radians(3.112f), 0.0543146463f);
 }
 
 void tst_identity_mat4(void) {
@@ -202,12 +202,13 @@ void tst_rotate2(void) {
   float ra[3] = {0.0f, 0.0f, 1.0f};
 
   float i[4][4] = IDENTITY_MAT4_INITIALIZER;
-  create_rotation_matrix(rotation, i, ra, radians(-90.0f));
+  create_rotation_matrix(rotation, i, ra, radians(90.0f));
 
   float result[4] = {0};
   product_vec4(result, rotation, A);
+
   ASSERT_FLOAT_EQ(result[0], 0.0f);
-  ASSERT_FLOAT_EQ(result[1], 1.0f);
+  ASSERT_FLOAT_EQ(result[1], -1.0f);
   ASSERT_FLOAT_EQ(result[2], 0.0f);
   ASSERT_FLOAT_EQ(result[3], 1.0f);
 }

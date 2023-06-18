@@ -34,7 +34,7 @@ void print_vec(const float *v, size_t n) {
 /**
  * ----------------------------------------------------------------------------
  */
-float radians(const float degrees) { return degrees * (M_PI / 180.0f); }
+float radians(const float degrees) { return (degrees * M_PI ) / 180.0f; }
 
 /**
  * ----------------------------------------------------------------------------
@@ -141,7 +141,7 @@ void product_mat4(float dest[4][4], float m1[4][4], float m2[4][4]) {
   for (size_t i = 0; i < 4; i++) {
     for (size_t j = 0; j < 4; j++) {
       for (size_t k = 0; k < 4; k++) {
-        dest[i][k] += m1[i][j] * m2[j][k];
+        dest[i][k] += (m1[i][j] * m2[j][k]);
       }
     }
   }
@@ -214,6 +214,12 @@ void translate(mat4 m, const vec3 v) {
   m[3][2] += v[2];
 }
 
+void rot(float dest[4], float v[4], float s[4]) {
+	for (int i = 0; i < 4; i++) {
+		dest[i] = v[i] * s[i];
+	}
+}
+
 /**
  * ----------------------------------------------------------------------------
  */
@@ -228,24 +234,25 @@ void create_rotation_matrix(float dest[4][4], float m[4][4], float axis[3],
   rot[0][0] = c + (1.0f - c) * axis[0] * axis[0];
   rot[0][1] = (1.0f - c) * axis[0] * axis[1] + s * axis[2];
   rot[0][2] = (1.0f - c) * axis[0] * axis[2] - s * axis[1];
-  rot[0][3] = 0.0f;
 
   rot[1][0] = (1.0f - c) * axis[1] * axis[0] - s * axis[2];
   rot[1][1] = c + (1.0f - c) * axis[1] * axis[1];
   rot[1][2] = (1.0f - c) * axis[1] * axis[2] + s * axis[0];
-  rot[1][3] = 0.0f;
 
   rot[2][0] = (1.0f - c) * axis[2] * axis[0] + s * axis[1];
   rot[2][1] = (1.0f - c) * axis[2] * axis[1] - s * axis[0];
   rot[2][2] = c + (1.0f - c) * axis[2] * axis[2];
-  rot[2][3] = 0.0f;
 
-  rot[3][0] = 0.0f;
-  rot[3][1] = 0.0f;
-  rot[3][2] = 0.0f;
   rot[3][3] = 1.0f;
 
   product_mat4(dest, m, rot);
+
+/*
+	dest[3][0] = m[3][0];
+	dest[3][1] = m[3][1];
+	dest[3][2] = m[3][2];
+	dest[3][3] = m[3][3];
+	*/
 }
 
 /**
