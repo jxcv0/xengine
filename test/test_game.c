@@ -65,9 +65,9 @@ int main() {
   strcpy(lr.as_request.path, "assets/textures/ravine_rock.mtl");
   set_component(e1, MAT_LOAD_REQUEST, lr);
 
-	union component e1_pos = {0};
-	union component e1_rot = {0};
-	e1_rot.as_rotation.axis[0] = 1.0f;
+  union component e1_pos = {0};
+  union component e1_rot = {0};
+  e1_rot.as_rotation.axis[0] = 1.0f;
   set_component(e1, POSITION, e1_pos);
   set_component(e1, ROTATION, e1_rot);
 
@@ -93,10 +93,10 @@ int main() {
       glfwSetWindowShouldClose(window, true);
     }
 
-		union component *rot = get_component(e1, ROTATION);
-		union component *mm = get_component(e1, ROTATION);
-		print_mat4(mm->as_model_matrix.elem);
-		rot->as_rotation.radians += radians(0.01f);
+    union component *rot = get_component(e1, ROTATION);
+    union component *mm = get_component(e1, ROTATION);
+    print_mat4(mm->as_model_matrix.elem);
+    rot->as_rotation.radians += radians(0.01f);
 
     get_cursor_position(&mouse_pos, window);
     vec2 cursor_offset;
@@ -107,7 +107,7 @@ int main() {
 
     sys_load(MESH_LOAD_REQUEST);
     sys_load(MAT_LOAD_REQUEST);
-		sys_update_model_matrices();
+    sys_update_model_matrices();
     sys_render_geometries(&r, projection_matrix, view_matrix);
     pbrd_render_lighting(&r, &l, 1, camera.m_pos, window_width, window_height);
 

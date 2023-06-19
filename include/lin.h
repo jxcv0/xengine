@@ -9,10 +9,48 @@
     {1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, { 0, 0, 0, 1 } \
   }
 
-typedef float mat4[4][4];
-typedef float vec2[2];
-typedef float vec3[3];
-typedef float vec4[4];
+typedef struct mat4 {
+  union {
+    float elem[4][4];
+    float *ptr;
+  };
+} mat4_t;
+
+typedef struct vec4 {
+  union {
+    struct {
+      float x;
+      float y;
+      float z;
+      float w;
+    };
+    float elem[4];
+    float *ptr;
+  };
+} vec4_t;
+
+struct vec3 {
+  union {
+    struct {
+      float x;
+      float y;
+      float z;
+    };
+    float elem[3];
+    float *ptr;
+  };
+} vec3_t;
+
+struct vec2 {
+  union {
+    struct {
+      float x;
+      float y;
+    };
+    float elem[2];
+    float *ptr;
+  };
+} vec2_t;
 
 /**
  * @brief Print a matrix to stdout.
@@ -45,8 +83,9 @@ void identity_mat4(mat4 m);
  * @brief Normalize a vec3.
  *
  * @param vec The vec3 to normalize.
+ * @return A normalized vec.
  */
-void normalize_vec3(vec3 vec);
+vec3_t normalize_vec3(const vec3_t vec);
 
 /**
  * @brief Get the dot product of 2 vec3's.
@@ -99,20 +138,20 @@ float dot_vec4(const vec4 v1, const vec4 v2);
 /**
  * @brief Cross 2 vec3's.
  *
- * @param dest The vec3 to store the result.
  * @param v1 The first vec3.
  * @param v2 The second vec3.
+ * @return The cross product of v1 and v2.
  */
-void cross_vec3(vec3 dest, const vec3 v1, const vec3 v2);
+vec3_t cross_vec3(const vec3_t v1, const vec3_t v2);
 
 /**
  * @brief Multiply 2 mat4's.
  *
- * @param dest The mat4 to store the result.
  * @param m1 The first mat4.
  * @param m2 The second mat4.
+ * @return The product of m1 and m2.
  */
-void product_mat4(float dest[4][4], float m1[4][4], float m2[4][4]);
+mat4_t product_mat4(const mat4_t m1, const mat4_t m2);
 
 /**
  * @brief TODO
@@ -134,13 +173,12 @@ void perspective(mat4 mat, const float fov, const float aspect_ratio,
 /**
  * @brief Create a view matrix.
  *
- * @param mat The matrix to store the result in.
  * @param eye The direction of the view.
  * @param ctr The position of the view.
  * @param up The up direction of the view.
  * @return A view matrix.
  */
-void look_at(mat4 mat, const vec3 eye, const vec3 ctr, const vec3 up);
+mat4_t look_at(const vec3_t eye, const vec3_t ctr, const vec3_t up);
 
 /**
  * @brief Translate a mat4 by a vec3.
@@ -158,11 +196,10 @@ void translate(mat4 m, const vec3 v);
  * @param axis The axis of the rotation.
  * @param angle The rotation angle in degrees.
  */
-void create_rotation_matrix(float dest[4][4], float m[4][4], float axis[3],
-                            float angle);
+void rotate(float dest[4][4], float m[4][4], float axis[3], float angle);
 
 /**
- * @brief Scale a tramsformation matrix by a vector v.
+ * @brief Scale a transformation matrix by a vector v.
  *
  * @param dest The matrix to store the result.
  * @param m The matrix to transform.

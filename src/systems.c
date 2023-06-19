@@ -36,11 +36,10 @@ void sys_update_model_matrices(void) {
 
     // TODO check that we dont need to recreate a new matrix each time.
     union component new_matrix;
-		identity_mat4(new_matrix.as_model_matrix.elem);
-    create_rotation_matrix(new_matrix.as_model_matrix.elem, mm.elem, rot.axis,
-                           rot.radians);
+    identity_mat4(new_matrix.as_model_matrix.elem);
+    rotate(new_matrix.as_model_matrix.elem, mm.elem, rot.axis, rot.radians);
     translate(new_matrix.as_model_matrix.elem, pos.elem);
-		model_buf[i] = new_matrix;
+    model_buf[i] = new_matrix;
   }
 
   update(nent, entity_buf, POSITION, pos_buf);

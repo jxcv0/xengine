@@ -49,13 +49,18 @@ void tst_normalize_vec(void) {
 
 void tst_cross_vec3(void) {
   TEST();
-  vec3 dest = {0};
-  vec3 v1 = {1.0f, 2.0f, 3.0f};
-  vec3 v2 = {1.0f, 5.0f, 7.0f};
-  cross_vec3(dest, v1, v2);
-  ASSERT_FLOAT_EQ(dest[0], -1.0f);
-  ASSERT_FLOAT_EQ(dest[1], -4.0f);
-  ASSERT_FLOAT_EQ(dest[2], 3.0f);
+  struct vec3 v1 = {1.0f, 2.0f, 3.0f};
+  struct vec3 v2 = {1.0f, 5.0f, 7.0f};
+  struct vec3 res = cross_vec3(dest, v1, v2);
+  ASSERT_FLOAT_EQ(res.x, -1.0f);
+  ASSERT_FLOAT_EQ(res.y, -4.0f);
+  ASSERT_FLOAT_EQ(res.z, 3.0f);
+  ASSERT_FLOAT_EQ(res.elem[0], -1.0f);
+  ASSERT_FLOAT_EQ(res.elem[1], -4.0f);
+  ASSERT_FLOAT_EQ(res.elem[2], 3.0f);
+  ASSERT_FLOAT_EQ(res.ptr[0], -1.0f);
+  ASSERT_FLOAT_EQ(res.ptr[1], -4.0f);
+  ASSERT_FLOAT_EQ(res.ptr[2], 3.0f);
 }
 
 void tst_product_mat4(void) {
@@ -171,7 +176,7 @@ void tst_rotate1(void) {
   mat4 m;
   identity_mat4(m);
   vec3 v = {0.0f, 1.0f, 0.0f};
-  create_rotation_matrix(dest, m, v, radians(30.0f));
+  rotate(dest, m, v, radians(30.0f));
 
   ASSERT_FLOAT_EQ(dest[0][0], 0.86602539f);
   ASSERT_FLOAT_EQ(dest[0][1], 0.0f);
@@ -202,7 +207,7 @@ void tst_rotate2(void) {
   float ra[3] = {0.0f, 0.0f, 1.0f};
 
   float i[4][4] = IDENTITY_MAT4_INITIALIZER;
-  create_rotation_matrix(rotation, i, ra, radians(90.0f));
+  rotate(rotation, i, ra, radians(90.0f));
 
   float result[4] = {0};
   product_vec4(result, rotation, A);

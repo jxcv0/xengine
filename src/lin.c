@@ -34,7 +34,7 @@ void print_vec(const float *v, size_t n) {
 /**
  * ----------------------------------------------------------------------------
  */
-float radians(const float degrees) { return (degrees * M_PI ) / 180.0f; }
+float radians(const float degrees) { return (degrees * M_PI) / 180.0f; }
 
 /**
  * ----------------------------------------------------------------------------
@@ -128,10 +128,11 @@ float dot_vec4(const vec4 v1, const vec4 v2) {
 /**
  * ----------------------------------------------------------------------------
  */
-void cross_vec3(vec3 dest, const vec3 v1, const vec3 v2) {
-  dest[0] = (v1[1] * v2[2]) - (v1[2] * v2[1]);
-  dest[1] = (v1[2] * v2[0]) - (v1[0] * v2[2]);
-  dest[2] = (v1[0] * v2[1]) - (v1[1] * v2[0]);
+struct vec3 cross_vec3(const struct vec3 v1, const struct vec3 v2) {
+  struct vec3 r = {
+      {{(v1.y * v2.z) - (v1.z * v2.y), (v1.z * v2.x) - (v1.x * v2.z),
+        (v1.x * v2.y) - (v1.y * v2.x)}}};
+  return r;
 }
 
 /**
@@ -175,16 +176,13 @@ void perspective(mat4 mat, const float fov, const float aspect_ratio,
 /**
  * ----------------------------------------------------------------------------
  */
-void look_at(mat4 mat, const vec3 eye, const vec3 ctr, const vec3 up) {
-  vec3 f = {ctr[0] - eye[0], ctr[1] - eye[1], ctr[2] - eye[2]};
+void look_at(const vec3_t eye, const vec3_t ctr, const vec3_t up) {
+  vec3_t f = {{{ctr[0] - eye[0], ctr[1] - eye[1], ctr[2] - eye[2]}}};
   normalize_vec3(f);
 
-  vec3 s;
-  cross_vec3(s, f, up);
-  normalize_vec3(s);
+  vec3_t s = normalize(cross_vec3(s, f, up));
 
-  vec3 u;
-  cross_vec3(u, s, f);
+  vec3_t u = cross_vec3(u, s, f);
 
   identity_mat4(mat);
 
@@ -214,17 +212,10 @@ void translate(mat4 m, const vec3 v) {
   m[3][2] += v[2];
 }
 
-void rot(float dest[4], float v[4], float s[4]) {
-	for (int i = 0; i < 4; i++) {
-		dest[i] = v[i] * s[i];
-	}
-}
-
 /**
  * ----------------------------------------------------------------------------
  */
-void create_rotation_matrix(float dest[4][4], float m[4][4], float axis[3],
-                            float angle) {
+void rotate(float dest[4][4], float m[4][4], float axis[3], float angle) {
   const float c = cos(angle);
   const float s = sin(angle);
 
@@ -247,12 +238,12 @@ void create_rotation_matrix(float dest[4][4], float m[4][4], float axis[3],
 
   product_mat4(dest, m, rot);
 
-/*
-	dest[3][0] = m[3][0];
-	dest[3][1] = m[3][1];
-	dest[3][2] = m[3][2];
-	dest[3][3] = m[3][3];
-	*/
+  /*
+          dest[3][0] = m[3][0];
+          dest[3][1] = m[3][1];
+          dest[3][2] = m[3][2];
+          dest[3][3] = m[3][3];
+          */
 }
 
 /**
