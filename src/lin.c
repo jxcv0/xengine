@@ -225,10 +225,10 @@ mat4_t rotate(const mat4_t m, const vec3_t axis, const float rads) {
 
   rot.elem[3][3] = 1.0f;
 
-  rot.elem[3][0] = m.elem[3][0];
-  rot.elem[3][1] = m.elem[3][1];
-  rot.elem[3][2] = m.elem[3][2];
-  rot.elem[3][3] = m.elem[3][3];
+  // rot.elem[3][0] = m.elem[3][0];
+  // rot.elem[3][1] = m.elem[3][1];
+  // rot.elem[3][2] = m.elem[3][2];
+  // rot.elem[3][3] = m.elem[3][3];
 
   return product_mat4(m, rot);
 }
