@@ -10,10 +10,7 @@
   }
 
 typedef struct mat4 {
-  union {
-    float elem[4][4];
-    float *ptr;
-  };
+  float elem[4][4];
 } mat4_t;
 
 typedef struct vec4 {
@@ -25,11 +22,10 @@ typedef struct vec4 {
       float w;
     };
     float elem[4];
-    float *ptr;
   };
 } vec4_t;
 
-struct vec3 {
+typedef struct vec3 {
   union {
     struct {
       float x;
@@ -37,18 +33,16 @@ struct vec3 {
       float z;
     };
     float elem[3];
-    float *ptr;
   };
 } vec3_t;
 
-struct vec2 {
+typedef struct vec2 {
   union {
     struct {
       float x;
       float y;
     };
     float elem[2];
-    float *ptr;
   };
 } vec2_t;
 
@@ -57,7 +51,7 @@ struct vec2 {
  *
  * @param m The matrix to print.
  */
-void print_mat4(const mat4 m);
+void print_mat4(const mat4_t m);
 
 /**
  * @brief TODO
@@ -77,7 +71,7 @@ float radians(const float degrees);
  *
  * @param m The mat4.
  */
-void identity_mat4(mat4 m);
+mat4_t identity_mat4(void);
 
 /**
  * @brief Normalize a vec3.
@@ -94,14 +88,7 @@ vec3_t normalize_vec3(const vec3_t vec);
  * @param v2 The second vec3.
  * @return The dot product of v1 and v2.
  */
-float dot_vec3(const vec3 v1, const vec3 v2);
-
-/**
- * @brief Copy a vec3 at src into dest.
- * @param dest The destination vector.
- * @param src The source vector.
- */
-void copy_vec3(vec3 dest, const vec3 src);
+float dot_vec3(const vec3_t v1, const vec3_t v2);
 
 /**
  * @brief Compare 2 vec3s
@@ -109,14 +96,7 @@ void copy_vec3(vec3 dest, const vec3 src);
  * @param v2
  * @return 1 if the vectors are the same, otherwise 0.
  */
-int cmp_vec3(vec3 v1, vec3 v2);
-
-/**
- * @brief Copy a vec2 at src into dest.
- * @param dest The destination vector.
- * @param src The source vector.
- */
-void copy_vec2(vec2 dest, const vec2 src);
+int cmp_vec3(const vec3_t v1, const vec3_t v2);
 
 /**
  * @brief Compare 2 vec2s
@@ -124,7 +104,7 @@ void copy_vec2(vec2 dest, const vec2 src);
  * @param v2
  * @return 1 if the vectors are the same, otherwise 0.
  */
-int cmp_vec2(vec2 v1, vec2 v2);
+int cmp_vec2(const vec2_t v1, const vec2_t v2);
 
 /**
  * @brief Get the dot product of 2 vec4's
@@ -133,7 +113,7 @@ int cmp_vec2(vec2 v1, vec2 v2);
  * @param v2 The second vec4.
  * @return The dot product of v1 and v2.
  */
-float dot_vec4(const vec4 v1, const vec4 v2);
+float dot_vec4(const vec4_t v1, const vec4_t v2);
 
 /**
  * @brief Cross 2 vec3's.
@@ -156,18 +136,12 @@ mat4_t product_mat4(const mat4_t m1, const mat4_t m2);
 /**
  * @brief TODO
  */
-void product_vec4(float dest[4], float mat[4][4], float vec[4]);
+vec4_t productm4v4(const mat4_t m, const vec4_t v);
 
 /**
- * @brief Create perspective matrix.
- *
- * @param mat The float[16] to store the resutlting matrix in.
- * @param fov The field of view in degrees.
- * @param near The near clip distance.
- * @param far The far clip distance.
- * @param aspect_ratio The aspect ratio of the frustum
+ * @brief TODO
  */
-void perspective(mat4 mat, const float fov, const float aspect_ratio,
+mat4_t perspective(const float fov, const float aspect_ratio,
                  const float near, const float far);
 
 /**
@@ -185,18 +159,19 @@ mat4_t look_at(const vec3_t eye, const vec3_t ctr, const vec3_t up);
  *
  * @param m The matrix to translate.
  * @param v The translation vector.
+ * @return The translated matrix.
  */
-void translate(mat4 m, const vec3 v);
+mat4_t translate(const mat4_t m, const vec3_t v);
 
 /**
- * @brief Create a rotation matrix.
+ * @brief Rotate a matrix about and axis (using unit quaternion).
  *
- * @param dest The matrix to store the result.
  * @param m The matrix to apply the rotation to.
  * @param axis The axis of the rotation.
- * @param angle The rotation angle in degrees.
+ * @param rads The rotation angle in radians.
+ * @return The rotated matrix.
  */
-void rotate(float dest[4][4], float m[4][4], float axis[3], float angle);
+mat4_t rotate(const mat4_t m, const vec3_t axis, const float rads);
 
 /**
  * @brief Scale a transformation matrix by a vector v.
