@@ -30,16 +30,13 @@ void sys_update_model_matrices(void) {
 
 #pragma omp parallel for num_threads(MAX_NUM_THREADS) schedule(static)
   for (size_t i = 0; i < nent; i++) {
-    struct position pos = pos_buf[i].as_position;
+    vec3_t pos = pos_buf[i].as_position;
     struct rotation rot = rot_buf[i].as_rotation;
-    struct model_matrix mm = model_buf[i].as_model_matrix;
+    mat4_t model = model_buf[i].as_model_matrix;
 
-    // TODO check that we dont need to recreate a new matrix each time.
-    union component new_matrix;
-    identity_mat4(new_matrix.as_model_matrix.elem);
-    rotate(new_matrix.as_model_matrix.elem, mm.elem, rot.axis, rot.radians);
-    translate(new_matrix.as_model_matrix.elem, pos.elem);
-    model_buf[i] = new_matrix;
+    model = rotate(model, rot.axis, rot.radians);
+    model = translate(model, pos);
+    model_buf[i].as_model_matrix = model;
   }
 
   update(nent, entity_buf, POSITION, pos_buf);

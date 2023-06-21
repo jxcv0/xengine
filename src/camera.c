@@ -1,13 +1,13 @@
 #include "camera.h"
 
-const vec3 GLOBAL_UP = {0, 1, 0};
+const vec3_t GLOBAL_UP = { .elem = {0.0f, 1.0f, 0.0f}};
 
 /**
  * ----------------------------------------------------------------------------
  */
-void process_mouse_movement(struct camera *camera, const vec2 cursor_offset) {
-  float offset_x = cursor_offset[0] * camera->m_mouse_sensetivity;
-  float offset_y = cursor_offset[1] * camera->m_mouse_sensetivity;
+void process_mouse_movement(struct camera *camera, const vec2_t cursor_offset) {
+  float offset_x = cursor_offset.x * camera->m_mouse_sensetivity;
+  float offset_y = cursor_offset.y * camera->m_mouse_sensetivity;
 
   camera->m_yaw += offset_x;
   camera->m_pitch += offset_y;
@@ -21,26 +21,22 @@ void process_mouse_movement(struct camera *camera, const vec2 cursor_offset) {
   float yaw = radians(camera->m_yaw);
   float pitch = radians(camera->m_pitch);
 
-  vec3 temp_view = {cos(yaw) * cos(pitch), sin(pitch), sin(yaw) * cos(pitch)};
+  vec3_t temp_view = { .elem = {cos(yaw) * cos(pitch), sin(pitch), sin(yaw) * cos(pitch)}};
 
   normalize_vec3(temp_view);
-  camera->m_view_dir[0] = temp_view[0];
-  camera->m_view_dir[1] = temp_view[1];
-  camera->m_view_dir[2] = temp_view[2];
+  camera->m_view_dir = temp_view;
 
-  cross_vec3(camera->m_right, camera->m_view_dir, GLOBAL_UP);
-  cross_vec3(camera->m_up, camera->m_right, camera->m_view_dir);
-  normalize_vec3(camera->m_right);
-  normalize_vec3(camera->m_up);
+  camera->m_right = normalize_vec3(cross_vec3(camera->m_view_dir, GLOBAL_UP));
+  camera->m_up = normalize_vec3(cross_vec3(camera->m_right, camera->m_view_dir));
 }
 
 /**
  * ----------------------------------------------------------------------------
  */
-void update_3rd_person_camera(struct camera *camera, const vec2 cursor_offset,
-                              const float rad, const vec3 centre) {
-  float offset_x = cursor_offset[0] * camera->m_mouse_sensetivity;
-  float offset_y = cursor_offset[1] * camera->m_mouse_sensetivity;
+void update_3rd_person_camera(struct camera *camera, const vec2_t cursor_offset,
+                              const float rad, const vec3_t centre) {
+  float offset_x = cursor_offset.x * camera->m_mouse_sensetivity;
+  float offset_y = cursor_offset.y * camera->m_mouse_sensetivity;
 
   camera->m_yaw += offset_x;
   camera->m_pitch += offset_y;
@@ -54,19 +50,15 @@ void update_3rd_person_camera(struct camera *camera, const vec2 cursor_offset,
   float yaw = radians(camera->m_yaw);
   float pitch = radians(camera->m_pitch);
 
-  vec3 temp_view = {cos(yaw) * cos(pitch), sin(pitch), sin(yaw) * cos(pitch)};
+  vec3_t temp_view = { .elem = {cos(yaw) * cos(pitch), sin(pitch), sin(yaw) * cos(pitch)}};
 
   normalize_vec3(temp_view);
-  camera->m_view_dir[0] = temp_view[0];
-  camera->m_view_dir[1] = temp_view[1];
-  camera->m_view_dir[2] = temp_view[2];
+  camera->m_view_dir = temp_view;
 
-  cross_vec3(camera->m_right, camera->m_view_dir, GLOBAL_UP);
-  cross_vec3(camera->m_up, camera->m_right, camera->m_view_dir);
-  normalize_vec3(camera->m_right);
-  normalize_vec3(camera->m_up);
+  camera->m_right = normalize_vec3(cross_vec3(camera->m_view_dir, GLOBAL_UP));
+  camera->m_up = normalize_vec3(cross_vec3(camera->m_right, camera->m_view_dir));
 
-  camera->m_pos[0] = centre[0] + rad * -temp_view[0];
-  camera->m_pos[1] = centre[1] + rad * -temp_view[1];
-  camera->m_pos[2] = centre[2] + rad * -temp_view[2];
+  camera->m_pos.x = centre.x + rad * -temp_view.x;
+  camera->m_pos.y = centre.y + rad * -temp_view.y;
+  camera->m_pos.z = centre.z + rad * -temp_view.z;
 }

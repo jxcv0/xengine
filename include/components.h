@@ -30,10 +30,10 @@ struct camera {
   float m_pitch;
   float m_movement_speed;
   float m_mouse_sensetivity;
-  float m_pos[3];
-  float m_view_dir[3];
-  float m_up[3];
-  float m_right[3];
+  vec3_t m_pos;
+  vec3_t m_view_dir;
+  vec3_t m_up;
+  vec3_t m_right;
 };
 
 /**
@@ -75,10 +75,6 @@ struct mesh {
   size_t num_indices;
 };
 
-struct model_matrix {
-  float elem[4][4];
-};
-
 struct position {
   union {
     float elem[3];
@@ -91,7 +87,7 @@ struct position {
 };
 
 struct rotation {
-  float axis[3];
+  vec3_t axis;
   float radians;
 };
 
@@ -102,8 +98,8 @@ struct loadreq {
 union component {
   struct mesh as_mesh;
   struct pbr_material as_material;
-  struct position as_position;
-  struct model_matrix as_model_matrix;
+  vec3_t as_position;
+  mat4_t as_model_matrix;
   struct loadreq as_request;
   struct rotation as_rotation;
   // ...

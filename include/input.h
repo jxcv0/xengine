@@ -4,13 +4,9 @@
 #include "GLFW/glfw3.h"
 #include "lin.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 struct mouse_pos {
-  vec2 m_curr_pos;
-  vec2 m_last_pos;
+  vec2_t m_curr_pos;
+  vec2_t m_last_pos;
 };
 
 /**
@@ -28,10 +24,6 @@ void get_cursor_position(struct mouse_pos *mp, GLFWwindow *window);
  * @param offset The vec2 to store the result in.
  * @param mp A pointer to the mouse position data to operate on.
  */
-void get_cursor_offset(vec2 offset, const struct mouse_pos *mp);
-
-#ifdef __cplusplus
-}
-#endif
+vec2_t get_cursor_offset(const struct mouse_pos *mp);
 
 #endif  // INPUT_H_
