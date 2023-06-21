@@ -176,10 +176,10 @@ mat4_t rotate(const mat4_t m, const vec3_t axis, const float rads);
 /**
  * @brief Scale a transformation matrix by a vector v.
  *
- * @param dest The matrix to store the result.
  * @param m The matrix to transform.
  * @param v The scaling vector.
+ * @return The scaled matrix.
  */
-void scale(float dest[4][4], float m[4][4], float v[3]);
+mat4_t scale(const mat4_t m, const vec3_t v);
 
 #endif  // LIN_H_

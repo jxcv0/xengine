@@ -229,9 +229,9 @@ void pbrd_render_lighting(struct renderer *r, struct light *lights,
   char light[64];
   for (size_t i = 0; i < nlights; i++) {
     sprintf(light, "lights[%ld].m_position", i);
-    shader_set_uniform_3fv(r->deferred_lighting, light, lights[i].position);
+    shader_set_uniform_3fv(r->deferred_lighting, light, lights[i].position.elem);
     sprintf(light, "lights[%ld].m_color", i);
-    shader_set_uniform_3fv(r->deferred_lighting, light, lights[i].color);
+    shader_set_uniform_3fv(r->deferred_lighting, light, lights[i].color.elem);
     sprintf(light, "lights[%ld].m_constant", i);
     shader_set_uniform_1f(r->deferred_lighting, light, lights[i].constant);
     sprintf(light, "lights[%ld].m_linear", i);

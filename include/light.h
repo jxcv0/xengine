@@ -40,8 +40,8 @@
   { .constant = 1.0, .linear = 0.0014, .quadratic = 0.000007 }
 
 struct light {
-  vec3 position;
-  vec3 color;
+  vec3_t position;
+  vec3_t color;
   float constant;
   float linear;
   float quadratic;
