@@ -10,7 +10,7 @@ void sys_load(uint64_t component_type);
 
 void sys_load_materials(void);
 
-void sys_render_geometries(struct renderer *r, float projection[4][4],
-                           float view[4][4]);
+void sys_render_geometries(struct renderer *r, mat4_t projection,
+                           mat4_t view);
 
 #endif  // SYSTEMS_H_

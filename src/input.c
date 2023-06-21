@@ -19,9 +19,7 @@ void get_cursor_position(struct mouse_pos *mp, GLFWwindow *window) {
  * ----------------------------------------------------------------------------
  */
 vec2_t get_cursor_offset(const struct mouse_pos *mp) {
-    vec2_t offset = { .elem = {
-  mp->m_curr_pos.x - mp->m_last_pos.x,
-  mp->m_last_pos.y - mp->m_curr_pos.y
-    }};
-    return offset;
+  vec2_t offset = {.elem = {mp->m_curr_pos.x - mp->m_last_pos.x,
+                            mp->m_last_pos.y - mp->m_curr_pos.y}};
+  return offset;
 }

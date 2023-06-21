@@ -33,6 +33,7 @@ void sys_update_model_matrices(void) {
     vec3_t pos = pos_buf[i].as_position;
     struct rotation rot = rot_buf[i].as_rotation;
     mat4_t model = model_buf[i].as_model_matrix;
+    print_mat4(model);
 
     model = rotate(model, rot.axis, rot.radians);
     model = translate(model, pos);
@@ -90,8 +91,8 @@ void sys_load(uint64_t component_type) {
 /**
  * ----------------------------------------------------------------------------
  */
-void sys_render_geometries(struct renderer *r, float projection[4][4],
-                           float view[4][4]) {
+void sys_render_geometries(struct renderer *r, mat4_t projection,
+                           mat4_t view) {
   uint64_t components[] = {MESH, MATERIAL, MODEL_MATRIX};
   uint64_t mask = create_mask(3, components);
   size_t nent = get_num_entities(mask);
@@ -111,8 +112,8 @@ void sys_render_geometries(struct renderer *r, float projection[4][4],
   glBindFramebuffer(GL_FRAMEBUFFER, r->g_buff);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glUseProgram(r->deferred_geometry);
-  shader_set_uniform_m4fv(r->deferred_geometry, "projection", projection);
-  shader_set_uniform_m4fv(r->deferred_geometry, "view", view);
+  shader_set_uniform_m4fv(r->deferred_geometry, "projection", projection.elem);
+  shader_set_uniform_m4fv(r->deferred_geometry, "view", view.elem);
 
   for (size_t i = 0; i < nent; i++) {
     shader_set_uniform_m4fv(r->deferred_geometry, "model",

@@ -141,8 +141,8 @@ vec4_t productm4v4(const mat4_t m, const vec4_t v);
 /**
  * @brief TODO
  */
-mat4_t perspective(const float fov, const float aspect_ratio,
-                 const float near, const float far);
+mat4_t perspective(const float fov, const float aspect_ratio, const float near,
+                   const float far);
 
 /**
  * @brief Create a view matrix.

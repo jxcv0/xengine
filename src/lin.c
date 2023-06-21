@@ -41,8 +41,10 @@ float radians(const float degrees) { return (degrees * M_PI) / 180.0f; }
  * ----------------------------------------------------------------------------
  */
 mat4_t identity_mat4(void) {
-  mat4_t i = {.elem = {{1.0f, 0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f, 0.0f}, {0.0f,
-                        0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 1.0f}}};
+  mat4_t i = {.elem = {{1.0f, 0.0f, 0.0f, 0.0f},
+                       {0.0f, 1.0f, 0.0f, 0.0f},
+                       {0.0f, 0.0f, 1.0f, 0.0f},
+                       {0.0f, 0.0f, 0.0f, 1.0f}}};
   return i;
 }
 
@@ -50,7 +52,7 @@ mat4_t identity_mat4(void) {
  * ----------------------------------------------------------------------------
  */
 vec3_t normalize_vec3(const vec3_t v) {
-  float l = dot_vec3(v, v);
+  float l = sqrt(dot_vec3(v, v));
   vec3_t n = {.elem = {v.elem[0] / l, v.elem[1] / l, v.elem[2] / l}};
   return n;
 }
@@ -59,11 +61,11 @@ vec3_t normalize_vec3(const vec3_t v) {
  * ----------------------------------------------------------------------------
  */
 float dot(const float *v1, const float *v2, size_t n) {
-    float res = 0.0f;
-    for (size_t i = 0; i < n; i++) {
-        res += v1[i] * v2[i];
-    }
-    return res;
+  float res = 0.0f;
+  for (size_t i = 0; i < n; i++) {
+    res += v1[i] * v2[i];
+  }
+  return res;
 }
 
 /**
@@ -101,8 +103,7 @@ int cmp_vec2(const vec2_t v1, const vec2_t v2) {
  * ----------------------------------------------------------------------------
  */
 float dot_vec4(const vec4_t v1, const vec4_t v2) {
-  return (v1.x * v2.x) + (v1.y * v2.y) +
-         (v1.z * v2.z)  + (v1.w * v2.w);
+  return (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z) + (v1.w * v2.w);
 }
 /**
  * ----------------------------------------------------------------------------
@@ -145,8 +146,8 @@ vec4_t productm4v4(const mat4_t m, const vec4_t v) {
 /**
  * ----------------------------------------------------------------------------
  */
-mat4_t perspective(const float fov, const float aspect_ratio,
-                 const float near, const float far) {
+mat4_t perspective(const float fov, const float aspect_ratio, const float near,
+                   const float far) {
   const float t = tan(fov / 2.0f);
 
   mat4_t mat = {0};
@@ -162,7 +163,8 @@ mat4_t perspective(const float fov, const float aspect_ratio,
  * ----------------------------------------------------------------------------
  */
 mat4_t look_at(const vec3_t eye, const vec3_t ctr, const vec3_t up) {
-  vec3_t f = {{{ctr.elem[0] - eye.elem[0], ctr.elem[1] - eye.elem[1], ctr.elem[2] - eye.elem[2]}}};
+  vec3_t f = {{{ctr.elem[0] - eye.elem[0], ctr.elem[1] - eye.elem[1],
+                ctr.elem[2] - eye.elem[2]}}};
 
   f = normalize_vec3(f);
   vec3_t s = normalize_vec3(cross_vec3(f, up));

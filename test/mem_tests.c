@@ -95,7 +95,7 @@ int main() {
   set_component(e3, POSITION, pos3);
   set_component(e4, POSITION, pos4);
 
-  struct position p = get_component(e1, POSITION)->as_position;
+  vec3_t p = get_component(e1, POSITION)->as_position;
   for (int i = 0; i < 3; i++) {
     assert(fabs(p.elem[i] - pos1.as_position.elem[i]) < 0.0001);
   };
