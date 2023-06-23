@@ -33,7 +33,6 @@ void sys_update_model_matrices(void) {
     vec3_t pos = pos_buf[i].as_position;
     struct rotation rot = rot_buf[i].as_rotation;
     mat4_t model = model_buf[i].as_model_matrix;
-    print_mat4(model);
 
     model = rotate(model, rot.axis, rot.radians);
     model = translate(model, pos);
@@ -66,6 +65,7 @@ void sys_load(uint64_t component_type) {
 
   union component *buf = component_buffers[0];
   query(nent, entity_buf, component_type, buf);
+
 #pragma omp parallel for num_threads(MAX_NUM_THREADS) schedule(static)
   for (size_t i = 0; i < nent; i++) {
     union component comp;
