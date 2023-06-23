@@ -30,15 +30,15 @@ $(bin_dir)/%: %.c
 
 libxen.a: $(patsubst %.c, $(build_dir)/%.o, $(wildcard $(xen_src_dir)/*.c))
 	@echo "Building static library $@"
-	@ar rcs $(build_dir)/$@ $^
+	@$(AR) rcs $(build_dir)/$@ $^
 
 libglad.a: $(patsubst %.c, $(build_dir)/%.o, $(wildcard $(glad_src_dir)/*.c))
 	@echo "Building static library $@"
-	@ar rcs $(build_dir)/$@ $^
+	@$(AR) rcs $(build_dir)/$@ $^
 
 libstb.a: $(patsubst %.c, $(build_dir)/%.o, $(wildcard $(stb_src_dir)/*.c))
 	@echo "Building static library $@"
-	@ar rcs $(build_dir)/$@ $^
+	@$(AR) rcs $(build_dir)/$@ $^
 
 tools: libxen.a libstb.a libglad.a $(patsubst %.c, $(bin_dir)/%, $(wildcard $(xen_tools_dir)/*.c))
 
@@ -49,9 +49,9 @@ test_game: libglad.a libstb.a libxen.a
 	@$(CC) $(xen_test_dir)/$@.c $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_include_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
 
 .PHONY: clean format
+
 clean:
 	@rm -rfd build/*
-	@rm -rfd bin/*
 
 format: $(wildcard $(xen_include_dir)/*.h) $(wildcard $(xen_src_dir)/*.c) $(wildcard test/*.c) $(wildcard tools/*.c)
 	@clang-format -i -style=google $^
