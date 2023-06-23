@@ -67,12 +67,12 @@ int main() {
 
   union component e1_pos = {0};
   union component e1_rot = {0};
-	union component e1_mm = {0};
-	e1_mm.as_model_matrix = identity_mat4();
+  union component e1_mm = {0};
+  e1_mm.as_model_matrix = identitym4();
   e1_rot.as_rotation.axis.x = 1.0f;
   set_component(e1, POSITION, e1_pos);
   set_component(e1, ROTATION, e1_rot);
-	set_component(e1, MODEL_MATRIX, e1_mm);
+  set_component(e1, MODEL_MATRIX, e1_mm);
 
   struct light l = LIGHT_RANGE_3250;
   l.position.x = 3.0;

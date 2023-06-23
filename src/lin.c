@@ -12,7 +12,7 @@
 /**
  * ----------------------------------------------------------------------------
  */
-void print_mat4(const mat4_t m) {
+void printm4(const mat4_t m) {
   printf("{ ");
   for (int i = 0; i < 4; i++) {
     printf("{ %f %f %f %f } ", m.elem[i][0], m.elem[i][1], m.elem[i][2],
@@ -24,7 +24,7 @@ void print_mat4(const mat4_t m) {
 /**
  * ----------------------------------------------------------------------------
  */
-void print_vec(const float *v, size_t n) {
+void printvn(const float *v, size_t n) {
   printf("{ ");
   for (size_t i = 0; i < n; i++) {
     printf("%f ", v[i]);
@@ -40,7 +40,7 @@ float radians(const float degrees) { return (degrees * M_PI) / 180.0f; }
 /**
  * ----------------------------------------------------------------------------
  */
-mat4_t identity_mat4(void) {
+mat4_t identitym4(void) {
   mat4_t i = {.elem = {{1.0f, 0.0f, 0.0f, 0.0f},
                        {0.0f, 1.0f, 0.0f, 0.0f},
                        {0.0f, 0.0f, 1.0f, 0.0f},
@@ -51,8 +51,8 @@ mat4_t identity_mat4(void) {
 /**
  * ----------------------------------------------------------------------------
  */
-vec3_t normalize_vec3(const vec3_t v) {
-  float l = sqrt(dot_vec3(v, v));
+vec3_t normalizev3(const vec3_t v) {
+  float l = sqrt(dotv3(v, v));
   vec3_t n = {.elem = {v.elem[0] / l, v.elem[1] / l, v.elem[2] / l}};
   return n;
 }
@@ -60,7 +60,7 @@ vec3_t normalize_vec3(const vec3_t v) {
 /**
  * ----------------------------------------------------------------------------
  */
-float dot(const float *v1, const float *v2, size_t n) {
+float dotvn(const float *v1, const float *v2, size_t n) {
   float res = 0.0f;
   for (size_t i = 0; i < n; i++) {
     res += v1[i] * v2[i];
@@ -71,14 +71,14 @@ float dot(const float *v1, const float *v2, size_t n) {
 /**
  * ----------------------------------------------------------------------------
  */
-float dot_vec3(const vec3_t v1, const vec3_t v2) {
-  return dot(v1.elem, v2.elem, 3);
+float dotv3(const vec3_t v1, const vec3_t v2) {
+  return dotvn(v1.elem, v2.elem, 3);
 }
 
 /**
  * ----------------------------------------------------------------------------
  */
-int cmp_vec3(const vec3_t v1, const vec3_t v2) {
+int cmpv3(const vec3_t v1, const vec3_t v2) {
   for (int i = 0; i < 3; i++) {
     if (fabs(v1.elem[i] - v2.elem[i]) > FLT_EPSILON) {
       return 0;
@@ -90,7 +90,7 @@ int cmp_vec3(const vec3_t v1, const vec3_t v2) {
 /**
  * ----------------------------------------------------------------------------
  */
-int cmp_vec2(const vec2_t v1, const vec2_t v2) {
+int cmpv2(const vec2_t v1, const vec2_t v2) {
   for (int i = 0; i < 2; i++) {
     if (fabs(v1.elem[i] - v2.elem[i]) > FLT_EPSILON) {
       return 0;
@@ -102,13 +102,13 @@ int cmp_vec2(const vec2_t v1, const vec2_t v2) {
 /**
  * ----------------------------------------------------------------------------
  */
-float dot_vec4(const vec4_t v1, const vec4_t v2) {
+float dotv4(const vec4_t v1, const vec4_t v2) {
   return (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z) + (v1.w * v2.w);
 }
 /**
  * ----------------------------------------------------------------------------
  */
-vec3_t cross_vec3(const struct vec3 v1, const struct vec3 v2) {
+vec3_t crossv3(const struct vec3 v1, const struct vec3 v2) {
   struct vec3 r = {
       {{(v1.y * v2.z) - (v1.z * v2.y), (v1.z * v2.x) - (v1.x * v2.z),
         (v1.x * v2.y) - (v1.y * v2.x)}}};
@@ -118,7 +118,7 @@ vec3_t cross_vec3(const struct vec3 v1, const struct vec3 v2) {
 /**
  * ----------------------------------------------------------------------------
  */
-mat4_t product_mat4(const mat4_t m1, const mat4_t m2) {
+mat4_t productm4(const mat4_t m1, const mat4_t m2) {
   mat4_t r = {0};
   for (size_t i = 0; i < 4; i++) {
     for (size_t j = 0; j < 4; j++) {
@@ -166,11 +166,11 @@ mat4_t look_at(const vec3_t eye, const vec3_t ctr, const vec3_t up) {
   vec3_t f = {{{ctr.elem[0] - eye.elem[0], ctr.elem[1] - eye.elem[1],
                 ctr.elem[2] - eye.elem[2]}}};
 
-  f = normalize_vec3(f);
-  vec3_t s = normalize_vec3(cross_vec3(f, up));
-  vec3_t u = cross_vec3(s, f);
+  f = normalizev3(f);
+  vec3_t s = normalizev3(crossv3(f, up));
+  vec3_t u = crossv3(s, f);
 
-  mat4_t mat = identity_mat4();
+  mat4_t mat = identitym4();
 
   mat.elem[0][0] = s.elem[0];
   mat.elem[1][0] = s.elem[1];
@@ -184,9 +184,9 @@ mat4_t look_at(const vec3_t eye, const vec3_t ctr, const vec3_t up) {
   mat.elem[1][2] = -f.elem[1];
   mat.elem[2][2] = -f.elem[2];
 
-  mat.elem[3][0] = -dot_vec3(s, eye);
-  mat.elem[3][1] = -dot_vec3(u, eye);
-  mat.elem[3][2] = dot_vec3(f, eye);
+  mat.elem[3][0] = -dotv3(s, eye);
+  mat.elem[3][1] = -dotv3(u, eye);
+  mat.elem[3][2] = dotv3(f, eye);
   return mat;
 }
 
@@ -208,7 +208,7 @@ mat4_t rotate(const mat4_t m, const vec3_t axis, const float rads) {
   const float c = cos(rads);
   const float s = sin(rads);
 
-  vec3_t a = normalize_vec3(axis);
+  vec3_t a = normalizev3(axis);
 
   mat4_t rot = {0};
   rot.elem[0][0] = c + (1.0f - c) * a.elem[0] * a.elem[0];
@@ -230,14 +230,14 @@ mat4_t rotate(const mat4_t m, const vec3_t axis, const float rads) {
   // rot.elem[3][2] = m.elem[3][2];
   // rot.elem[3][3] = m.elem[3][3];
 
-  return product_mat4(m, rot);
+  return productm4(m, rot);
 }
 
 /**
  * ----------------------------------------------------------------------------
  */
 mat4_t scale(const mat4_t m, const vec3_t v) {
-  mat4_t sm = identity_mat4();
+  mat4_t sm = identitym4();
   sm.elem[0][0] = v.elem[0];
   sm.elem[1][1] = v.elem[1];
   sm.elem[2][2] = v.elem[2];
@@ -246,5 +246,5 @@ mat4_t scale(const mat4_t m, const vec3_t v) {
   sm.elem[3][2] = m.elem[3][2];
   sm.elem[3][3] = m.elem[3][3];
 
-  return product_mat4(m, sm);
+  return productm4(m, sm);
 }

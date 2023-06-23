@@ -87,6 +87,14 @@ size_t get_component_count(uint64_t type);
  */
 size_t get_num_entities(uint64_t mask);
 
+/**
+ * @brief Get all entities with the same identity (mask). It is assumed that
+ * \link get_num_entities has been called to determine the appropriate size of
+ * get_entities.
+ *
+ * @param mask The identity bitmask of the entities.
+ * @param arr The array to load the entities into.
+ */
 void get_entities(uint64_t mask, uint32_t *arr);
 
 /**

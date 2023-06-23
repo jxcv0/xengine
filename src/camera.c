@@ -24,12 +24,11 @@ void process_mouse_movement(struct camera *camera, const vec2_t cursor_offset) {
   vec3_t temp_view = {
       .elem = {cos(yaw) * cos(pitch), sin(pitch), sin(yaw) * cos(pitch)}};
 
-  normalize_vec3(temp_view);
+  normalizev3(temp_view);
   camera->m_view_dir = temp_view;
 
-  camera->m_right = normalize_vec3(cross_vec3(camera->m_view_dir, GLOBAL_UP));
-  camera->m_up =
-      normalize_vec3(cross_vec3(camera->m_right, camera->m_view_dir));
+  camera->m_right = normalizev3(crossv3(camera->m_view_dir, GLOBAL_UP));
+  camera->m_up = normalizev3(crossv3(camera->m_right, camera->m_view_dir));
 }
 
 /**
@@ -55,12 +54,11 @@ void update_3rd_person_camera(struct camera *camera, const vec2_t cursor_offset,
   vec3_t temp_view = {
       .elem = {cos(yaw) * cos(pitch), sin(pitch), sin(yaw) * cos(pitch)}};
 
-  normalize_vec3(temp_view);
+  normalizev3(temp_view);
   camera->m_view_dir = temp_view;
 
-  camera->m_right = normalize_vec3(cross_vec3(camera->m_view_dir, GLOBAL_UP));
-  camera->m_up =
-      normalize_vec3(cross_vec3(camera->m_right, camera->m_view_dir));
+  camera->m_right = normalizev3(crossv3(camera->m_view_dir, GLOBAL_UP));
+  camera->m_up = normalizev3(crossv3(camera->m_right, camera->m_view_dir));
 
   camera->m_pos.x = centre.x + rad * -temp_view.x;
   camera->m_pos.y = centre.y + rad * -temp_view.y;

@@ -51,12 +51,15 @@ typedef struct vec2 {
  *
  * @param m The matrix to print.
  */
-void print_mat4(const mat4_t m);
+void printm4(const mat4_t m);
 
 /**
- * @brief TODO
+ * @brief Print the contents of a vector.
+ *
+ * @param v The elements of the vector.
+ * @param n The number of dimensions of the vector.
  */
-void print_vec(const float *v, size_t n);
+void printvn(const float *v, size_t n);
 
 /**
  * @brief Convert an angle from degrees to radians. Not exact.
@@ -71,7 +74,7 @@ float radians(const float degrees);
  *
  * @param m The mat4.
  */
-mat4_t identity_mat4(void);
+mat4_t identitym4(void);
 
 /**
  * @brief Normalize a vec3.
@@ -79,7 +82,7 @@ mat4_t identity_mat4(void);
  * @param vec The vec3 to normalize.
  * @return A normalized vec.
  */
-vec3_t normalize_vec3(const vec3_t vec);
+vec3_t normalizev3(const vec3_t vec);
 
 /**
  * @brief Get the dot product of 2 vec3's.
@@ -88,7 +91,7 @@ vec3_t normalize_vec3(const vec3_t vec);
  * @param v2 The second vec3.
  * @return The dot product of v1 and v2.
  */
-float dot_vec3(const vec3_t v1, const vec3_t v2);
+float dotv3(const vec3_t v1, const vec3_t v2);
 
 /**
  * @brief Compare 2 vec3s
@@ -96,7 +99,7 @@ float dot_vec3(const vec3_t v1, const vec3_t v2);
  * @param v2
  * @return 1 if the vectors are the same, otherwise 0.
  */
-int cmp_vec3(const vec3_t v1, const vec3_t v2);
+int cmpv3(const vec3_t v1, const vec3_t v2);
 
 /**
  * @brief Compare 2 vec2s
@@ -104,7 +107,7 @@ int cmp_vec3(const vec3_t v1, const vec3_t v2);
  * @param v2
  * @return 1 if the vectors are the same, otherwise 0.
  */
-int cmp_vec2(const vec2_t v1, const vec2_t v2);
+int cmpv2(const vec2_t v1, const vec2_t v2);
 
 /**
  * @brief Get the dot product of 2 vec4's
@@ -113,7 +116,7 @@ int cmp_vec2(const vec2_t v1, const vec2_t v2);
  * @param v2 The second vec4.
  * @return The dot product of v1 and v2.
  */
-float dot_vec4(const vec4_t v1, const vec4_t v2);
+float dotv4(const vec4_t v1, const vec4_t v2);
 
 /**
  * @brief Cross 2 vec3's.
@@ -122,19 +125,23 @@ float dot_vec4(const vec4_t v1, const vec4_t v2);
  * @param v2 The second vec3.
  * @return The cross product of v1 and v2.
  */
-vec3_t cross_vec3(const vec3_t v1, const vec3_t v2);
+vec3_t crossv3(const vec3_t v1, const vec3_t v2);
 
 /**
- * @brief Multiply 2 mat4's.
+ * @brief Get the product of 2 4 x 4 matrices
  *
  * @param m1 The first mat4.
  * @param m2 The second mat4.
  * @return The product of m1 and m2.
  */
-mat4_t product_mat4(const mat4_t m1, const mat4_t m2);
+mat4_t productm4(const mat4_t m1, const mat4_t m2);
 
 /**
- * @brief TODO
+ * @brief Get the product of a 4x4 matrix and a vec4.
+ *
+ * @param m The matrix.
+ * @param v The vector.
+ * @return The product of m and v
  */
 vec4_t productm4v4(const mat4_t m, const vec4_t v);
 

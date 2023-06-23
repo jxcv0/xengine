@@ -14,7 +14,7 @@ void tst_radians(void) {
 
 void tst_identity_mat4(void) {
   TEST();
-  mat4_t m = identity_mat4();
+  mat4_t m = identitym4();
   ASSERT_FLOAT_EQ(m.elem[0][0], 1.0f);
   ASSERT_FLOAT_EQ(m.elem[0][1], 0.0f);
   ASSERT_FLOAT_EQ(m.elem[0][2], 0.0f);
@@ -39,7 +39,7 @@ void tst_identity_mat4(void) {
 void tst_normalize_vec(void) {
   TEST();
   vec3_t v = {.elem = {5.0f, 2.0f, -3.0f}};
-  v = normalize_vec3(v);
+  v = normalizev3(v);
 
   ASSERT_FLOAT_EQ(v.elem[0], 0.8111071056538127f);
   ASSERT_FLOAT_EQ(v.elem[1], 0.3244428422615251f);
@@ -53,7 +53,7 @@ void tst_cross_vec3(void) {
   TEST();
   vec3_t v1 = {.elem = {1.0f, 2.0f, 3.0f}};
   vec3_t v2 = {.elem = {1.0f, 5.0f, 7.0f}};
-  vec3_t res = cross_vec3(v1, v2);
+  vec3_t res = crossv3(v1, v2);
   ASSERT_FLOAT_EQ(res.x, -1.0f);
   ASSERT_FLOAT_EQ(res.y, -4.0f);
   ASSERT_FLOAT_EQ(res.z, 3.0f);
@@ -76,7 +76,7 @@ void tst_product_mat4(void) {
     }
   }
 
-  mat4_t result = product_mat4(m1, m2);
+  mat4_t result = productm4(m1, m2);
   ASSERT_FLOAT_EQ(result.elem[0][0], 56.0f);
   ASSERT_FLOAT_EQ(result.elem[0][1], 62.0f);
   ASSERT_FLOAT_EQ(result.elem[0][2], 68.0f);
@@ -123,14 +123,14 @@ void tst_dot_vec3(void) {
   TEST();
   vec3_t v1 = {.elem = {1.0f, -3.2f, 0.0f}};
   vec3_t v2 = {.elem = {5.4f, 3.2f, -5.0f}};
-  ASSERT_FLOAT_EQ(dot_vec3(v1, v2), -4.84f);
+  ASSERT_FLOAT_EQ(dotv3(v1, v2), -4.84f);
 }
 
 void tst_dot_vec4(void) {
   TEST();
   vec4_t v1 = {.elem = {1.0f, -3.2f, 0.0f, 1.0f}};
   vec4_t v2 = {.elem = {5.4f, 3.2f, -5.0f, -0.5f}};
-  ASSERT_FLOAT_EQ(dot_vec4(v1, v2), -5.34f);
+  ASSERT_FLOAT_EQ(dotv4(v1, v2), -5.34f);
 }
 
 void tst_perspective(void) {
@@ -160,7 +160,7 @@ void tst_perspective(void) {
 
 void tst_translate(void) {
   TEST();
-  mat4_t m = identity_mat4();
+  mat4_t m = identitym4();
   vec3_t v = {.elem = {0.1f, 0.1f, 0.1f}};
   m = translate(m, v);
 
@@ -171,8 +171,8 @@ void tst_translate(void) {
 
 void tst_rotate1(void) {
   TEST();
-  mat4_t m = identity_mat4();
-  vec3_t v = { .elem = {0.0f, 1.0f, 0.0f}};
+  mat4_t m = identitym4();
+  vec3_t v = {.elem = {0.0f, 1.0f, 0.0f}};
   m = rotate(m, v, radians(30.0f));
 
   ASSERT_FLOAT_EQ(m.elem[0][0], 0.86602539f);
@@ -201,7 +201,7 @@ void tst_rotate2(void) {
   vec4_t a = {.elem = {1.0f, 0.0f, 0.0f, 1.0f}};
   vec3_t axis = {.elem = {0.0f, 0.0f, 1.0f}};
 
-  mat4_t rot = identity_mat4();
+  mat4_t rot = identitym4();
   rot = rotate(rot, axis, radians(90.0f));
   a = productm4v4(rot, a);
 

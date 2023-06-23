@@ -28,7 +28,7 @@ void sys_update_model_matrices(void) {
   query(nent, entity_buf, ROTATION, rot_buf);
   query(nent, entity_buf, MODEL_MATRIX, model_buf);
 
-// #pragma omp parallel for num_threads(MAX_NUM_THREADS) schedule(static)
+  // #pragma omp parallel for num_threads(MAX_NUM_THREADS) schedule(static)
   for (size_t i = 0; i < nent; i++) {
     vec3_t pos = pos_buf[i].as_position;
     struct rotation rot = rot_buf[i].as_rotation;
@@ -91,8 +91,7 @@ void sys_load(uint64_t component_type) {
 /**
  * ----------------------------------------------------------------------------
  */
-void sys_render_geometries(struct renderer *r, mat4_t projection,
-                           mat4_t view) {
+void sys_render_geometries(struct renderer *r, mat4_t projection, mat4_t view) {
   uint64_t components[] = {MESH, MATERIAL, MODEL_MATRIX};
   uint64_t mask = create_mask(3, components);
   size_t nent = get_num_entities(mask);
