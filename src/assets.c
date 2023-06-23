@@ -10,16 +10,7 @@
 #include <string.h>
 #include <time.h>
 
-/* TODO Asset cache
-static char loaded_asset_paths[MAX_LOADED_ASSETS][MAX_ASSET_PATH_LEN];
-
-static struct {
-  union {
-    struct mesh as_mesh;
-    struct pbr_material as_material;
-  };
-} loaded_assets;
-*/
+static char **asset_cache;
 
 /**
  * ----------------------------------------------------------------------------
@@ -233,3 +224,8 @@ int load_mtl(struct pbr_material *mat, const char *filepath) {
 
   return 0;
 }
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+int load_asset(const char *path) {}

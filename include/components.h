@@ -73,17 +73,7 @@ struct mesh {
   GLuint ebo;
   size_t num_vertices;
   size_t num_indices;
-};
-
-struct position {
-  union {
-    float elem[3];
-    struct {
-      float x;
-      float y;
-      float z;
-    };
-  };
+  char asset_path[MAX_ASSET_PATH_LEN];
 };
 
 struct rotation {
@@ -95,7 +85,7 @@ struct loadreq {
   char path[MAX_ASSET_PATH_LEN];
 };
 
-union component {
+typedef union component {
   struct mesh as_mesh;
   struct pbr_material as_material;
   vec3_t as_position;
@@ -103,9 +93,9 @@ union component {
   struct loadreq as_request;
   struct rotation as_rotation;
   // ...
-};
+} cmpnt_t;
 
 _Static_assert(sizeof(union component) == 64,
-               "union component size exceeds L1 CLS");
+               "Component size is not equal to L1 CLS");
 
 #endif  // TYPES_H_

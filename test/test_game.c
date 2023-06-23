@@ -96,8 +96,9 @@ int main() {
       glfwSetWindowShouldClose(window, true);
     }
 
-    union component *rot = get_component(e1, ROTATION);
-    rot->as_rotation.radians += radians(0.01f);
+    union component rot = get_component(e1, ROTATION);
+    rot.as_rotation.radians += radians(0.01f);
+    set_component(e1, ROTATION, rot);
 
     get_cursor_position(&mouse_pos, window);
     vec2_t cursor_offset = get_cursor_offset(&mouse_pos);

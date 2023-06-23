@@ -76,7 +76,10 @@ void remove_component(uint32_t e, uint64_t type);
  */
 int set_component(uint32_t e, uint64_t type, union component cmpnt);
 
-union component *get_component(uint32_t e, uint64_t type);
+/**
+ * @brief DO NOT USE
+ */
+union component get_component(uint32_t e, uint64_t type);
 
 size_t get_component_count(uint64_t type);
 
