@@ -3,6 +3,7 @@ MAKEFLAGS := --jobs=$(shell nproc) / 2
 build_dir := build
 bin_dir := bin
 lib_dir := lib
+tests_dir := $(bin_dir)/tests
 
 xen_src_dir := src
 xen_include_dir := include
@@ -54,19 +55,15 @@ test_game: libglad.a libstb.a libxen.a
 
 lin_tests: libxen.a libglad.a libstb.a
 	@echo "building executable $@"
-	@$(c_comp) $(xen_test_dir)/$@.c $(cflags) -I$(xen_include_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
-
-buffer_tests: libxen.a libglad.a libstb.a
-	@echo "building executable $@"
-	@$(c_comp) $(xen_test_dir)/$@.c $(cflags) -I$(xen_include_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
+	@$(c_comp) $(xen_test_dir)/$@.c $(cflags) -I$(xen_include_dir) $(xen_lib) $(libs) -o $(tests_dir)/$@
 
 mem_tests: libxen.a libglad.a libstb.a
 	@echo "building executable $@"
-	@$(c_comp) $(xen_test_dir)/$@.c $(cflags) -I$(xen_include_dir) -I$(glad_src_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
+	@$(c_comp) $(xen_test_dir)/$@.c $(cflags) -I$(xen_include_dir) -I$(glad_src_dir) $(xen_lib) $(libs) -o $(tests_dir)/$@
 
 asset_tests: libxen.a libglad.a libstb.a
 	@echo "building executable $@"
-	@$(c_comp) $(xen_test_dir)/$@.c $(cflags) -I$(xen_include_dir) -I$(glad_src_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
+	@$(c_comp) $(xen_test_dir)/$@.c $(cflags) -I$(xen_include_dir) -I$(glad_src_dir) $(xen_lib) $(libs) -o $(tests_dir)/$@
 
 
 .PHONY: clean format
