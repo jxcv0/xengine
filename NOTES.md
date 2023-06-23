@@ -13,7 +13,7 @@ enum {
     GAME_PLAY,
     GAME_MENU,
     EXIT
-} game_mode = menu;
+} game_mode = MAIN_MENU;
 
 void main_loop() {
     while (game_mode != EXIT) {

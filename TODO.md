@@ -1,1 +1,0 @@
-- [ ] Revert geom\_converter tool. We only want one mesh and material per model for now.
