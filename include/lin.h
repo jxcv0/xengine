@@ -4,11 +4,6 @@
 #include <math.h>
 #include <stddef.h>
 
-#define IDENTITY_MAT4_INITIALIZER                            \
-  {                                                          \
-    {1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, { 0, 0, 0, 1 } \
-  }
-
 typedef struct mat4 {
   float elem[4][4];
 } mat4_t;

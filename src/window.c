@@ -63,8 +63,7 @@ void create_window(GLFWwindow **window, const float width, const float height,
                           GL_TRUE);
   }
 
-  glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
+  // glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
   glEnable(GL_CULL_FACE);
