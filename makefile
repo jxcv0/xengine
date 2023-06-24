@@ -1,7 +1,7 @@
 build_dir := build
 bin_dir := $(build_dir)/bin
 lib_dir := lib
-tests_dir := $(bin_dir)/tests
+tests_dir := $(bin_dir)/test
 
 xen_src_dir := src
 xen_include_dir := include
@@ -55,3 +55,10 @@ clean:
 
 format: $(wildcard $(xen_include_dir)/*.h) $(wildcard $(xen_src_dir)/*.c) $(wildcard test/*.c) $(wildcard tools/*.c)
 	@clang-format -i -style=google $^
+
+%_tests:
+	@echo "Running tests in $@"
+	./$(tests_dir)/$@
+	echo "$? errors"
+
+runtests: mem_tests asset_tests lin_tests
