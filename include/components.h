@@ -11,13 +11,13 @@
 #define MAX_BONE_INFLUENCE 4
 
 enum component_type {
-  MESH = 0,
-  MATERIAL = 1,
-  MODEL_MATRIX = 2,
-  POSITION = 3,
-  ROTATION = 4,
-  MESH_LOAD_REQUEST = 5,
-  MAT_LOAD_REQUEST = 6,
+  component_type_MESH = 0,
+  component_type_MATERIAL = 1,
+  component_type_MODEL_MATRIX = 2,
+  component_type_POSITION = 3,
+  component_type_ROTATION = 4,
+  component_type_MESH_LOAD_REQUEST = 5,
+  component_type_MAT_LOAD_REQUEST = 6,
   // ANIM_LOAD_REQUEST 6
   // AUDIO_LOAD_REQUEST 7
 };
@@ -52,6 +52,7 @@ struct pbr_material {
       GLuint metallic;
     };
   };
+  char asset_path[MAX_ASSET_PATH_LEN];
 };
 
 struct vertex {

@@ -10,7 +10,9 @@
 #include <string.h>
 #include <time.h>
 
-static char **asset_cache;
+#define MESH_CACHE_SIZE 64
+static struct mesh mesh_cache[MESH_CACHE_SIZE];
+static size_t num_cached_meshes;
 
 /**
  * ----------------------------------------------------------------------------
@@ -125,34 +127,35 @@ char *decompress_lz77(struct lz77tok *toks, size_t ntoks, size_t n) {
 /**
  * ----------------------------------------------------------------------------
  */
-int load_obj(struct mesh *geom, const char *filepath) {
+int load_mesh(struct mesh *mesh, const char *filepath) {
   FILE *file;
   if ((file = fopen(filepath, "rb")) == NULL) {
     return -1;
   }
 
-  fread(&geom->num_vertices, sizeof(size_t), 1, file);
-  fread(&geom->num_indices, sizeof(size_t), 1, file);
+  strcpy(mesh->asset_path, filepath);
+  fread(&mesh->num_vertices, sizeof(size_t), 1, file);
+  fread(&mesh->num_indices, sizeof(size_t), 1, file);
 
-  size_t verts_size = sizeof(struct vertex) * geom->num_vertices;
-  size_t indices_size = sizeof(GLuint) * geom->num_indices;
+  size_t verts_size = sizeof(struct vertex) * mesh->num_vertices;
+  size_t indices_size = sizeof(GLuint) * mesh->num_indices;
 
   void *mem = malloc(verts_size + indices_size);
   struct vertex *vertices = mem;
   GLuint *indices = (GLuint *)((uintptr_t)mem + verts_size);
   fread(mem, 1, verts_size + indices_size, file);
 
-  glGenBuffers(1, &geom->vbo);
-  glGenBuffers(1, &geom->ebo);
-  glGenVertexArrays(1, &geom->vao);
-  glBindVertexArray(geom->vao);
+  glGenBuffers(1, &mesh->vbo);
+  glGenBuffers(1, &mesh->ebo);
+  glGenVertexArrays(1, &mesh->vao);
+  glBindVertexArray(mesh->vao);
 
-  glBindBuffer(GL_ARRAY_BUFFER, geom->vbo);
-  glBufferData(GL_ARRAY_BUFFER, geom->num_vertices * sizeof(struct vertex),
+  glBindBuffer(GL_ARRAY_BUFFER, mesh->vbo);
+  glBufferData(GL_ARRAY_BUFFER, mesh->num_vertices * sizeof(struct vertex),
                vertices, GL_STATIC_DRAW);
 
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geom->ebo);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, geom->num_indices * sizeof(uint32_t),
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ebo);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->num_indices * sizeof(uint32_t),
                indices, GL_STATIC_DRAW);
 
   glEnableVertexAttribArray(0);
@@ -228,4 +231,19 @@ int load_mtl(struct pbr_material *mat, const char *filepath) {
 /**
  * ----------------------------------------------------------------------------
  */
-int load_asset(const char *path) {}
+int asset_type(const char *path) {
+  char *ext = strrchr(path, '.');
+
+  if (ext == NULL) {
+    return -1;
+  }
+
+  const char *supported_asset_exts[] = {".mesh", ".mtl"};
+  for (int i = 0; i < NUM_ASSET_TYPES; i++) {
+    if (strcmp(supported_asset_exts[i], ext) == 0) {
+      return i;
+    }
+  }
+
+  return -1;
+}

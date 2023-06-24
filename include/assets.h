@@ -9,6 +9,9 @@
 #define COMP_WINDOW_LEN 64
 #define MAX_LOADED_ASSETS 32
 
+#define NUM_ASSET_TYPES 2
+enum asset_type { asset_type_MESH = 0, asset_type_MATERIAL = 1 };
+
 struct lz77tok {
   uint8_t start;
   uint8_t len;
@@ -40,7 +43,7 @@ int write_file(char *bytes, const char *filepath);
  * @param filepath The filepath to load the object from.
  * @return 0 on success, -1 on failure.
  */
-int load_obj(struct mesh *mesh, const char *filepath);
+int load_mesh(struct mesh *mesh, const char *filepath);
 
 /**
  * @brief Load a material from a xengine binary file.
@@ -49,5 +52,14 @@ int load_obj(struct mesh *mesh, const char *filepath);
  * @return 0 on success, -1 on failure.
  */
 int load_mtl(struct pbr_material *mat, const char *filepath);
+
+/**
+ * @brief Determine the type of an asset based on its file extension.
+ *
+ * @param filepath The filepath
+ * @return int The type of the asset or -1 if the file extension is not
+ * recognized.
+ */
+int asset_type(const char *filepath);
 
 #endif  // ASSETS_H_

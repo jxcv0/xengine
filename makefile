@@ -45,7 +45,7 @@ tools: libxen.a libstb.a libglad.a $(patsubst %.c, $(bin_dir)/%, $(wildcard $(xe
 tests: libxen.a libstb.a libglad.a $(patsubst %.c, $(bin_dir)/%, $(wildcard $(xen_test_dir)/*.c))
 
 test_game: libglad.a libstb.a libxen.a
-	@echo "building executable $@"
+	@echo "Building executable $@"
 	@$(CC) $(xen_test_dir)/$@.c $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_include_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
 
 .PHONY: clean format

@@ -15,7 +15,8 @@ static union component component_buffers[4][MAX_NUM_ENTITIES];
  * ----------------------------------------------------------------------------
  */
 void sys_update_model_matrices(void) {
-  uint64_t components[] = {POSITION, ROTATION, MODEL_MATRIX};
+  uint64_t components[] = {component_type_POSITION, component_type_ROTATION,
+                           component_type_MODEL_MATRIX};
   uint64_t mask = create_mask(3, components);
   size_t nent = get_num_entities(mask);
   get_entities(mask, entity_buf);
@@ -24,9 +25,9 @@ void sys_update_model_matrices(void) {
   union component *rot_buf = component_buffers[1];
   union component *model_buf = component_buffers[2];
 
-  query(nent, entity_buf, POSITION, pos_buf);
-  query(nent, entity_buf, ROTATION, rot_buf);
-  query(nent, entity_buf, MODEL_MATRIX, model_buf);
+  query(nent, entity_buf, component_type_POSITION, pos_buf);
+  query(nent, entity_buf, component_type_ROTATION, rot_buf);
+  query(nent, entity_buf, component_type_MODEL_MATRIX, model_buf);
 
 #pragma omp parallel for num_threads(MAX_NUM_THREADS) schedule(static)
   for (size_t i = 0; i < nent; i++) {
@@ -39,9 +40,9 @@ void sys_update_model_matrices(void) {
     model_buf[i].as_model_matrix = model;
   }
 
-  update(nent, entity_buf, POSITION, pos_buf);
-  update(nent, entity_buf, ROTATION, rot_buf);
-  update(nent, entity_buf, MODEL_MATRIX, model_buf);
+  update(nent, entity_buf, component_type_POSITION, pos_buf);
+  update(nent, entity_buf, component_type_ROTATION, rot_buf);
+  update(nent, entity_buf, component_type_MODEL_MATRIX, model_buf);
 }
 
 /**
@@ -50,11 +51,11 @@ void sys_update_model_matrices(void) {
 void sys_load(uint64_t component_type) {
   uint64_t result_type;
   switch (component_type) {
-    case MESH_LOAD_REQUEST:
-      result_type = MESH;
+    case component_type_MESH_LOAD_REQUEST:
+      result_type = component_type_MESH;
       break;
-    case MAT_LOAD_REQUEST:
-      result_type = MATERIAL;
+    case component_type_MAT_LOAD_REQUEST:
+      result_type = component_type_MATERIAL;
       break;
     default:
       return;
@@ -70,13 +71,13 @@ void sys_load(uint64_t component_type) {
   for (size_t i = 0; i < nent; i++) {
     union component comp;
     switch (result_type) {
-      case MESH:
-        if (load_obj(&comp.as_mesh, buf[i].as_request.path) != 0) {
+      case component_type_MESH:
+        if (load_mesh(&comp.as_mesh, buf[i].as_request.path) != 0) {
           continue;
         }
         break;
 
-      case MATERIAL:
+      case component_type_MATERIAL:
         if (load_mtl(&comp.as_material, buf[i].as_request.path) != 0) {
           continue;
         }
@@ -92,7 +93,8 @@ void sys_load(uint64_t component_type) {
  * ----------------------------------------------------------------------------
  */
 void sys_render_geometries(struct renderer *r, mat4_t projection, mat4_t view) {
-  uint64_t components[] = {MESH, MATERIAL, MODEL_MATRIX};
+  uint64_t components[] = {component_type_MESH, component_type_MATERIAL,
+                           component_type_MODEL_MATRIX};
   uint64_t mask = create_mask(3, components);
   size_t nent = get_num_entities(mask);
   get_entities(mask, entity_buf);
@@ -101,9 +103,9 @@ void sys_render_geometries(struct renderer *r, mat4_t projection, mat4_t view) {
   union component *mat_buf = component_buffers[2];
   union component *model_buf = component_buffers[3];
 
-  query(nent, entity_buf, MESH, mesh_buf);
-  query(nent, entity_buf, MATERIAL, mat_buf);
-  query(nent, entity_buf, MODEL_MATRIX, model_buf);
+  query(nent, entity_buf, component_type_MESH, mesh_buf);
+  query(nent, entity_buf, component_type_MATERIAL, mat_buf);
+  query(nent, entity_buf, component_type_MODEL_MATRIX, model_buf);
 
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

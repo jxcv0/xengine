@@ -8,6 +8,7 @@
 
 static uint64_t entity_buf[MAX_NUM_ENTITIES];
 static size_t num_entities;
+static pthread_mutex_t ebuf_lock = PTHREAD_MUTEX_INITIALIZER;
 
 struct index_table {
   uint32_t entity;
@@ -144,6 +145,7 @@ int create_entity(uint32_t *e) {
  * ----------------------------------------------------------------------------
  */
 void delete_entity(uint32_t e) {
+  pthread_mutex_lock(&ebuf_lock);
   uint64_t mask = entity_buf[e];
   for (size_t i = 0; i < NUM_COMPONENT_TYPES; i++) {
     if (mask & (1LU << i)) {
@@ -152,25 +154,41 @@ void delete_entity(uint32_t e) {
   }
   entity_buf[e] = ENTITY_UNUSED;
   --num_entities;
+  pthread_mutex_unlock(&ebuf_lock);
 }
 
 /**
  * ----------------------------------------------------------------------------
  */
-uint64_t get_identity(uint32_t e) { return entity_buf[e]; }
+uint64_t get_identity(uint32_t e) {
+  pthread_mutex_lock(&ebuf_lock);
+  uint64_t i = entity_buf[e];
+  pthread_mutex_unlock(&ebuf_lock);
+  return i;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+static void set_identity_bit(uint32_t e, uint64_t mask) {
+  pthread_mutex_lock(&ebuf_lock);
+  entity_buf[e] |= mask;
+  pthread_mutex_unlock(&ebuf_lock);
+}
 
 /**
  * ----------------------------------------------------------------------------
  */
 int add_component(uint32_t e, uint64_t type) {
-  if ((entity_buf[e] & ENTITY_UNUSED) != 0) {
+  uint64_t identity = get_identity(e);
+  if ((identity & ENTITY_UNUSED) != 0) {
     return -1;
   }
 
   uint64_t mask = (1LU << type);
-  if ((entity_buf[e] & mask) == 0) {
+  if ((identity & mask) == 0) {
     struct row *row = aquire_row(type);
-    entity_buf[e] |= mask;
+    set_identity_bit(e, mask);
 
     struct index_table *it = row->table;
     size_t count = row->count;
@@ -187,7 +205,8 @@ int add_component(uint32_t e, uint64_t type) {
  * ----------------------------------------------------------------------------
  */
 void remove_component(uint32_t e, uint64_t type) {
-  if ((entity_buf[e] & ENTITY_UNUSED) != 0) {
+  uint64_t identity = get_identity(e);
+  if ((identity & ENTITY_UNUSED) != 0) {
     return;
   }
 
@@ -201,7 +220,8 @@ void remove_component(uint32_t e, uint64_t type) {
   }
 
   if (table_index_delete != row->count) {
-    entity_buf[e] &= ~(1LU << type);
+    identity &= ~(1LU << type);
+    set_identity_bit(e, identity);
 
     size_t buffer_index_delete = table[table_index_delete].index;
     size_t last = (row->count) - 1;
@@ -255,11 +275,13 @@ size_t get_component_count(uint64_t type) {
  */
 size_t get_num_entities(uint64_t mask) {
   size_t count = 0;
+  pthread_mutex_lock(&ebuf_lock);
   for (size_t j = 0; j < num_entities; j++) {
     if ((entity_buf[j] & mask) == mask) {
       ++count;
     }
   }
+  pthread_mutex_unlock(&ebuf_lock);
   return count;
 }
 
@@ -268,11 +290,13 @@ size_t get_num_entities(uint64_t mask) {
  */
 void get_entities(uint64_t mask, uint32_t *arr) {
   size_t idx = 0;
+  pthread_mutex_lock(&ebuf_lock);
   for (size_t i = 0; i < num_entities; i++) {
     if ((entity_buf[i] & mask) == mask) {
       arr[idx++] = i;
     }
   }
+  pthread_mutex_unlock(&ebuf_lock);
 }
 
 /**
