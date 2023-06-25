@@ -206,14 +206,22 @@ int main() {
 */
 
 int test_init_entity_table(void) {
-  uint64_t etable[16];
-  init_entity_table(etable, 16);
+  gamestate_t gs = create_gamestate(16);
   for (int i = 0; i < 16; i++) {
-    if (etable[i] != ENTITY_UNUSED) {
+    if (gs.otable[i] != 0) {
       return 1;
     }
   }
-  return 1;
+
+  if (gs.nobj != 0) {
+    return 1;
+  }
+
+  if (gs.max_nobj != 16) {
+    return 1;
+  }
+
+  return 0;
 }
 
 int test_create_mask(void) {
@@ -225,13 +233,32 @@ int test_create_mask(void) {
                   component_type_POSITION};
   uint64_t m = create_mask(3, a);
 
+  if (m == (mesh_bit | mat_bit | pos_bit)) {
+    return 0;
+  }
   return 1;
-  return (m == (mesh_bit | mat_bit | pos_bit));
+}
+
+int test_create_game_object(void) {
+  gamestate_t gs = create_gamestate(16);
+
+  for (int i = 0; i < 15; i++) {
+    if (create_game_object(&gs) == -1) {
+      return 1;
+    }
+  }
+
+  if (create_game_object(&gs) == 0) {
+    return 1;
+  }
+
+  return 0;
 }
 
 int main() {
   int err = 0;
   err += test_init_entity_table();
   err += test_create_mask();
+  err += test_create_game_object();
   return err;
 }

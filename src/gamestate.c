@@ -5,6 +5,7 @@
 #include <pthread.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
 static uint64_t entity_buf[MAX_NUM_ENTITIES];
 static size_t num_entities;
@@ -61,10 +62,33 @@ static struct component_table lookup_table[NUM_COMPONENT_TYPES] = {
 /**
  * ----------------------------------------------------------------------------
  */
-void init_entity_table(uint64_t *etable, size_t nmemb) {
-  for (size_t i = 0; i < nmemb; i++) {
-    etable[i] = ENTITY_UNUSED;
+gamestate_t create_gamestate(int nobj) {
+  gamestate_t g = {
+      .nobj = 0, .max_nobj = nobj, .otable = malloc(sizeof(uint64_t) * nobj)};
+  memset(g.otable, 0, sizeof(uint64_t) * nobj);
+  return g;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+uint64_t create_mask(size_t n, uint64_t *components) {
+  uint64_t mask = 0;
+  for (size_t i = 0; i < n; i++) {
+    mask |= (1LU << components[i]);
   }
+  return mask;
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+int create_game_object(gamestate_t *gs) {
+  if (gs->nobj < gs->max_nobj) {
+    gs->otable[gs->nobj] = 0;
+    return gs->nobj++;
+  }
+  return -1;
 }
 
 /**
@@ -102,17 +126,6 @@ void init_mem_subsys(void) {
   for (size_t i = 0; i < MAX_NUM_ENTITIES; i++) {
     entity_buf[i] = ENTITY_UNUSED;
   }
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-uint64_t create_mask(size_t n, uint64_t *components) {
-  uint64_t mask = 0;
-  for (size_t i = 0; i < n; i++) {
-    mask |= (1LU << components[i]);
-  }
-  return mask;
 }
 
 /**
