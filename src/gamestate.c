@@ -8,7 +8,6 @@
 
 static uint64_t entity_buf[MAX_NUM_ENTITIES];
 static size_t num_entities;
-static pthread_mutex_t ebuf_lock = PTHREAD_MUTEX_INITIALIZER;
 
 struct index_table {
   uint32_t entity;
@@ -47,32 +46,17 @@ struct row {
   union component *buffer;
   struct index_table *table;
   size_t count;
-  pthread_mutex_t lock;
 };
 
 // TODO should each of these have a mutex?
 static struct row lookup_table[NUM_COMPONENT_TYPES] = {
-    {mesh_buf, geometry_table, 0, PTHREAD_MUTEX_INITIALIZER},
-    {material_buf, material_table, 0, PTHREAD_MUTEX_INITIALIZER},
-    {position_buf, position_table, 0, PTHREAD_MUTEX_INITIALIZER},
-    {rotation_buf, rotation_table, 0, PTHREAD_MUTEX_INITIALIZER},
-    {model_matrix_buf, model_matrix_table, 0, PTHREAD_MUTEX_INITIALIZER},
-    {geomreq_buf, geomreq_table, 0, PTHREAD_MUTEX_INITIALIZER},
-    {matreq_buf, matreq_table, 0, PTHREAD_MUTEX_INITIALIZER}};
-
-/**
- * ----------------------------------------------------------------------------
- */
-static struct row *aquire_row(uint64_t type) {
-  struct row *row = &lookup_table[type];
-  pthread_mutex_lock(&row->lock);
-  return row;
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-static void release_row(struct row *row) { pthread_mutex_unlock(&row->lock); }
+    {mesh_buf, geometry_table, 0},
+    {material_buf, material_table, 0},
+    {position_buf, position_table, 0},
+    {rotation_buf, rotation_table, 0},
+    {model_matrix_buf, model_matrix_table, 0},
+    {geomreq_buf, geomreq_table, 0},
+    {matreq_buf, matreq_table, 0}};
 
 /**
  * ----------------------------------------------------------------------------
@@ -145,7 +129,6 @@ int create_entity(uint32_t *e) {
  * ----------------------------------------------------------------------------
  */
 void delete_entity(uint32_t e) {
-  pthread_mutex_lock(&ebuf_lock);
   uint64_t mask = entity_buf[e];
   for (size_t i = 0; i < NUM_COMPONENT_TYPES; i++) {
     if (mask & (1LU << i)) {
@@ -154,26 +137,14 @@ void delete_entity(uint32_t e) {
   }
   entity_buf[e] = ENTITY_UNUSED;
   --num_entities;
-  pthread_mutex_unlock(&ebuf_lock);
 }
 
 /**
  * ----------------------------------------------------------------------------
  */
 uint64_t get_identity(uint32_t e) {
-  pthread_mutex_lock(&ebuf_lock);
   uint64_t i = entity_buf[e];
-  pthread_mutex_unlock(&ebuf_lock);
   return i;
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-static void set_identity_bit(uint32_t e, uint64_t mask) {
-  pthread_mutex_lock(&ebuf_lock);
-  entity_buf[e] |= mask;
-  pthread_mutex_unlock(&ebuf_lock);
 }
 
 /**
@@ -187,17 +158,15 @@ int add_component(uint32_t e, uint64_t type) {
 
   uint64_t mask = (1LU << type);
   if ((identity & mask) == 0) {
-    struct row *row = aquire_row(type);
-    set_identity_bit(e, mask);
+    struct row *row = &lookup_table[type];
+    entity_buf[e] |= mask;
 
     struct index_table *it = row->table;
     size_t count = row->count;
     it[count].entity = e;
     it[count].index = count;
     ++row->count;
-    release_row(row);
   }
-
   return 0;
 }
 
@@ -210,19 +179,16 @@ void remove_component(uint32_t e, uint64_t type) {
     return;
   }
 
-  struct row *row = aquire_row(type);
+  struct row *row = &lookup_table[type];
   struct index_table *table = row->table;
 
   size_t table_index_delete;
   if (table_index(e, table, &table_index_delete, row->count) == -1) {
-    release_row(row);
     return;
   }
 
+  // change indices if we need too
   if (table_index_delete != row->count) {
-    identity &= ~(1LU << type);
-    set_identity_bit(e, identity);
-
     size_t buffer_index_delete = table[table_index_delete].index;
     size_t last = (row->count) - 1;
     row->buffer[buffer_index_delete] = row->buffer[last];
@@ -230,20 +196,23 @@ void remove_component(uint32_t e, uint64_t type) {
     table[last].index = buffer_index_delete;
     table[table_index_delete] = table[last];
   }
+
+  entity_buf[e] &= ~(1LU << type);
+
   --row->count;
-  release_row(row);
 }
 
+/**
+ * ----------------------------------------------------------------------------
+ */
 int set_component(uint32_t e, uint64_t type, union component cmpnt) {
-  struct row *row = aquire_row(type);
+  struct row *row = &lookup_table[type];
   struct index_table *table = row->table;
   size_t index;
   if (buffer_index(e, table, &index, row->count) == -1) {
-    release_row(row);
     return -1;
   }
   row->buffer[index] = cmpnt;
-  release_row(row);
   return 0;
 }
 
@@ -251,37 +220,29 @@ int set_component(uint32_t e, uint64_t type, union component cmpnt) {
  * ----------------------------------------------------------------------------
  */
 union component get_component(uint32_t e, uint64_t type) {
-  struct row *row = aquire_row(type);
+  struct row *row = &lookup_table[type];
   struct index_table *table = row->table;
   size_t index;
   assert(buffer_index(e, table, &index, row->count) != -1);
   cmpnt_t c = row->buffer[index];
-  release_row(row);
   return c;
 }
 
 /**
  * ----------------------------------------------------------------------------
  */
-size_t get_component_count(uint64_t type) {
-  struct row *row = aquire_row(type);
-  uint64_t count = lookup_table[type].count;
-  release_row(row);
-  return count;
-}
+size_t get_component_count(uint64_t type) { return lookup_table[type].count; }
 
 /**
  * ----------------------------------------------------------------------------
  */
 size_t get_num_entities(uint64_t mask) {
   size_t count = 0;
-  pthread_mutex_lock(&ebuf_lock);
   for (size_t j = 0; j < num_entities; j++) {
     if ((entity_buf[j] & mask) == mask) {
       ++count;
     }
   }
-  pthread_mutex_unlock(&ebuf_lock);
   return count;
 }
 
@@ -290,13 +251,11 @@ size_t get_num_entities(uint64_t mask) {
  */
 void get_entities(uint64_t mask, uint32_t *arr) {
   size_t idx = 0;
-  pthread_mutex_lock(&ebuf_lock);
   for (size_t i = 0; i < num_entities; i++) {
     if ((entity_buf[i] & mask) == mask) {
       arr[idx++] = i;
     }
   }
-  pthread_mutex_unlock(&ebuf_lock);
 }
 
 /**
@@ -304,7 +263,7 @@ void get_entities(uint64_t mask, uint32_t *arr) {
  */
 void query(size_t nent, uint32_t *entities, uint64_t type,
            union component *set) {
-  struct row *row = aquire_row(type);
+  struct row *row = &lookup_table[type];
   union component *buffer = row->buffer;
   struct index_table *table = row->table;
   for (size_t i = 0; i < nent; i++) {
@@ -312,7 +271,6 @@ void query(size_t nent, uint32_t *entities, uint64_t type,
     assert(buffer_index(entities[i], table, &index, row->count) != -1);
     set[i] = buffer[index];
   }
-  release_row(row);
 }
 
 /**
@@ -320,16 +278,14 @@ void query(size_t nent, uint32_t *entities, uint64_t type,
  */
 void update(size_t nent, uint32_t *entities, uint64_t type,
             union component *set) {
-  struct row *row = aquire_row(type);
+  struct row *row = &lookup_table[type];
   union component *buffer = row->buffer;
   struct index_table *table = row->table;
   for (size_t i = 0; i < nent; i++) {
     size_t index;
     if (buffer_index(entities[i], table, &index, row->count) == -1) {
-      release_row(row);
       return;
     }
     buffer[index] = set[i];
   }
-  release_row(row);
 }

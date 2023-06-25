@@ -48,7 +48,7 @@ test_game: libglad.a libstb.a libxen.a
 	@echo "Building executable $@"
 	@$(CC) $(xen_test_dir)/$@.c $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_include_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
 
-.PHONY: clean format
+.PHONY: clean format runtests
 
 clean:
 	@rm -rfd build/*
