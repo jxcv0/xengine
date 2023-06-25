@@ -42,14 +42,14 @@ static struct index_table geomreq_table[MAX_NUM_LOAD_REQUESTS];
 static union component matreq_buf[MAX_NUM_LOAD_REQUESTS];
 static struct index_table matreq_table[MAX_NUM_LOAD_REQUESTS];
 
-struct row {
+struct component_table {
   union component *buffer;
   struct index_table *table;
   size_t count;
 };
 
 // TODO should each of these have a mutex?
-static struct row lookup_table[NUM_COMPONENT_TYPES] = {
+static struct component_table lookup_table[NUM_COMPONENT_TYPES] = {
     {mesh_buf, geometry_table, 0},
     {material_buf, material_table, 0},
     {position_buf, position_table, 0},
@@ -57,6 +57,15 @@ static struct row lookup_table[NUM_COMPONENT_TYPES] = {
     {model_matrix_buf, model_matrix_table, 0},
     {geomreq_buf, geomreq_table, 0},
     {matreq_buf, matreq_table, 0}};
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+void init_entity_table(uint64_t *etable, size_t nmemb) {
+  for (size_t i = 0; i < nmemb; i++) {
+    etable[i] = ENTITY_UNUSED;
+  }
+}
 
 /**
  * ----------------------------------------------------------------------------
@@ -158,14 +167,14 @@ int add_component(uint32_t e, uint64_t type) {
 
   uint64_t mask = (1LU << type);
   if ((identity & mask) == 0) {
-    struct row *row = &lookup_table[type];
+    struct component_table *component_table = &lookup_table[type];
     entity_buf[e] |= mask;
 
-    struct index_table *it = row->table;
-    size_t count = row->count;
+    struct index_table *it = component_table->table;
+    size_t count = component_table->count;
     it[count].entity = e;
     it[count].index = count;
-    ++row->count;
+    ++component_table->count;
   }
   return 0;
 }
@@ -179,19 +188,21 @@ void remove_component(uint32_t e, uint64_t type) {
     return;
   }
 
-  struct row *row = &lookup_table[type];
-  struct index_table *table = row->table;
+  struct component_table *component_table = &lookup_table[type];
+  struct index_table *table = component_table->table;
 
   size_t table_index_delete;
-  if (table_index(e, table, &table_index_delete, row->count) == -1) {
+  if (table_index(e, table, &table_index_delete, component_table->count) ==
+      -1) {
     return;
   }
 
   // change indices if we need too
-  if (table_index_delete != row->count) {
+  if (table_index_delete != component_table->count) {
     size_t buffer_index_delete = table[table_index_delete].index;
-    size_t last = (row->count) - 1;
-    row->buffer[buffer_index_delete] = row->buffer[last];
+    size_t last = (component_table->count) - 1;
+    component_table->buffer[buffer_index_delete] =
+        component_table->buffer[last];
 
     table[last].index = buffer_index_delete;
     table[table_index_delete] = table[last];
@@ -199,20 +210,20 @@ void remove_component(uint32_t e, uint64_t type) {
 
   entity_buf[e] &= ~(1LU << type);
 
-  --row->count;
+  --component_table->count;
 }
 
 /**
  * ----------------------------------------------------------------------------
  */
 int set_component(uint32_t e, uint64_t type, union component cmpnt) {
-  struct row *row = &lookup_table[type];
-  struct index_table *table = row->table;
+  struct component_table *component_table = &lookup_table[type];
+  struct index_table *table = component_table->table;
   size_t index;
-  if (buffer_index(e, table, &index, row->count) == -1) {
+  if (buffer_index(e, table, &index, component_table->count) == -1) {
     return -1;
   }
-  row->buffer[index] = cmpnt;
+  component_table->buffer[index] = cmpnt;
   return 0;
 }
 
@@ -220,11 +231,11 @@ int set_component(uint32_t e, uint64_t type, union component cmpnt) {
  * ----------------------------------------------------------------------------
  */
 union component get_component(uint32_t e, uint64_t type) {
-  struct row *row = &lookup_table[type];
-  struct index_table *table = row->table;
+  struct component_table *component_table = &lookup_table[type];
+  struct index_table *table = component_table->table;
   size_t index;
-  assert(buffer_index(e, table, &index, row->count) != -1);
-  cmpnt_t c = row->buffer[index];
+  assert(buffer_index(e, table, &index, component_table->count) != -1);
+  cmpnt_t c = component_table->buffer[index];
   return c;
 }
 
@@ -263,12 +274,13 @@ void get_entities(uint64_t mask, uint32_t *arr) {
  */
 void query(size_t nent, uint32_t *entities, uint64_t type,
            union component *set) {
-  struct row *row = &lookup_table[type];
-  union component *buffer = row->buffer;
-  struct index_table *table = row->table;
+  struct component_table *component_table = &lookup_table[type];
+  union component *buffer = component_table->buffer;
+  struct index_table *table = component_table->table;
   for (size_t i = 0; i < nent; i++) {
     size_t index;
-    assert(buffer_index(entities[i], table, &index, row->count) != -1);
+    assert(buffer_index(entities[i], table, &index, component_table->count) !=
+           -1);
     set[i] = buffer[index];
   }
 }
@@ -278,12 +290,13 @@ void query(size_t nent, uint32_t *entities, uint64_t type,
  */
 void update(size_t nent, uint32_t *entities, uint64_t type,
             union component *set) {
-  struct row *row = &lookup_table[type];
-  union component *buffer = row->buffer;
-  struct index_table *table = row->table;
+  struct component_table *component_table = &lookup_table[type];
+  union component *buffer = component_table->buffer;
+  struct index_table *table = component_table->table;
   for (size_t i = 0; i < nent; i++) {
     size_t index;
-    if (buffer_index(entities[i], table, &index, row->count) == -1) {
+    if (buffer_index(entities[i], table, &index, component_table->count) ==
+        -1) {
       return;
     }
     buffer[index] = set[i];

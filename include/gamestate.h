@@ -21,6 +21,14 @@
 void init_mem_subsys(void);
 
 /**
+ * @brief Initialize each member of an entity_buffer to ENTITY_UNUSED.
+ *
+ * @param etable The entity table.
+ * @param nmemb The number of members in the buffer.
+ */
+void init_entity_table(uint64_t *etable, size_t nmemb);
+
+/**
  * @brief Create a mask from an array of components.
  *
  * @param n The number of members in the components array

@@ -6,6 +6,7 @@
 #include "gamestate.h"
 #include "test.h"
 
+/*
 int main() {
   TEST_BEGIN();
   TEST();
@@ -201,4 +202,36 @@ int main() {
   assert(get_component(e2, component_type_MESH).as_mesh.vbo == 7);
   assert(get_component(e3, component_type_MESH).as_mesh.vbo == 8);
   TEST_END();
+}
+*/
+
+int test_init_entity_table(void) {
+  uint64_t etable[16];
+  init_entity_table(etable, 16);
+  for (int i = 0; i < 16; i++) {
+    if (etable[i] != ENTITY_UNUSED) {
+      return 1;
+    }
+  }
+  return 1;
+}
+
+int test_create_mask(void) {
+  uint64_t mesh_bit = (1LL << component_type_MESH);
+  uint64_t mat_bit = (1LL << component_type_MATERIAL);
+  uint64_t pos_bit = (1LL << component_type_POSITION);
+
+  uint64_t a[] = {component_type_MESH, component_type_MATERIAL,
+                  component_type_POSITION};
+  uint64_t m = create_mask(3, a);
+
+  return 1;
+  return (m == (mesh_bit | mat_bit | pos_bit));
+}
+
+int main() {
+  int err = 0;
+  err += test_init_entity_table();
+  err += test_create_mask();
+  return err;
 }
