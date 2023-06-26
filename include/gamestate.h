@@ -34,7 +34,7 @@ uint64_t create_mask(size_t n, uint64_t *attrib_types);
 
 /**
  * @brief Create a game object.
- * 
+ *
  * @param oid A pointer to where to store the object id.
  * @return 0 on success -1, on error.
  */
@@ -42,14 +42,14 @@ int create_obj(uint32_t *oid);
 
 /**
  * @brief Delete a game object.
- * 
+ *
  * @param obj The object to delete.
  */
 void delete_obj(uint32_t obj);
 
 /**
  * @brief Get the attribute bitmask of an object.
- * 
+ *
  * @param obj The game object.
  * @return The attribute mask of obj.
  */
@@ -84,8 +84,8 @@ int set_attrib(uint32_t obj, uint64_t attrib_type, attrib_t attrib);
 
 /**
  * @brief Get an attribute of an object.
- * 
- * @param obj The object. 
+ *
+ * @param obj The object.
  * @param attrib_type The type of the attribute.
  * @return The attribute.
  */
@@ -93,7 +93,7 @@ attrib_t get_attrib(uint32_t e, uint64_t attrib_type);
 
 /**
  * @brief Get the number of attributes of a type.
- * 
+ *
  * @param attrib_type The attribute type.
  * @return The number of attributes of attrib_type.
  */
@@ -101,7 +101,7 @@ size_t get_num_attribs(uint64_t attrib_type);
 
 /**
  * @brief Count the number of objects who's attributes matches mask.
- * 
+ *
  * @param attrib_mask The attribute bitmask.
  * @return The number of objects.
  */
@@ -116,18 +116,26 @@ size_t get_num_obj(uint64_t attrib_mask);
 void get_objs(uint64_t mask, uint32_t *arr);
 
 /**
- * @brief Generate a set of components of the same type belonging to entities.
+ * @brief Generate a set of attributes of the same type belonging to a list of objects.
  * The attribute at index n of array belongs to the entity at index n of
  * entities.
  *
- * @param nent The number of entities in the entities array.
- * @param type The type of the components.
- * @param set The destination array of components.
+ * @param nent The number of objects in the objects array.
+ * @param type The type of the attributes.
+ * @param set The destination array of attributes.
  */
-void query(size_t nent, uint32_t *entities, uint64_t type,
-           union attribute *set);
+void query(size_t nobj, uint32_t *objs, uint64_t attrib_type,
+           union attribute *attribs);
 
-void update(size_t nent, uint32_t *entities, uint64_t type,
-            union attribute *set);
+/**
+ * @brief Save back a modified query.
+ * 
+ * @param nobj The number of objects.
+ * @param objs The objects
+ * @param attrib_type The type of the attributes.
+ * @param attribs The array of attributes.
+ */
+void update(size_t nobj, uint32_t *objs, uint64_t attrib_type,
+            union attribute *attribs);
 
 #endif  // MEM_H_

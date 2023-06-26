@@ -16,7 +16,7 @@ xen_lib := -L$(build_dir) -lxen
 
 format_cmd := "/usr/bin/clang-format -i -style=Google"
 
-all: format tests tools test_game
+all: format tests tools
 
 $(build_dir)/%.o: %.c
 	@mkdir -p $(@D)
@@ -43,10 +43,6 @@ libstb.a: $(patsubst %.c, $(build_dir)/%.o, $(wildcard $(stb_src_dir)/*.c))
 tools: libxen.a libstb.a libglad.a $(patsubst %.c, $(bin_dir)/%, $(wildcard $(xen_tools_dir)/*.c))
 
 tests: libxen.a libstb.a libglad.a $(patsubst %.c, $(bin_dir)/%, $(wildcard $(xen_test_dir)/*.c))
-
-test_game: libglad.a libstb.a libxen.a
-	@echo "Building executable $@"
-	@$(CC) $(xen_test_dir)/$@.c $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_include_dir) $(xen_lib) $(libs) -o $(bin_dir)/$@
 
 .PHONY: clean format runtests
 

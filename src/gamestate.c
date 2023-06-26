@@ -201,7 +201,6 @@ void remove_attrib(uint32_t e, uint64_t type) {
   }
 
   entity_buf[e] &= ~(1LU << type);
-
   --component_table->count;
 }
 
