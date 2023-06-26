@@ -104,8 +104,7 @@ int main() {
     sys_load(attrib_type_MAT_LOAD_REQUEST);
     sys_update_model_matrices();
     sys_render_geometries(&r, projection_matrix, create_view_matrix());
-    pbrd_render_lighting(&r, &l, 1, camera.m_pos.elem, window_width,
-                         window_height);
+    render_lighting(&r, &l, 1, camera.m_pos.elem, window_width, window_height);
 
     /*
     TODO Rendering to wrong buffer?

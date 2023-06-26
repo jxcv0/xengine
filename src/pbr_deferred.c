@@ -86,8 +86,8 @@ int pbrd_init(struct renderer *r, const uint32_t scr_w, const uint32_t scr_h) {
   // glPatchParameteri(GL_PATCH_VERTICES, 3);
 
   // set up G-Buffer
-  glGenFramebuffers(1, &r->g_buff);
-  glBindFramebuffer(GL_FRAMEBUFFER, r->g_buff);
+  glGenFramebuffers(1, &r->g_buf);
+  glBindFramebuffer(GL_FRAMEBUFFER, r->g_buf);
 
   // vertex position buffer
   glGenTextures(1, &r->g_position);
@@ -159,18 +159,49 @@ int pbrd_init(struct renderer *r, const uint32_t scr_w, const uint32_t scr_h) {
 /**
  * ----------------------------------------------------------------------------
  */
-void pbrd_render_geometries(struct renderer *r, float projection[4][4],
-                            float view[4][4], float *model_matrices[4][4],
-                            struct mesh *geometries,
-                            struct pbr_material *materials, size_t n) {
+void set_up_gbuf(struct renderer *r, float projection[4][4], float view[4][4]) {
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  glBindFramebuffer(GL_FRAMEBUFFER, r->g_buff);
+  glBindFramebuffer(GL_FRAMEBUFFER, r->g_buf);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glUseProgram(r->deferred_geometry);
   shader_set_uniform_m4fv(r->deferred_geometry, "projection", projection);
   shader_set_uniform_m4fv(r->deferred_geometry, "view", view);
+}
+
+void render_geom_to_gbuf(struct renderer *r, struct pbr_material *mat, struct mesh *mesh, float model[4][4]) {
+    shader_set_uniform_m4fv(r->deferred_geometry, "model", model);
+    shader_set_uniform_1i(r->deferred_geometry, "tex_diffuse", 0);
+    shader_set_uniform_1i(r->deferred_geometry, "tex_roughness", 1);
+    shader_set_uniform_1i(r->deferred_geometry, "tex_normal", 2);
+    shader_set_uniform_1i(r->deferred_geometry, "tex_metallic", 3);
+    // shader_set_uniform_1i(pbr.deferred_geometry, "tex_displacement", 4);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, mat->diffuse);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, mat->roughness);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, mat->normal);
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, mat->metallic);
+    // glActiveTexture(GL_TEXTURE4);
+    // glBindTexture(GL_TEXTURE_2D, materials[i].displacement);
+
+    glBindVertexArray(mesh->vao);
+
+    glDrawElements(GL_TRIANGLES, mesh->num_indices, GL_UNSIGNED_INT, 0);
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+void render_geometries(struct renderer *r, float projection[4][4],
+                       float view[4][4], float *model_matrices[4][4],
+                       struct mesh *geometries, struct pbr_material *materials,
+                       size_t n) {
+  set_up_gbuf(r, projection, geometries);
 
   for (size_t i = 0; i < n; i++) {
     shader_set_uniform_m4fv(r->deferred_geometry, "model",
@@ -201,9 +232,8 @@ void pbrd_render_geometries(struct renderer *r, float projection[4][4],
 /**
  * ----------------------------------------------------------------------------
  */
-void pbrd_render_lighting(struct renderer *r, struct light *lights,
-                          size_t nlights, float view_pos[3], uint32_t scr_w,
-                          uint32_t scr_h) {
+void render_lighting(struct renderer *r, struct light *lights, size_t nlights,
+                     float view_pos[3], uint32_t scr_w, uint32_t scr_h) {
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glUseProgram(r->deferred_lighting);
@@ -242,7 +272,7 @@ void pbrd_render_lighting(struct renderer *r, struct light *lights,
   glBindVertexArray(r->quad_vao);
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-  glBindFramebuffer(GL_READ_FRAMEBUFFER, r->g_buff);
+  glBindFramebuffer(GL_READ_FRAMEBUFFER, r->g_buf);
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
   glBlitFramebuffer(0, 0, scr_w, scr_h, 0, 0, scr_w, scr_h, GL_DEPTH_BUFFER_BIT,
                     GL_NEAREST);

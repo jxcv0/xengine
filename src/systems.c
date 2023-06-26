@@ -109,7 +109,7 @@ void sys_render_geometries(struct renderer *r, mat4_t projection, mat4_t view) {
 
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glBindFramebuffer(GL_FRAMEBUFFER, r->g_buff);
+  glBindFramebuffer(GL_FRAMEBUFFER, r->g_buf);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glUseProgram(r->deferred_geometry);
 

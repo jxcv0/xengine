@@ -12,7 +12,7 @@
 
 struct renderer {
   // geometry
-  GLuint g_buff;
+  GLuint g_buf;
   GLuint g_position;
 
   // normal matrix
@@ -44,20 +44,23 @@ struct renderer {
  */
 int pbrd_init(struct renderer *r, const uint32_t scr_w, const uint32_t scr_h);
 
+void set_up_gbuf(struct renderer *r, float projection[4][4], float view[4][4]);
+
+void render_geom_to_gbuf();
+
 /**
  * @brief Render geometry and texture data to the G-Buffer.
  *
  * @param TODO
  */
-void pbrd_render_geometries(struct renderer *r, float projection[4][4],
-                            float view[4][4], float *model_matrices[4][4],
-                            struct mesh *geometries,
-                            struct pbr_material *materials, size_t n);
+void render_geometries(struct renderer *r, float projection[4][4],
+                       float view[4][4], float *model_matrices[4][4],
+                       struct mesh *geometries, struct pbr_material *materials,
+                       size_t n);
 /**
  * @brief Render lighting using data stored in G-Buffer.
  */
-void pbrd_render_lighting(struct renderer *r, struct light *lights,
-                          size_t nlights, float view_pos[3], uint32_t scr_w,
-                          uint32_t scr_h);
+void render_lighting(struct renderer *r, struct light *lights, size_t nlights,
+                     float view_pos[3], uint32_t scr_w, uint32_t scr_h);
 
 #endif  // PBR_DEFERRED_H_
