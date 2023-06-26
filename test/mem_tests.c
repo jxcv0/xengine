@@ -138,11 +138,11 @@ int test_static_gamestate(void) {
   add_component(e2, component_type_POSITION);
   add_component(e1, component_type_POSITION);
 
-  if (get_identity(e1) == (mesh_bit | pos_bit)) {
+  if (get_identity(e1) != (mesh_bit | pos_bit)) {
     ++err;
   }
 
-  if (get_identity(e2) == (mat_bit | pos_bit)) {
+  if (get_identity(e2) != (mat_bit | pos_bit)) {
     ++err;
   }
 
