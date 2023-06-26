@@ -1,14 +1,23 @@
 #ifndef TEXT_H_
 #define TEXT_H_
 
-#include <stddef.h>
+/**
+ * @brief
+ *
+ * @param filepath
+ * @return int
+ */
+int init_text(const char *filepath);
 
-#include "lin.h"
-#include "shader.h"
-
-void init_ttf(char *filepath);
-
-void render_text(GLuint shader, float projection[4][4], float xpos, float ypos,
-                 float color[4], char *txt, size_t n);
+/**
+ * @brief
+ *
+ * @param x
+ * @param y
+ * @param scale
+ * @param text
+ * @param col
+ */
+void render_text(float x, float y, float scale, char *text, float col[4]);
 
 #endif  // TEXT_H_

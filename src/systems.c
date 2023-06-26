@@ -109,10 +109,10 @@ void sys_render_geometries(struct renderer *r, mat4_t projection, mat4_t view) {
 
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
   glBindFramebuffer(GL_FRAMEBUFFER, r->g_buff);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glUseProgram(r->deferred_geometry);
+
   shader_set_uniform_m4fv(r->deferred_geometry, "projection", projection.elem);
   shader_set_uniform_m4fv(r->deferred_geometry, "view", view.elem);
 
@@ -134,8 +134,9 @@ void sys_render_geometries(struct renderer *r, mat4_t projection, mat4_t view) {
     glBindTexture(GL_TEXTURE_2D, mat_buf[i].as_material.metallic);
 
     glBindVertexArray(mesh_buf[i].as_mesh.vao);
-
     glDrawElements(GL_TRIANGLES, mesh_buf[i].as_mesh.num_indices,
                    GL_UNSIGNED_INT, 0);
   }
+  // glBindTexture(GL_TEXTURE_2D, 0);
+  // glBindVertexArray(0);
 }

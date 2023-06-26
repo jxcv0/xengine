@@ -6,11 +6,13 @@
 #include "assets.h"
 
 int test_asset_type(void) {
-  if (asset_type("some_mtl_file.mtl") != asset_type_MESH) {
+  int mat = asset_type("some_mtl_file.mtl");
+  if (mat != asset_type_MATERIAL) {
     return 1;
   }
 
-  if (asset_type("some_mtl_file.mesh") != asset_type_MATERIAL) {
+  int mesh = asset_type("some_mesh_file.mesh");
+  if (mesh != asset_type_MESH) {
     return 1;
   }
 

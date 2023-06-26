@@ -55,7 +55,6 @@ void pbrd_render_geometries(struct renderer *r, float projection[4][4],
                             struct pbr_material *materials, size_t n);
 /**
  * @brief Render lighting using data stored in G-Buffer.
- * TODO
  */
 void pbrd_render_lighting(struct renderer *r, struct light *lights,
                           size_t nlights, float view_pos[3], uint32_t scr_w,

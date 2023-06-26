@@ -206,15 +206,12 @@ void pbrd_render_lighting(struct renderer *r, struct light *lights,
                           uint32_t scr_h) {
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
   glUseProgram(r->deferred_lighting);
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, r->g_position);
-
   glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_2D, r->g_normal);
-
   glActiveTexture(GL_TEXTURE2);
   glBindTexture(GL_TEXTURE_2D, r->g_tex_diff);
 
@@ -250,4 +247,7 @@ void pbrd_render_lighting(struct renderer *r, struct light *lights,
   glBlitFramebuffer(0, 0, scr_w, scr_h, 0, 0, scr_w, scr_h, GL_DEPTH_BUFFER_BIT,
                     GL_NEAREST);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+  // glBindTexture(GL_TEXTURE_2D, 0);
+  // glBindVertexArray(0);
 }

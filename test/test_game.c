@@ -17,9 +17,6 @@
 #include "text.h"
 #include "window.h"
 
-#define MAX_ENTITIES 128
-#define MAX_GEOMS 64
-
 extern const vec3_t GLOBAL_UP;
 
 GLFWwindow *window;
@@ -45,6 +42,7 @@ int main() {
   omp_set_dynamic(0);
 
   create_window(&window, window_width, window_height, "game");
+  // assert(init_text("assets/fonts/Consolas.ttf") != -1);
   pbrd_init(&r, window_width, window_height);
 
   projection_matrix =
@@ -59,15 +57,15 @@ int main() {
   add_attrib(e1, attrib_type_POSITION);
   add_attrib(e1, attrib_type_ROTATION);
 
-  union attribute lr;
+  attrib_t lr;
   strcpy(lr.as_request.path, "assets/meshes/suzanne.mesh");
   set_attrib(e1, attrib_type_MESH_LOAD_REQUEST, lr);
   strcpy(lr.as_request.path, "assets/textures/ravine_rock.mtl");
   set_attrib(e1, attrib_type_MAT_LOAD_REQUEST, lr);
 
-  union attribute e1_pos = {0};
-  union attribute e1_rot = {0};
-  union attribute e1_mm = {0};
+  attrib_t e1_pos = {0};
+  attrib_t e1_rot = {0};
+  attrib_t e1_mm = {0};
   e1_mm.as_model_matrix = identitym4();
   e1_rot.as_rotation.axis.x = 1.0f;
   set_attrib(e1, attrib_type_POSITION, e1_pos);
@@ -87,9 +85,6 @@ int main() {
   mouse_pos.m_last_pos.x = window_width / 2.0f;
   mouse_pos.m_last_pos.y = window_height / 2.0f;
   camera.m_yaw = 275.0f;
-
-  // TODO
-  init_ttf("assets/fonts/Consolas.ttf");
 
   while (!glfwWindowShouldClose(window)) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -111,6 +106,12 @@ int main() {
     sys_render_geometries(&r, projection_matrix, create_view_matrix());
     pbrd_render_lighting(&r, &l, 1, camera.m_pos.elem, window_width,
                          window_height);
+
+    /*
+    TODO Rendering to wrong buffer?
+    float text_col[] = {1.0f, 1.0f, 1.0f, 1.0f};
+    render_text(25.0f, 15.0f, 10.0f, "Sample Text", text_col);
+    */
 
     glfwSwapBuffers(window);
     glfwPollEvents();

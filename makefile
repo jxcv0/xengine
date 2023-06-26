@@ -10,8 +10,10 @@ xen_tools_dir := tools
 stb_src_dir := $(lib_dir)/stb
 glad_src_dir := $(lib_dir)/glad
 
+ft2_include_dir := /usr/include/freetype2
+
 cflags := -std=c17 -Wall -Wextra -ggdb -Og
-libs := -L$(build_dir) -lglad -lstb -lm -ldl -lglfw -fopenmp -lassimp
+libs := -L$(build_dir) -lglad -lstb -lm -ldl -lglfw -fopenmp -lassimp -lfreetype
 xen_lib := -L$(build_dir) -lxen
 
 format_cmd := "/usr/bin/clang-format -i -style=Google"
@@ -21,7 +23,7 @@ all: format tests tools
 $(build_dir)/%.o: %.c
 	@mkdir -p $(@D)
 	@echo "Building object $@"
-	@$(CC) $< $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_include_dir) $(libs) -c -o $@
+	@$(CC) $< $(cflags) -I$(glad_src_dir) -I$(stb_src_dir) -I$(xen_include_dir) -I$(ft2_include_dir) $(libs) -c -o $@
 
 $(bin_dir)/%: %.c
 	@mkdir -p $(@D)
@@ -56,4 +58,4 @@ format: $(wildcard $(xen_include_dir)/*.h) $(wildcard $(xen_src_dir)/*.c) $(wild
 	@echo "Running tests in $@"
 	@./$(tests_dir)/$@ && (echo "    - PASS") || (echo "    - FAILED WITH $$? ERROR(S)")
 	
-runtests: mem_tests asset_tests lin_tests
+runtests: gamestate_tests asset_tests lin_tests
