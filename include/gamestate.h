@@ -7,6 +7,7 @@
 
 #define NUM_COMPONENT_TYPES 63
 #define MAX_NUM_ENTITIES 2048
+#define MAX_NUM_ATTRIBS 63
 #define ENTITY_UNUSED (1LU << NUM_COMPONENT_TYPES)
 #define ENTITY_IN_USE (1LU << NUM_COMPONENT_TYPES)
 
@@ -16,24 +17,10 @@
 #define MAX_NUM_MODEL_MATRICES 32
 #define MAX_NUM_LOAD_REQUESTS 32
 
-typedef struct gamestate {
-  uint64_t *otable;
-  int nobj;
-  const int max_nobj;
-} gamestate_t;
-
 /**
  * @brief Initialize the memory subsystem.
  */
 void init_mem_subsys(void);
-
-/**
- * @brief Create a gamestate.
- *
- * @param nobj The number of game objects in the gamesstate.
- * @return gamestate_t The new gamestate.
- */
-gamestate_t create_gamestate(int nobj);
 
 /**
  * @brief Create a mask from an array of components.
@@ -44,14 +31,6 @@ gamestate_t create_gamestate(int nobj);
  * the components array.
  */
 uint64_t create_mask(size_t n, uint64_t *components);
-
-/**
- * @brief Create a game object and get its object id.
- *
- * @param gs The gamestate.
- * @return The new object id, -1 on failure.
- */
-int create_game_object(gamestate_t *gs);
 
 /**
  * @brief Create an entity.

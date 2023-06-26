@@ -6,36 +6,7 @@
 #include "gamestate.h"
 #include "test.h"
 
-/*
-int main() {
-  TEST_BEGIN();
-  TEST();
-  init_mem_subsys();
-  uint32_t e1;
-  assert(get_identity(0) == ENTITY_UNUSED);
-  assert(create_entity(&e1) != -1);
-  assert(get_identity(e1) == 0);
-  delete_entity(e1);
-  assert(get_identity(e1) == ENTITY_UNUSED);
-
-  create_entity(&e1);
-  assert(add_component(e1, component_type_MESH) != -1);
-  assert(get_identity(e1) == (1UL << component_type_MESH));
-
-  uint32_t e2, e3, e4;
-  create_entity(&e2);
-  create_entity(&e3);
-  create_entity(&e4);
-
-  assert(add_component(e2, component_type_MATERIAL) != -1);
-
-  assert(add_component(e3, component_type_MESH) != -1);
-  assert(add_component(e3, component_type_MATERIAL) != -1);
-
-  assert(add_component(e4, component_type_MESH) != -1);
-  assert(add_component(e4, component_type_MATERIAL) != -1);
-  assert(add_component(e4, component_type_POSITION) != -1);
-
+int test_create_mask(void) {
   uint64_t mesh_bit = (1LL << component_type_MESH);
   uint64_t mat_bit = (1LL << component_type_MATERIAL);
   uint64_t pos_bit = (1LL << component_type_POSITION);
@@ -44,32 +15,149 @@ int main() {
                   component_type_POSITION};
   uint64_t m = create_mask(3, a);
 
-  assert(m == (mesh_bit | mat_bit | pos_bit));
+  if (m == (mesh_bit | mat_bit | pos_bit)) {
+    return 0;
+  }
+  return 1;
+}
 
-  assert(get_identity(e1) == mesh_bit);
-  assert(get_identity(e2) == mat_bit);
-  assert(get_identity(e3) == (mat_bit | mesh_bit));
-  assert(get_identity(e4) == (mat_bit | mesh_bit | pos_bit));
-  assert(get_component_count(component_type_MESH) == 3);
-  assert(get_component_count(component_type_MATERIAL) == 3);
-  assert(get_component_count(component_type_POSITION) == 1);
+int test_static_gamestate(void) {
+  int err = 0;
+  init_mem_subsys();
+  uint32_t e1;
+  if (get_identity(0) != ENTITY_UNUSED) {
+    ++err;
+  }
 
-  assert(get_num_entities(mesh_bit) == 3);
-  assert(get_num_entities(mesh_bit | mat_bit) == 2);
-  assert(get_num_entities(mesh_bit | mat_bit | pos_bit) == 1);
+  if (create_entity(&e1) == -1) {
+    ++err;
+  }
+
+  if(get_identity(e1) != 0) {
+    ++err;
+  }
+
+  delete_entity(e1);
+  if (get_identity(e1) != ENTITY_UNUSED) {
+    ++err;
+  }
+
+  create_entity(&e1);
+  if (add_component(e1, component_type_MESH) == -1) {
+    ++err;
+  }
+
+  if (get_identity(e1) != (1UL << component_type_MESH)) {
+    ++err;
+  }
+
+  uint32_t e2, e3, e4;
+  create_entity(&e2);
+  create_entity(&e3);
+  create_entity(&e4);
+
+  if (add_component(e2, component_type_MATERIAL) == -1) {
+    ++err;
+  }
+
+  if(add_component(e3, component_type_MESH) == -1) {
+    ++err;
+  }
+
+  if(add_component(e3, component_type_MATERIAL) == -1) {
+++err;
+  }
+
+  if(add_component(e4, component_type_MESH) == -1) {
+    ++err;
+  }
+
+  if(add_component(e4, component_type_MATERIAL) == -1){
+    ++err;
+  }
+
+  if (add_component(e4, component_type_POSITION) == -1) {
+    ++err;
+  }
+
+  uint64_t mesh_bit = (1LL << component_type_MESH);
+  uint64_t mat_bit = (1LL << component_type_MATERIAL);
+  uint64_t pos_bit = (1LL << component_type_POSITION);
+
+  if (get_identity(e1) != mesh_bit) {
+    ++err;
+  }
+
+  if (get_identity(e2) != mat_bit) {
+    ++err;
+  }
+
+  if (get_identity(e3) != (mat_bit | mesh_bit)) {
+    ++err;
+  }
+
+  if (get_identity(e4) != (mat_bit | mesh_bit | pos_bit)) {
+    ++err; 
+  }
+
+  if(get_component_count(component_type_MESH) != 3){
+    ++err;
+  }
+
+  if(get_component_count(component_type_MATERIAL) != 3) {
+    ++err;
+  }
+
+  if(get_component_count(component_type_POSITION) != 1) {
+    ++err;
+  }
+
+  if (get_num_entities(mesh_bit) != 3) {
+
+  }
+
+  if (get_num_entities(mesh_bit | mat_bit) != 2) {
+    ++err;
+  }
+
+  if (get_num_entities(mesh_bit | mat_bit | pos_bit) != 1) {
+    ++err;
+  }
 
   remove_component(e2, component_type_MESH);  // should do nothing
 
-  assert(get_identity(e2) == mat_bit);
+  if(get_identity(e2) != mat_bit) {
+    ++err;
+  }
+
   remove_component(e4, component_type_MATERIAL);
-  assert(get_identity(e4) == (mesh_bit | pos_bit));
+  
+  if (get_identity(e4) != (mesh_bit | pos_bit)) {
+    ++err;
+  }
+
   add_component(e2, component_type_POSITION);
   add_component(e1, component_type_POSITION);
-  assert(get_identity(e1) == (mesh_bit | pos_bit));
-  assert(get_identity(e2) == (mat_bit | pos_bit));
-  assert(get_component_count(component_type_MESH) == 3);
-  assert(get_component_count(component_type_MATERIAL) == 2);
-  assert(get_component_count(component_type_POSITION) == 3);
+
+  if (get_identity(e1) == (mesh_bit | pos_bit)) {
+    ++err;
+  }
+
+  if (get_identity(e2) == (mat_bit | pos_bit)) {
+    ++err;
+  }
+
+  if (get_component_count(component_type_MESH) != 3) {
+    ++err;
+  }
+
+  if (get_component_count(component_type_MATERIAL) != 2) {
+    ++err;
+  }
+
+  if (get_component_count(component_type_POSITION) != 3) {
+    ++err;
+  }
 
   add_component(e3, component_type_POSITION);
   union component pos1;
@@ -99,7 +187,9 @@ int main() {
 
   vec3_t p = get_component(e1, component_type_POSITION).as_position;
   for (int i = 0; i < 3; i++) {
-    assert(fabs(p.elem[i] - pos1.as_position.elem[i]) < 0.0001);
+    if (fabs(p.elem[i] - pos1.as_position.elem[i]) > 0.0001) {
+      ++err;
+    }
   };
 
   // removing item in middle of buffer
@@ -107,12 +197,16 @@ int main() {
 
   p = get_component(e1, component_type_POSITION).as_position;
   for (int i = 0; i < 3; i++) {
-    assert(fabs(p.elem[i] - pos1.as_position.elem[i]) < 0.0001);
+    if(fabs(p.elem[i] - pos1.as_position.elem[i]) > 0.0001) {
+      ++err;
+    }
   };
 
   p = get_component(e4, component_type_POSITION).as_position;
   for (int i = 0; i < 3; i++) {
-    assert(fabs(p.elem[i] - pos4.as_position.elem[i]) < 0.0001);
+    if (fabs(p.elem[i] - pos4.as_position.elem[i]) < 0.0001) {
+
+    }
   };
 
   delete_entity(e1);
@@ -201,64 +295,13 @@ int main() {
   assert(get_component(e1, component_type_MESH).as_mesh.vbo == 6);
   assert(get_component(e2, component_type_MESH).as_mesh.vbo == 7);
   assert(get_component(e3, component_type_MESH).as_mesh.vbo == 8);
-  TEST_END();
-}
-*/
 
-int test_init_entity_table(void) {
-  gamestate_t gs = create_gamestate(16);
-  for (int i = 0; i < 16; i++) {
-    if (gs.otable[i] != 0) {
-      return 1;
-    }
-  }
-
-  if (gs.nobj != 0) {
-    return 1;
-  }
-
-  if (gs.max_nobj != 16) {
-    return 1;
-  }
-
-  return 0;
-}
-
-int test_create_mask(void) {
-  uint64_t mesh_bit = (1LL << component_type_MESH);
-  uint64_t mat_bit = (1LL << component_type_MATERIAL);
-  uint64_t pos_bit = (1LL << component_type_POSITION);
-
-  uint64_t a[] = {component_type_MESH, component_type_MATERIAL,
-                  component_type_POSITION};
-  uint64_t m = create_mask(3, a);
-
-  if (m == (mesh_bit | mat_bit | pos_bit)) {
-    return 0;
-  }
-  return 1;
-}
-
-int test_create_game_object(void) {
-  gamestate_t gs = create_gamestate(16);
-
-  for (int i = 0; i < 15; i++) {
-    if (create_game_object(&gs) == -1) {
-      return 1;
-    }
-  }
-
-  if (create_game_object(&gs) == 0) {
-    return 1;
-  }
-
-  return 0;
+  return err;
 }
 
 int main() {
   int err = 0;
-  err += test_init_entity_table();
   err += test_create_mask();
-  err += test_create_game_object();
+  err += test_static_gamestate();
   return err;
 }

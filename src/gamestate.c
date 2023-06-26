@@ -62,33 +62,12 @@ static struct component_table lookup_table[NUM_COMPONENT_TYPES] = {
 /**
  * ----------------------------------------------------------------------------
  */
-gamestate_t create_gamestate(int nobj) {
-  gamestate_t g = {
-      .nobj = 0, .max_nobj = nobj, .otable = malloc(sizeof(uint64_t) * nobj)};
-  memset(g.otable, 0, sizeof(uint64_t) * nobj);
-  return g;
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
 uint64_t create_mask(size_t n, uint64_t *components) {
   uint64_t mask = 0;
   for (size_t i = 0; i < n; i++) {
     mask |= (1LU << components[i]);
   }
   return mask;
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-int create_game_object(gamestate_t *gs) {
-  if (gs->nobj < gs->max_nobj) {
-    gs->otable[gs->nobj] = 0;
-    return gs->nobj++;
-  }
-  return -1;
 }
 
 /**
