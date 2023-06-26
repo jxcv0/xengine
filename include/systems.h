@@ -6,7 +6,7 @@
 
 void sys_update_model_matrices(void);
 
-void sys_load(uint64_t component_type);
+void sys_load(uint64_t attrib_type);
 
 void sys_load_materials(void);
 

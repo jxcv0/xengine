@@ -16,35 +16,35 @@ struct index_table {
 };
 
 // geometry buffer
-static union component mesh_buf[MAX_NUM_GEOMETRIES];
+static union attribute mesh_buf[MAX_NUM_GEOMETRIES];
 static struct index_table geometry_table[MAX_NUM_GEOMETRIES];
 
 // material buffer
-static union component material_buf[MAX_NUM_MATERIALS];
+static union attribute material_buf[MAX_NUM_MATERIALS];
 static struct index_table material_table[MAX_NUM_MATERIALS];
 
 // position buffer
-static union component position_buf[MAX_NUM_POSITIONS];
+static union attribute position_buf[MAX_NUM_POSITIONS];
 static struct index_table position_table[MAX_NUM_POSITIONS];
 
 // rotation buffer
-static union component rotation_buf[MAX_NUM_POSITIONS];
+static union attribute rotation_buf[MAX_NUM_POSITIONS];
 static struct index_table rotation_table[MAX_NUM_POSITIONS];
 
 // model matrix buffer
-static union component model_matrix_buf[MAX_NUM_MODEL_MATRICES];
+static union attribute model_matrix_buf[MAX_NUM_MODEL_MATRICES];
 static struct index_table model_matrix_table[MAX_NUM_MODEL_MATRICES];
 
 // geometry request buffer
-static union component geomreq_buf[MAX_NUM_LOAD_REQUESTS];
+static union attribute geomreq_buf[MAX_NUM_LOAD_REQUESTS];
 static struct index_table geomreq_table[MAX_NUM_LOAD_REQUESTS];
 
 // material request buffer
-static union component matreq_buf[MAX_NUM_LOAD_REQUESTS];
+static union attribute matreq_buf[MAX_NUM_LOAD_REQUESTS];
 static struct index_table matreq_table[MAX_NUM_LOAD_REQUESTS];
 
 struct component_table {
-  union component *buffer;
+  union attribute *buffer;
   struct index_table *table;
   size_t count;
 };
@@ -101,7 +101,7 @@ static int buffer_index(uint32_t e, struct index_table *table, size_t *index,
 /**
  * ----------------------------------------------------------------------------
  */
-void init_mem_subsys(void) {
+void init_gamestate(void) {
   for (size_t i = 0; i < MAX_NUM_ENTITIES; i++) {
     entity_buf[i] = ENTITY_UNUSED;
   }
@@ -110,7 +110,7 @@ void init_mem_subsys(void) {
 /**
  * ----------------------------------------------------------------------------
  */
-int create_entity(uint32_t *e) {
+int create_obj(uint32_t *e) {
   if (e == NULL || num_entities == MAX_NUM_ENTITIES) {
     return -1;
   }
@@ -129,11 +129,11 @@ int create_entity(uint32_t *e) {
 /**
  * ----------------------------------------------------------------------------
  */
-void delete_entity(uint32_t e) {
+void delete_obj(uint32_t e) {
   uint64_t mask = entity_buf[e];
   for (size_t i = 0; i < NUM_COMPONENT_TYPES; i++) {
     if (mask & (1LU << i)) {
-      remove_component(e, i);
+      remove_attrib(e, i);
     }
   }
   entity_buf[e] = ENTITY_UNUSED;
@@ -143,7 +143,7 @@ void delete_entity(uint32_t e) {
 /**
  * ----------------------------------------------------------------------------
  */
-uint64_t get_identity(uint32_t e) {
+uint64_t get_attribs(uint32_t e) {
   uint64_t i = entity_buf[e];
   return i;
 }
@@ -151,8 +151,8 @@ uint64_t get_identity(uint32_t e) {
 /**
  * ----------------------------------------------------------------------------
  */
-int add_component(uint32_t e, uint64_t type) {
-  uint64_t identity = get_identity(e);
+int add_attrib(uint32_t e, uint64_t type) {
+  uint64_t identity = get_attribs(e);
   if ((identity & ENTITY_UNUSED) != 0) {
     return -1;
   }
@@ -174,8 +174,8 @@ int add_component(uint32_t e, uint64_t type) {
 /**
  * ----------------------------------------------------------------------------
  */
-void remove_component(uint32_t e, uint64_t type) {
-  uint64_t identity = get_identity(e);
+void remove_attrib(uint32_t e, uint64_t type) {
+  uint64_t identity = get_attribs(e);
   if ((identity & ENTITY_UNUSED) != 0) {
     return;
   }
@@ -208,7 +208,7 @@ void remove_component(uint32_t e, uint64_t type) {
 /**
  * ----------------------------------------------------------------------------
  */
-int set_component(uint32_t e, uint64_t type, union component cmpnt) {
+int set_attrib(uint32_t e, uint64_t type, union attribute cmpnt) {
   struct component_table *component_table = &lookup_table[type];
   struct index_table *table = component_table->table;
   size_t index;
@@ -222,24 +222,24 @@ int set_component(uint32_t e, uint64_t type, union component cmpnt) {
 /**
  * ----------------------------------------------------------------------------
  */
-union component get_component(uint32_t e, uint64_t type) {
+union attribute get_attrib(uint32_t e, uint64_t type) {
   struct component_table *component_table = &lookup_table[type];
   struct index_table *table = component_table->table;
   size_t index;
   assert(buffer_index(e, table, &index, component_table->count) != -1);
-  cmpnt_t c = component_table->buffer[index];
+  attrib_t c = component_table->buffer[index];
   return c;
 }
 
 /**
  * ----------------------------------------------------------------------------
  */
-size_t get_component_count(uint64_t type) { return lookup_table[type].count; }
+size_t get_num_attribs(uint64_t type) { return lookup_table[type].count; }
 
 /**
  * ----------------------------------------------------------------------------
  */
-size_t get_num_entities(uint64_t mask) {
+size_t get_num_obj(uint64_t mask) {
   size_t count = 0;
   for (size_t j = 0; j < num_entities; j++) {
     if ((entity_buf[j] & mask) == mask) {
@@ -252,7 +252,7 @@ size_t get_num_entities(uint64_t mask) {
 /**
  * ----------------------------------------------------------------------------
  */
-void get_entities(uint64_t mask, uint32_t *arr) {
+void get_objs(uint64_t mask, uint32_t *arr) {
   size_t idx = 0;
   for (size_t i = 0; i < num_entities; i++) {
     if ((entity_buf[i] & mask) == mask) {
@@ -265,9 +265,9 @@ void get_entities(uint64_t mask, uint32_t *arr) {
  * ----------------------------------------------------------------------------
  */
 void query(size_t nent, uint32_t *entities, uint64_t type,
-           union component *set) {
+           union attribute *set) {
   struct component_table *component_table = &lookup_table[type];
-  union component *buffer = component_table->buffer;
+  union attribute *buffer = component_table->buffer;
   struct index_table *table = component_table->table;
   for (size_t i = 0; i < nent; i++) {
     size_t index;
@@ -281,9 +281,9 @@ void query(size_t nent, uint32_t *entities, uint64_t type,
  * ----------------------------------------------------------------------------
  */
 void update(size_t nent, uint32_t *entities, uint64_t type,
-            union component *set) {
+            union attribute *set) {
   struct component_table *component_table = &lookup_table[type];
-  union component *buffer = component_table->buffer;
+  union attribute *buffer = component_table->buffer;
   struct index_table *table = component_table->table;
   for (size_t i = 0; i < nent; i++) {
     size_t index;

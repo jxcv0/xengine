@@ -37,7 +37,7 @@ void handle_keyboard_input(GLFWwindow *w);
 struct renderer r;
 
 int main() {
-  init_mem_subsys();
+  init_gamestate();
   camera.m_mouse_sensetivity = 0.3;
   camera.m_movement_speed = 0.15;
 
@@ -52,27 +52,27 @@ int main() {
                   0.1f, 100.0f);
 
   uint32_t e1;
-  create_entity(&e1);
-  add_component(e1, component_type_MESH_LOAD_REQUEST);
-  add_component(e1, component_type_MAT_LOAD_REQUEST);
-  add_component(e1, component_type_MODEL_MATRIX);
-  add_component(e1, component_type_POSITION);
-  add_component(e1, component_type_ROTATION);
+  create_obj(&e1);
+  add_attrib(e1, attrib_type_MESH_LOAD_REQUEST);
+  add_attrib(e1, attrib_type_MAT_LOAD_REQUEST);
+  add_attrib(e1, attrib_type_MODEL_MATRIX);
+  add_attrib(e1, attrib_type_POSITION);
+  add_attrib(e1, attrib_type_ROTATION);
 
-  union component lr;
+  union attribute lr;
   strcpy(lr.as_request.path, "assets/meshes/suzanne.mesh");
-  set_component(e1, component_type_MESH_LOAD_REQUEST, lr);
+  set_attrib(e1, attrib_type_MESH_LOAD_REQUEST, lr);
   strcpy(lr.as_request.path, "assets/textures/ravine_rock.mtl");
-  set_component(e1, component_type_MAT_LOAD_REQUEST, lr);
+  set_attrib(e1, attrib_type_MAT_LOAD_REQUEST, lr);
 
-  union component e1_pos = {0};
-  union component e1_rot = {0};
-  union component e1_mm = {0};
+  union attribute e1_pos = {0};
+  union attribute e1_rot = {0};
+  union attribute e1_mm = {0};
   e1_mm.as_model_matrix = identitym4();
   e1_rot.as_rotation.axis.x = 1.0f;
-  set_component(e1, component_type_POSITION, e1_pos);
-  set_component(e1, component_type_ROTATION, e1_rot);
-  set_component(e1, component_type_MODEL_MATRIX, e1_mm);
+  set_attrib(e1, attrib_type_POSITION, e1_pos);
+  set_attrib(e1, attrib_type_ROTATION, e1_rot);
+  set_attrib(e1, attrib_type_MODEL_MATRIX, e1_mm);
 
   struct light l = LIGHT_RANGE_3250;
   l.position.x = 3.0;
@@ -96,17 +96,17 @@ int main() {
       glfwSetWindowShouldClose(window, true);
     }
 
-    union component rot = get_component(e1, component_type_ROTATION);
+    union attribute rot = get_attrib(e1, attrib_type_ROTATION);
     rot.as_rotation.radians += radians(0.01f);
-    set_component(e1, component_type_ROTATION, rot);
+    set_attrib(e1, attrib_type_ROTATION, rot);
 
     get_cursor_position(&mouse_pos, window);
     vec2_t cursor_offset = get_cursor_offset(&mouse_pos);
     update_3rd_person_camera(&camera, cursor_offset, 3, camera_centre);
     // handle_keyboard_input(window);
 
-    sys_load(component_type_MESH_LOAD_REQUEST);
-    sys_load(component_type_MAT_LOAD_REQUEST);
+    sys_load(attrib_type_MESH_LOAD_REQUEST);
+    sys_load(attrib_type_MAT_LOAD_REQUEST);
     sys_update_model_matrices();
     sys_render_geometries(&r, projection_matrix, create_view_matrix());
     pbrd_render_lighting(&r, &l, 1, camera.m_pos.elem, window_width,

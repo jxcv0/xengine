@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 
-#include "components.h"
+#include "attrib.h"
 
 #define NUM_COMPONENT_TYPES 63
 #define MAX_NUM_ENTITIES 2048
@@ -18,93 +18,106 @@
 #define MAX_NUM_LOAD_REQUESTS 32
 
 /**
- * @brief Initialize the memory subsystem.
+ * @brief Initialize the game state subsystem.
  */
-void init_mem_subsys(void);
+void init_gamestate(void);
 
 /**
- * @brief Create a mask from an array of components.
+ * @brief Create a mask from an array of attribute type ids.
  *
  * @param n The number of members in the components array
- * @param components An array of component types.
+ * @param attrib_types An array of attribute types types.
  * @return A The identity (bitmask) of entities that have all the components in
  * the components array.
  */
-uint64_t create_mask(size_t n, uint64_t *components);
+uint64_t create_mask(size_t n, uint64_t *attrib_types);
 
 /**
- * @brief Create an entity.
- * @param e A pointer to the entity handle to initialize.
- * @return 0 on success, -1 on failure.
+ * @brief Create a game object.
+ * 
+ * @param oid A pointer to where to store the object id.
+ * @return 0 on success -1, on error.
  */
-int create_entity(uint32_t *e);
+int create_obj(uint32_t *oid);
 
 /**
- * @brief Delete an entity.
- * @details If the entity does not exist then this function does nothing.
+ * @brief Delete a game object.
+ * 
+ * @param obj The object to delete.
  */
-void delete_entity(uint32_t e);
+void delete_obj(uint32_t obj);
 
 /**
- * @brief Get the identity (bitmask) of an entity.
- * @param e The entity.
- * @return A mask of all the components this entity has an instance of.
+ * @brief Get the attribute bitmask of an object.
+ * 
+ * @param obj The game object.
+ * @return The attribute mask of obj.
  */
-uint64_t get_identity(uint32_t e);
+uint64_t get_attribs(uint32_t obj);
 
 /**
- * @brief Assign a component to an entity.
+ * @brief Assign a attribute to an object.
  *
- * @param e The entity.
- * @param type The type of the component to assign.
- */
-int add_component(uint32_t e, uint64_t type);
-
-/**
- * @brief Remove a component from an entity.
- *
- * @param e The entity.
- * @param type The type of the component to remove.
- */
-void remove_component(uint32_t e, uint64_t type);
-
-/**
- * @brief Set the value of a component.
- *
- * @param e The entity.
- * @param type The type of the component to set.
- * @param cmpnt The new component value.
+ * @param obj The type of the attribute to assign.
+ * @param attrib_type The type of attribute to assign.
  * @return 0 on success, -1 on error.
  */
-int set_component(uint32_t e, uint64_t type, union component cmpnt);
+int add_attrib(uint32_t obj, uint64_t attrib_type);
 
 /**
- * @brief DO NOT USE
+ * @brief Remove a attribute from an object.
+ *
+ * @param obj The object.
+ * @param attrib_type The type of the attribute to remove.
  */
-union component get_component(uint32_t e, uint64_t type);
-
-size_t get_component_count(uint64_t type);
+void remove_attrib(uint32_t e, uint64_t attrib_type);
 
 /**
- * @brief Count the number of entities who's identity matches mask.
- * @param Mask The component bitmask.
- * @return The number of entities.
+ * @brief Set the value of a attribute.
+ *
+ * @param obj The object.
+ * @param type The type of the attribute to set.
+ * @param attrib The new attribute value.
+ * @return 0 on success, -1 on error.
  */
-size_t get_num_entities(uint64_t mask);
+int set_attrib(uint32_t obj, uint64_t attrib_type, attrib_t attrib);
 
 /**
- * @brief Get all entities with the same identity (mask). It is assumed that
- * \link get_num_entities has been called to determine the appropriate size of
- * get_entities.
+ * @brief Get an attribute of an object.
+ * 
+ * @param obj The object. 
+ * @param attrib_type The type of the attribute.
+ * @return The attribute.
+ */
+attrib_t get_attrib(uint32_t e, uint64_t attrib_type);
+
+/**
+ * @brief Get the number of attributes of a type.
+ * 
+ * @param attrib_type The attribute type.
+ * @return The number of attributes of attrib_type.
+ */
+size_t get_num_attribs(uint64_t attrib_type);
+
+/**
+ * @brief Count the number of objects who's attributes matches mask.
+ * 
+ * @param attrib_mask The attribute bitmask.
+ * @return The number of objects.
+ */
+size_t get_num_obj(uint64_t attrib_mask);
+
+/**
+ * @brief Get all objects with the same attribute mask.
  *
  * @param mask The identity bitmask of the entities.
  * @param arr The array to load the entities into.
  */
-void get_entities(uint64_t mask, uint32_t *arr);
+void get_objs(uint64_t mask, uint32_t *arr);
 
 /**
  * @brief Generate a set of components of the same type belonging to entities.
- * The component at index n of array belongs to the entity at index n of
+ * The attribute at index n of array belongs to the entity at index n of
  * entities.
  *
  * @param nent The number of entities in the entities array.
@@ -112,9 +125,9 @@ void get_entities(uint64_t mask, uint32_t *arr);
  * @param set The destination array of components.
  */
 void query(size_t nent, uint32_t *entities, uint64_t type,
-           union component *set);
+           union attribute *set);
 
 void update(size_t nent, uint32_t *entities, uint64_t type,
-            union component *set);
+            union attribute *set);
 
 #endif  // MEM_H_

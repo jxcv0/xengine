@@ -1,7 +1,7 @@
 #ifndef CAMERA_H_
 #define CAMERA_H_
 
-#include "components.h"
+#include "attrib.h"
 #include "lin.h"
 
 /**

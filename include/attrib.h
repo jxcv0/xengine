@@ -10,14 +10,14 @@
 #define MAX_ASSET_PATH_LEN 32
 #define MAX_BONE_INFLUENCE 4
 
-enum component_type {
-  component_type_MESH = 0,
-  component_type_MATERIAL = 1,
-  component_type_MODEL_MATRIX = 2,
-  component_type_POSITION = 3,
-  component_type_ROTATION = 4,
-  component_type_MESH_LOAD_REQUEST = 5,
-  component_type_MAT_LOAD_REQUEST = 6,
+enum attrib_type {
+  attrib_type_MESH = 0,
+  attrib_type_MATERIAL = 1,
+  attrib_type_MODEL_MATRIX = 2,
+  attrib_type_POSITION = 3,
+  attrib_type_ROTATION = 4,
+  attrib_type_MESH_LOAD_REQUEST = 5,
+  attrib_type_MAT_LOAD_REQUEST = 6,
   // ANIM_LOAD_REQUEST 6
   // AUDIO_LOAD_REQUEST 7
 };
@@ -86,7 +86,7 @@ struct loadreq {
   char path[MAX_ASSET_PATH_LEN];
 };
 
-typedef union component {
+typedef union attribute {
   struct mesh as_mesh;
   struct pbr_material as_material;
   vec3_t as_position;
@@ -94,9 +94,9 @@ typedef union component {
   struct loadreq as_request;
   struct rotation as_rotation;
   // ...
-} cmpnt_t;
+} attrib_t;
 
-_Static_assert(sizeof(union component) == 64,
+_Static_assert(sizeof(union attribute) == 64,
                "Component size is not equal to L1 CLS");
 
 #endif  // TYPES_H_

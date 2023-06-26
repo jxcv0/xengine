@@ -1,7 +1,7 @@
 #ifndef ASSETS_H_
 #define ASSETS_H_
 
-#include "components.h"
+#include "attrib.h"
 #include "glad.h"
 #include "lin.h"
 
