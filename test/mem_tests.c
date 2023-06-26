@@ -33,7 +33,7 @@ int test_static_gamestate(void) {
     ++err;
   }
 
-  if(get_identity(e1) != 0) {
+  if (get_identity(e1) != 0) {
     ++err;
   }
 
@@ -60,19 +60,19 @@ int test_static_gamestate(void) {
     ++err;
   }
 
-  if(add_component(e3, component_type_MESH) == -1) {
+  if (add_component(e3, component_type_MESH) == -1) {
     ++err;
   }
 
-  if(add_component(e3, component_type_MATERIAL) == -1) {
-++err;
-  }
-
-  if(add_component(e4, component_type_MESH) == -1) {
+  if (add_component(e3, component_type_MATERIAL) == -1) {
     ++err;
   }
 
-  if(add_component(e4, component_type_MATERIAL) == -1){
+  if (add_component(e4, component_type_MESH) == -1) {
+    ++err;
+  }
+
+  if (add_component(e4, component_type_MATERIAL) == -1) {
     ++err;
   }
 
@@ -97,23 +97,22 @@ int test_static_gamestate(void) {
   }
 
   if (get_identity(e4) != (mat_bit | mesh_bit | pos_bit)) {
-    ++err; 
-  }
-
-  if(get_component_count(component_type_MESH) != 3){
     ++err;
   }
 
-  if(get_component_count(component_type_MATERIAL) != 3) {
+  if (get_component_count(component_type_MESH) != 3) {
     ++err;
   }
 
-  if(get_component_count(component_type_POSITION) != 1) {
+  if (get_component_count(component_type_MATERIAL) != 3) {
+    ++err;
+  }
+
+  if (get_component_count(component_type_POSITION) != 1) {
     ++err;
   }
 
   if (get_num_entities(mesh_bit) != 3) {
-
   }
 
   if (get_num_entities(mesh_bit | mat_bit) != 2) {
@@ -126,12 +125,12 @@ int test_static_gamestate(void) {
 
   remove_component(e2, component_type_MESH);  // should do nothing
 
-  if(get_identity(e2) != mat_bit) {
+  if (get_identity(e2) != mat_bit) {
     ++err;
   }
 
   remove_component(e4, component_type_MATERIAL);
-  
+
   if (get_identity(e4) != (mesh_bit | pos_bit)) {
     ++err;
   }
@@ -197,7 +196,7 @@ int test_static_gamestate(void) {
 
   p = get_component(e1, component_type_POSITION).as_position;
   for (int i = 0; i < 3; i++) {
-    if(fabs(p.elem[i] - pos1.as_position.elem[i]) > 0.0001) {
+    if (fabs(p.elem[i] - pos1.as_position.elem[i]) > 0.0001) {
       ++err;
     }
   };
@@ -205,7 +204,6 @@ int test_static_gamestate(void) {
   p = get_component(e4, component_type_POSITION).as_position;
   for (int i = 0; i < 3; i++) {
     if (fabs(p.elem[i] - pos4.as_position.elem[i]) < 0.0001) {
-
     }
   };
 
@@ -213,12 +211,29 @@ int test_static_gamestate(void) {
   delete_entity(e2);
   delete_entity(e3);
   delete_entity(e4);
-  assert(get_num_entities(mesh_bit) == 0);
-  assert(get_num_entities(mesh_bit | mat_bit) == 0);
-  assert(get_num_entities(mesh_bit | mat_bit | pos_bit) == 0);
-  assert(get_component_count(component_type_MESH) == 0);
-  assert(get_component_count(component_type_MATERIAL) == 0);
-  assert(get_component_count(component_type_POSITION) == 0);
+  if (get_num_entities(mesh_bit) != 0) {
+    ++err;
+  }
+
+  if (get_num_entities(mesh_bit | mat_bit) != 0) {
+    ++err;
+  }
+
+  if (get_num_entities(mesh_bit | mat_bit | pos_bit) != 0) {
+    ++err;
+  }
+
+  if (get_component_count(component_type_MESH) != 0) {
+    ++err;
+  }
+
+  if (get_component_count(component_type_MATERIAL) != 0) {
+    ++err;
+  }
+
+  if (get_component_count(component_type_POSITION) != 0) {
+    ++err;
+  }
 
   create_entity(&e1);
   create_entity(&e2);
@@ -238,22 +253,53 @@ int test_static_gamestate(void) {
   add_component(e3, component_type_POSITION);
   add_component(e4, component_type_POSITION);
 
-  assert(get_component_count(component_type_MESH) == 3);
-  assert(get_component_count(component_type_MATERIAL) == 3);
-  assert(get_component_count(component_type_POSITION) == 4);
+  if (get_component_count(component_type_MESH) != 3) {
+    ++err;
+  }
 
-  assert(get_num_entities(mesh_bit) == 3);
-  assert(get_num_entities(mesh_bit | pos_bit) == 3);
-  assert(get_num_entities(mesh_bit | mat_bit) == 3);
-  assert(get_num_entities(mesh_bit | mat_bit | pos_bit) == 3);
-  assert(get_num_entities(pos_bit) == 4);
+  if (get_component_count(component_type_MATERIAL) != 3) {
+    ++err;
+  }
+
+  if (get_component_count(component_type_POSITION) != 4) {
+    ++err;
+  }
+
+  if (get_num_entities(mesh_bit) != 3) {
+    ++err;
+  }
+
+  if (get_num_entities(mesh_bit | pos_bit) != 3) {
+    ++err;
+  }
+
+  if (get_num_entities(mesh_bit | mat_bit) != 3) {
+    ++err;
+  }
+
+  if (get_num_entities(mesh_bit | mat_bit | pos_bit) != 3) {
+    ++err;
+  }
+
+  if (get_num_entities(pos_bit) != 4) {
+    ++err;
+  }
 
   size_t ne = get_num_entities(mesh_bit | pos_bit);
   uint32_t e_arr[ne];
   get_entities(mesh_bit | pos_bit, e_arr);
-  assert(e_arr[0] == e1);
-  assert(e_arr[1] == e2);
-  assert(e_arr[2] == e3);
+
+  if (e_arr[0] != e1) {
+    ++err;
+  }
+
+  if (e_arr[1] != e2) {
+    ++err;
+  }
+
+  if (e_arr[2] != e3) {
+    ++err;
+  }
 
   cmpnt_t c;
   c = get_component(e1, component_type_MESH);
@@ -282,19 +328,48 @@ int test_static_gamestate(void) {
 
   union component arr[ne];
   query(ne, e_arr, component_type_MESH, arr);
-  assert(arr[0].as_mesh.vbo == 1);
-  assert(arr[1].as_mesh.vbo == 2);
-  assert(arr[2].as_mesh.vbo == 3);
+
+  if (arr[0].as_mesh.vbo != 1) {
+    ++err;
+  }
+
+  if (arr[1].as_mesh.vbo != 2) {
+    ++err;
+  }
+
+  if (arr[2].as_mesh.vbo != 3) {
+    ++err;
+  }
+
   for (size_t i = 0; i < ne; i++) {
     arr[i].as_mesh.vbo += 5;
   }
-  assert(arr[0].as_mesh.vbo == 6);
-  assert(arr[1].as_mesh.vbo == 7);
-  assert(arr[2].as_mesh.vbo == 8);
+
+  if (arr[0].as_mesh.vbo != 6) {
+    ++err;
+  }
+
+  if (arr[1].as_mesh.vbo != 7) {
+    ++err;
+  }
+
+  if (arr[2].as_mesh.vbo != 8) {
+    ++err;
+  }
+
   update(ne, e_arr, component_type_MESH, arr);
-  assert(get_component(e1, component_type_MESH).as_mesh.vbo == 6);
-  assert(get_component(e2, component_type_MESH).as_mesh.vbo == 7);
-  assert(get_component(e3, component_type_MESH).as_mesh.vbo == 8);
+
+  if (get_component(e1, component_type_MESH).as_mesh.vbo != 6) {
+    ++err;
+  }
+
+  if (get_component(e2, component_type_MESH).as_mesh.vbo != 7) {
+    ++err;
+  }
+
+  if (get_component(e3, component_type_MESH).as_mesh.vbo != 8) {
+    ++err;
+  }
 
   return err;
 }
