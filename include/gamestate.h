@@ -116,9 +116,9 @@ size_t get_num_obj(uint64_t attrib_mask);
 void get_objs(uint64_t mask, uint32_t *arr);
 
 /**
- * @brief Generate a set of attributes of the same type belonging to a list of objects.
- * The attribute at index n of array belongs to the entity at index n of
- * entities.
+ * @brief Generate a set of attributes of the same type belonging to a list of
+ * objects. The attribute at index n of array belongs to the entity at index n
+ * of entities.
  *
  * @param nent The number of objects in the objects array.
  * @param type The type of the attributes.
@@ -129,7 +129,7 @@ void query(size_t nobj, uint32_t *objs, uint64_t attrib_type,
 
 /**
  * @brief Save back a modified query.
- * 
+ *
  * @param nobj The number of objects.
  * @param objs The objects
  * @param attrib_type The type of the attributes.

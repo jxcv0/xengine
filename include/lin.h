@@ -4,6 +4,8 @@
 #include <math.h>
 #include <stddef.h>
 
+int feq(float f1, float f2);
+
 typedef struct mat4 {
   float elem[4][4];
 } mat4_t;

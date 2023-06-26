@@ -7,13 +7,26 @@
 #include "lin.h"
 #include "test.h"
 
-void tst_radians(void) {
-  TEST();
-  ASSERT_FLOAT_EQ(radians(3.112f), 0.0543146463f);
+int test_feq(void) {
+  if (feq(1.0f, 1.001f)) {
+    return 1;
+  }
+
+  if (!feq(1.0f, 1.0f)) {
+    return 1;
+  }
+
+  return 0;
 }
 
-void tst_identity_mat4(void) {
-  TEST();
+int test_radians(void) {
+  if (feq(radians(3.112f), 0.0543146463f)) {
+    return 0;
+  }
+  return 1;
+}
+
+int test_identity_mat4(void) {
   mat4_t m = identitym4();
   ASSERT_FLOAT_EQ(m.elem[0][0], 1.0f);
   ASSERT_FLOAT_EQ(m.elem[0][1], 0.0f);
@@ -34,10 +47,10 @@ void tst_identity_mat4(void) {
   ASSERT_FLOAT_EQ(m.elem[3][1], 0.0f);
   ASSERT_FLOAT_EQ(m.elem[3][2], 0.0f);
   ASSERT_FLOAT_EQ(m.elem[3][3], 1.0f);
+  return 0;
 }
 
-void tst_normalize_vec(void) {
-  TEST();
+int test_normalize_vec(void) {
   vec3_t v = {.elem = {5.0f, 2.0f, -3.0f}};
   v = normalizev3(v);
 
@@ -47,10 +60,10 @@ void tst_normalize_vec(void) {
   ASSERT_FLOAT_EQ(v.x, 0.8111071056538127f);
   ASSERT_FLOAT_EQ(v.y, 0.3244428422615251f);
   ASSERT_FLOAT_EQ(v.z, -0.4866642633922876f);
+  return 0;
 }
 
-void tst_cross_vec3(void) {
-  TEST();
+int test_cross_vec3(void) {
   vec3_t v1 = {.elem = {1.0f, 2.0f, 3.0f}};
   vec3_t v2 = {.elem = {1.0f, 5.0f, 7.0f}};
   vec3_t res = crossv3(v1, v2);
@@ -60,10 +73,10 @@ void tst_cross_vec3(void) {
   ASSERT_FLOAT_EQ(res.elem[0], -1.0f);
   ASSERT_FLOAT_EQ(res.elem[1], -4.0f);
   ASSERT_FLOAT_EQ(res.elem[2], 3.0f);
+  return 0;
 }
 
-void tst_product_mat4(void) {
-  TEST();
+int test_product_mat4(void) {
   mat4_t m1 = {0};
   mat4_t m2 = {0};
 
@@ -93,10 +106,10 @@ void tst_product_mat4(void) {
   ASSERT_FLOAT_EQ(result.elem[3][1], 398.0f);
   ASSERT_FLOAT_EQ(result.elem[3][2], 452.0f);
   ASSERT_FLOAT_EQ(result.elem[3][3], 506.0);
+  return 0;
 }
 
-void tst_product_vec4(void) {
-  TEST();
+int test_product_vec4(void) {
   mat4_t m = {0};
 
   float x = 0.0f;
@@ -117,24 +130,24 @@ void tst_product_vec4(void) {
   ASSERT_FLOAT_EQ(result.y, 60.0f);
   ASSERT_FLOAT_EQ(result.z, 100.0f);
   ASSERT_FLOAT_EQ(result.w, 140.0f);
+  return 0;
 }
 
-void tst_dot_vec3(void) {
-  TEST();
+int test_dot_vec3(void) {
   vec3_t v1 = {.elem = {1.0f, -3.2f, 0.0f}};
   vec3_t v2 = {.elem = {5.4f, 3.2f, -5.0f}};
   ASSERT_FLOAT_EQ(dotv3(v1, v2), -4.84f);
+  return 0;
 }
 
-void tst_dot_vec4(void) {
-  TEST();
+int test_dot_vec4(void) {
   vec4_t v1 = {.elem = {1.0f, -3.2f, 0.0f, 1.0f}};
   vec4_t v2 = {.elem = {5.4f, 3.2f, -5.0f, -0.5f}};
   ASSERT_FLOAT_EQ(dotv4(v1, v2), -5.34f);
+  return 0;
 }
 
-void tst_perspective(void) {
-  TEST();
+int test_perspective(void) {
   mat4_t m = perspective(radians(45.0f), (800.0f / 600.0f), 0.1f, 100.0f);
 
   ASSERT_FLOAT_EQ(m.elem[0][0], 1.81066f);
@@ -156,10 +169,10 @@ void tst_perspective(void) {
   ASSERT_FLOAT_EQ(m.elem[3][1], 0.0f);
   ASSERT_FLOAT_EQ(m.elem[3][2], -0.2002002f);
   ASSERT_FLOAT_EQ(m.elem[3][3], 0.0f);
+  return 0;
 }
 
-void tst_translate(void) {
-  TEST();
+int test_translate(void) {
   mat4_t m = identitym4();
   vec3_t v = {.elem = {0.1f, 0.1f, 0.1f}};
   m = translate(m, v);
@@ -167,10 +180,10 @@ void tst_translate(void) {
   ASSERT_FLOAT_EQ(m.elem[3][0], 0.1f);
   ASSERT_FLOAT_EQ(m.elem[3][1], 0.1f);
   ASSERT_FLOAT_EQ(m.elem[3][2], 0.1f);
+  return 0;
 }
 
-void tst_rotate1(void) {
-  TEST();
+int test_rotate1(void) {
   mat4_t m = identitym4();
   vec3_t v = {.elem = {0.0f, 1.0f, 0.0f}};
   m = rotate(m, v, radians(30.0f));
@@ -194,10 +207,10 @@ void tst_rotate1(void) {
   ASSERT_FLOAT_EQ(m.elem[3][1], 0.0f);
   ASSERT_FLOAT_EQ(m.elem[3][2], 0.0f);
   ASSERT_FLOAT_EQ(m.elem[3][3], 1.0f);
+  return 0;
 }
 
-void tst_rotate2(void) {
-  TEST();
+int test_rotate2(void) {
   vec4_t a = {.elem = {1.0f, 0.0f, 0.0f, 1.0f}};
   vec3_t axis = {.elem = {0.0f, 0.0f, 1.0f}};
 
@@ -213,10 +226,10 @@ void tst_rotate2(void) {
   ASSERT_FLOAT_EQ(a.y, -1.0f);
   ASSERT_FLOAT_EQ(a.z, 0.0f);
   ASSERT_FLOAT_EQ(a.w, 1.0f);
+  return 0;
 }
 
-void tst_look_at(void) {
-  TEST();
+int test_look_at(void) {
   vec3_t eye = {.elem = {3.0f, 3.0f, 3.0f}};
   vec3_t ctr = {.elem = {1.0f, 0.0f, 1.0f}};
   vec3_t c = {.elem = {eye.x + ctr.x, eye.y + ctr.y, eye.z + ctr.z}};
@@ -238,10 +251,10 @@ void tst_look_at(void) {
   ASSERT_FLOAT_EQ(m.elem[3][1], -3.0f);
   ASSERT_FLOAT_EQ(m.elem[3][2], 4.24264f);
   ASSERT_FLOAT_EQ(m.elem[3][3], 1.0f);
+  return 0;
 }
 
-void tst_scale(void) {
-  TEST();
+int test_scale(void) {
   mat4_t m = {0};
   m.elem[0][2] = 1.032f;
   m.elem[2][1] = 0.032f;
@@ -267,24 +280,25 @@ void tst_scale(void) {
   ASSERT_FLOAT_EQ(result.elem[3][1], 0.000000f);
   ASSERT_FLOAT_EQ(result.elem[3][2], 2.664000f);
   ASSERT_FLOAT_EQ(result.elem[3][3], 0.000000f);
+  return 0;
 }
 
 int main() {
-  TEST_BEGIN();
-  tst_radians();
-  tst_identity_mat4();
-  tst_normalize_vec();
-  tst_cross_vec3();
-  tst_product_mat4();
-  tst_product_vec4();
-  tst_dot_vec3();
-  tst_dot_vec4();
-  tst_perspective();
-  tst_translate();
-  tst_rotate1();
-  tst_rotate2();
-  tst_look_at();
-  tst_scale();
-  TEST_END();
-  return 0;
+  int err = 0;
+  err += test_feq();
+  err += test_radians();
+  err += test_identity_mat4();
+  err += test_normalize_vec();
+  err += test_cross_vec3();
+  err += test_product_mat4();
+  err += test_product_vec4();
+  err += test_dot_vec3();
+  err += test_dot_vec4();
+  err += test_perspective();
+  err += test_translate();
+  err += test_rotate1();
+  err += test_rotate2();
+  err += test_look_at();
+  err += test_scale();
+  return err;
 }
