@@ -56,6 +56,6 @@ format: $(wildcard $(xen_include_dir)/*.h) $(wildcard $(xen_src_dir)/*.c) $(wild
 
 %_tests:
 	@echo "Running tests in $@"
-	@./$(tests_dir)/$@ && (echo "    - PASS") || (echo "    - FAILED WITH $$? ERROR(S)")
+	@./$(tests_dir)/$@
 	
 check: gamestate_tests asset_tests lin_tests test_tests

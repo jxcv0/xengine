@@ -8,12 +8,11 @@
 #define TEST_SKIP 77
 #define TEST_FAIL 99
 
-#define ASSERT_FLOAT_EQ(f1, f2) assert(fabs(f1 - f2) < (FLT_EPSILON * 10))
+void assert_float_eq(const char *file, const char *func, int line,
+                     float expected, float actual);
+#define ASSERT_FLOAT_EQ(e, a) \
+  assert_float_eq(__FILE__, __func__, __LINE__, e, a)
 
-void test_pass(const char *file, const char *msg, ...) {}
-
-void print_time(clock_t start, const char *msg) {
-  printf("TIME: %s - %f s\n", msg, (double)(clock() - start) / CLOCKS_PER_SEC);
-}
+void test_end(void);
 
 #endif  // TEST_H_
