@@ -7,25 +7,12 @@
 #include "lin.h"
 #include "test.h"
 
-/*
 void test_feq(void) {
-  if (feq(1.0f, 1.001f)) {
-    return 1;
-  }
-
-  if (!feq(1.0f, 1.0f)) {
-    return 1;
-  }
-
+  ASSERT_FALSE(feq(1.0f, 1.001f));
+  ASSERT_TRUE(feq(1.0f, 1.0f));
 }
 
-void test_radians(void) {
-  if (feq(radians(3.112f), 0.0543146463f)) {
-    return 0;
-  }
-  return 1;
-}
-*/
+void test_radians(void) { ASSERT_TRUE(feq(radians(3.112f), 0.0543146463f)); }
 
 void test_identity_mat4(void) {
   mat4_t m = identitym4();
@@ -272,8 +259,8 @@ void test_scale(void) {
 }
 
 int main() {
-  // test_feq();
-  // test_radians();
+  test_feq();
+  test_radians();
   test_identity_mat4();
   test_normalize_vec();
   test_cross_vec3();

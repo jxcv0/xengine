@@ -20,6 +20,28 @@ void assert_float_eq(const char *file, const char *func, int line,
 /**
  * ----------------------------------------------------------------------------
  */
+void assert_true(const char *file, const char *func, int line, int val) {
+  if (!val) {
+    printf("FAILURE: %s:%d %s\n\tExpected true value is false\n", file, line,
+           func);
+    exit(EXIT_SUCCESS);
+  }
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+void assert_false(const char *file, const char *func, int line, int val) {
+  if (val) {
+    printf("FAILURE: %s:%d %s\n\tExpected true value is false\n", file, line,
+           func);
+    exit(EXIT_SUCCESS);
+  }
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ */
 void test_end(void) {
   printf("ALL TESTS PASSED\n");
   exit(EXIT_SUCCESS);
