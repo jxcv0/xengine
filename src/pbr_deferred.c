@@ -170,28 +170,29 @@ void set_up_gbuf(struct renderer *r, float projection[4][4], float view[4][4]) {
   shader_set_uniform_m4fv(r->deferred_geometry, "view", view);
 }
 
-void render_geom_to_gbuf(struct renderer *r, struct pbr_material *mat, struct mesh *mesh, float model[4][4]) {
-    shader_set_uniform_m4fv(r->deferred_geometry, "model", model);
-    shader_set_uniform_1i(r->deferred_geometry, "tex_diffuse", 0);
-    shader_set_uniform_1i(r->deferred_geometry, "tex_roughness", 1);
-    shader_set_uniform_1i(r->deferred_geometry, "tex_normal", 2);
-    shader_set_uniform_1i(r->deferred_geometry, "tex_metallic", 3);
-    // shader_set_uniform_1i(pbr.deferred_geometry, "tex_displacement", 4);
+void render_geom_to_gbuf(struct renderer *r, struct pbr_material *mat,
+                         struct mesh *mesh, float model[4][4]) {
+  shader_set_uniform_m4fv(r->deferred_geometry, "model", model);
+  shader_set_uniform_1i(r->deferred_geometry, "tex_diffuse", 0);
+  shader_set_uniform_1i(r->deferred_geometry, "tex_roughness", 1);
+  shader_set_uniform_1i(r->deferred_geometry, "tex_normal", 2);
+  shader_set_uniform_1i(r->deferred_geometry, "tex_metallic", 3);
+  // shader_set_uniform_1i(pbr.deferred_geometry, "tex_displacement", 4);
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, mat->diffuse);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, mat->roughness);
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, mat->normal);
-    glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, mat->metallic);
-    // glActiveTexture(GL_TEXTURE4);
-    // glBindTexture(GL_TEXTURE_2D, materials[i].displacement);
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, mat->diffuse);
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, mat->roughness);
+  glActiveTexture(GL_TEXTURE2);
+  glBindTexture(GL_TEXTURE_2D, mat->normal);
+  glActiveTexture(GL_TEXTURE3);
+  glBindTexture(GL_TEXTURE_2D, mat->metallic);
+  // glActiveTexture(GL_TEXTURE4);
+  // glBindTexture(GL_TEXTURE_2D, materials[i].displacement);
 
-    glBindVertexArray(mesh->vao);
+  glBindVertexArray(mesh->vao);
 
-    glDrawElements(GL_TRIANGLES, mesh->num_indices, GL_UNSIGNED_INT, 0);
+  glDrawElements(GL_TRIANGLES, mesh->num_indices, GL_UNSIGNED_INT, 0);
 }
 
 /**
