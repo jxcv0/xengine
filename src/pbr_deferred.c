@@ -159,17 +159,21 @@ int pbrd_init(struct renderer *r, const uint32_t scr_w, const uint32_t scr_h) {
 /**
  * ----------------------------------------------------------------------------
  */
-void set_up_gbuf(struct renderer *r, float projection[4][4], float view[4][4]) {
+void prepare_gbuf(struct renderer *r, float projection[4][4],
+                  float view[4][4]) {
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
   glBindFramebuffer(GL_FRAMEBUFFER, r->g_buf);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glUseProgram(r->deferred_geometry);
+
   shader_set_uniform_m4fv(r->deferred_geometry, "projection", projection);
   shader_set_uniform_m4fv(r->deferred_geometry, "view", view);
 }
 
+/**
+ * ----------------------------------------------------------------------------
+ */
 void render_geom_to_gbuf(struct renderer *r, struct pbr_material *mat,
                          struct mesh *mesh, float model[4][4]) {
   shader_set_uniform_m4fv(r->deferred_geometry, "model", model);
@@ -177,7 +181,6 @@ void render_geom_to_gbuf(struct renderer *r, struct pbr_material *mat,
   shader_set_uniform_1i(r->deferred_geometry, "tex_roughness", 1);
   shader_set_uniform_1i(r->deferred_geometry, "tex_normal", 2);
   shader_set_uniform_1i(r->deferred_geometry, "tex_metallic", 3);
-  // shader_set_uniform_1i(pbr.deferred_geometry, "tex_displacement", 4);
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, mat->diffuse);
@@ -187,11 +190,8 @@ void render_geom_to_gbuf(struct renderer *r, struct pbr_material *mat,
   glBindTexture(GL_TEXTURE_2D, mat->normal);
   glActiveTexture(GL_TEXTURE3);
   glBindTexture(GL_TEXTURE_2D, mat->metallic);
-  // glActiveTexture(GL_TEXTURE4);
-  // glBindTexture(GL_TEXTURE_2D, materials[i].displacement);
 
   glBindVertexArray(mesh->vao);
-
   glDrawElements(GL_TRIANGLES, mesh->num_indices, GL_UNSIGNED_INT, 0);
 }
 
@@ -202,7 +202,7 @@ void render_geometries(struct renderer *r, float projection[4][4],
                        float view[4][4], float *model_matrices[4][4],
                        struct mesh *geometries, struct pbr_material *materials,
                        size_t n) {
-  set_up_gbuf(r, projection, geometries);
+  prepare_gbuf(r, projection, view);
 
   for (size_t i = 0; i < n; i++) {
     shader_set_uniform_m4fv(r->deferred_geometry, "model",

@@ -44,7 +44,7 @@ struct renderer {
  */
 int pbrd_init(struct renderer *r, const uint32_t scr_w, const uint32_t scr_h);
 
-void set_up_gbuf(struct renderer *r, float projection[4][4], float view[4][4]);
+void prepare_gbuf(struct renderer *r, float projection[4][4], float view[4][4]);
 
 void render_geom_to_gbuf();
 

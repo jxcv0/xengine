@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #define MAX_NUM_THREADS 8
@@ -67,19 +68,18 @@ void sys_load(uint64_t attrib_type) {
   union attribute *buf = component_buffers[0];
   query(nent, entity_buf, attrib_type, buf);
 
-#pragma omp parallel for num_threads(MAX_NUM_THREADS) schedule(static)
   for (size_t i = 0; i < nent; i++) {
     union attribute comp;
     switch (result_type) {
       case attrib_type_MESH:
         if (load_mesh(&comp.as_mesh, buf[i].as_request.path) != 0) {
-          continue;
+          fprintf(stderr, "Unable to load asset: %s", buf[i].as_request.path);
         }
         break;
 
       case attrib_type_MATERIAL:
         if (load_mtl(&comp.as_material, buf[i].as_request.path) != 0) {
-          continue;
+          fprintf(stderr, "Unable to load asset: %s", buf[i].as_request.path);
         }
         break;
     }
@@ -107,35 +107,11 @@ void sys_render_geometries(struct renderer *r, mat4_t projection, mat4_t view) {
   query(nent, entity_buf, attrib_type_MATERIAL, mat_buf);
   query(nent, entity_buf, attrib_type_MODEL_MATRIX, model_buf);
 
-  glClearColor(0, 0, 0, 1);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glBindFramebuffer(GL_FRAMEBUFFER, r->g_buf);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glUseProgram(r->deferred_geometry);
-
-  shader_set_uniform_m4fv(r->deferred_geometry, "projection", projection.elem);
-  shader_set_uniform_m4fv(r->deferred_geometry, "view", view.elem);
+  prepare_gbuf(r, projection.elem, view.elem);
 
   for (size_t i = 0; i < nent; i++) {
-    shader_set_uniform_m4fv(r->deferred_geometry, "model",
-                            model_buf[i].as_model_matrix.elem);
-    shader_set_uniform_1i(r->deferred_geometry, "tex_diffuse", 0);
-    shader_set_uniform_1i(r->deferred_geometry, "tex_roughness", 1);
-    shader_set_uniform_1i(r->deferred_geometry, "tex_normal", 2);
-    shader_set_uniform_1i(r->deferred_geometry, "tex_metallic", 3);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, mat_buf[i].as_material.diffuse);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, mat_buf[i].as_material.roughness);
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, mat_buf[i].as_material.normal);
-    glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, mat_buf[i].as_material.metallic);
-
-    glBindVertexArray(mesh_buf[i].as_mesh.vao);
-    glDrawElements(GL_TRIANGLES, mesh_buf[i].as_mesh.num_indices,
-                   GL_UNSIGNED_INT, 0);
+    render_geom_to_gbuf(r, &mat_buf[i].as_material, &mesh_buf[i].as_mesh,
+                        &model_buf[i].as_model_matrix.elem);
   }
   // glBindTexture(GL_TEXTURE_2D, 0);
   // glBindVertexArray(0);

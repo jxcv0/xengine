@@ -51,6 +51,8 @@ tests: libxen.a libstb.a libglad.a $(patsubst %.c, $(bin_dir)/%, $(wildcard $(xe
 clean:
 	@rm -rfd build/*
 
+cleanbuild: clean all
+
 format: $(wildcard $(xen_include_dir)/*.h) $(wildcard $(xen_src_dir)/*.c) $(wildcard test/*.c) $(wildcard tools/*.c)
 	@clang-format -i -style=google $^
 
