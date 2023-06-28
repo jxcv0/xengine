@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "assets.h"
+#include "test.h"
 
 int test_asset_type(void) {
   int mat = asset_type("some_mtl_file.mtl");
@@ -22,5 +23,6 @@ int test_asset_type(void) {
 int main() {
   int result = 0;
   result += test_asset_type();
+  test_end();
   return result;
 }

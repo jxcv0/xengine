@@ -377,5 +377,6 @@ int main() {
   int err = 0;
   err += test_create_mask();
   err += test_static_gamestate();
+  test_end();
   return err;
 }
