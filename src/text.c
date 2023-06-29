@@ -87,24 +87,24 @@ void render_text(float x, float y, float scale, char *text, float col[4]) {
   glBindVertexArray(VAO);
 
   while (*text) {
-    float xpos = x + characters[*text].bearing[0] * scale;
-    float ypos =
-        y - (characters[*text].size[0] - characters[*text].bearing[1]) * scale;
-    float w = characters[*text].size[0] * scale;
-    float h = characters[*text].size[1] * scale;
+    int c = *text;
+    float xpos = x + characters[c].bearing[0] * scale;
+    float ypos = y - (characters[c].size[0] - characters[c].bearing[1]) * scale;
+    float w = characters[c].size[0] * scale;
+    float h = characters[c].size[1] * scale;
 
     float vertices[6][4] = {
         {xpos, ypos + h, 0.0f, 0.0f}, {xpos, ypos, 0.0f, 1.0f},
         {xpos + w, ypos, 1.0f, 1.0f}, {xpos, ypos + h, 0.0f, 0.0f},
         {xpos + w, ypos, 1.0f, 1.0f}, {xpos + w, ypos + h, 1.0f, 0.0f}};
 
-    glBindTexture(GL_TEXTURE_2D, characters[*text].tex);
+    glBindTexture(GL_TEXTURE_2D, characters[c].tex);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
-    x += (characters[*text].adv >> 6) * scale;
+    x += (characters[c].adv >> 6) * scale;
     ++text;
   }
   glBindVertexArray(0);

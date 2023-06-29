@@ -11,8 +11,8 @@
 #include <time.h>
 
 #define MESH_CACHE_SIZE 64
-static struct mesh mesh_cache[MESH_CACHE_SIZE];
-static size_t num_cached_meshes;
+// static struct mesh mesh_cache[MESH_CACHE_SIZE];
+// static size_t num_cached_meshes;
 
 /**
  * ----------------------------------------------------------------------------
@@ -40,7 +40,10 @@ char *load_file(const char *filepath) {
   char *buff = malloc(filesize + 1);  // + 1 for '\0'
   rewind(file);
 
-  fread(buff, filesize, 1, file);
+  if (fread(buff, 1, filesize, file) == 0) {
+    free(buff);
+    return NULL;
+  }
 
   fclose(file);
   buff[filesize] = '\0';
@@ -134,8 +137,15 @@ int load_mesh(struct mesh *mesh, const char *filepath) {
   }
 
   strcpy(mesh->asset_path, filepath);
-  fread(&mesh->num_vertices, sizeof(size_t), 1, file);
-  fread(&mesh->num_indices, sizeof(size_t), 1, file);
+  if (fread(&mesh->num_vertices, sizeof(size_t), 1, file) == 0) {
+    fclose(file);
+    return -1;
+  }
+
+  if (fread(&mesh->num_indices, sizeof(size_t), 1, file) == 0) {
+    fclose(file);
+    return -1;
+  }
 
   size_t verts_size = sizeof(struct vertex) * mesh->num_vertices;
   size_t indices_size = sizeof(GLuint) * mesh->num_indices;
@@ -143,7 +153,11 @@ int load_mesh(struct mesh *mesh, const char *filepath) {
   void *mem = malloc(verts_size + indices_size);
   struct vertex *vertices = mem;
   GLuint *indices = (GLuint *)((uintptr_t)mem + verts_size);
-  fread(mem, 1, verts_size + indices_size, file);
+  if (fread(mem, 1, verts_size + indices_size, file) == 0) {
+    free(mem);
+    fclose(file);
+    return -1;
+  }
 
   glGenBuffers(1, &mesh->vbo);
   glGenBuffers(1, &mesh->ebo);
@@ -194,7 +208,10 @@ int load_mtl(struct pbr_material *mat, const char *filepath) {
   }
 
   uint32_t sizes[4][3];
-  fread(sizes, sizeof(uint32_t), 12, file);
+  if (fread(sizes, sizeof(uint32_t), 12, file) == 0) {
+    fclose(file);
+    return -1;
+  }
 
   size_t imgsize = 0;
   for (int i = 0; i < 4; i++) {
@@ -202,7 +219,11 @@ int load_mtl(struct pbr_material *mat, const char *filepath) {
   }
 
   unsigned char *imgdata = malloc(imgsize);
-  fread(imgdata, 1, imgsize, file);
+  if (fread(imgdata, 1, imgsize, file) == 0) {
+    fclose(file);
+    free(imgdata);
+    return -1;
+  }
 
   size_t offset = 0;
   for (int i = 0; i < 4; i++) {

@@ -73,13 +73,13 @@ void sys_load(uint64_t attrib_type) {
     switch (result_type) {
       case attrib_type_MESH:
         if (load_mesh(&comp.as_mesh, buf[i].as_request.path) != 0) {
-          fprintf(stderr, "Unable to load asset: %s", buf[i].as_request.path);
+          fprintf(stderr, "Unable to load asset: %s\n", buf[i].as_request.path);
         }
         break;
 
       case attrib_type_MATERIAL:
         if (load_mtl(&comp.as_material, buf[i].as_request.path) != 0) {
-          fprintf(stderr, "Unable to load asset: %s", buf[i].as_request.path);
+          fprintf(stderr, "Unable to load asset: %s\n", buf[i].as_request.path);
         }
         break;
     }

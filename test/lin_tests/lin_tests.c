@@ -255,7 +255,7 @@ void test_scale(void) {
   ASSERT_FLOAT_EQ(result.elem[3][0], 0.000000f);
   ASSERT_FLOAT_EQ(result.elem[3][1], 0.000000f);
   ASSERT_FLOAT_EQ(result.elem[3][2], 2.664000f);
-  ASSERT_FLOAT_EQ(result.elem[3][3], 0.001000f);
+  ASSERT_FLOAT_EQ(result.elem[3][3], 0.000000f);
 }
 
 int main() {
