@@ -58,7 +58,6 @@ format: $(wildcard $(xen_include_dir)/*.h) $(wildcard $(xen_src_dir)/*.c) $(wild
 
 # run each test in *_tests dirs
 %_tests:
-	@echo "Running test suite: $@"
-	@./$(tests_dir)/$@/*
+	@for x in $(tests_dir)/$@/*; do ./$$x; done
 	
 check: gamestate_tests asset_tests lin_tests

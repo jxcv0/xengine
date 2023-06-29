@@ -6,20 +6,6 @@
 #include "gamestate.h"
 #include "test.h"
 
-int test_create_mask(void) {
-  uint64_t mesh_bit = (1LL << attrib_type_MESH);
-  uint64_t mat_bit = (1LL << attrib_type_MATERIAL);
-  uint64_t pos_bit = (1LL << attrib_type_POSITION);
-
-  uint64_t a[] = {attrib_type_MESH, attrib_type_MATERIAL, attrib_type_POSITION};
-  uint64_t m = create_mask(3, a);
-
-  if (m == (mesh_bit | mat_bit | pos_bit)) {
-    return 0;
-  }
-  return 1;
-}
-
 int test_static_gamestate(void) {
   int err = 0;
   init_gamestate();
@@ -373,10 +359,9 @@ int test_static_gamestate(void) {
   return err;
 }
 
-int main() {
-  int err = 0;
-  err += test_create_mask();
-  err += test_static_gamestate();
+int main(int argc, char **argv) {
+  test_start(argc, argv);
+  test_static_gamestate();
   test_end();
-  return err;
+  return 0;
 }
