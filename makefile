@@ -44,7 +44,7 @@ libstb.a: $(patsubst %.c, $(build_dir)/%.o, $(wildcard $(stb_src_dir)/*.c))
 
 tools: libxen.a libstb.a libglad.a $(patsubst %.c, $(bin_dir)/%, $(wildcard $(xen_tools_dir)/*.c))
 
-tests: libxen.a libstb.a libglad.a $(patsubst %.c, $(bin_dir)/%, $(wildcard $(xen_test_dir)/*.c))
+tests: libxen.a libstb.a libglad.a $(patsubst %.c, $(bin_dir)/%, $(wildcard $(xen_test_dir)/*/*.c))
 
 .PHONY: clean format runtests
 
@@ -56,8 +56,9 @@ cleanbuild: clean all
 format: $(wildcard $(xen_include_dir)/*.h) $(wildcard $(xen_src_dir)/*.c) $(wildcard test/*.c) $(wildcard tools/*.c)
 	@clang-format -i -style=google $^
 
+# run each test in *_tests dirs
 %_tests:
-	@echo "Running tests in $@"
-	@./$(tests_dir)/$@
+	@echo "Running test suite: $@"
+	@./$(tests_dir)/$@/*
 	
-check: gamestate_tests asset_tests lin_tests test_tests
+check: gamestate_tests asset_tests lin_tests

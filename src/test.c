@@ -15,7 +15,7 @@
 void assert_float_eq(const char *file, const char *func, int line,
                      float expected, float actual) {
   if (fabs(expected - actual) > (FLT_EPSILON * 10)) {
-    printf(RED "FAILURE: %s:%d %s\n" NONE "\tExpected: %f\n\tActual: %f\n",
+    printf(RED "[FAILURE]: %s:%d %s\n" NONE "\tExpected: %f\n\tActual: %f\n",
            file, line, func, expected, actual);
     exit(EXIT_SUCCESS);
   }
@@ -26,7 +26,7 @@ void assert_float_eq(const char *file, const char *func, int line,
  */
 void assert_true(const char *file, const char *func, int line, int val) {
   if (!val) {
-    printf(RED "FAILURE: %s:%d %s\n " NONE "\tExpected true value is false\n",
+    printf(RED "[FAILURE]: %s:%d %s\n " NONE "\tExpected true value is false\n",
            file, line, func);
     exit(EXIT_SUCCESS);
   }
@@ -37,7 +37,7 @@ void assert_true(const char *file, const char *func, int line, int val) {
  */
 void assert_false(const char *file, const char *func, int line, int val) {
   if (val) {
-    printf(RED "FAILURE: %s:%d %s\n" NONE "\tExpected true value is false\n",
+    printf(RED "[FAILURE]: %s:%d %s\n" NONE "\tExpected true value is false\n",
            file, line, func);
     exit(EXIT_SUCCESS);
   }
@@ -47,6 +47,6 @@ void assert_false(const char *file, const char *func, int line, int val) {
  * ----------------------------------------------------------------------------
  */
 void test_end(void) {
-  printf(GREEN "ALL TESTS PASSED\n" NONE);
+  printf(GREEN "[TEST PASSED]\n" NONE);
   exit(EXIT_SUCCESS);
 }
