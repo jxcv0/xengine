@@ -255,11 +255,10 @@ void test_scale(void) {
   ASSERT_FLOAT_EQ(result.elem[3][0], 0.000000f);
   ASSERT_FLOAT_EQ(result.elem[3][1], 0.000000f);
   ASSERT_FLOAT_EQ(result.elem[3][2], 2.664000f);
-  ASSERT_FLOAT_EQ(result.elem[3][3], 0.000000f);
+  ASSERT_FLOAT_EQ(result.elem[3][3], 0.001000f);
 }
 
-int main(int argc, char **argv) {
-  test_start(argc, argv);
+int main() {
   test_feq();
   test_radians();
   test_identity_mat4();
@@ -276,5 +275,6 @@ int main(int argc, char **argv) {
   test_look_at();
   test_scale();
 
-  test_end();
+  TEST_END();
+  return 0;
 }

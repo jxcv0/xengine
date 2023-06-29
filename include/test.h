@@ -23,7 +23,7 @@ void assert_int_eq(const char* file, const char* func, int line, int exp,
                    int act);
 #define ASSERT_INT_EQ(e, a) assert_int_eq(__FILE__, __func__, __LINE__, e, a)
 
-void test_start(int argc, char** argv);
-void test_end(void);
+void test_end(const char* file);
+#define TEST_END() test_end(__FILE__)
 
 #endif  // TEST_H_

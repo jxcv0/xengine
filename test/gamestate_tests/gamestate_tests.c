@@ -359,9 +359,8 @@ int test_static_gamestate(void) {
   return err;
 }
 
-int main(int argc, char **argv) {
-  test_start(argc, argv);
+int main() {
   test_static_gamestate();
-  test_end();
+  TEST_END();
   return 0;
 }

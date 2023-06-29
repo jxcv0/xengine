@@ -58,15 +58,7 @@ void assert_int_eq(const char* file, const char* func, int line, int exp,
 /**
  * ----------------------------------------------------------------------------
  */
-void test_start(int argc, char** argv) {
-  (void)argc;
-  printf(GREEN "[RUNNING]" NONE "%s\n", argv[0]);
-}
-
-/**
- * ----------------------------------------------------------------------------
- */
-void test_end(void) {
-  printf(GREEN "[TEST PASSED]\n" NONE);
+void test_end(const char* file) {
+  printf(GREEN "[TEST PASSED] " NONE "%s\n", file);
   exit(EXIT_SUCCESS);
 }
