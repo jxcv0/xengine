@@ -16,31 +16,31 @@ struct index_table {
 };
 
 // geometry buffer
-static attrib_t mesh_buf[MAX_NUM_GEOMETRIES];
+static union attribute mesh_buf[MAX_NUM_GEOMETRIES];
 static struct index_table geometry_table[MAX_NUM_GEOMETRIES];
 
 // material buffer
-static attrib_t material_buf[MAX_NUM_MATERIALS];
+static union attribute material_buf[MAX_NUM_MATERIALS];
 static struct index_table material_table[MAX_NUM_MATERIALS];
 
 // position buffer
-static attrib_t position_buf[MAX_NUM_POSITIONS];
+static union attribute position_buf[MAX_NUM_POSITIONS];
 static struct index_table position_table[MAX_NUM_POSITIONS];
 
 // rotation buffer
-static attrib_t rotation_buf[MAX_NUM_POSITIONS];
+static union attribute rotation_buf[MAX_NUM_POSITIONS];
 static struct index_table rotation_table[MAX_NUM_POSITIONS];
 
 // model matrix buffer
-static attrib_t model_matrix_buf[MAX_NUM_MODEL_MATRICES];
+static union attribute model_matrix_buf[MAX_NUM_MODEL_MATRICES];
 static struct index_table model_matrix_table[MAX_NUM_MODEL_MATRICES];
 
-// mesh request buffer
-static attrib_t meshreq_buf[MAX_NUM_LOAD_REQUESTS];
-static struct index_table meshreq_table[MAX_NUM_LOAD_REQUESTS];
+// geometry request buffer
+static union attribute geomreq_buf[MAX_NUM_LOAD_REQUESTS];
+static struct index_table geomreq_table[MAX_NUM_LOAD_REQUESTS];
 
 // material request buffer
-static attrib_t matreq_buf[MAX_NUM_LOAD_REQUESTS];
+static union attribute matreq_buf[MAX_NUM_LOAD_REQUESTS];
 static struct index_table matreq_table[MAX_NUM_LOAD_REQUESTS];
 
 struct component_table {
@@ -56,7 +56,7 @@ static struct component_table lookup_table[NUM_COMPONENT_TYPES] = {
     {position_buf, position_table, 0},
     {rotation_buf, rotation_table, 0},
     {model_matrix_buf, model_matrix_table, 0},
-    {meshreq_buf, meshreq_table, 0},
+    {geomreq_buf, geomreq_table, 0},
     {matreq_buf, matreq_table, 0}};
 
 /**

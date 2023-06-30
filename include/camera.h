@@ -1,18 +1,8 @@
 #ifndef CAMERA_H_
 #define CAMERA_H_
 
+#include "attrib.h"
 #include "lin.h"
-
-struct camera {
-  float yaw;
-  float pitch;
-  float movement_speed;
-  float mouse_sensetivity;
-  vec3_t pos;
-  vec3_t view_dir;
-  vec3_t up;
-  vec3_t right;
-};
 
 /**
  * @brief Update camera state based on change in cursor position.
