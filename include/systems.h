@@ -1,8 +1,7 @@
 #ifndef SYSTEMS_H_
 #define SYSTEMS_H_
 
-#include "gamestate.h"
-#include "pbr_deferred.h"
+#include "render.h"
 
 void sys_update_model_matrices(void);
 

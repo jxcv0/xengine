@@ -1,36 +1,17 @@
-#ifndef MAINWINDOW_H_
-#define MAINWINDOW_H_
-
-// #ifndef GLAD_INCLUDED
-// #define GLAD_INCLUDED
-// #include "glad.h"
-// #endif
+#ifndef WINDOW_H_
+#define WINDOW_H_
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /**
- * @brief Create window and correct OpenGl context.
+ * @brief Open a window and create an OpenGL context.
  *
- * @param window A pointer to a GLFWwindow.
+ * @param width The width of the window.
+ * @param height The height of the window.
+ * @param A pointer the the new window.
  */
-void create_window(GLFWwindow **window, const float width, const float height,
-                   const char *name);
+GLFWwindow *create_window(const float width, const float height,
+                          const char *name);
 
-/**
- * @brief Create window with usable mouse and correct OpenGl context.
- *
- * @param window A pointer to a GLFWwindow.
- */
-void create_editor_window(GLFWwindow **window, const float width,
-                          const float height, const char *name);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif  // MAINWINDOW_H_
+#endif  // WINDOW_H_

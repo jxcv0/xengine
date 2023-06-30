@@ -12,14 +12,13 @@
 #include "glad.h"
 #include "input.h"
 #include "lin.h"
-#include "pbr_deferred.h"
+#include "render.h"
 #include "systems.h"
 #include "text.h"
 #include "window.h"
 
 extern const vec3_t GLOBAL_UP;
 
-GLFWwindow *window;
 const float window_width = 800;
 const float window_height = 600;
 
@@ -41,9 +40,9 @@ int main() {
   omp_set_num_threads(4);
   omp_set_dynamic(0);
 
-  create_window(&window, window_width, window_height, "game");
-  // assert(init_text("assets/fonts/Consolas.ttf") != -1);
-  pbrd_init(&r, window_width, window_height);
+  GLFWwindow *window = create_window(window_width, window_height, "game");
+  //  assert(init_text("assets/fonts/Consolas.ttf") != -1);
+  init_renderer(&r, window_width, window_height);
 
   projection_matrix =
       perspective(radians(60.0f), ((float)window_width / (float)window_height),
@@ -106,11 +105,9 @@ int main() {
     sys_render_geometries(&r, projection_matrix, create_view_matrix());
     render_lighting(&r, &l, 1, camera.m_pos.elem, window_width, window_height);
 
-    /*
-    TODO Rendering to wrong buffer?
-    float text_col[] = {1.0f, 1.0f, 1.0f, 1.0f};
-    render_text(25.0f, 15.0f, 10.0f, "Sample Text", text_col);
-    */
+    // TODO Rendering to wrong buffer?
+    // float text_col[] = {1.0f, 1.0f, 1.0f, 1.0f};
+    // render_text(25.0f, 15.0f, 10.0f, "Sample Text", text_col);
 
     glfwSwapBuffers(window);
     glfwPollEvents();

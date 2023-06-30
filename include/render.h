@@ -42,7 +42,8 @@ struct renderer {
  * @param scr_h The height of the screen in pixels.
  * @return On success 0, on error -1.
  */
-int pbrd_init(struct renderer *r, const uint32_t scr_w, const uint32_t scr_h);
+int init_renderer(struct renderer *r, const uint32_t scr_w,
+                  const uint32_t scr_h);
 
 void prepare_gbuf(struct renderer *r, float projection[4][4], float view[4][4]);
 

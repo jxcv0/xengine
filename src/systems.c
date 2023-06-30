@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "gamestate.h"
 #define MAX_NUM_THREADS 8
 
 static uint32_t entity_buf[MAX_NUM_ENTITIES];

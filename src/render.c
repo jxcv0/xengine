@@ -1,4 +1,4 @@
-#include "pbr_deferred.h"
+#include "render.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -81,7 +81,8 @@ static void load_pbrd_shaders(struct renderer *r) {
 /**
  * ----------------------------------------------------------------------------
  */
-int pbrd_init(struct renderer *r, const uint32_t scr_w, const uint32_t scr_h) {
+int init_renderer(struct renderer *r, const uint32_t scr_w,
+                  const uint32_t scr_h) {
   load_pbrd_shaders(r);
   // glPatchParameteri(GL_PATCH_VERTICES, 3);
 
