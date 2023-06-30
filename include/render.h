@@ -56,7 +56,7 @@ void render_geom_to_gbuf();
  */
 void render_geometries(struct renderer *r, float projection[4][4],
                        float view[4][4], float *model_matrices[4][4],
-                       struct mesh *geometries, struct pbr_material *materials,
+                       struct mesh *geometries, struct material *materials,
                        size_t n);
 /**
  * @brief Render lighting using data stored in G-Buffer.

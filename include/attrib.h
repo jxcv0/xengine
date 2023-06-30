@@ -42,7 +42,7 @@ struct camera {
  *
  * NOTE: the order of the members is important see assets.c:load_mtl
  */
-struct pbr_material {
+struct material {
   union {
     GLuint arr[4];
     struct {
@@ -88,7 +88,7 @@ struct loadreq {
 
 typedef union attribute {
   struct mesh as_mesh;
-  struct pbr_material as_material;
+  struct material as_material;
   vec3_t as_position;
   mat4_t as_model_matrix;
   struct loadreq as_request;

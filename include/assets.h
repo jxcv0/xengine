@@ -54,7 +54,7 @@ int load_mesh(struct mesh *mesh, const char *filepath);
  * @param filepath The file to load the material from.
  * @return 0 on success, -1 on failure.
  */
-int load_mtl(struct pbr_material *mat, const char *filepath);
+int load_mtl(struct material *mat, const char *filepath);
 
 /**
  * @brief Determine the type of an asset based on its file extension.

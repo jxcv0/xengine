@@ -201,7 +201,7 @@ int load_mesh(struct mesh *mesh, const char *filepath) {
 /**
  * ----------------------------------------------------------------------------
  */
-int load_mtl(struct pbr_material *mat, const char *filepath) {
+int load_mtl(struct material *mat, const char *filepath) {
   FILE *file;
   if ((file = fopen(filepath, "rb")) == NULL) {
     return -1;

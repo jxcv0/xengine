@@ -175,7 +175,7 @@ void prepare_gbuf(struct renderer *r, float projection[4][4],
 /**
  * ----------------------------------------------------------------------------
  */
-void render_geom_to_gbuf(struct renderer *r, struct pbr_material *mat,
+void render_geom_to_gbuf(struct renderer *r, struct material *mat,
                          struct mesh *mesh, float model[4][4]) {
   shader_set_uniform_m4fv(r->deferred_geometry, "model", model);
   shader_set_uniform_1i(r->deferred_geometry, "tex_diffuse", 0);
@@ -201,7 +201,7 @@ void render_geom_to_gbuf(struct renderer *r, struct pbr_material *mat,
  */
 void render_geometries(struct renderer *r, float projection[4][4],
                        float view[4][4], float *model_matrices[4][4],
-                       struct mesh *geometries, struct pbr_material *materials,
+                       struct mesh *geometries, struct material *materials,
                        size_t n) {
   prepare_gbuf(r, projection, view);
 
