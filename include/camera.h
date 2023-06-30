@@ -5,6 +5,20 @@
 #include "lin.h"
 
 /**
+ * @brief data for calculating view matrix.
+ */
+struct camera {
+  float yaw;
+  float pitch;
+  float movement_speed;
+  float mouse_sensetivity;
+  vec3_t pos;
+  vec3_t view_dir;
+  vec3_t up;
+  vec3_t right;
+};
+
+/**
  * @brief Update camera state based on change in cursor position.
  *
  * @param camera Pointer to the camera to update.

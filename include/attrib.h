@@ -23,20 +23,6 @@ enum attrib_type {
 };
 
 /**
- * @brief data for calculating view matrix.
- */
-struct camera {
-  float yaw;
-  float pitch;
-  float movement_speed;
-  float mouse_sensetivity;
-  vec3_t pos;
-  vec3_t view_dir;
-  vec3_t up;
-  vec3_t right;
-};
-
-/**
  * @brief Contains ID's of diffuse, normal, roughness and metallic image
  * maps.
  *
