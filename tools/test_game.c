@@ -34,8 +34,8 @@ struct renderer r;
 
 int main() {
   init_gamestate();
-  camera.m_mouse_sensetivity = 0.3;
-  camera.m_movement_speed = 0.15;
+  camera.mouse_sensetivity = 0.3;
+  camera.movement_speed = 0.15;
 
   omp_set_num_threads(4);
   omp_set_dynamic(0);
@@ -83,7 +83,7 @@ int main() {
 
   mouse_pos.m_last_pos.x = window_width / 2.0f;
   mouse_pos.m_last_pos.y = window_height / 2.0f;
-  camera.m_yaw = 275.0f;
+  camera.yaw = 275.0f;
 
   while (!glfwWindowShouldClose(window)) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -103,7 +103,7 @@ int main() {
     sys_load(attrib_type_MAT_LOAD_REQUEST);
     sys_update_model_matrices();
     sys_render_geometries(&r, projection_matrix, create_view_matrix());
-    render_lighting(&r, &l, 1, camera.m_pos.elem, window_width, window_height);
+    render_lighting(&r, &l, 1, camera.pos.elem, window_width, window_height);
 
     // TODO Rendering to wrong buffer?
     // float text_col[] = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -120,36 +120,36 @@ int main() {
 }
 
 mat4_t create_view_matrix() {
-  vec3_t ctr = {.elem = {camera.m_pos.x + camera.m_view_dir.x,
-                         camera.m_pos.y + camera.m_view_dir.y,
-                         camera.m_pos.z + camera.m_view_dir.z}};
+  vec3_t ctr = {.elem = {camera.pos.x + camera.view_dir.x,
+                         camera.pos.y + camera.view_dir.y,
+                         camera.pos.z + camera.view_dir.z}};
 
-  return look_at(camera.m_pos, ctr, camera.m_up);
+  return look_at(camera.pos, ctr, camera.up);
 }
 
 // move the fps camera with wasd and update mouse input
 void handle_keyboard_input(GLFWwindow *w) {
   if (glfwGetKey(w, GLFW_KEY_W) == GLFW_PRESS) {
-    camera.m_pos.x += camera.m_view_dir.x * camera.m_movement_speed;
-    camera.m_pos.y += camera.m_view_dir.y * camera.m_movement_speed;
-    camera.m_pos.z += camera.m_view_dir.z * camera.m_movement_speed;
+    camera.pos.x += camera.view_dir.x * camera.movement_speed;
+    camera.pos.y += camera.view_dir.y * camera.movement_speed;
+    camera.pos.z += camera.view_dir.z * camera.movement_speed;
   }
 
   if (glfwGetKey(w, GLFW_KEY_S) == GLFW_PRESS) {
-    camera.m_pos.x -= camera.m_view_dir.x * camera.m_movement_speed;
-    camera.m_pos.y -= camera.m_view_dir.y * camera.m_movement_speed;
-    camera.m_pos.z -= camera.m_view_dir.z * camera.m_movement_speed;
+    camera.pos.x -= camera.view_dir.x * camera.movement_speed;
+    camera.pos.y -= camera.view_dir.y * camera.movement_speed;
+    camera.pos.z -= camera.view_dir.z * camera.movement_speed;
   }
 
   if (glfwGetKey(w, GLFW_KEY_A) == GLFW_PRESS) {
-    camera.m_pos.x -= camera.m_right.x * camera.m_movement_speed;
-    camera.m_pos.y -= camera.m_right.y * camera.m_movement_speed;
-    camera.m_pos.z -= camera.m_right.z * camera.m_movement_speed;
+    camera.pos.x -= camera.right.x * camera.movement_speed;
+    camera.pos.y -= camera.right.y * camera.movement_speed;
+    camera.pos.z -= camera.right.z * camera.movement_speed;
   }
 
   if (glfwGetKey(w, GLFW_KEY_D) == GLFW_PRESS) {
-    camera.m_pos.x += camera.m_right.x * camera.m_movement_speed;
-    camera.m_pos.y += camera.m_right.y * camera.m_movement_speed;
-    camera.m_pos.z += camera.m_right.z * camera.m_movement_speed;
+    camera.pos.x += camera.right.x * camera.movement_speed;
+    camera.pos.y += camera.right.y * camera.movement_speed;
+    camera.pos.z += camera.right.z * camera.movement_speed;
   }
 }

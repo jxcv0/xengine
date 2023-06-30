@@ -26,14 +26,14 @@ enum attrib_type {
  * @brief data for calculating view matrix.
  */
 struct camera {
-  float m_yaw;
-  float m_pitch;
-  float m_movement_speed;
-  float m_mouse_sensetivity;
-  vec3_t m_pos;
-  vec3_t m_view_dir;
-  vec3_t m_up;
-  vec3_t m_right;
+  float yaw;
+  float pitch;
+  float movement_speed;
+  float mouse_sensetivity;
+  vec3_t pos;
+  vec3_t view_dir;
+  vec3_t up;
+  vec3_t right;
 };
 
 /**
