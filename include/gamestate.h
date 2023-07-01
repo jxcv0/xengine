@@ -8,8 +8,7 @@
 #define NUM_COMPONENT_TYPES 63
 #define MAX_NUM_ENTITIES 2048
 #define MAX_NUM_ATTRIBS 63
-#define ENTITY_UNUSED (1LU << NUM_COMPONENT_TYPES)
-#define ENTITY_IN_USE (1LU << NUM_COMPONENT_TYPES)
+#define OBJ_UNUSED (1LU << NUM_COMPONENT_TYPES)
 
 #define MAX_NUM_GEOMETRIES 32
 #define MAX_NUM_MATERIALS 32
@@ -38,7 +37,7 @@ uint64_t create_mask(size_t n, uint64_t *attrib_types);
  * @param oid A pointer to where to store the object id.
  * @return 0 on success -1, on error.
  */
-int create_obj(uint32_t *oid);
+int create_obj(uint32_t *obj);
 
 /**
  * @brief Delete a game object.

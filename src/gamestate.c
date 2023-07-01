@@ -103,21 +103,21 @@ static int buffer_index(uint32_t e, struct index_table *table, size_t *index,
  */
 void init_gamestate(void) {
   for (size_t i = 0; i < MAX_NUM_ENTITIES; i++) {
-    entity_buf[i] = ENTITY_UNUSED;
+    entity_buf[i] = OBJ_UNUSED;
   }
 }
 
 /**
  * ----------------------------------------------------------------------------
  */
-int create_obj(uint32_t *e) {
-  if (e == NULL || num_entities == MAX_NUM_ENTITIES) {
+int create_obj(uint32_t *obj) {
+  if (obj == NULL || num_entities == MAX_NUM_ENTITIES) {
     return -1;
   }
 
   for (size_t i = 0; i < MAX_NUM_ENTITIES; i++) {
-    if (entity_buf[i] & ENTITY_UNUSED) {
-      *e = i;
+    if (entity_buf[i] & OBJ_UNUSED) {
+      *obj = i;
       entity_buf[i] = 0;
       ++num_entities;
       return 0;
@@ -136,7 +136,7 @@ void delete_obj(uint32_t e) {
       remove_attrib(e, i);
     }
   }
-  entity_buf[e] = ENTITY_UNUSED;
+  entity_buf[e] = OBJ_UNUSED;
   --num_entities;
 }
 
@@ -153,7 +153,7 @@ uint64_t get_attribs(uint32_t e) {
  */
 int add_attrib(uint32_t e, uint64_t type) {
   uint64_t identity = get_attribs(e);
-  if ((identity & ENTITY_UNUSED) != 0) {
+  if ((identity & OBJ_UNUSED) != 0) {
     return -1;
   }
 
@@ -176,7 +176,7 @@ int add_attrib(uint32_t e, uint64_t type) {
  */
 void remove_attrib(uint32_t e, uint64_t type) {
   uint64_t identity = get_attribs(e);
-  if ((identity & ENTITY_UNUSED) != 0) {
+  if ((identity & OBJ_UNUSED) != 0) {
     return;
   }
 

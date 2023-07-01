@@ -10,7 +10,7 @@ int test_static_gamestate(void) {
   int err = 0;
   init_gamestate();
   uint32_t e1;
-  if (get_attribs(0) != ENTITY_UNUSED) {
+  if (get_attribs(0) != OBJ_UNUSED) {
     ++err;
   }
 
@@ -23,7 +23,7 @@ int test_static_gamestate(void) {
   }
 
   delete_obj(e1);
-  if (get_attribs(e1) != ENTITY_UNUSED) {
+  if (get_attribs(e1) != OBJ_UNUSED) {
     ++err;
   }
 
