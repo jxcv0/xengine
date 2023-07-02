@@ -1,4 +1,4 @@
-#define _POSIX_C_SOURCE
+#define _POSIX_C_SOURCE 200112L
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/mman.h>
@@ -7,25 +7,28 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "resrcmgr.h"
+#include "assetmgr.h"
 
 int main(int argc, char **argv) {
 	(void) argc;
 	(void) argv;
 
-	int fd = shm_open(RESRCMGR_SHMPATH, O_CREAT | O_TRUNC | O_RDWR, S_IRWXU | S_IRWXG);
+	int fd = shm_open(ASSETMGR_SHMPATH, O_CREAT | O_TRUNC | O_RDWR,
+										S_IRWXU | S_IRWXG);
+
 	if (fd == -1) {
 		perror("shm_open");
 		exit(EXIT_FAILURE);
 	}
 
-	if (ftruncate(fd, sizeof(struct reqshmbuf)) == -1) {
+	if (ftruncate(fd, sizeof(struct assetmgr_shm)) == -1) {
 		perror("mmap");
 		exit(EXIT_FAILURE);
 	}
 
-	struct reqshmbuf *shm = mmap(NULL, sizeof(struct reqshmbuf),
-															 PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	struct assetmgr_shm *shm = mmap(NULL, sizeof(*shm),
+												 PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+
 	if (shm == MAP_FAILED) {
 		perror("mmap");
 		exit(EXIT_FAILURE);
@@ -46,6 +49,6 @@ int main(int argc, char **argv) {
 		printf("Destination address: %p\n", shm->dest);
 	}
 
-	shm_unlink(RESRCMGR_SHMPATH);
+	shm_unlink(ASSETMGR_SHMPATH);
 	return 0;
 }
