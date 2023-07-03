@@ -5,6 +5,7 @@
 
 #define ASSETMGR_SHMPATH "/resrcmgr"
 #define MAX_FILENAME_LEN 32
+#define MAX_NUM_REQUESTS 8
 
 #ifdef __cplusplus
 extern "C" {
@@ -16,13 +17,24 @@ extern "C" {
  */
 enum asset_type { asset_type_MESH, asset_type_MATERIAL };
 
+enum assetreq_status {
+  assetreq_status_WAITING,
+  asetreq_status_READY,
+  asssetreq_status_ERROR
+};
+
+struct assetreq {
+  sem_t sem;
+  char filepath[MAX_FILENAME_LEN];
+  int status;
+};
+
 /**
  * @brief The shared memory structure used to request assets.
  */
 struct assetmgr_shm {
   sem_t sem;
-  char filepath[MAX_FILENAME_LEN];
-  void *dest;
+  struct assetreq requests[MAX_NUM_REQUESTS];
 };
 
 /**
@@ -37,7 +49,7 @@ struct assetmgr_shm *create_assetmgr_shm(void);
  * @brief Get the type of an asset based on a file extension.
  *
  * @param filepath The filepath to extract the asset type from
- * @return int The type of the asset with the filepath.
+ * @return The type of the asset with the filepath.
  */
 int asset_type(const char *filepath);
 
