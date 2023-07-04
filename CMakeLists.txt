@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 project(xengine)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ggdb -Wall -Werror -Wextra -Wpedantic")
+set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -Wpedantic")
 
 include(FetchContent)
 FetchContent_Declare(

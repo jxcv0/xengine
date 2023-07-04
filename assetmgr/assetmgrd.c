@@ -23,22 +23,7 @@ int main(int argc, char **argv) {
   struct assetmgr_shm *shm = init_assetmgr_shm();
 
   while (1) {
-    if (sem_wait(&shm->sem) == -1) {
-      handle_error("sem_wait");
-    }
-
-    // this semaphore is only waited on by this process so we will always get
-    // the value.
-    int nwaiting;
-    if (sem_getvalue(&shm->sem, &nwaiting) == -1) {
-      handle_error("sem_getvalue");
-    }
-
-    for (int i = 0; i < nwaiting; i++) {
-      if (shm->requests[i].status == assetreq_status_WAITING) {
-
-      }
-    }
+    assetmgrd_process_requests(shm);
   }
 
   shm_unlink(ASSETMGR_SHMPATH);

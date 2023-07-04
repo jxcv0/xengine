@@ -29,11 +29,12 @@ struct assetmgr_shm *init_assetmgr_shm(void) {
       shm_open(ASSETMGR_SHMPATH, O_CREAT | O_EXCL | O_RDWR, S_IRWXU | S_IRWXG);
 
   if (fd == -1) {
-    shm_unlink(ASSETMGR_SHMPATH);
+    perror("shm_open");
     return NULL;
   }
 
   if (ftruncate(fd, sizeof(struct assetmgr_shm)) == -1) {
+    perror("ftruncate");
     shm_unlink(ASSETMGR_SHMPATH);
     return NULL;
   }
@@ -42,11 +43,20 @@ struct assetmgr_shm *init_assetmgr_shm(void) {
       mmap(NULL, sizeof(*shm), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 
   if (shm == MAP_FAILED) {
+    perror("mmap");
     shm_unlink(ASSETMGR_SHMPATH);
     return NULL;
   }
 
-  if (sem_init(&shm->sem, 1, 0) == -1) {
+  if (sem_init(&shm->mgrsem, 1, 0) == -1) {
+    perror("sem_init");
+    munmap(shm, sizeof(*shm));
+    shm_unlink(ASSETMGR_SHMPATH);
+    return NULL;
+  }
+
+  if (sem_init(&shm->reqsem, 1, 1) == -1) {
+    perror("sem_init");
     munmap(shm, sizeof(*shm));
     shm_unlink(ASSETMGR_SHMPATH);
     return NULL;
@@ -56,34 +66,25 @@ struct assetmgr_shm *init_assetmgr_shm(void) {
 }
 
 int register_asset(struct assetmgr_shm *shm, const char *filepath) {
-  // TODO
+  // TODO - How should we store assets
+  return -1;
 }
 
 int load_assets(struct assetmgr_shm *shm, int nassets, int *ids) {
   // TODO
+  return -1;
 }
 
 int unload_assets(struct assetmgr_shm *shm, int nassets, int *ids) {
   // TODO
+  return -1;
 }
 
 int assetmgrd_process_requests(struct assetmgr_shm *shm) {
-    if (sem_wait(&shm->sem) == -1) {
-      return -1;
-    }
-
-    int nwaiting;
-    if (sem_getvalue(&shm->sem, &nwaiting) == -1) {
-      return -1;
-    }
-
-    for (int i = 0; i < nwaiting; i++) {
-      if (shm->requests[i].status == assetreq_status_WAITING) {
-        // TODO
-      }
-    }
+  if (sem_wait(&shm->mgrsem) == -1) {
+    return -1;
+  }
 }
-
 
 int asset_type(const char *path) {
   char *ext = strrchr(path, '.');
