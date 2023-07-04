@@ -24,7 +24,6 @@ enum assetreq_status {
 };
 
 struct assetreq {
-  sem_t sem;
   char filepath[MAX_FILENAME_LEN];
   int status;
 };
@@ -43,7 +42,14 @@ struct assetmgr_shm {
  *
  * @return A pointer to the shared assetmgr_shm structure.
  */
-struct assetmgr_shm *create_assetmgr_shm(void);
+struct assetmgr_shm *mmap_assetmgr_shm(void);
+
+/**
+ * @brief Initialize the assetmgr shared memory. This should only be called by the assetmgr process.
+ * 
+ * @return A pointer to the initialized shared memory. Or NULL on error.
+ */
+struct assetmgr_shm *init_assetmgr_shm(void);
 
 /**
  * @brief Get the type of an asset based on a file extension.

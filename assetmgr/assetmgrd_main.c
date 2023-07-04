@@ -27,33 +27,7 @@ int main(int argc, char **argv) {
   (void)argc;
   (void)argv;
 
-  int fd =
-      shm_open(ASSETMGR_SHMPATH, O_CREAT | O_EXCL | O_RDWR, S_IRWXU | S_IRWXG);
-
-  if (fd == -1) {
-    handle_error("shm_open");
-  }
-
-  if (ftruncate(fd, sizeof(struct assetmgr_shm)) == -1) {
-    handle_error("ftruncate");
-  }
-
-  struct assetmgr_shm *shm =
-      mmap(NULL, sizeof(*shm), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-
-  if (shm == MAP_FAILED) {
-    handle_error("mmap");
-  }
-
-  if (sem_init(&shm->sem, 1, 0) == -1) {
-    handle_error("sem_init");
-  }
-
-  for (int i = 0; i < MAX_NUM_REQUESTS; i++) {
-    if (sem_init(&shm->requests[i].sem, 1, 0) == -1) {
-      handle_error("sem_init");
-    }
-  }
+  struct assetmgr_shm *shm = init_assetmgr_shm();
 
   while (1) {
     if (sem_wait(&shm->sem) == -1) {
@@ -68,13 +42,8 @@ int main(int argc, char **argv) {
     }
 
     for (int i = 0; i < nwaiting; i++) {
-      int val;
-      if (sem_getvalue(&shm->requests[i].sem, &val) == -1) {
-        handle_error("sem_getvalue");
-      }
+      if (shm->requests[i].status == assetreq_status_WAITING) {
 
-      // this request is waiting.
-      if (val == 0) {
       }
     }
   }

@@ -1,3 +1,7 @@
 add_executable(assetmgr_tests assetmgr_tests.cpp)
 target_link_libraries(assetmgr_tests gtest_main assetmgr)
 add_test(NAME assetmgr_tests COMMAND assetmgr_tests)
+
+add_executable(assetmgrd_tests assetmgrd_tests.cpp)
+target_link_libraries(assetmgrd_tests gtest_main assetmgr)
+add_test(NAME assetmgrd_tests COMMAND assetmgrd_tests)

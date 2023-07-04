@@ -2,14 +2,14 @@ cmake_minimum_required(VERSION 3.16)
 project(assetmgr)
 
 set(SOURCES
-	src/assetmgr.c
+	assetmgr.c
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
-target_include_directories(${PROJECT_NAME} PUBLIC include)
-target_link_libraries(${PROJECT_NAME} PRIVATE pthread)
+target_include_directories(${PROJECT_NAME} PUBLIC .)
+target_link_libraries(${PROJECT_NAME} PRIVATE pthread rt)
 
-add_executable(assetmgr-d src/assetmgr-main.c)
-target_link_libraries(assetmgr-d ${PROJECT_NAME})
+add_executable(assetmgrd assetmgrd_main.c)
+target_link_libraries(assetmgrd ${PROJECT_NAME} rt)
 
 add_subdirectory(test)
