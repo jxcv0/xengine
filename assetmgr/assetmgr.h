@@ -51,6 +51,13 @@ struct assetmgr_shm *mmap_assetmgr_shm(void);
  */
 struct assetmgr_shm *init_assetmgr_shm(void);
 
+int register_asset(struct assetmgr_shm *shm, const char *filepath);
+
+int load_assets(struct assetmgr_shm *shm, int nassets, int *ids);
+int unload_assets(struct assetmgr_shm *shm, int nassets, int *ids);
+
+int assetmgrd_process_requests(struct assetmgr_shm *shm);
+
 /**
  * @brief Get the type of an asset based on a file extension.
  *

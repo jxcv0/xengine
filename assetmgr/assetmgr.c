@@ -47,13 +47,43 @@ struct assetmgr_shm *init_assetmgr_shm(void) {
   }
 
   if (sem_init(&shm->sem, 1, 0) == -1) {
-    shm_unlink(ASSETMGR_SHMPATH);
     munmap(shm, sizeof(*shm));
+    shm_unlink(ASSETMGR_SHMPATH);
     return NULL;
   }
 
   return shm;
 }
+
+int register_asset(struct assetmgr_shm *shm, const char *filepath) {
+  // TODO
+}
+
+int load_assets(struct assetmgr_shm *shm, int nassets, int *ids) {
+  // TODO
+}
+
+int unload_assets(struct assetmgr_shm *shm, int nassets, int *ids) {
+  // TODO
+}
+
+int assetmgrd_process_requests(struct assetmgr_shm *shm) {
+    if (sem_wait(&shm->sem) == -1) {
+      return -1;
+    }
+
+    int nwaiting;
+    if (sem_getvalue(&shm->sem, &nwaiting) == -1) {
+      return -1;
+    }
+
+    for (int i = 0; i < nwaiting; i++) {
+      if (shm->requests[i].status == assetreq_status_WAITING) {
+        // TODO
+      }
+    }
+}
+
 
 int asset_type(const char *path) {
   char *ext = strrchr(path, '.');
