@@ -5,14 +5,16 @@
 extern "C" {
 #endif
 
-struct mesh {
+struct mesh
+{
   float *vertices;
   unsigned int *indices;
   unsigned int nvertices;
   unsigned int nindices;
 };
 
-struct texture {
+struct texture
+{
   unsigned char *img;
 };
 
@@ -20,4 +22,4 @@ struct texture {
 }
 #endif
 
-#endif  // ASSET_TYPES_H_
+#endif // ASSET_TYPES_H_
