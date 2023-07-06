@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "assetmgr.h"
+#include "assets.h"
 
 TEST(assetmgr_tests, asset_type) {
   ASSERT_EQ(asset_type("some_mtl_file.mtl"), asset_type_MATERIAL);

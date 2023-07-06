@@ -14,5 +14,5 @@ FetchContent_MakeAvailable(googletest)
 
 include(CTest)
 
-add_subdirectory(assetmgr)
+add_subdirectory(assets)
 add_subdirectory(lib)

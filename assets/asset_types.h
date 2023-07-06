@@ -15,6 +15,16 @@ struct mesh
 
 struct texture
 {
+  union
+  {
+    struct
+    {
+      int width;
+      int height;
+      int nchannels;
+    };
+    int whn[3];
+  };
   unsigned char *img;
 };
 
