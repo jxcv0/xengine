@@ -5,6 +5,13 @@
 extern "C" {
 #endif
 
+enum asset_type
+{
+  asset_type_MESH,
+  asset_type_TEXTURE
+};
+
+/* */
 struct mesh
 {
   float *vertices;
@@ -13,19 +20,20 @@ struct mesh
   unsigned int nindices;
 };
 
+/* An image texture */
 struct texture
 {
   union
   {
+    int whn[3];
     struct
     {
       int width;
       int height;
       int nchannels;
-    };
-    int whn[3];
+    } sizeinfo;
   };
-  unsigned char *img;
+  unsigned char *data;
 };
 
 #ifdef __cplusplus
