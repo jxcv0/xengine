@@ -1,5 +1,11 @@
 #include "assets.h"
 
+#include "stb_image.h"
+#include <assert.h>
+#include <assimp/cimport.h>
+#include <assimp/mesh.h>
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
 #include <string.h>
 
 int
@@ -22,4 +28,54 @@ asset_type (const char *path)
     }
 
   return -1;
+}
+
+struct texture *
+load_texture (const char *filepath, allocator alloc_tex)
+{
+  struct texture *tex = alloc_tex (sizeof (*tex));
+  tex->data = stbi_load (filepath, &tex->sizeinfo.width, &tex->sizeinfo.height,
+                         &tex->sizeinfo.nchannels, 0);
+  if (tex->data == NULL)
+    {
+      return NULL;
+    }
+  return 0;
+}
+
+static void
+process_aiNode (struct model *model, const struct aiNode *node,
+                const struct aiScene *scene, allocator alloc_mesh)
+{
+  struct mesh *meshes = alloc_mesh (sizeof (*meshes) * node->mNumMeshes);
+  for (unsigned int i = 0; i < node->mNumMeshes; i++)
+    {
+      struct aiMesh *m = scene->mMeshes[node->mMeshes[i]];
+      (void) m;
+    }
+  model->meshes = meshes;
+  model->nmeshes = node->mNumMeshes;
+}
+
+struct model
+load_model_assimp (const char *filepath, allocator alloc_mesh)
+{
+  struct model model;
+  const struct aiScene *scene
+      = aiImportFile (filepath, aiProcess_GenSmoothNormals | aiProcess_FlipUVs
+                                    | aiProcess_CalcTangentSpace);
+
+  if (scene != NULL)
+    {
+      process_aiNode (&model, scene->mRootNode, scene, alloc_mesh);
+    }
+
+  aiReleaseImport (scene);
+  return model;
+}
+
+struct model
+load_meshes (const char *filepath, allocator alloc_mesh)
+{
+  return load_model_assimp (filepath, alloc_mesh);
 }

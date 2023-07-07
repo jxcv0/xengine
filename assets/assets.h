@@ -1,18 +1,24 @@
 #ifndef ASSETMGR_H_
 #define ASSETMGR_H_
 
-#include <semaphore.h>
 #include "asset_types.h"
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-enum req_type
+typedef void *(*allocator) (size_t);
+
+struct asset
 {
-  req_type_REGISTER,
-  req_type_LOAD,
-  req_type_UNLOAD
+  union
+  {
+    struct mesh as_mesh;
+    struct texture as_texture;
+  } data;
+  unsigned int refcount;
+  char filepath[32];
 };
 
 /**
@@ -22,6 +28,13 @@ enum req_type
  * @return The type of the asset with the filepath.
  */
 int asset_type (const char *filepath);
+
+struct texture *load_texture (const char *filepath, allocator alloc_tex);
+
+struct model load_meshes (const char *filepath, allocator alloc_mesh);
+
+struct font *load_font (struct font *font, const char *filepath,
+                        allocator alloc_font);
 
 #ifdef __cplusplus
 }

@@ -1,2 +1,2 @@
-add_library(stb STATIC src/stb_image.c src/stb_truetype.c)
-target_include_directories(stb PUBLIC include)
+add_library(stb STATIC stb_image.c stb_truetype.c)
+target_include_directories(stb PUBLIC .)
