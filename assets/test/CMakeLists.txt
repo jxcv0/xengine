@@ -1,3 +1,7 @@
 add_executable(assets_tests assets_tests.cpp)
 target_link_libraries(assets_tests gtest_main assets)
 add_test(NAME assets_tests COMMAND assets_tests)
+
+add_executable(vertex_alloc_tests vertex_alloc_tests.cpp)
+target_link_libraries(vertex_alloc_tests gtest_main assets)
+add_test(NAME vertex_alloc_tests COMMAND vertex_alloc_tests)

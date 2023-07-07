@@ -44,17 +44,28 @@ load_texture (const char *filepath, allocator alloc_tex)
 }
 
 static void
+process_aiMesh (struct model *model, struct aiMesh *aimesh)
+{
+}
+
+static void
 process_aiNode (struct model *model, const struct aiNode *node,
                 const struct aiScene *scene, allocator alloc_mesh)
 {
-  struct mesh *meshes = alloc_mesh (sizeof (*meshes) * node->mNumMeshes);
+  /*
   for (unsigned int i = 0; i < node->mNumMeshes; i++)
     {
-      struct aiMesh *m = scene->mMeshes[node->mMeshes[i]];
-      (void) m;
+      process_aiMesh (meshes[i], scene->mMeshes[node->mMeshes[i]]);
     }
+
+  for (unsigned int i = 0; i < node->mNumChildren; i++)
+    {
+      process_aiNode
+    }
+
   model->meshes = meshes;
   model->nmeshes = node->mNumMeshes;
+  */
 }
 
 struct model
