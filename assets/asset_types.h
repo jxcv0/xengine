@@ -1,6 +1,8 @@
 #ifndef ASSET_TYPES_H_
 #define ASSET_TYPES_H_
 
+#define MAX_NUM_MESHES_PER_MODEL 6
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -28,6 +30,12 @@ struct mesh
   unsigned int *indices;
   unsigned int nvertices;
   unsigned int nindices;
+};
+
+struct model
+{
+  int meshes[MAX_NUM_MESHES_PER_MODEL];
+  unsigned int nmeshes;
 };
 
 /* An image texture */
