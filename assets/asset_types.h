@@ -23,6 +23,7 @@ struct vertex
 
 struct mesh
 {
+  int model_id;
   struct vertex *vertices;
   unsigned int *indices;
   unsigned int nvertices;

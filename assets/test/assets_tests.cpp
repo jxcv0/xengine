@@ -11,7 +11,6 @@ TEST (assets_tests, asset_type)
 
 TEST (assets_tests, load_texture)
 {
-  /* relative path from repo root */
   struct texture tex = load_texture ("testassets/textures/default_diffuse.png");
   ASSERT_NE (tex.data, nullptr);
   ASSERT_EQ (tex.sizeinfo.width, 2048);
