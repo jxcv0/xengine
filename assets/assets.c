@@ -8,6 +8,64 @@
 #include <assimp/scene.h>
 #include <string.h>
 
+struct mesh_allocator
+create_mesh_allocator (int bufsize)
+{
+  struct mesh_allocator alloc
+      = { .buf = malloc (bufsize * sizeof (*alloc.buf)),
+          .free = malloc (bufsize * sizeof (*alloc.free)),
+          .bufsize = bufsize,
+          .nmeshes = 0,
+          .nfree = bufsize};
+
+  sem_init (&alloc.sem, 0, 1);
+  for (int i = 0; i < bufsize; i++)
+    {
+      alloc.free[i] = i;
+    }
+  return alloc;
+}
+
+int
+alloc_mesh (struct mesh_allocator *alloc)
+{
+  if (sem_wait (&alloc->sem) == -1)
+    {
+      return -1;
+    }
+
+  if (alloc->nmeshes == alloc->bufsize)
+    {
+      sem_post (&alloc->sem);
+      return -1;
+    }
+
+  int index = alloc->free[--alloc->nfree];
+  ++alloc->nmeshes;
+  sem_post (&alloc->sem);
+  return index;
+}
+
+int
+free_mesh (struct mesh_allocator *alloc, int index)
+{
+  if (sem_wait (&alloc->sem) == -1)
+    {
+      return -1;
+    }
+
+  if (alloc->nmeshes == 0)
+    {
+      sem_post (&alloc->sem);
+      return -1;
+    }
+
+  alloc->free[alloc->nfree++] = index;
+  --alloc->nmeshes;
+  sem_post (&alloc->sem);
+  return 0;
+}
+
 int
 asset_type (const char *path)
 {
@@ -30,19 +88,16 @@ asset_type (const char *path)
   return -1;
 }
 
-struct texture *
-load_texture (const char *filepath, allocator alloc_tex)
+struct texture
+load_texture (const char *filepath)
 {
-  struct texture *tex = alloc_tex (sizeof (*tex));
-  tex->data = stbi_load (filepath, &tex->sizeinfo.width, &tex->sizeinfo.height,
-                         &tex->sizeinfo.nchannels, 0);
-  if (tex->data == NULL)
-    {
-      return NULL;
-    }
-  return 0;
+  struct texture tex;
+  tex.data = stbi_load (filepath, &tex.sizeinfo.width, &tex.sizeinfo.height,
+                        &tex.sizeinfo.nchannels, 0);
+  return tex;
 }
 
+/*
 static void
 process_aiMesh (struct model *model, struct aiMesh *aimesh)
 {
@@ -52,7 +107,6 @@ static void
 process_aiNode (struct model *model, const struct aiNode *node,
                 const struct aiScene *scene, allocator alloc_mesh)
 {
-  /*
   for (unsigned int i = 0; i < node->mNumMeshes; i++)
     {
       process_aiMesh (meshes[i], scene->mMeshes[node->mMeshes[i]]);
@@ -65,13 +119,11 @@ process_aiNode (struct model *model, const struct aiNode *node,
 
   model->meshes = meshes;
   model->nmeshes = node->mNumMeshes;
-  */
 }
 
 struct model
 load_model_assimp (const char *filepath, allocator alloc_mesh)
 {
-  struct model model;
   const struct aiScene *scene
       = aiImportFile (filepath, aiProcess_GenSmoothNormals | aiProcess_FlipUVs
                                     | aiProcess_CalcTangentSpace);
@@ -90,3 +142,4 @@ load_meshes (const char *filepath, allocator alloc_mesh)
 {
   return load_model_assimp (filepath, alloc_mesh);
 }
+*/

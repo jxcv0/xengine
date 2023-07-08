@@ -5,26 +5,6 @@
 extern "C" {
 #endif
 
-/*
-struct vertex *vertex_buf;
-unsigned int vertex_buf_size;
-
-unsigned int *index_buf;
-unsigned int index_buf_size;
-
-struct mesh
-{
-  unsigned int start;
-  unsigned int count;
-};
-
-struct model
-{
-  struct mesh meshes[MAX_NUM_MESHES_PER_MODEL];
-  unsigned int num_meshes;
-}
-*/
-
 enum asset_type
 {
   asset_type_MESH,
@@ -41,19 +21,12 @@ struct vertex
   float bitangent[3];
 };
 
-/* */
 struct mesh
 {
   struct vertex *vertices;
   unsigned int *indices;
   unsigned int nvertices;
   unsigned int nindices;
-};
-
-struct model
-{
-  struct mesh *meshes;
-  unsigned int nmeshes;
 };
 
 /* An image texture */
@@ -76,6 +49,7 @@ struct font
 {
   int placeholder;
 };
+
 #ifdef __cplusplus
 }
 #endif

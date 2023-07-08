@@ -3,7 +3,6 @@ project(assets)
 
 set(SOURCES
 	assets.c
-	vertex_alloc.c
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
