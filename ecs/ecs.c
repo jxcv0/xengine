@@ -32,7 +32,7 @@ create_component_array (struct ecs *ecs, size_t size, size_t nmemb)
 }
 
 int
-assign_component (struct ecs *ecs, eid_t entity, cid_t component)
+map_component (struct ecs *ecs, eid_t entity, cid_t component)
 {
   struct component_array *array = &ecs->arrays[component];
   if (array->num_components * array->stride == array->bufsize)
@@ -62,7 +62,7 @@ int get_last (struct offset_map *map, struct component_array *arr)
 }
 
 void
-unassign_component (struct ecs *ecs, eid_t entity, cid_t component)
+unmap_component (struct ecs *ecs, eid_t entity, cid_t component)
 {
   /* TODO: Is this the best way of doing this? */
   struct component_array *array = &ecs->arrays[component];
@@ -78,7 +78,7 @@ unassign_component (struct ecs *ecs, eid_t entity, cid_t component)
           last_mapping.offset = buffer_offset_to_delete;
           array->map[i] = last_mapping;
           --array->num_components;
-          unassign_component (ecs, entity, component);
+          unmap_component (ecs, entity, component);
         }
     }
 }
