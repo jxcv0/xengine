@@ -43,6 +43,40 @@ assign_component (struct ecs *ecs, eid_t entity, cid_t component)
   array->map[array->num_components].entity = entity;
   array->map[array->num_components].offset
       = array->num_components * array->stride;
-  ++array->num_components;
+  array->num_components++;
   return 0;
+}
+
+int get_last (struct offset_map *map, struct component_array *arr)
+{
+  size_t last_offset = (arr->num_components - 1) * arr->stride;
+  for (size_t i = 0; i < arr->num_components; i++)
+    {
+      if (arr->map[i].offset == last_offset)
+        {
+          *map = arr->map[i];
+          return 0;
+        }
+    }
+  return -1;
+}
+
+void
+unassign_component (struct ecs *ecs, eid_t entity, cid_t component)
+{
+  struct component_array *array = &ecs->arrays[component];
+  for (size_t i = 0; i < array->num_components; i++)
+    {
+      if (array->map[i].entity == entity)
+        {
+          size_t buffer_offset_to_delete = array->map[i].offset;
+          struct offset_map last_mapping;
+          assert (get_last (&last_mapping, array) == 0);
+          memcpy (array->buf + buffer_offset_to_delete,
+                  array->buf + last_mapping.offset, array->stride);
+          last_mapping.offset = buffer_offset_to_delete;
+          array->map[i] = last_mapping;
+          --array->num_components;
+        }
+    }
 }
