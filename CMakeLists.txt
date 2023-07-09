@@ -3,6 +3,7 @@ project(xengine)
 
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -Wpedantic")
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 include(FetchContent)
 FetchContent_Declare(

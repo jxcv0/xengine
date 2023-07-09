@@ -12,12 +12,11 @@ struct mesh_allocator
 create_mesh_allocator (int bufsize)
 {
   void *mem = malloc (bufsize * sizeof (struct mesh) + bufsize * sizeof (int));
-  struct mesh_allocator alloc
-      = { .buf = mem,
-          .free = mem + (bufsize * sizeof (int)),
-          .bufsize = bufsize,
-          .nmeshes = 0,
-          .nfree = bufsize };
+  struct mesh_allocator alloc = { .buf = mem,
+                                  .free = mem + (bufsize * sizeof (int)),
+                                  .bufsize = bufsize,
+                                  .nmeshes = 0,
+                                  .nfree = bufsize };
   sem_init (&alloc.sem, 0, 1);
   for (int i = 0; i < bufsize; i++)
     {
