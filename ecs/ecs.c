@@ -64,19 +64,21 @@ int get_last (struct offset_map *map, struct component_array *arr)
 void
 unassign_component (struct ecs *ecs, eid_t entity, cid_t component)
 {
+  /* TODO: Is this the best way of doing this? */
   struct component_array *array = &ecs->arrays[component];
   for (size_t i = 0; i < array->num_components; i++)
     {
       if (array->map[i].entity == entity)
         {
-          size_t buffer_offset_to_delete = array->map[i].offset;
           struct offset_map last_mapping;
           assert (get_last (&last_mapping, array) == 0);
+          size_t buffer_offset_to_delete = array->map[i].offset;
           memcpy (array->buf + buffer_offset_to_delete,
                   array->buf + last_mapping.offset, array->stride);
           last_mapping.offset = buffer_offset_to_delete;
           array->map[i] = last_mapping;
           --array->num_components;
+          unassign_component (ecs, entity, component);
         }
     }
 }

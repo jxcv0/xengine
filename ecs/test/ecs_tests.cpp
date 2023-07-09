@@ -84,13 +84,27 @@ TEST (ecs_tests, unassign_component)
 
   unassign_component(&ecs, e2, new_array);
   ASSERT_EQ (ecs.arrays[new_array].num_components, 2);
-  ASSERT_EQ (ecs.arrays[new_array].map[1].entity, e3);
+
   /* e3 should now be mapped to the offset e2 used to have */
+  ASSERT_EQ (ecs.arrays[new_array].map[1].entity, e3);
   ASSERT_EQ (ecs.arrays[new_array].map[1].offset, sizeof (struct some_component));
 
   ASSERT_EQ (assign_component (&ecs, e2, new_array), 0);
   ASSERT_EQ (ecs.arrays[new_array].num_components, 3);
-  ASSERT_EQ (ecs.arrays[new_array].map[2].entity, e2);
+
   /* e2 should be mapped to the last position */
+  ASSERT_EQ (ecs.arrays[new_array].map[2].entity, e2);
   ASSERT_EQ (ecs.arrays[new_array].map[2].offset, sizeof (struct some_component) * 2);
+
+  ASSERT_EQ (assign_component (&ecs, e1, new_array), 0);
+  ASSERT_EQ (ecs.arrays[new_array].num_components, 4);
+  ASSERT_EQ (ecs.arrays[new_array].map[3].entity, e1);
+  ASSERT_EQ (ecs.arrays[new_array].map[3].offset, sizeof (struct some_component) * 3);
+
+  unassign_component (&ecs, e1, new_array);
+  ASSERT_EQ (ecs.arrays[new_array].num_components, 2);
+
+  ASSERT_EQ (ecs.arrays[new_array].map[0].entity, e2);
+  /* e2 gets mapped into the first position of e1's components */
+  ASSERT_EQ (ecs.arrays[new_array].map[0].offset, 0);
 }
