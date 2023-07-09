@@ -46,7 +46,11 @@ cid_t create_component_array (struct ecs *ecs, size_t size, size_t nmemb);
  * is it better to be able to assign more that one? */
 int map_component (struct ecs *ecs, eid_t entity, cid_t component);
 
+/* Unmap all components from an entity */
 void unmap_component (struct ecs *ecs, eid_t entity, cid_t component);
+
+/* Get a component by it's entity */
+void *get_component (struct ecs *ecs, eid_t entity, cid_t component);
 
 #ifdef __cplusplus
 } /* end of extern "C" */

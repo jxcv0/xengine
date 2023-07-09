@@ -47,7 +47,8 @@ map_component (struct ecs *ecs, eid_t entity, cid_t component)
   return 0;
 }
 
-int get_last (struct offset_map *map, struct component_array *arr)
+int
+get_last (struct offset_map *map, struct component_array *arr)
 {
   size_t last_offset = (arr->num_components - 1) * arr->stride;
   for (size_t i = 0; i < arr->num_components; i++)
@@ -81,4 +82,18 @@ unmap_component (struct ecs *ecs, eid_t entity, cid_t component)
           unmap_component (ecs, entity, component);
         }
     }
+}
+
+void *
+get_component (struct ecs *ecs, eid_t entity, cid_t component)
+{
+  struct component_array *array = &ecs->arrays[component];
+  for (size_t i = 0; i < array->num_components; i++)
+    {
+      if (array->map[i].entity == entity)
+        {
+          return array->buf + array->map[i].offset;
+        }
+    }
+  return NULL;
 }
