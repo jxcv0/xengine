@@ -135,3 +135,30 @@ has_component (struct ecs *ecs, eid_t entity, cid_t component)
   const uint64_t shift = component % (sizeof (*bitset->sets) * 8);
   return bitset->sets[set] & (1LU << shift);
 }
+
+int
+has_components (struct ecs *ecs, eid_t entity, size_t num_components, cid_t *components)
+{
+  for (size_t i = 0; i < num_components; i++)
+    {
+      if (!has_component (ecs, entity, i))
+        {
+          return 0;
+        }
+    }
+  return 1;
+}
+
+size_t
+num_entities(struct ecs *ecs, size_t num_components, cid_t *components)
+{
+  size_t num = 0;
+  for (size_t i = 0; i < ecs->num_entities; i++)
+    {
+      if (has_components (ecs, i, num_components, components))
+        {
+          ++num;
+        }
+    }
+  return num;
+}

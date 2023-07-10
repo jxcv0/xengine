@@ -148,3 +148,17 @@ TEST (ecs_tests, unmap_component)
   /* e2 gets mapped into the first position of e1's components */
   ASSERT_EQ (ecs.arrays[arr].map[0].offset, 0);
 }
+
+TEST (ecs_tests, num_components)
+{
+  struct ecs ecs;
+  memset (&ecs, 0, sizeof (ecs));
+  cid_t c1 = create_component_array (&ecs, sizeof (struct some_component), 10);
+  cid_t c2 = create_component_array (&ecs, sizeof (struct some_component), 5);
+  cid_t c3 = create_component_array (&ecs, sizeof (struct some_component), 5);
+
+  eid_t e1 = create_entity (&ecs);
+  eid_t e2 = create_entity (&ecs);
+  eid_t e3 = create_entity (&ecs);
+}
+

@@ -56,8 +56,7 @@ void set_bitset(struct component_bitset *bitset, cid_t component);
 /* Unset the component bit flag for an entity */
 void unset_bitset(struct component_bitset *bitset, cid_t component);
 
-/* Map an entity id to the next available component in a component array TODO:
- * is it better to be able to assign more that one? */
+/* Map an entity id to the next available component in a component array */
 int map_component (struct ecs *ecs, eid_t entity, cid_t component);
 
 /* Unmap all components from an entity */
@@ -68,6 +67,11 @@ void *get_component (struct ecs *ecs, eid_t entity, cid_t component);
 
 /* Check if an entity has a component */
 int has_component (struct ecs *ecs, eid_t entity, cid_t component);
+
+/* TODO test this */
+int has_components (struct ecs *ecs, eid_t entity, size_t num_components, cid_t *components);
+
+size_t num_entities(struct ecs *ecs, size_t num_components, cid_t *components);
 
 #ifdef __cplusplus
 } /* end of extern "C" */
