@@ -149,7 +149,7 @@ TEST (ecs_tests, unmap_component)
   ASSERT_EQ (ecs.arrays[arr].map[0].offset, 0);
 }
 
-TEST (ecs_tests, num_components)
+TEST (ecs_tests, num_entities)
 {
   struct ecs ecs;
   memset (&ecs, 0, sizeof (ecs));
@@ -160,5 +160,23 @@ TEST (ecs_tests, num_components)
   eid_t e1 = create_entity (&ecs);
   eid_t e2 = create_entity (&ecs);
   eid_t e3 = create_entity (&ecs);
+
+  cid_t cids[3] = {c1, c2, c3}; 
+  ASSERT_EQ (has_components (&ecs, e1, 3, cids), 0);
+  ASSERT_EQ (has_components (&ecs, e2, 3, cids), 0);
+  ASSERT_EQ (has_components (&ecs, e3, 3, cids), 0);
+  ASSERT_EQ (num_entities (&ecs, 3, cids), 0);
+
+  map_component (&ecs, e1, c1);
+  ASSERT_EQ (has_components (&ecs, e1, 1, &c1), 1);
+  ASSERT_EQ (has_components (&ecs, e1, 3, cids), 0);
+  ASSERT_EQ (has_components (&ecs, e2, 3, cids), 0);
+  ASSERT_EQ (has_components (&ecs, e3, 3, cids), 0);
+
+  map_component (&ecs, e1, c2);
+  map_component (&ecs, e1, c3);
+  ASSERT_EQ (has_components (&ecs, e1, 3, cids), 1);
+  ASSERT_EQ (has_components (&ecs, e2, 3, cids), 0);
+  ASSERT_EQ (has_components (&ecs, e3, 3, cids), 0);
 }
 
