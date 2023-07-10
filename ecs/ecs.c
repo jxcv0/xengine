@@ -37,25 +37,6 @@ create_component_array (struct ecs *ecs, size_t size, size_t nmemb)
   return ecs->num_component_types++;
 }
 
-int
-map_component (struct ecs *ecs, eid_t entity, cid_t component)
-{
-  struct component_bitset *bitset = &ecs->bitsets[entity];
-  bitset->sets[component / sizeof (*bitset->sets)] |= (1 << component);
-
-  struct component_array *array = &ecs->arrays[component];
-  if (array->num_components * array->stride == array->bufsize)
-    {
-      return -1;
-    }
-
-  array->map[array->num_components].entity = entity;
-  array->map[array->num_components].offset
-      = array->num_components * array->stride;
-  array->num_components++;
-  return 0;
-}
-
 void
 set_bitset(struct component_bitset *bitset, cid_t component)
 {
@@ -70,6 +51,25 @@ unset_bitset(struct component_bitset *bitset, cid_t component)
   const size_t set = component / (sizeof (*bitset->sets) * 8);
   const uint64_t shift = component % (sizeof (*bitset->sets) * 8);
   bitset->sets[set] &= ~(1LU << shift);
+}
+
+int
+map_component (struct ecs *ecs, eid_t entity, cid_t component)
+{
+  struct component_bitset *bitset = &ecs->bitsets[entity];
+  set_bitset(bitset, component);
+
+  struct component_array *array = &ecs->arrays[component];
+  if (array->num_components * array->stride == array->bufsize)
+    {
+      return -1;
+    }
+
+  array->map[array->num_components].entity = entity;
+  array->map[array->num_components].offset
+      = array->num_components * array->stride;
+  array->num_components++;
+  return 0;
 }
 
 static int
@@ -91,8 +91,7 @@ void
 unmap_component (struct ecs *ecs, eid_t entity, cid_t component)
 {
   struct component_bitset *bitset = &ecs->bitsets[entity];
-  const size_t x = sizeof (*bitset->sets) * 8;
-  bitset->sets[component / x] &= ~(1 << component % x);
+  unset_bitset(bitset, component);
 
   /* TODO: Is this the best way of doing this? */
   struct component_array *array = &ecs->arrays[component];
@@ -126,4 +125,13 @@ get_component (struct ecs *ecs, eid_t entity, cid_t component)
         }
     }
   return NULL;
+}
+
+int
+has_component (struct ecs *ecs, eid_t entity, cid_t component)
+{
+  struct component_bitset *bitset = &ecs->bitsets[entity];
+  const size_t set = component / (sizeof (*bitset->sets) * 8);
+  const uint64_t shift = component % (sizeof (*bitset->sets) * 8);
+  return bitset->sets[set] & (1LU << shift);
 }

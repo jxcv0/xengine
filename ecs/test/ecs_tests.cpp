@@ -58,6 +58,7 @@ TEST (ecs_tests, map_component)
   ASSERT_EQ (ecs.arrays[new_array].map[0].entity, e1);
   ASSERT_EQ (ecs.arrays[new_array].map[0].offset, 0);
   ASSERT_EQ (ecs.bitsets[e1].sets[0], 1);
+  ASSERT_EQ (has_component (&ecs, e1, new_array), 1);
 
   eid_t e2 = create_entity (&ecs);
   ASSERT_EQ (map_component (&ecs, e2, new_array), 0);
@@ -65,6 +66,7 @@ TEST (ecs_tests, map_component)
   ASSERT_EQ (ecs.arrays[new_array].map[1].entity, e2);
   ASSERT_EQ (ecs.arrays[new_array].map[1].offset,
              sizeof (struct some_component));
+  ASSERT_EQ (has_component (&ecs, e2, new_array), 1);
 
   eid_t e3 = create_entity (&ecs);
   ASSERT_EQ (map_component (&ecs, e3, new_array), 0);
@@ -72,6 +74,7 @@ TEST (ecs_tests, map_component)
   ASSERT_EQ (ecs.arrays[new_array].map[2].entity, e3);
   ASSERT_EQ (ecs.arrays[new_array].map[2].offset,
              sizeof (struct some_component) * 2);
+  ASSERT_EQ (has_component (&ecs, e3, new_array), 1);
 }
 
 TEST (ecs_tests, unmap_component)
@@ -87,6 +90,7 @@ TEST (ecs_tests, unmap_component)
   ASSERT_EQ (ecs.arrays[arr].map[0].entity, e1);
   ASSERT_EQ (ecs.arrays[arr].map[0].offset, 0);
   ASSERT_EQ (ecs.bitsets[e1].sets[0], 1);
+  ASSERT_EQ (has_component (&ecs, e1, arr), 1);
 
   eid_t e2 = create_entity (&ecs);
   ASSERT_EQ (map_component (&ecs, e2, arr), 0);
@@ -94,6 +98,7 @@ TEST (ecs_tests, unmap_component)
   ASSERT_EQ (ecs.arrays[arr].map[1].entity, e2);
   ASSERT_EQ (ecs.arrays[arr].map[1].offset,
              sizeof (struct some_component));
+  ASSERT_EQ (has_component (&ecs, e2, arr), 1);
 
   eid_t e3 = create_entity (&ecs);
   ASSERT_EQ (map_component (&ecs, e3, arr), 0);
@@ -101,12 +106,14 @@ TEST (ecs_tests, unmap_component)
   ASSERT_EQ (ecs.arrays[arr].map[2].entity, e3);
   ASSERT_EQ (ecs.arrays[arr].map[2].offset,
              sizeof (struct some_component) * 2);
+  ASSERT_EQ (has_component (&ecs, e3, arr), 1);
   auto first_pos
       = static_cast<struct some_component *>(get_component (&ecs, e3, arr));
   first_pos->a = 42;
 
   unmap_component (&ecs, e2, arr);
   ASSERT_EQ (ecs.arrays[arr].num_components, 2);
+  ASSERT_EQ (has_component (&ecs, e2, arr), 0);
 
   /* e3 should now be mapped to the offset e2 used to have */
   ASSERT_EQ (ecs.arrays[arr].map[1].entity, e3);
@@ -135,6 +142,7 @@ TEST (ecs_tests, unmap_component)
   ASSERT_EQ (ecs.arrays[arr].num_components, 2);
   ASSERT_EQ (get_component (&ecs, e1, arr), nullptr);
   ASSERT_EQ (ecs.bitsets[e1].sets[0], 0);
+  ASSERT_EQ (has_component (&ecs, e1, arr), 0);
 
   ASSERT_EQ (ecs.arrays[arr].map[0].entity, e2);
   /* e2 gets mapped into the first position of e1's components */
