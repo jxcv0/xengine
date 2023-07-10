@@ -4,6 +4,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#define MAX_NUM_COMPONENT_TYPES 256
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -14,7 +16,12 @@ typedef uint64_t eid_t;
 /* component id */
 typedef uint64_t cid_t;
 
-struct offset_map
+struct component_bitset
+{
+  uint64_t sets[4];
+};
+
+struct offset_pair
 {
   eid_t entity;
   size_t offset;
@@ -23,7 +30,7 @@ struct offset_map
 struct component_array
 {
   void *buf;
-  struct offset_map *map;
+  struct offset_pair *map;
   size_t num_components;
   size_t bufsize;
   size_t stride;
@@ -34,6 +41,7 @@ struct ecs
   eid_t num_entities;
   struct component_array *arrays;
   size_t num_component_types;
+  struct component_bitset *bitsets;
 };
 
 /* Create a new entity */
@@ -51,6 +59,9 @@ void unmap_component (struct ecs *ecs, eid_t entity, cid_t component);
 
 /* Get a component by it's entity */
 void *get_component (struct ecs *ecs, eid_t entity, cid_t component);
+
+/* Check if an entity has a component */
+int has_component (struct ecs *ecs, eid_t entity, cid_t component);
 
 #ifdef __cplusplus
 } /* end of extern "C" */

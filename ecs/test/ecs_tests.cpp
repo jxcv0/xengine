@@ -34,6 +34,7 @@ TEST (ecs_tests, map_component)
   ASSERT_EQ (ecs.arrays[new_array].num_components, 1);
   ASSERT_EQ (ecs.arrays[new_array].map[0].entity, e1);
   ASSERT_EQ (ecs.arrays[new_array].map[0].offset, 0);
+  ASSERT_EQ (ecs.bitsets[e1].sets[0], 1);
 
   eid_t e2 = create_entity (&ecs);
   ASSERT_EQ (map_component (&ecs, e2, new_array), 0);
@@ -62,6 +63,7 @@ TEST (ecs_tests, unmap_component)
   ASSERT_EQ (ecs.arrays[arr].num_components, 1);
   ASSERT_EQ (ecs.arrays[arr].map[0].entity, e1);
   ASSERT_EQ (ecs.arrays[arr].map[0].offset, 0);
+  ASSERT_EQ (ecs.bitsets[e1].sets[0], 1);
 
   eid_t e2 = create_entity (&ecs);
   ASSERT_EQ (map_component (&ecs, e2, arr), 0);
@@ -104,10 +106,12 @@ TEST (ecs_tests, unmap_component)
   ASSERT_EQ (ecs.arrays[arr].map[3].entity, e1);
   ASSERT_EQ (ecs.arrays[arr].map[3].offset,
              sizeof (struct some_component) * 3);
+  ASSERT_EQ (ecs.bitsets[e1].sets[0], 1);
 
   unmap_component (&ecs, e1, arr);
   ASSERT_EQ (ecs.arrays[arr].num_components, 2);
   ASSERT_EQ (get_component (&ecs, e1, arr), nullptr);
+  ASSERT_EQ (ecs.bitsets[e1].sets[0], 0);
 
   ASSERT_EQ (ecs.arrays[arr].map[0].entity, e2);
   /* e2 gets mapped into the first position of e1's components */
