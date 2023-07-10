@@ -22,6 +22,29 @@ TEST (ecs_tests, create_component_array)
   ASSERT_EQ (ecs.arrays[0].stride, sizeof (struct some_component));
 }
 
+TEST (ecs_tests, set_bitset)
+{
+  struct component_bitset bitset;
+  memset (&bitset, 0, sizeof (bitset));
+  set_bitset (&bitset, 1);
+  ASSERT_EQ (bitset.sets[0], (1 << 1));
+
+  set_bitset (&bitset, 63);
+  ASSERT_EQ (bitset.sets[0], (1LU << 63) + (1LU << 1));
+
+  set_bitset (&bitset, 64);
+  ASSERT_EQ (bitset.sets[1], 1);
+  ASSERT_EQ (bitset.sets[0], (1LU << 63) + (1LU << 1));
+
+  unset_bitset (&bitset, 64);
+  ASSERT_EQ (bitset.sets[1], 0);
+  ASSERT_EQ (bitset.sets[0], (1LU << 63) + (1LU << 1));
+
+  unset_bitset (&bitset, 1);
+  ASSERT_EQ (bitset.sets[1], 0);
+  ASSERT_EQ (bitset.sets[0], (1LU << 63));
+}
+
 TEST (ecs_tests, map_component)
 {
   struct ecs ecs;

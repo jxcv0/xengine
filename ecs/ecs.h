@@ -50,6 +50,12 @@ eid_t create_entity (struct ecs *ecs);
 /* Create a new component array */
 cid_t create_component_array (struct ecs *ecs, size_t size, size_t nmemb);
 
+/* Set set component bit flag */
+void set_bitset(struct component_bitset *bitset, cid_t component);
+
+/* Unset the component bit flag for an entity */
+void unset_bitset(struct component_bitset *bitset, cid_t component);
+
 /* Map an entity id to the next available component in a component array TODO:
  * is it better to be able to assign more that one? */
 int map_component (struct ecs *ecs, eid_t entity, cid_t component);

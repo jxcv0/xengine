@@ -56,7 +56,23 @@ map_component (struct ecs *ecs, eid_t entity, cid_t component)
   return 0;
 }
 
-int
+void
+set_bitset(struct component_bitset *bitset, cid_t component)
+{
+  const size_t set = component / (sizeof (*bitset->sets) * 8);
+  const uint64_t shift = component % (sizeof (*bitset->sets) * 8);
+  bitset->sets[set] |= (1LU << shift);
+}
+
+void
+unset_bitset(struct component_bitset *bitset, cid_t component)
+{
+  const size_t set = component / (sizeof (*bitset->sets) * 8);
+  const uint64_t shift = component % (sizeof (*bitset->sets) * 8);
+  bitset->sets[set] &= ~(1LU << shift);
+}
+
+static int
 get_last (struct offset_pair *map, struct component_array *arr)
 {
   size_t last_offset = (arr->num_components - 1) * arr->stride;
@@ -75,7 +91,8 @@ void
 unmap_component (struct ecs *ecs, eid_t entity, cid_t component)
 {
   struct component_bitset *bitset = &ecs->bitsets[entity];
-  bitset->sets[component / sizeof (*bitset->sets)] &= ~(1 << component);
+  const size_t x = sizeof (*bitset->sets) * 8;
+  bitset->sets[component / x] &= ~(1 << component % x);
 
   /* TODO: Is this the best way of doing this? */
   struct component_array *array = &ecs->arrays[component];
