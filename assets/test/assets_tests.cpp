@@ -1,17 +1,19 @@
 #include <gtest/gtest.h>
 
 #include "assets.h"
+#include <limits.h>
 #include <stdlib.h>
 
 TEST (assets_tests, asset_type)
 {
-  ASSERT_EQ(asset_type("some_mtl_file.tex"), asset_type_TEXTURE);
-	ASSERT_EQ(asset_type("some_mesh_file.mesh"), asset_type_MESH);
+  ASSERT_EQ (asset_type ("some_mtl_file.tex"), asset_type_TEXTURE);
+  ASSERT_EQ (asset_type ("some_mesh_file.mesh"), asset_type_MESH);
 }
 
 TEST (assets_tests, load_texture)
 {
-  struct texture tex = load_texture ("testassets/textures/default_diffuse.png");
+  struct texture tex
+      = load_texture ("/home/jxcv/xengine/testassets/textures/default_diffuse.png");
   ASSERT_NE (tex.data, nullptr);
   ASSERT_EQ (tex.sizeinfo.width, 2048);
   ASSERT_EQ (tex.sizeinfo.height, 2048);
