@@ -1,0 +1,7 @@
+set(SOURCES
+  entity_mgr_tests.cpp
+  )
+
+add_executable(ecs2_tests ${SOURCES})
+target_link_libraries(ecs2_tests gtest_main ecs2)
+add_test(NAME ecs2_tests COMMAND ecs2_tests)
