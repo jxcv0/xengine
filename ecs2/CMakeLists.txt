@@ -5,6 +5,7 @@ set(SOURCES
   entity_mgr.cpp
   entity_mgr.h
   component_array.h
+  ecs.h
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})

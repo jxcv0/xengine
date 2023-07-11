@@ -10,9 +10,11 @@ TEST (component_array_tests, assign_and_remove)
 {
     xen::component_array<position> posarr;
     posarr.assign (10);
+    posarr.assign (11);
     ASSERT_NO_THROW (posarr.get (10));
     posarr.remove (10);
     ASSERT_THROW (posarr.get (10), std::runtime_error);
+    ASSERT_NO_THROW (posarr.get (11));
 }
 
 TEST (component_array_tests, get_and_set_component)
