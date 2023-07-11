@@ -1,7 +1,18 @@
 #include <gtest/gtest.h>
 #include "component_array.h"
 
-TEST (component_array_tests, placeholder)
+struct position
 {
-    ASSERT_TRUE (true);
+    float vec[3];
+};
+
+TEST (component_array_tests, get_and_set_component)
+{
+    xen::component_array<position> posarr;
+    posarr.assign(10);
+    position pos = posarr.get(10);
+    pos.vec[0] = -20.0f;
+    posarr.set(10, pos);
+    position p = posarr.get(10);
+    ASSERT_FLOAT_EQ (p.vec[0], -20.0f);
 }

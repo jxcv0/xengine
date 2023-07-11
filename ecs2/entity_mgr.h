@@ -36,12 +36,7 @@ public:
     try
       {
         auto &v = m_map.at (entity);
-        auto it = std::find (std::execution::par_unseq, v.cbegin (), v.cend (),
-                             typeid (T).hash_code ());
-        if (it != v.cend ())
-          {
-            v.erase (it);
-          }
+        std::remove (v.begin(), v.end(), typeid(T).hash_code());
       }
     catch (const std::exception &e)
       {
