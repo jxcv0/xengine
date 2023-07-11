@@ -36,7 +36,7 @@ public:
     try
       {
         auto &v = m_map.at (entity);
-        std::remove (v.begin(), v.end(), typeid(T).hash_code());
+        std::remove (v.begin (), v.end (), typeid (T).hash_code ());
       }
     catch (const std::exception &e)
       {
@@ -46,7 +46,7 @@ public:
 
   template <typename T>
   bool
-  has_component (std::uint64_t entity)
+  has_component (std::uint64_t entity) const
   {
     try
       {
@@ -64,6 +64,22 @@ public:
         /* TODO: some logging would be nice */
         return false;
       }
+  }
+
+  template <typename... T>
+  bool
+  has_components (std::uint64_t entity) const
+  {
+    return (... && has_component<T> (entity));
+  }
+
+  template <typename... T>
+  std::size_t
+  count_archetype () const
+  {
+    return std::count_if (
+        m_map.begin (), m_map.end (),
+        [this] (const auto &kv) { return has_components<T...>(kv.first); });
   }
 
 private:
