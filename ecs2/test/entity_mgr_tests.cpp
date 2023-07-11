@@ -59,8 +59,21 @@ TEST (entity_mgr_tests, count_archetype)
 {
   xen::entity_mgr mgr;
   std::uint64_t e1 = mgr.create_entity ();
+  std::uint64_t e2 = mgr.create_entity ();
+  //std::uint64_t e3 = mgr.create_entity ();
+
   mgr.add_component<vec3> (e1);
+
   std::size_t res = mgr.count_archetype<vec3> ();
+  ASSERT_EQ (res, 1);
+  res = mgr.count_archetype<vec3, mat4> ();
+  ASSERT_EQ (res, 0);
+  res = mgr.count_archetype<vec3, mat4, position> ();
+  ASSERT_EQ (res, 0);
+
+  mgr.add_component<mat4> (e2);
+
+  res = mgr.count_archetype<vec3> ();
   ASSERT_EQ (res, 1);
   res = mgr.count_archetype<vec3, mat4> ();
   ASSERT_EQ (res, 0);
@@ -75,4 +88,13 @@ TEST (entity_mgr_tests, count_archetype)
   ASSERT_EQ (res, 1);
   res = mgr.count_archetype<vec3, mat4, position> ();
   ASSERT_EQ (res, 0);
+
+  mgr.add_component<position> (e1);
+
+  res = mgr.count_archetype<vec3> ();
+  ASSERT_EQ (res, 1);
+  res = mgr.count_archetype<vec3, mat4> ();
+  ASSERT_EQ (res, 1);
+  res = mgr.count_archetype<vec3, mat4, position> ();
+  ASSERT_EQ (res, 1);
 }

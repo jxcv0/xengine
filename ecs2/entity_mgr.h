@@ -68,7 +68,7 @@ public:
     size_t ntypes = sizeof...(T);
     size_t hascount = 0;
     (
-        [entity, &hascount, this] {
+        [&] {
           if (has_component<T> (entity))
             {
               ++hascount;
