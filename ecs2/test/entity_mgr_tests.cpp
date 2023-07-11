@@ -27,4 +27,6 @@ TEST (entity_mgr_tests, add_remove_components)
     ASSERT_FALSE (mgr.has_component<vec3>(e1));
     mgr.add_component<vec3>(e1);
     ASSERT_TRUE (mgr.has_component<vec3>(e1));
+    mgr.delete_entity (e1);
+    ASSERT_FALSE (mgr.has_component<vec3>(e1));
 }

@@ -13,7 +13,7 @@ xen::entity_mgr::create_entity ()
     {
       new_id = m_counter++;
     }
-  m_map[new_id] = std::vector<std::size_t> ();
+  m_map[new_id].clear ();
   return new_id;
 }
 
