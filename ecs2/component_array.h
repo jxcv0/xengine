@@ -39,7 +39,7 @@ public:
   assign (std::uint64_t entity) override
   {
     /* TODO: entities cannot have multiple entries in the array */
-    component<T> c;
+    component<T> c{};
     c.entity = entity;
     m_arr.push_back (c);
   }
@@ -47,8 +47,10 @@ public:
   void
   remove (std::uint64_t entity) override
   {
-    std::remove_if (m_arr.begin (), m_arr.end (),
-                    [=] (const auto &c) { return c.entity == entity; });
+    m_arr.erase (
+        std::remove_if (m_arr.begin (), m_arr.end (),
+                        [=] (const auto &c) { return c.entity == entity; }),
+        m_arr.end ());
   }
 
   T
