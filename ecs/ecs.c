@@ -38,7 +38,7 @@ create_component_array (struct ecs *ecs, size_t size, size_t nmemb)
 }
 
 void
-set_bitset(struct component_bitset *bitset, cid_t component)
+set_bitset (struct component_bitset *bitset, cid_t component)
 {
   const size_t set = component / (sizeof (*bitset->sets) * 8);
   const uint64_t shift = component % (sizeof (*bitset->sets) * 8);
@@ -46,7 +46,7 @@ set_bitset(struct component_bitset *bitset, cid_t component)
 }
 
 void
-unset_bitset(struct component_bitset *bitset, cid_t component)
+unset_bitset (struct component_bitset *bitset, cid_t component)
 {
   const size_t set = component / (sizeof (*bitset->sets) * 8);
   const uint64_t shift = component % (sizeof (*bitset->sets) * 8);
@@ -57,7 +57,7 @@ int
 map_component (struct ecs *ecs, eid_t entity, cid_t component)
 {
   struct component_bitset *bitset = &ecs->bitsets[entity];
-  set_bitset(bitset, component);
+  set_bitset (bitset, component);
 
   struct component_array *array = &ecs->arrays[component];
   if (array->num_components * array->stride == array->bufsize)
@@ -91,7 +91,7 @@ void
 unmap_component (struct ecs *ecs, eid_t entity, cid_t component)
 {
   struct component_bitset *bitset = &ecs->bitsets[entity];
-  unset_bitset(bitset, component);
+  unset_bitset (bitset, component);
 
   /* TODO: Is this the best way of doing this? */
   struct component_array *array = &ecs->arrays[component];
@@ -137,7 +137,8 @@ has_component (struct ecs *ecs, eid_t entity, cid_t component)
 }
 
 int
-has_components (struct ecs *ecs, eid_t entity, size_t num_components, cid_t *components)
+has_components (struct ecs *ecs, eid_t entity, size_t num_components,
+                cid_t *components)
 {
   for (size_t i = 0; i < num_components; i++)
     {
@@ -150,7 +151,7 @@ has_components (struct ecs *ecs, eid_t entity, size_t num_components, cid_t *com
 }
 
 size_t
-num_entities(struct ecs *ecs, size_t num_components, cid_t *components)
+num_entities (struct ecs *ecs, size_t num_components, cid_t *components)
 {
   size_t num = 0;
   for (size_t i = 0; i < ecs->num_entities; i++)

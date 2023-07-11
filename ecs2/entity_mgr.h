@@ -5,6 +5,8 @@
 #include <cstddef>
 #include <cstdint>
 #include <execution>
+#include <iostream>
+#include <tuple>
 #include <unordered_map>
 #include <vector>
 
@@ -36,7 +38,8 @@ public:
     try
       {
         auto &v = m_map.at (entity);
-        std::remove (v.begin (), v.end (), typeid (T).hash_code ());
+        std::remove (std::execution::par_unseq, v.begin (), v.end (),
+                     typeid (T).hash_code ());
       }
     catch (const std::exception &e)
       {
@@ -48,29 +51,31 @@ public:
   bool
   has_component (std::uint64_t entity) const
   {
-    try
+    const auto &v = m_map.at (entity);
+    if (std::find (std::execution::par_unseq, v.cbegin (), v.cend (),
+                   typeid (T).hash_code ())
+        != v.cend ())
       {
-        const auto &v = m_map.at (entity);
-        if (std::find (std::execution::par_unseq, v.cbegin (), v.cend (),
-                       typeid (T).hash_code ())
-            == v.cend ())
-          {
-            return false;
-          }
         return true;
       }
-    catch (const std::exception &e)
-      {
-        /* TODO: some logging would be nice */
-        return false;
-      }
+    return false;
   }
 
   template <typename... T>
   bool
   has_components (std::uint64_t entity) const
   {
-    return (... && has_component<T> (entity));
+    size_t ntypes = sizeof...(T);
+    size_t hascount = 0;
+    (
+        [entity, &hascount, this] {
+          if (has_component<T> (entity))
+            {
+              ++hascount;
+            }
+        }(),
+        ...);
+    return ntypes == hascount;
   }
 
   template <typename... T>
@@ -78,8 +83,8 @@ public:
   count_archetype () const
   {
     return std::count_if (
-        m_map.begin (), m_map.end (),
-        [this] (const auto &kv) { return has_components<T...>(kv.first); });
+        std::execution::par_unseq, m_map.begin (), m_map.end (),
+        [this] (const auto &kv) { return has_components<T...> (kv.first); });
   }
 
 private:

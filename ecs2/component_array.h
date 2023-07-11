@@ -2,6 +2,8 @@
 #define COMPONENT_ARRAY_H_
 
 #include <algorithm>
+#include <cstdint>
+#include <stdexcept>
 #include <vector>
 
 namespace xen
@@ -9,7 +11,7 @@ namespace xen
 
 template <typename T> struct component
 {
-  std::uint32_t entity;
+  std::uint64_t entity;
   T value;
 
   static std::size_t
@@ -82,7 +84,7 @@ public:
   }
 
 private:
-  std::vector<component<T> > m_arr;
+  std::vector<component<T> > m_arr{};
 };
 
 } /* end of namespace xen */
