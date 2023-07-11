@@ -1,5 +1,6 @@
 set(SOURCES
   entity_mgr_tests.cpp
+  component_array_tests.cpp
   )
 
 add_executable(ecs2_tests ${SOURCES})

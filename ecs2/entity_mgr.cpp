@@ -20,7 +20,7 @@ xen::entity_mgr::create_entity ()
 void
 xen::entity_mgr::delete_entity (std::uint64_t entity)
 {
-  m_map.erase(entity);
+  m_map.erase (entity);
   --m_counter;
 }
 
