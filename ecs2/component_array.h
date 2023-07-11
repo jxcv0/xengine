@@ -67,20 +67,20 @@ public:
       }
   }
 
-  void 
+  void
   set (std::uint64_t entity, T val)
   {
-    auto it
-        = std::find_if (m_arr.begin (), m_arr.end (),
-                        [=] (const auto &c) { return c.entity == entity; });
+    auto it = std::find_if (m_arr.begin (), m_arr.end (), [=] (const auto &c) {
+      return c.entity == entity;
+    });
     if (it != m_arr.end ())
       {
         (*it).value = val;
       }
   }
 
-  private : std::vector<component<T> >
-                m_arr;
+private:
+  std::vector<component<T> > m_arr;
 };
 
 } /* end of namespace xen */
