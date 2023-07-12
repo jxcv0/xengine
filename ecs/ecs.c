@@ -138,7 +138,7 @@ has_component (struct ecs *ecs, eid_t entity, cid_t component)
 
 int
 is_archetype (struct ecs *ecs, eid_t entity, size_t num_components,
-                cid_t *components)
+              cid_t *components)
 {
   for (size_t i = 0; i < num_components; i++)
     {

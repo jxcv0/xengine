@@ -73,11 +73,11 @@ public:
     m_mgr.get_archetype<T...> (eids);
   }
 
-/*
-  template <typename... T>
-  void
-  query_components
-*/
+  /*
+    template <typename... T>
+    void
+    query_components
+  */
 
 private:
   template <typename T>

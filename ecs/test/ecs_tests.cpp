@@ -195,5 +195,9 @@ TEST (ecs_tests, count_archetype)
   ASSERT_EQ (is_archetype (&ecs, e1, 3, cids), 1);
   ASSERT_EQ (is_archetype (&ecs, e2, 3, cids), 0);
   ASSERT_EQ (is_archetype (&ecs, e3, 3, cids), 1);
+  unmap_component (&ecs, e3, c3);
+  ASSERT_EQ (is_archetype (&ecs, e1, 3, cids), 1);
+  ASSERT_EQ (is_archetype (&ecs, e2, 3, cids), 0);
+  ASSERT_EQ (is_archetype (&ecs, e3, 3, cids), 0);
 }
 

@@ -99,13 +99,12 @@ public:
   void
   get_archetype (uint64_t *dest) const
   {
-    std::for_each (m_map.begin (), m_map.end (),
-                   [&] (const auto &kv) {
-                     if (has_components<T...> (kv.first))
-                       {
-                         *dest++ = kv.first;
-                       }
-                   });
+    std::for_each (m_map.begin (), m_map.end (), [&] (const auto &kv) {
+      if (has_components<T...> (kv.first))
+        {
+          *dest++ = kv.first;
+        }
+    });
   }
 
 private:

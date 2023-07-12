@@ -113,21 +113,21 @@ TEST (entity_mgr_tests, get_archetype)
   std::uint64_t e2 = mgr.create_entity ();
   std::uint64_t e3 = mgr.create_entity ();
 
-  mgr.add_components<mat4, vec3>(e1);
-  mgr.add_components<vec3, position>(e2);
-  mgr.add_components<mat4, vec3, position>(e3);
+  mgr.add_components<mat4, vec3> (e1);
+  mgr.add_components<vec3, position> (e2);
+  mgr.add_components<mat4, vec3, position> (e3);
 
-  uint64_t *eids1 = new uint64_t[mgr.count_archetype<mat4, vec3>()];
-  mgr.get_archetype<mat4, vec3>(eids1);
+  uint64_t *eids1 = new uint64_t[mgr.count_archetype<mat4, vec3> ()];
+  mgr.get_archetype<mat4, vec3> (eids1);
   ASSERT_EQ (eids1[0], e3); /* order doesnt matter */
   ASSERT_EQ (eids1[1], e1);
 
-  uint64_t *eids2 = new uint64_t[mgr.count_archetype<position>()];
-  mgr.get_archetype<position>(eids2);
+  uint64_t *eids2 = new uint64_t[mgr.count_archetype<position> ()];
+  mgr.get_archetype<position> (eids2);
   ASSERT_EQ (eids2[0], e3); /* order doesnt matter */
   ASSERT_EQ (eids2[1], e2);
 
-  uint64_t *eids3 = new uint64_t[mgr.count_archetype<mat4, vec3, position>()];
-  mgr.get_archetype<position>(eids3);
+  uint64_t *eids3 = new uint64_t[mgr.count_archetype<mat4, vec3, position> ()];
+  mgr.get_archetype<position> (eids3);
   ASSERT_EQ (eids3[0], e3); /* order doesnt matter */
 }
