@@ -68,11 +68,11 @@ void *get_component (struct ecs *ecs, eid_t entity, cid_t component);
 /* Check if an entity has a component */
 int has_component (struct ecs *ecs, eid_t entity, cid_t component);
 
-/* TODO test this */
-int has_components (struct ecs *ecs, eid_t entity, size_t num_components,
+int is_archetype (struct ecs *ecs, eid_t entity, size_t num_components,
                     cid_t *components);
 
-size_t num_entities (struct ecs *ecs, size_t num_components,
+/* Count the number of entities that have a set of components */
+size_t count_archetype (struct ecs *ecs, size_t num_components,
                      cid_t *components);
 
 #ifdef __cplusplus

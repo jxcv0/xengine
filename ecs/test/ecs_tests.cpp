@@ -149,7 +149,7 @@ TEST (ecs_tests, unmap_component)
   ASSERT_EQ (ecs.arrays[arr].map[0].offset, 0);
 }
 
-TEST (ecs_tests, num_entities)
+TEST (ecs_tests, count_archetype)
 {
   struct ecs ecs;
   memset (&ecs, 0, sizeof (ecs));
@@ -162,21 +162,38 @@ TEST (ecs_tests, num_entities)
   eid_t e3 = create_entity (&ecs);
 
   cid_t cids[3] = {c1, c2, c3}; 
-  ASSERT_EQ (has_components (&ecs, e1, 3, cids), 0);
-  ASSERT_EQ (has_components (&ecs, e2, 3, cids), 0);
-  ASSERT_EQ (has_components (&ecs, e3, 3, cids), 0);
-  ASSERT_EQ (num_entities (&ecs, 3, cids), 0);
+  ASSERT_EQ (is_archetype (&ecs, e1, 3, cids), 0);
+  ASSERT_EQ (is_archetype (&ecs, e2, 3, cids), 0);
+  ASSERT_EQ (is_archetype (&ecs, e3, 3, cids), 0);
+  ASSERT_EQ (count_archetype (&ecs, 3, cids), 0);
 
   map_component (&ecs, e1, c1);
-  ASSERT_EQ (has_components (&ecs, e1, 1, &c1), 1);
-  ASSERT_EQ (has_components (&ecs, e1, 3, cids), 0);
-  ASSERT_EQ (has_components (&ecs, e2, 3, cids), 0);
-  ASSERT_EQ (has_components (&ecs, e3, 3, cids), 0);
+  ASSERT_EQ (is_archetype (&ecs, e1, 1, &c1), 1);
+  ASSERT_EQ (is_archetype (&ecs, e1, 3, cids), 0);
+  ASSERT_EQ (is_archetype (&ecs, e2, 3, cids), 0);
+  ASSERT_EQ (is_archetype (&ecs, e3, 3, cids), 0);
+  ASSERT_EQ (count_archetype (&ecs, 3, cids), 0);
+  ASSERT_EQ (count_archetype (&ecs, 1, cids), 1);
 
   map_component (&ecs, e1, c2);
   map_component (&ecs, e1, c3);
-  ASSERT_EQ (has_components (&ecs, e1, 3, cids), 1);
-  ASSERT_EQ (has_components (&ecs, e2, 3, cids), 0);
-  ASSERT_EQ (has_components (&ecs, e3, 3, cids), 0);
+  ASSERT_EQ (is_archetype (&ecs, e1, 3, cids), 1);
+  ASSERT_EQ (is_archetype (&ecs, e2, 3, cids), 0);
+  ASSERT_EQ (is_archetype (&ecs, e3, 3, cids), 0);
+  ASSERT_EQ (count_archetype (&ecs, 3, cids), 1);
+
+  map_component (&ecs, e2, c1);
+  map_component (&ecs, e2, c2);
+  ASSERT_EQ (is_archetype (&ecs, e1, 3, cids), 1);
+  ASSERT_EQ (is_archetype (&ecs, e2, 2, cids), 1);
+  ASSERT_EQ (is_archetype (&ecs, e2, 3, cids), 0);
+  ASSERT_EQ (is_archetype (&ecs, e3, 3, cids), 0);
+
+  map_component (&ecs, e3, c1);
+  map_component (&ecs, e3, c2);
+  map_component (&ecs, e3, c3);
+  ASSERT_EQ (is_archetype (&ecs, e1, 3, cids), 1);
+  ASSERT_EQ (is_archetype (&ecs, e2, 3, cids), 0);
+  ASSERT_EQ (is_archetype (&ecs, e3, 3, cids), 1);
 }
 

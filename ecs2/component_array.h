@@ -57,7 +57,7 @@ public:
   }
 
   T
-  get (std::uint64_t entity)
+  get (std::uint64_t entity) const
   {
     auto it = std::find_if (
         std::execution::par_unseq, m_arr.cbegin (), m_arr.cend (),
@@ -68,7 +68,7 @@ public:
       }
     else
       {
-        throw std::runtime_error ("Entity not found");
+        throw std::runtime_error ("Entity not found in component array");
       }
   }
 
@@ -85,7 +85,7 @@ public:
   }
 
 private:
-  std::vector<component<T> > m_arr{};
+  std::vector<component<T> > m_arr;
 };
 
 } /* end of namespace xen */

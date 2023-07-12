@@ -137,7 +137,7 @@ has_component (struct ecs *ecs, eid_t entity, cid_t component)
 }
 
 int
-has_components (struct ecs *ecs, eid_t entity, size_t num_components,
+is_archetype (struct ecs *ecs, eid_t entity, size_t num_components,
                 cid_t *components)
 {
   for (size_t i = 0; i < num_components; i++)
@@ -151,12 +151,12 @@ has_components (struct ecs *ecs, eid_t entity, size_t num_components,
 }
 
 size_t
-num_entities (struct ecs *ecs, size_t num_components, cid_t *components)
+count_archetype (struct ecs *ecs, size_t num_components, cid_t *archetype)
 {
   size_t num = 0;
   for (size_t i = 0; i < ecs->num_entities; i++)
     {
-      if (has_components (ecs, i, num_components, components))
+      if (is_archetype (ecs, i, num_components, archetype))
         {
           ++num;
         }

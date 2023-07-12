@@ -66,6 +66,19 @@ public:
     return m_mgr.count_archetype<T...> ();
   }
 
+  template <typename... T>
+  void
+  get_archetype (std::uint64_t *eids)
+  {
+    m_mgr.get_archetype<T...> (eids);
+  }
+
+/*
+  template <typename... T>
+  void
+  query_components
+*/
+
 private:
   template <typename T>
   component_array_base *
