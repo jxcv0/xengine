@@ -130,7 +130,7 @@ get_component (struct ecs *ecs, eid_t entity, cid_t component)
 int
 has_component (struct ecs *ecs, eid_t entity, cid_t component)
 {
-  struct component_bitset *bitset = &ecs->bitsets[entity];
+  const struct component_bitset *bitset = &ecs->bitsets[entity];
   const size_t set = component / (sizeof (*bitset->sets) * 8);
   const uint64_t shift = component % (sizeof (*bitset->sets) * 8);
   return bitset->sets[set] & (1LU << shift);

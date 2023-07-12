@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <execution>
 #include <stdexcept>
 #include <vector>
 
@@ -49,18 +50,18 @@ public:
   void
   remove (std::uint64_t entity) override
   {
-    m_arr.erase (
-        std::remove_if (m_arr.begin (), m_arr.end (),
-                        [=] (const auto &c) { return c.entity == entity; }),
-        m_arr.end ());
+    m_arr.erase (std::remove_if (
+                     std::execution::par_unseq, m_arr.begin (), m_arr.end (),
+                     [=] (const auto &c) { return c.entity == entity; }),
+                 m_arr.end ());
   }
 
   T
   get (std::uint64_t entity)
   {
-    auto it
-        = std::find_if (m_arr.cbegin (), m_arr.cend (),
-                        [=] (const auto &c) { return c.entity == entity; });
+    auto it = std::find_if (
+        std::execution::par_unseq, m_arr.cbegin (), m_arr.cend (),
+        [=] (const auto &c) { return c.entity == entity; });
     if (it != m_arr.cend ())
       {
         return (*it).value;
@@ -74,9 +75,9 @@ public:
   void
   set (std::uint64_t entity, T val)
   {
-    auto it = std::find_if (m_arr.begin (), m_arr.end (), [=] (const auto &c) {
-      return c.entity == entity;
-    });
+    auto it = std::find_if (
+        std::execution::par_unseq, m_arr.begin (), m_arr.end (),
+        [=] (const auto &c) { return c.entity == entity; });
     if (it != m_arr.end ())
       {
         (*it).value = val;

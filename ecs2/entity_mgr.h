@@ -31,6 +31,13 @@ public:
     m_map.at (entity).push_back (typeid (T).hash_code ());
   }
 
+  template <typename... T>
+  void
+  add_components (std::uint64_t entity)
+  {
+    ([&] { m_map.at (entity).push_back (typeid (T).hash_code ()); }(), ...);
+  }
+
   template <typename T>
   void
   remove_component (std::uint64_t entity)
@@ -65,6 +72,7 @@ public:
   bool
   has_components (std::uint64_t entity) const
   {
+    /* Count the number of component types T that entity has */
     size_t ntypes = sizeof...(T);
     size_t hascount = 0;
     (
@@ -85,6 +93,19 @@ public:
     return std::count_if (
         std::execution::par_unseq, m_map.begin (), m_map.end (),
         [this] (const auto &kv) { return has_components<T...> (kv.first); });
+  }
+
+  template <typename... T>
+  void
+  get_archetype (uint64_t *dest) const
+  {
+    std::for_each (m_map.begin (), m_map.end (),
+                   [&] (const auto &kv) {
+                     if (has_components<T...> (kv.first))
+                       {
+                         *dest++ = kv.first;
+                       }
+                   });
   }
 
 private:
