@@ -17,6 +17,13 @@ public:
   std::uint64_t
   create_entity ()
   {
+    for (archetype_base *b : m_archetypes)
+      {
+        for (size_t i = 0; i < sizeof...(T); i++)
+          {
+            // ...
+          }
+      }
     return m_mgr.create_entity ();
   }
 
@@ -29,6 +36,7 @@ public:
 
 private:
   entity_mgr m_mgr;
+  std::vector<archetype_base *> m_archetypes;
 };
 
 } /* end of namespace xen */
