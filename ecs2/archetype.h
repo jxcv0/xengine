@@ -11,6 +11,7 @@ namespace xen
 struct archetype_base
 {
   virtual void add_entity (std::uint64_t entity) = 0;
+  virtual void remove_entity (std::uint64_t entity) = 0;
   virtual bool has_type (std::size_t) const = 0;
   virtual bool has_entity (std::uint64_t) const = 0;
   virtual std::size_t type_count () const = 0;
@@ -75,6 +76,14 @@ public:
   add_entity (std::uint64_t entity) override
   {
     m_entries.push_back (std::make_pair (entity, std::tuple<T...>{}));
+  }
+
+  void
+  remove_entity (std::uint64_t entity) override
+  {
+      m_entries.erase(std::remove_if (std::execution::par_unseq, m_entries.begin (),
+                            m_entries.end (),
+                            [=] (const auto &e) { return e.first == entity; }));
   }
 
   bool

@@ -18,27 +18,10 @@ public:
   create_entity ()
   {
     std::uint64_t new_entity = m_mgr.create_entity ();
-    const std::size_t ntypes = sizeof...(T);
-    for (archetype_base *b : m_archetypes)
+    archetype_base *arch = get_archetype<T...> ();
+    if (arch != nullptr)
       {
-        std::size_t hascount = 0;
-        if (b->type_count () != ntypes)
-          {
-            continue;
-          }
-
-        (
-            [&] {
-              if (b->has_type (typeid (T).hash_code ()))
-                {
-                  ++hascount;
-                }
-            }(),
-            ...);
-        if (hascount == ntypes)
-          {
-            b->add_entity (new_entity);
-          }
+        arch->add_entity (new_entity);
       }
     return new_entity;
   }
@@ -47,7 +30,11 @@ public:
   void
   register_archetype (archetype<T...> *arch)
   {
-    /* TODO should check we dont already have one like arch */
+    archetype_base *a = get_archetype<T...> ();
+    if (a != nullptr)
+      {
+        return;
+      }
     m_archetypes.push_back (arch);
   }
 
@@ -55,12 +42,15 @@ public:
   delete_entity (std::uint64_t entity)
   {
     m_mgr.delete_entity (entity);
-    /* TODO: delete from archetypes */
+    for (archetype_base *a : m_archetypes)
+    {
+        a->remove_entity(entity);
+    }
   }
 
   template <typename... T>
   archetype_base *
-  get_archetype()
+  get_archetype ()
   {
     archetype_base *a = nullptr;
     for (archetype_base *b : m_archetypes)
@@ -81,13 +71,11 @@ public:
             ...);
         if (hascount == sizeof...(T))
           {
-              a = b;
+            a = b;
           }
       }
     return a;
   }
-
-private:
 
 private:
   entity_mgr m_mgr;
