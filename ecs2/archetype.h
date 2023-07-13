@@ -8,6 +8,10 @@
 namespace xen
 {
 
+/**
+ * @brief Interface class for all class template archetypes.
+ *
+ */
 struct archetype_base
 {
   virtual void add_entity (std::uint64_t entity) = 0;
@@ -18,23 +22,21 @@ struct archetype_base
   virtual void *get_type (std::uint64_t entity, std::size_t typehash) = 0;
 };
 
-/*
- * template <typename T>
- * T &
- * get_component(std::uint64_t entity)
- * {
- *   xen::archetype_base * arch = get_arch_with_entity(entity);
- *   if (arch->has_type(typeid(T).hash_code())
- *     {
- *       return reinterpret_cast<T *>(arch.get_type(typeid(T).hash_code()));
- *     {
- *   return NULL;
- * }
+/**
+ * @brief Archetypes are a group of entities with the same components.
+ *
+ * @tparam T The types of component of the archetype.
  */
-
 template <typename... T> class archetype : public archetype_base
 {
 public:
+  /**
+   * @brief Check if the archetype has a component type.
+   *
+   * @tparam U The type of the component to check for.
+   * @return true if the archetype has component type U.
+   * @return false if the archetype does not have component U.
+   */
   template <typename U>
   constexpr bool
   has_component ()
@@ -42,6 +44,13 @@ public:
     return (std::is_same<U, T>::value || ...);
   }
 
+  /**
+   * @brief Check if the archetype has multiple component types.
+   *
+   * @tparam U The types to check for.
+   * @return true if all component types U are in this archetype.
+   * @return false if any of component types U are not in this archetype.
+   */
   template <typename... U>
   constexpr bool
   has_components ()
@@ -59,39 +68,53 @@ public:
     return hascount == ntypes;
   }
 
-  template <typename... U>
-  void
-  register_entity (std::uint64_t entity, U... vals)
-  {
-    if (has_entity (entity) || !has_components<U...> ())
-      {
-        return;
-      }
-    std::tuple<U...> new_tuple;
-    ((std::get<U> (new_tuple) = vals), ...);
-    m_entries.push_back (std::make_pair (entity, new_tuple));
-  }
-
+  /**
+   * @brief Add an entity to the archetype.
+   *
+   * @param entity The entity to add.
+   */
   void
   add_entity (std::uint64_t entity) override
   {
     m_entries.push_back (std::make_pair (entity, std::tuple<T...>{}));
   }
 
+  /**
+   * @brief Remove an entity from the archetype.
+   *
+   * @param entity The entity to remove.
+   */
   void
   remove_entity (std::uint64_t entity) override
   {
-      m_entries.erase(std::remove_if (std::execution::par_unseq, m_entries.begin (),
-                            m_entries.end (),
-                            [=] (const auto &e) { return e.first == entity; }));
+    m_entries.erase (std::remove_if (
+        std::execution::par_unseq, m_entries.begin (), m_entries.end (),
+        [=] (const auto &e) { return e.first == entity; }));
   }
 
+  /**
+   * @brief Check if the archetype has a component by the hash code of its
+   * type.
+   *
+   * @param hash The has code of the type.
+   * @return true if hash is equal to the hash of one of the types of
+   * components in this archetype.
+   * @return false if hash is not equal to any of the hashes of the types of
+   * the components in this archetype.
+   */
   bool
   has_type (std::size_t hash) const override
   {
     return ((hash == typeid (T).hash_code ()) || ...);
   }
 
+  /**
+   * @brief Check if an entity is of the archetype.
+   *
+   * @param entity The entity to check for.
+   * @return true if the entity is of this archetype.
+   * @return false if the entity is not of this archetype.
+   */
   bool
   has_entity (std::uint64_t entity) const override
   {
@@ -101,12 +124,24 @@ public:
     return it != m_entries.cend ();
   }
 
+  /**
+   * @brief Get the number of component types this archetype is comprised of.
+   *
+   * @return The number of component types this archetype is comprised of.
+   */
   std::size_t
   type_count () const override
   {
     return sizeof...(T);
   }
 
+  /**
+   * @brief Get a component by the hash code of its type.
+   *
+   * @param entity The entity that owns the component.
+   * @param typehash The hashcode of the type.
+   * @return A pointer to the component or nullptr if the component cannot be retrieved.
+   */
   void *
   get_type (std::uint64_t entity, std::size_t typehash) override
   {
@@ -125,6 +160,13 @@ public:
     return res;
   }
 
+  /**
+   * @brief Get a component belonging to an entity.
+   * 
+   * @tparam U The type of the component.
+   * @param entity The entity the component belongs too.
+   * @return A reference to the component.
+   */
   template <typename U>
   U &
   get_component (std::uint64_t entity)
