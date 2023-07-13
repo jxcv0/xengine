@@ -4,6 +4,7 @@
 #include <execution>
 #include <unordered_map>
 #include <utility>
+#include <cstdint>
 
 namespace xen
 {
@@ -140,7 +141,8 @@ public:
    *
    * @param entity The entity that owns the component.
    * @param typehash The hashcode of the type.
-   * @return A pointer to the component or nullptr if the component cannot be retrieved.
+   * @return A pointer to the component or nullptr if the component cannot be
+   * retrieved.
    */
   void *
   get_type (std::uint64_t entity, std::size_t typehash) override
@@ -162,7 +164,7 @@ public:
 
   /**
    * @brief Get a component belonging to an entity.
-   * 
+   *
    * @tparam U The type of the component.
    * @param entity The entity the component belongs too.
    * @return A reference to the component.

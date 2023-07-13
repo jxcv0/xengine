@@ -18,7 +18,7 @@ public:
   create_entity ()
   {
     std::uint64_t new_entity = m_mgr.create_entity ();
-    archetype_base *arch = get_archetype<T...> ();
+    auto arch = get_archetype<T...> ();
     if (arch != nullptr)
       {
         arch->add_entity (new_entity);
@@ -28,32 +28,44 @@ public:
 
   template <typename... T>
   void
-  register_archetype (archetype<T...> *arch)
+  create_archetype ()
   {
-    archetype_base *a = get_archetype<T...> ();
+    auto a = get_archetype<T...> ();
     if (a != nullptr)
       {
         return;
       }
-    m_archetypes.push_back (arch);
+    m_archetypes.push_back (std::shared_ptr<archetype_base>(new archetype<T...>));
+  }
+
+  template <typename... T>
+  void
+  register_archetype (archetype<T...> *arch)
+  {
+    auto a = get_archetype<T...> ();
+    if (a != nullptr)
+      {
+        return;
+      }
+    m_archetypes.push_back (std::shared_ptr<archetype_base>(arch));
   }
 
   void
   delete_entity (std::uint64_t entity)
   {
     m_mgr.delete_entity (entity);
-    for (archetype_base *a : m_archetypes)
+    for (const auto &a : m_archetypes)
       {
         a->remove_entity (entity);
       }
   }
 
   template <typename... T>
-  archetype_base *
+  std::shared_ptr<archetype<T...> >
   get_archetype ()
   {
-    archetype_base *a = nullptr;
-    for (archetype_base *b : m_archetypes)
+    std::shared_ptr<archetype_base> a = nullptr;
+    for (auto &b : m_archetypes)
       {
         std::size_t hascount = 0;
         if (b->type_count () != sizeof...(T))
@@ -74,12 +86,12 @@ public:
             a = b;
           }
       }
-    return a;
+    return std::dynamic_pointer_cast<archetype<T...> >(a);
   }
 
 private:
   entity_mgr m_mgr;
-  std::vector<archetype_base *> m_archetypes;
+  std::vector<std::shared_ptr<archetype_base> > m_archetypes;
 };
 
 } /* end of namespace xen */
