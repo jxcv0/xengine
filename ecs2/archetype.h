@@ -10,8 +10,10 @@ namespace xen
 
 struct archetype_base
 {
+  virtual void add_entity(std::uint64_t entity) = 0;
   virtual bool has_type(std::size_t) const = 0;
   virtual bool has_entity(std::uint64_t) const = 0;
+  virtual std::size_t type_count() const = 0;
 };
 
 template <typename... T> class archetype : public archetype_base
@@ -54,6 +56,11 @@ public:
     m_entries.push_back (std::make_pair (entity, new_tuple));
   }
 
+  void add_entity(std::uint64_t entity) override
+  {
+      m_entries.push_back(std::make_pair(entity, std::tuple<T...>{}));
+  }
+
   bool has_type(std::size_t hash) const override
   {
     return ((hash == typeid(T).hash_code()) || ...);
@@ -66,6 +73,12 @@ public:
                             m_entries.cend (),
                             [=] (const auto &e) { return e.first == entity; });
     return it != m_entries.cend ();
+  }
+
+  std::size_t
+  type_count() const override
+  {
+      return sizeof...(T);
   }
 
   template <typename U>

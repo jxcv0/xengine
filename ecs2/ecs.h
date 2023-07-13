@@ -17,14 +17,29 @@ public:
   std::uint64_t
   create_entity ()
   {
+    std::uint64_t new_entity = m_mgr.create_entity();
+    const std::size_t ntypes = sizeof...(T);
     for (archetype_base *b : m_archetypes)
       {
-        for (size_t i = 0; i < sizeof...(T); i++)
+          std::size_t hascount = 0;
+          if (b->type_count() != ntypes)
+            {
+              continue;
+            }
+
+          (
+           [&]{
+                if (b->has_type(typeid(T).hash_code()))
+                {
+                    ++hascount;
+                }
+           }(), ...);
+          if (hascount == ntypes)
           {
-            // ...
+              b->add_entity(new_entity);
           }
       }
-    return m_mgr.create_entity ();
+    return new_entity;
   }
 
   void
