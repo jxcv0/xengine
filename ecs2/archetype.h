@@ -99,7 +99,7 @@ public:
   void *
   get_type(std::uint64_t entity, std::size_t typehash) override
   {
-      void *res = NULL;
+      void *res = nullptr;
       auto &pair = get_by_entity(entity);
       /* Find the type by hash_code */
       (

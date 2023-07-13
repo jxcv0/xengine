@@ -104,4 +104,6 @@ TEST (archetype_base_tests, get_type)
   c->i = -10;
   C1 res = arch.get_component<C1>(42);
   ASSERT_EQ (res.i, -10);
+
+  ASSERT_EQ (arch_base->get_type(42, typeid(C4).hash_code()), nullptr);
 }
