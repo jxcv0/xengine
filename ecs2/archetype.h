@@ -1,10 +1,10 @@
 #ifndef ARCHETYPE_H_
 #define ARCHETYPE_H_
 
+#include <cstdint>
 #include <execution>
 #include <unordered_map>
 #include <utility>
-#include <cstdint>
 
 namespace xen
 {
@@ -13,14 +13,52 @@ namespace xen
  * @brief Interface class for all class template archetypes.
  *
  */
-struct archetype_base
+class archetype_base
 {
+public:
+  class iterator
+  {
+  public:
+    using iterator_type = std::forward_iterator_tag;
+    iterator (archetype_base *base, std::size_t start_index)
+        : m_base{ base }, m_index{ start_index }
+    {
+    }
+
+    template <typename T>
+    T &
+    operator* ()
+    {
+      return std::get<T> (
+          m_base->get_at_index (m_index, typeid (T).hash_code ()));
+    }
+
+  private:
+    archetype_base *m_base;
+    std::size_t m_index;
+  };
+
   virtual void add_entity (std::uint64_t entity) = 0;
   virtual void remove_entity (std::uint64_t entity) = 0;
   virtual bool has_type (std::size_t) const = 0;
   virtual bool has_entity (std::uint64_t) const = 0;
   virtual std::size_t type_count () const = 0;
   virtual void *get_type (std::uint64_t entity, std::size_t typehash) = 0;
+  virtual void *get_at_index (std::size_t index, std::size_t typehash) = 0;
+
+  template <typename T>
+  T *
+  get_component (std::uint64_t entity)
+  {
+    return static_cast<T *> (get_type (entity, typeid (T).hash_code ()));
+  }
+
+  template <typename T>
+  T *
+  get_component_by_index (std::size_t index)
+  {
+    return static_cast<T *> (get_at_index (index, typeid (T).hash_code ()));
+  }
 };
 
 /**
@@ -31,6 +69,9 @@ struct archetype_base
 template <typename... T> class archetype : public archetype_base
 {
 public:
+  using container_type
+      = std::vector<std::pair<std::uint64_t, std::tuple<T...> > >;
+
   /**
    * @brief Check if the archetype has a component type.
    *
@@ -162,6 +203,21 @@ public:
     return res;
   }
 
+  void *
+  get_at_index (std::size_t index, std::size_t typehash) override
+  {
+    void *res = nullptr;
+    (
+        [&] {
+          if (typeid (T).hash_code () == typehash)
+            {
+              res = &std::get<T> (m_entries[index].second);
+            }
+        }(),
+        ...);
+    return res;
+  }
+
   /**
    * @brief Get a component belonging to an entity.
    *
@@ -192,7 +248,7 @@ private:
   }
 
 private:
-  std::vector<std::pair<std::uint64_t, std::tuple<T...> > > m_entries;
+  container_type m_entries;
 };
 
 } /* end of namespace xen */

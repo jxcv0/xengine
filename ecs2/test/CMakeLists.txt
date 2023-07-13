@@ -2,6 +2,7 @@ set(SOURCES
   entity_mgr_tests.cpp
   component_array_tests.cpp
   archetype_tests.cpp
+  system_tests.cpp
   ecs_tests.cpp
   )
 

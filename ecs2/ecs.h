@@ -35,7 +35,8 @@ public:
       {
         return;
       }
-    m_archetypes.push_back (std::shared_ptr<archetype_base>(new archetype<T...>));
+    m_archetypes.push_back (
+        std::shared_ptr<archetype_base> (new archetype<T...>));
   }
 
   template <typename... T>
@@ -47,7 +48,7 @@ public:
       {
         return;
       }
-    m_archetypes.push_back (std::shared_ptr<archetype_base>(arch));
+    m_archetypes.push_back (std::shared_ptr<archetype_base> (arch));
   }
 
   void
@@ -61,7 +62,7 @@ public:
   }
 
   template <typename... T>
-  std::shared_ptr<archetype<T...> >
+  std::shared_ptr<archetype_base>
   get_archetype ()
   {
     std::shared_ptr<archetype_base> a = nullptr;
@@ -86,7 +87,7 @@ public:
             a = b;
           }
       }
-    return std::dynamic_pointer_cast<archetype<T...> >(a);
+    return a;
   }
 
 private:

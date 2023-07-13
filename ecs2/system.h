@@ -2,20 +2,35 @@
 #define SYSTEM_H_
 
 #include "archetype.h"
+#include <execution>
+#include <memory>
 #include <vector>
 
 namespace xen
 {
 
-template <typename... T>
-class system_base
+template <typename Func, typename... T> class system
 {
 public:
-  virtual void execute() = 0;
+  system (Func f) : m_func{ f } {}
+
+  void
+  iterate ()
+  {
+    std::for_each (std::execution::par_unseq, m_archetypes.begin (),
+                   m_archetypes.end (), m_func);
+  }
+
+  void
+  add_archetype ()
+  {
+  }
 
 private:
-  std::vector<archetype<T...> *> archetypes
+  std::vector<std::shared_ptr<archetype_base> > m_archetypes;
+  Func m_func;
 };
 
 } /* end of namespace xen */
-#endif  /* SYSTEM_H_ */
+
+#endif /* SYSTEM_H_ */

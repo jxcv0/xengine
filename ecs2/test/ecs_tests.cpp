@@ -26,7 +26,8 @@ TEST (ecs_tests, create_entity)
 {
   auto arch_pv = new xen::archetype<cmpnt::position, cmpnt::velocity>;
   auto arch_a = new xen::archetype<cmpnt::assetlist>;
-  auto arch_pva = new xen::archetype<cmpnt::position, cmpnt::velocity, cmpnt::assetlist>;
+  auto arch_pva
+      = new xen::archetype<cmpnt::position, cmpnt::velocity, cmpnt::assetlist>;
 
   xen::ecs ecs;
 
@@ -77,9 +78,10 @@ TEST (ecs_tests, delete_entity)
 TEST (ecs_tests, get_archetype)
 {
   auto arch_pv = new xen::archetype<cmpnt::position, cmpnt::velocity>;
-  auto arch_pva = new xen::archetype<cmpnt::position, cmpnt::velocity, cmpnt::assetlist>;
-  arch_pv->add_entity(42);
-  arch_pva->add_entity(43);
+  auto arch_pva
+      = new xen::archetype<cmpnt::position, cmpnt::velocity, cmpnt::assetlist>;
+  arch_pv->add_entity (42);
+  arch_pva->add_entity (43);
   xen::ecs ecs;
 
   ecs.register_archetype (arch_pv);
@@ -87,7 +89,7 @@ TEST (ecs_tests, get_archetype)
 
   auto a = ecs.get_archetype<cmpnt::position, cmpnt::velocity> ();
   auto b = ecs.get_archetype<cmpnt::position, cmpnt::velocity,
-                                             cmpnt::assetlist> ();
-  ASSERT_TRUE (arch_pv->has_entity(42));
-  ASSERT_TRUE (arch_pva->has_entity(43));
+                             cmpnt::assetlist> ();
+  ASSERT_TRUE (arch_pv->has_entity (42));
+  ASSERT_TRUE (arch_pva->has_entity (43));
 }

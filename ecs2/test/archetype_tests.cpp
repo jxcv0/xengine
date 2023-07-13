@@ -92,3 +92,41 @@ TEST (archetype_base_tests, get_type)
 
   ASSERT_EQ (arch_base->get_type (42, typeid (C4).hash_code ()), nullptr);
 }
+
+TEST (archetype_base_tests, get_type_templated)
+{
+  xen::archetype<C1, C2> arch;
+  xen::archetype_base *arch_base = &arch;
+  arch_base->add_entity (42);
+  C1 *c = arch_base->get_component<C1> (42);
+  c->i = -10;
+  C1 &res = arch.get_component<C1> (42);
+  ASSERT_EQ (res.i, -10);
+
+  ASSERT_EQ (arch_base->get_component<C4> (42), nullptr);
+}
+
+TEST (archetype_base_tests, get_at_index)
+{
+  auto arch = new xen::archetype<C1, C2>;
+
+  arch->add_entity (0);
+  arch->add_entity (2);
+  arch->add_entity (42);
+
+  C1 &tmp_a = arch->get_component<C1> (0);
+  C1 &tmp_b = arch->get_component<C1> (2);
+  C1 &tmp_c = arch->get_component<C1> (42);
+
+  tmp_a.i = 10;
+  tmp_b.i = 11;
+  tmp_c.i = 12;
+
+  C1 *a = arch->get_component_by_index<C1> (0);
+  C1 *b = arch->get_component_by_index<C1> (1);
+  C1 *c = arch->get_component_by_index<C1> (2);
+
+  ASSERT_EQ (a->i, tmp_a.i);
+  ASSERT_EQ (b->i, tmp_b.i);
+  ASSERT_EQ (c->i, tmp_c.i);
+}

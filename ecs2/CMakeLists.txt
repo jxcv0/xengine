@@ -5,6 +5,7 @@ set(SOURCES
   entity_mgr.cpp
   entity_mgr.h
   component_array.h
+  system.h
   ecs.h
 )
 
