@@ -10,11 +10,11 @@ namespace xen
 
 struct archetype_base
 {
-  virtual void add_entity(std::uint64_t entity) = 0;
-  virtual bool has_type(std::size_t) const = 0;
-  virtual bool has_entity(std::uint64_t) const = 0;
-  virtual std::size_t type_count() const = 0;
-  virtual void *get_type(std::uint64_t entity, std::size_t typehash) = 0;
+  virtual void add_entity (std::uint64_t entity) = 0;
+  virtual bool has_type (std::size_t) const = 0;
+  virtual bool has_entity (std::uint64_t) const = 0;
+  virtual std::size_t type_count () const = 0;
+  virtual void *get_type (std::uint64_t entity, std::size_t typehash) = 0;
 };
 
 /*
@@ -71,16 +71,18 @@ public:
     m_entries.push_back (std::make_pair (entity, new_tuple));
   }
 
-  void add_entity(std::uint64_t entity) override
+  void
+  add_entity (std::uint64_t entity) override
   {
-      m_entries.push_back(std::make_pair(entity, std::tuple<T...>{}));
+    m_entries.push_back (std::make_pair (entity, std::tuple<T...>{}));
   }
 
-  bool has_type(std::size_t hash) const override
+  bool
+  has_type (std::size_t hash) const override
   {
-    return ((hash == typeid(T).hash_code()) || ...);
+    return ((hash == typeid (T).hash_code ()) || ...);
   }
-  
+
   bool
   has_entity (std::uint64_t entity) const override
   {
@@ -91,39 +93,40 @@ public:
   }
 
   std::size_t
-  type_count() const override
+  type_count () const override
   {
-      return sizeof...(T);
+    return sizeof...(T);
   }
 
   void *
-  get_type(std::uint64_t entity, std::size_t typehash) override
+  get_type (std::uint64_t entity, std::size_t typehash) override
   {
-      void *res = nullptr;
-      auto &pair = get_by_entity(entity);
-      /* Find the type by hash_code */
-      (
-       [&]{
-            if (typeid(T).hash_code() == typehash)
+    void *res = nullptr;
+    auto &pair = get_by_entity (entity);
+    /* Find the type by hash_code */
+    (
+        [&] {
+          if (typeid (T).hash_code () == typehash)
             {
-                res = &std::get<T>(pair.second);
+              res = &std::get<T> (pair.second);
             }
-       }(), ...);
-      
-      return res;
+        }(),
+        ...);
+
+    return res;
   }
 
   template <typename U>
   U &
   get_component (std::uint64_t entity)
   {
-    auto &pair = get_by_entity(entity);
+    auto &pair = get_by_entity (entity);
     return std::get<U> (pair.second);
   }
 
 private:
   std::pair<std::uint64_t, std::tuple<T...> > &
-  get_by_entity(std::uint64_t entity)
+  get_by_entity (std::uint64_t entity)
   {
     auto it = std::find_if (std::execution::par_unseq, m_entries.begin (),
                             m_entries.end (),

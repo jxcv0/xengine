@@ -49,3 +49,21 @@ TEST (ecs_tests, create_entity)
   ASSERT_FALSE (arch_a.has_entity (epva));
   ASSERT_TRUE (arch_pva.has_entity (epva));
 }
+
+TEST (ecs_tests, get_archetype)
+{
+  xen::archetype<cmpnt::position, cmpnt::velocity> arch_pv;
+  xen::archetype<cmpnt::position, cmpnt::velocity, cmpnt::assetlist> arch_pva;
+  xen::ecs ecs;
+
+  ecs.register_archetype(&arch_pv);
+  ecs.register_archetype(&arch_pva);
+
+  xen::archetype_base *a = ecs.get_archetype<cmpnt::position, cmpnt::velocity>();
+  ASSERT_EQ (a, &arch_pv);
+  ASSERT_NE (a, &arch_pva);
+
+  xen::archetype_base *b = ecs.get_archetype<cmpnt::position, cmpnt::velocity, cmpnt::assetlist>();
+  ASSERT_NE (b, &arch_pv);
+  ASSERT_EQ (b, &arch_pva);
+}

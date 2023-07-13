@@ -58,6 +58,37 @@ public:
     /* TODO: delete from archetypes */
   }
 
+  template <typename... T>
+  archetype_base *
+  get_archetype()
+  {
+    archetype_base *a = nullptr;
+    for (archetype_base *b : m_archetypes)
+      {
+        std::size_t hascount = 0;
+        if (b->type_count () != sizeof...(T))
+          {
+            continue;
+          }
+
+        (
+            [&] {
+              if (b->has_type (typeid (T).hash_code ()))
+                {
+                  ++hascount;
+                }
+            }(),
+            ...);
+        if (hascount == sizeof...(T))
+          {
+              a = b;
+          }
+      }
+    return a;
+  }
+
+private:
+
 private:
   entity_mgr m_mgr;
   std::vector<archetype_base *> m_archetypes;
