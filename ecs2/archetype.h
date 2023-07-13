@@ -14,7 +14,22 @@ struct archetype_base
   virtual bool has_type(std::size_t) const = 0;
   virtual bool has_entity(std::uint64_t) const = 0;
   virtual std::size_t type_count() const = 0;
+  virtual void *get_type(std::uint64_t entity, std::size_t typehash) = 0;
 };
+
+/*
+ * template <typename T>
+ * T &
+ * get_component(std::uint64_t entity)
+ * {
+ *   xen::archetype_base * arch = get_arch_with_entity(entity);
+ *   if (arch->has_type(typeid(T).hash_code())
+ *     {
+ *       return reinterpret_cast<T *>(arch.get_type(typeid(T).hash_code()));
+ *     {
+ *   return NULL;
+ * }
+ */
 
 template <typename... T> class archetype : public archetype_base
 {
@@ -81,9 +96,32 @@ public:
       return sizeof...(T);
   }
 
+  void *
+  get_type(std::uint64_t entity, std::size_t typehash) override
+  {
+      (void) entity;
+      if (!has_type(typehash))
+        {
+          /* Something truly terrible has happened */
+          return NULL;
+        }
+
+      /* Find the type by hash_code */
+      
+      return NULL;
+  }
+
   template <typename U>
   U &
   get_component (std::uint64_t entity)
+  {
+    auto &pair = get_by_entity(entity);
+    return std::get<U> (pair.second);
+  }
+
+private:
+  std::pair<std::uint64_t, std::tuple<T...> > &
+  get_by_entity(std::uint64_t entity)
   {
     auto it = std::find_if (std::execution::par_unseq, m_entries.begin (),
                             m_entries.end (),
@@ -92,7 +130,7 @@ public:
       {
         throw std::runtime_error ("Entity not found in archetype");
       }
-    return std::get<U> ((*it).second);
+    return *it;
   }
 
 private:
