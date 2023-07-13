@@ -43,9 +43,9 @@ public:
   {
     m_mgr.delete_entity (entity);
     for (archetype_base *a : m_archetypes)
-    {
+      {
         a->remove_entity(entity);
-    }
+      }
   }
 
   template <typename... T>

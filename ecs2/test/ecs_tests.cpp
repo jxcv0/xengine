@@ -50,6 +50,19 @@ TEST (ecs_tests, create_entity)
   ASSERT_TRUE (arch_pva.has_entity (epva));
 }
 
+TEST (ecs_tests, delete_entity)
+{
+  xen::archetype<cmpnt::position, cmpnt::velocity> arch_pv;
+
+  xen::ecs ecs;
+
+  ecs.register_archetype(&arch_pv);
+  auto epv = ecs.create_entity<cmpnt::position, cmpnt::velocity>();
+  ASSERT_TRUE (arch_pv.has_entity (epv));
+  ecs.delete_entity(epv);
+  ASSERT_FALSE(arch_pv.has_entity (epv));
+}
+
 TEST (ecs_tests, get_archetype)
 {
   xen::archetype<cmpnt::position, cmpnt::velocity> arch_pv;
