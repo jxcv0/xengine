@@ -95,4 +95,13 @@ TEST (archetype_base_tests, type_count)
   ASSERT_EQ (three->type_count(), 2);
 }
 
-
+TEST (archetype_base_tests, get_type)
+{
+  xen::archetype<C1, C2> arch;
+  xen::archetype_base *arch_base = &arch;
+  arch_base->add_entity(42);
+  C1 *c = static_cast<C1*>(arch_base->get_type(42, typeid(C1).hash_code()));
+  c->i = -10;
+  C1 res = arch.get_component<C1>(42);
+  ASSERT_EQ (res.i, -10);
+}

@@ -99,16 +99,18 @@ public:
   void *
   get_type(std::uint64_t entity, std::size_t typehash) override
   {
-      (void) entity;
-      if (!has_type(typehash))
-        {
-          /* Something truly terrible has happened */
-          return NULL;
-        }
-
+      void *res = NULL;
+      auto &pair = get_by_entity(entity);
       /* Find the type by hash_code */
+      (
+       [&]{
+            if (typeid(T).hash_code() == typehash)
+            {
+                res = &std::get<T>(pair.second);
+            }
+       }(), ...);
       
-      return NULL;
+      return res;
   }
 
   template <typename U>
