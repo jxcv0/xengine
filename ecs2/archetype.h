@@ -16,14 +16,51 @@ namespace xen
 class archetype_base
 {
 public:
-  virtual void add_entity(std::uint64_t entity) = 0;
-  virtual void remove_entity(std::uint64_t entity) = 0;
-  virtual bool has_type(std::size_t) const = 0;
-  virtual bool has_entity(std::uint64_t) const = 0;
-  virtual std::size_t type_count() const = 0;
-  virtual void* get_type(std::uint64_t entity, std::size_t typehash) = 0;
-  virtual void* get_at_index(std::size_t index, std::size_t typehash) = 0;
-  virtual std::size_t size() const = 0;
+  virtual void
+  add_entity(std::uint64_t)
+  {
+  }
+
+  virtual void
+  remove_entity(std::uint64_t)
+  {
+  }
+
+  virtual bool
+  has_type(std::size_t) const
+  {
+    return false;
+  }
+
+  virtual bool
+  has_entity(std::uint64_t) const
+  {
+    return false;
+  }
+
+  virtual std::size_t
+  type_count() const
+  {
+    return 0;
+  }
+
+  virtual void*
+  get_type(std::uint64_t, std::size_t)
+  {
+    return nullptr;
+  }
+
+  virtual void*
+  get_at_index(std::size_t, std::size_t)
+  {
+    return nullptr;
+  }
+
+  virtual std::size_t
+  size() const
+  {
+    return 0;
+  }
 
   template <typename T>
   T*
@@ -38,6 +75,40 @@ public:
   {
     return static_cast<T*>(get_at_index(index, typeid(T).hash_code()));
   }
+
+  class iterator
+  {
+    public:
+    using iterator_type = std::forward_iterator_tag;
+    iterator(std::size_t index) : m_index{ index } {}
+
+    /*
+    reference operator*() const { return *m_ptr; }
+    pointer operator->() { return m_ptr; }
+
+    iterator& operator++() { m_ptr++; return *this; }  
+
+    iterator operator++(int) { iterator tmp = *this; ++(*this); return tmp; }
+
+    friend bool operator== (const iterator& a, const iterator& b) { return a.m_ptr == b.m_ptr; };
+    friend bool operator!= (const iterator& a, const iterator& b) { return a.m_ptr != b.m_ptr; }; 
+    */
+    private:
+
+    std::size_t m_index;
+  };
+
+  virtual iterator
+  begin()
+  {
+    return iterator(0);
+  }
+
+  virtual iterator
+  end()
+  {
+    return iterator(size());
+  }
 };
 
 /**
@@ -45,7 +116,8 @@ public:
  *
  * @tparam T The types of component of the archetype.
  */
-template <typename... T> class archetype : public archetype_base
+template <typename... T>
+class archetype : public archetype_base
 {
 public:
   using container_type

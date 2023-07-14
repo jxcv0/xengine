@@ -10,7 +10,8 @@
 namespace xen
 {
 
-template <typename T> struct component
+template <typename T>
+struct component
 {
   std::uint64_t entity;
   T value;
@@ -29,7 +30,8 @@ struct component_array_base
   virtual void remove(std::uint64_t entity) = 0;
 };
 
-template <typename T> class component_array : public component_array_base
+template <typename T>
+class component_array : public component_array_base
 {
 public:
   std::size_t

@@ -13,7 +13,7 @@ namespace xen
 class ecs
 {
 public:
-  using container_type = std::vector<std::shared_ptr<archetype_base> >;
+  using ArchetypeStorage = std::vector<std::shared_ptr<archetype_base> >;
   ecs() = default;
 
   template <typename... T>
@@ -124,29 +124,52 @@ public:
     return vec;
   }
 
-  template <typename... T> class view
+  template <typename... Components>
+  class view
   {
   public:
+    // friend class iterator;
+
     class iterator
     {
     public:
       using iterator_type = std::forward_iterator_tag;
+
+      iterator(ArchetypeStorage::iterator ci) : m_container_iter{ ci } {}
+
+    private:
+      // T m_archetype_iter;
+      ArchetypeStorage::iterator m_container_iter;
     };
 
-    view(ecs& ecs) {}
+    view(ecs& ecs) : m_archetypes{ ecs.get_archetypes<Components...>() } {}
 
     iterator
     begin()
     {
+      return iterator(m_archetypes.begin());
+    }
+
+    iterator
+    end()
+    {
+      return iterator(m_archetypes.end());
     }
 
   private:
-    container_type::iterator m_container_iter;
+    ArchetypeStorage m_archetypes;
   };
+
+  template <typename... Components>
+  view<Components...>
+  get_view()
+  {
+    return view<Components...>(this);
+  }
 
 private:
   entity_mgr m_mgr;
-  container_type m_archetypes;
+  ArchetypeStorage m_archetypes;
 };
 
 } /* end of namespace xen */

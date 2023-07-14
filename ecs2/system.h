@@ -10,7 +10,8 @@
 namespace xen
 {
 
-template <typename Func, typename... T> class system
+template <typename Func, typename... T>
+class system
 {
 public:
   system(Func f) : m_func{ f } {}
