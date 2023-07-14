@@ -32,6 +32,13 @@ public:
     return false;
   }
 
+  template <typename... Components>
+  bool
+  has_components()
+  {
+    // TODO
+  }
+
   virtual bool
   has_entity(std::uint64_t) const
   {
@@ -74,40 +81,6 @@ public:
   get_component_by_index(std::size_t index)
   {
     return static_cast<T*>(get_at_index(index, typeid(T).hash_code()));
-  }
-
-  class iterator
-  {
-    public:
-    using iterator_type = std::forward_iterator_tag;
-    iterator(std::size_t index) : m_index{ index } {}
-
-    /*
-    reference operator*() const { return *m_ptr; }
-    pointer operator->() { return m_ptr; }
-
-    iterator& operator++() { m_ptr++; return *this; }  
-
-    iterator operator++(int) { iterator tmp = *this; ++(*this); return tmp; }
-
-    friend bool operator== (const iterator& a, const iterator& b) { return a.m_ptr == b.m_ptr; };
-    friend bool operator!= (const iterator& a, const iterator& b) { return a.m_ptr != b.m_ptr; }; 
-    */
-    private:
-
-    std::size_t m_index;
-  };
-
-  virtual iterator
-  begin()
-  {
-    return iterator(0);
-  }
-
-  virtual iterator
-  end()
-  {
-    return iterator(size());
   }
 };
 

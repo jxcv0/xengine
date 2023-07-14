@@ -10,9 +10,16 @@
 namespace xen
 {
 
-class ecs
+class ecs : public std::enable_shared_from_this<ecs>
 {
 public:
+
+  [[nodiscard]] static std::shared_ptr<ecs>
+  create()
+  {
+    return std::shared_ptr<ecs>(new ecs);
+  }
+
   using ArchetypeStorage = std::vector<std::shared_ptr<archetype_base> >;
   ecs() = default;
 
@@ -93,79 +100,71 @@ public:
     return a;
   }
 
-  template <typename... T>
-  std::vector<std::shared_ptr<archetype_base> >
-  get_archetypes()
-  {
-    std::vector<std::shared_ptr<archetype_base> > vec;
-    std::shared_ptr<archetype_base> a = nullptr;
-    for (auto& b : m_archetypes)
-      {
-        std::size_t hascount = 0;
-        if (b->type_count() < sizeof...(T))
-          {
-            /* arch does not have all of T */
-            continue;
-          }
-
-        (
-            [&] {
-              if (b->has_type(typeid(T).hash_code()))
-                {
-                  ++hascount;
-                }
-            }(),
-            ...);
-        if (hascount == sizeof...(T))
-          {
-            vec.push_back(a);
-          }
-      }
-    return vec;
-  }
-
+  friend class query;
   template <typename... Components>
-  class view
+  class query
   {
   public:
-    // friend class iterator;
-
+    friend class iterator;
     class iterator
     {
     public:
       using iterator_type = std::forward_iterator_tag;
+      using reference = std::shared_ptr<archetype_base>&;
+      using pointer = std::shared_ptr<archetype_base>;
 
-      iterator(ArchetypeStorage::iterator ci) : m_container_iter{ ci } {}
+      reference
+      operator*() const
+      {
+        return *m_ptr;
+      }
+
+      pointer
+      operator->()
+      {
+        return m_ptr;
+      }
+
+      iterator&
+      operator++()
+      {
+      }
+
+      iterator
+      operator++(int)
+      {
+      }
+
+      friend bool
+      operator==(const iterator& a, const iterator& b)
+      {
+      }
+
+      friend bool
+      operator!=(const iterator& a, const iterator& b)
+      {
+      }
 
     private:
-      // T m_archetype_iter;
-      ArchetypeStorage::iterator m_container_iter;
+      std::shared_ptr<archetype_base>
+      get_next()
+      {
+        while ((*m_ecs_iter)->has_types // TODO
+      }
+
+      ArchetypeStorage::iterator m_ecs_iter;
     };
 
-    view(ecs& ecs) : m_archetypes{ ecs.get_archetypes<Components...>() } {}
-
-    iterator
-    begin()
-    {
-      return iterator(m_archetypes.begin());
-    }
-
-    iterator
-    end()
-    {
-      return iterator(m_archetypes.end());
-    }
-
   private:
-    ArchetypeStorage m_archetypes;
+    std::shared_ptr<ecs> m_ecs;
   };
 
   template <typename... Components>
-  view<Components...>
-  get_view()
+  query<Components...>
+  create_query()
   {
-    return view<Components...>(this);
-  }
+    return query<Components...>(this);
+  };
 
 private:
   entity_mgr m_mgr;
