@@ -1,10 +1,11 @@
 #ifndef SYSTEM_H_
 #define SYSTEM_H_
 
-#include "archetype.h"
 #include <execution>
 #include <memory>
 #include <vector>
+
+#include "archetype.h"
 
 namespace xen
 {
@@ -12,17 +13,17 @@ namespace xen
 template <typename Func, typename... T> class system
 {
 public:
-  system (Func f) : m_func{ f } {}
+  system(Func f) : m_func{ f } {}
 
   void
-  iterate ()
+  iterate()
   {
-    std::for_each (std::execution::par_unseq, m_archetypes.begin (),
-                   m_archetypes.end (), m_func);
+    std::for_each(std::execution::par_unseq, m_archetypes.begin(),
+                  m_archetypes.end(), m_func);
   }
 
   void
-  add_archetype ()
+  add_archetype()
   {
   }
 

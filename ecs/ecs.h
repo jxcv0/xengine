@@ -29,8 +29,8 @@ struct offset_pair
 
 struct component_array
 {
-  void *buf;
-  struct offset_pair *map;
+  void* buf;
+  struct offset_pair* map;
   size_t num_components;
   size_t bufsize;
   size_t stride;
@@ -39,42 +39,42 @@ struct component_array
 struct ecs
 {
   eid_t num_entities;
-  struct component_array *arrays;
+  struct component_array* arrays;
   size_t num_component_types;
-  struct component_bitset *bitsets;
+  struct component_bitset* bitsets;
 };
 
 /* Create a new entity */
-eid_t create_entity (struct ecs *ecs);
+eid_t create_entity(struct ecs* ecs);
 
 /* Create a new component array */
-cid_t create_component_array (struct ecs *ecs, size_t size, size_t nmemb);
+cid_t create_component_array(struct ecs* ecs, size_t size, size_t nmemb);
 
 /* Set set component bit flag */
-void set_bitset (struct component_bitset *bitset, cid_t component);
+void set_bitset(struct component_bitset* bitset, cid_t component);
 
 /* Unset the component bit flag for an entity */
-void unset_bitset (struct component_bitset *bitset, cid_t component);
+void unset_bitset(struct component_bitset* bitset, cid_t component);
 
 /* Map an entity id to the next available component in a component array */
-int map_component (struct ecs *ecs, eid_t entity, cid_t component);
+int map_component(struct ecs* ecs, eid_t entity, cid_t component);
 
 /* Unmap all components from an entity */
-void unmap_component (struct ecs *ecs, eid_t entity, cid_t component);
+void unmap_component(struct ecs* ecs, eid_t entity, cid_t component);
 
 /* Get a component by it's entity */
-void *get_component (struct ecs *ecs, eid_t entity, cid_t component);
+void* get_component(struct ecs* ecs, eid_t entity, cid_t component);
 
 /* Check if an entity has a component */
-int has_component (struct ecs *ecs, eid_t entity, cid_t component);
+int has_component(struct ecs* ecs, eid_t entity, cid_t component);
 
 /* Check if an entity has multiple components */
-int is_archetype (struct ecs *ecs, eid_t entity, size_t num_components,
-                  cid_t *components);
+int is_archetype(struct ecs* ecs, eid_t entity, size_t num_components,
+                 cid_t* components);
 
 /* Count the number of entities that have a set of components */
-size_t count_archetype (struct ecs *ecs, size_t num_components,
-                        cid_t *components);
+size_t count_archetype(struct ecs* ecs, size_t num_components,
+                       cid_t* components);
 
 #ifdef __cplusplus
 } /* end of extern "C" */

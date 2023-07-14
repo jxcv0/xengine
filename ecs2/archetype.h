@@ -16,87 +16,27 @@ namespace xen
 class archetype_base
 {
 public:
-  class iterator
-  {
-  public:
-    using iterator_type = std::forward_iterator_tag;
-
-    iterator (archetype_base *base, std::size_t start_index)
-        : m_base{ base }, m_index{ start_index }
-    {
-    }
-
-    template <typename T>
-    T &
-    operator* ()
-    {
-      return std::get<T> (
-          m_base->get_at_index (m_index, typeid (T).hash_code ()));
-    }
-
-    iterator &
-    operator++ ()
-    {
-      m_index++;
-      return *this;
-    }
-
-    iterator
-    operator++ (int)
-    {
-      iterator tmp = *this;
-      ++(*this);
-      return tmp;
-    }
-
-    friend bool
-    operator== (const iterator &a, const iterator &b)
-    {
-      return a.m_index == b.m_index;
-    }
-
-    friend bool
-    operator!= (const iterator &a, const iterator &b)
-    {
-      return a.m_index != b.m_index;
-    }
-
-  private:
-    archetype_base *m_base;
-    std::size_t m_index;
-  };
-
-  virtual void add_entity (std::uint64_t entity) = 0;
-  virtual void remove_entity (std::uint64_t entity) = 0;
-  virtual bool has_type (std::size_t) const = 0;
-  virtual bool has_entity (std::uint64_t) const = 0;
-  virtual std::size_t type_count () const = 0;
-  virtual void *get_type (std::uint64_t entity, std::size_t typehash) = 0;
-  virtual void *get_at_index (std::size_t index, std::size_t typehash) = 0;
+  virtual void add_entity(std::uint64_t entity) = 0;
+  virtual void remove_entity(std::uint64_t entity) = 0;
+  virtual bool has_type(std::size_t) const = 0;
+  virtual bool has_entity(std::uint64_t) const = 0;
+  virtual std::size_t type_count() const = 0;
+  virtual void* get_type(std::uint64_t entity, std::size_t typehash) = 0;
+  virtual void* get_at_index(std::size_t index, std::size_t typehash) = 0;
   virtual std::size_t size() const = 0;
 
-  iterator begin()
+  template <typename T>
+  T*
+  get_component(std::uint64_t entity)
   {
-    return iterator(this, 0);
-  }
-
-  iterator end()
-  {
-    return iterator(this, size() - 1);
+    return static_cast<T*>(get_type(entity, typeid(T).hash_code()));
   }
 
   template <typename T>
-  T *
-  get_component (std::uint64_t entity)
+  T*
+  get_component_by_index(std::size_t index)
   {
-    return static_cast<T *> (get_type (entity, typeid (T).hash_code ()));
-  }
-
-  template <typename T>
-  T *
-  get_component_by_index (std::size_t index)
-  {
-    return static_cast<T *> (get_at_index (index, typeid (T).hash_code ()));
+    return static_cast<T*>(get_at_index(index, typeid(T).hash_code()));
   }
 };
 
@@ -120,7 +60,7 @@ public:
    */
   template <typename U>
   constexpr bool
-  has_component ()
+  has_component()
   {
     return (std::is_same<U, T>::value || ...);
   }
@@ -134,13 +74,13 @@ public:
    */
   template <typename... U>
   constexpr bool
-  has_components ()
+  has_components()
   {
     const std::size_t ntypes = sizeof...(U);
     std::size_t hascount = 0;
     (
         [&] {
-          if (has_component<U> ())
+          if (has_component<U>())
             {
               ++hascount;
             }
@@ -155,9 +95,9 @@ public:
    * @param entity The entity to add.
    */
   void
-  add_entity (std::uint64_t entity) override
+  add_entity(std::uint64_t entity) override
   {
-    m_entries.push_back (std::make_pair (entity, std::tuple<T...>{}));
+    m_entries.push_back(std::make_pair(entity, std::tuple<T...>{}));
   }
 
   /**
@@ -166,11 +106,11 @@ public:
    * @param entity The entity to remove.
    */
   void
-  remove_entity (std::uint64_t entity) override
+  remove_entity(std::uint64_t entity) override
   {
-    m_entries.erase (std::remove_if (
-        std::execution::par_unseq, m_entries.begin (), m_entries.end (),
-        [=] (const auto &e) { return e.first == entity; }));
+    m_entries.erase(std::remove_if(
+        std::execution::par_unseq, m_entries.begin(), m_entries.end(),
+        [=](const auto& e) { return e.first == entity; }));
   }
 
   /**
@@ -184,9 +124,9 @@ public:
    * the components in this archetype.
    */
   bool
-  has_type (std::size_t hash) const override
+  has_type(std::size_t hash) const override
   {
-    return ((hash == typeid (T).hash_code ()) || ...);
+    return ((hash == typeid(T).hash_code()) || ...);
   }
 
   /**
@@ -197,12 +137,12 @@ public:
    * @return false if the entity is not of this archetype.
    */
   bool
-  has_entity (std::uint64_t entity) const override
+  has_entity(std::uint64_t entity) const override
   {
-    auto it = std::find_if (std::execution::par_unseq, m_entries.cbegin (),
-                            m_entries.cend (),
-                            [=] (const auto &e) { return e.first == entity; });
-    return it != m_entries.cend ();
+    auto it = std::find_if(std::execution::par_unseq, m_entries.cbegin(),
+                           m_entries.cend(),
+                           [=](const auto& e) { return e.first == entity; });
+    return it != m_entries.cend();
   }
 
   /**
@@ -211,7 +151,7 @@ public:
    * @return The number of component types this archetype is comprised of.
    */
   std::size_t
-  type_count () const override
+  type_count() const override
   {
     return sizeof...(T);
   }
@@ -224,17 +164,17 @@ public:
    * @return A pointer to the component or nullptr if the component cannot be
    * retrieved.
    */
-  void *
-  get_type (std::uint64_t entity, std::size_t typehash) override
+  void*
+  get_type(std::uint64_t entity, std::size_t typehash) override
   {
-    void *res = nullptr;
-    auto &pair = get_by_entity (entity);
+    void* res = nullptr;
+    auto& pair = get_by_entity(entity);
     /* Find the type by hash_code */
     (
         [&] {
-          if (typeid (T).hash_code () == typehash)
+          if (typeid(T).hash_code() == typehash)
             {
-              res = &std::get<T> (pair.second);
+              res = &std::get<T>(pair.second);
             }
         }(),
         ...);
@@ -242,15 +182,15 @@ public:
     return res;
   }
 
-  void *
-  get_at_index (std::size_t index, std::size_t typehash) override
+  void*
+  get_at_index(std::size_t index, std::size_t typehash) override
   {
-    void *res = nullptr;
+    void* res = nullptr;
     (
         [&] {
-          if (typeid (T).hash_code () == typehash)
+          if (typeid(T).hash_code() == typehash)
             {
-              res = &std::get<T> (m_entries[index].second);
+              res = &std::get<T>(m_entries[index].second);
             }
         }(),
         ...);
@@ -258,7 +198,7 @@ public:
   }
 
   std::size_t
-  size() const override 
+  size() const override
   {
     return m_entries.size();
   }
@@ -271,23 +211,23 @@ public:
    * @return A reference to the component.
    */
   template <typename U>
-  U &
-  get_component (std::uint64_t entity)
+  U&
+  get_component(std::uint64_t entity)
   {
-    auto &pair = get_by_entity (entity);
-    return std::get<U> (pair.second);
+    auto& pair = get_by_entity(entity);
+    return std::get<U>(pair.second);
   }
 
 private:
-  std::pair<std::uint64_t, std::tuple<T...> > &
-  get_by_entity (std::uint64_t entity)
+  std::pair<std::uint64_t, std::tuple<T...> >&
+  get_by_entity(std::uint64_t entity)
   {
-    auto it = std::find_if (std::execution::par_unseq, m_entries.begin (),
-                            m_entries.end (),
-                            [=] (const auto &e) { return e.first == entity; });
-    if (it == m_entries.cend ())
+    auto it = std::find_if(std::execution::par_unseq, m_entries.begin(),
+                           m_entries.end(),
+                           [=](const auto& e) { return e.first == entity; });
+    if (it == m_entries.cend())
       {
-        throw std::runtime_error ("Entity not found in archetype");
+        throw std::runtime_error("Entity not found in archetype");
       }
     return *it;
   }

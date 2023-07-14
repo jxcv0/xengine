@@ -1,6 +1,5 @@
 #include "assets.h"
 
-#include "stb_image.h"
 #include <assert.h>
 #include <assimp/cimport.h>
 #include <assimp/mesh.h>
@@ -8,16 +7,18 @@
 #include <assimp/scene.h>
 #include <string.h>
 
+#include "stb_image.h"
+
 struct mesh_allocator
-create_mesh_allocator (int bufsize)
+create_mesh_allocator(int bufsize)
 {
-  void *mem = malloc (bufsize * sizeof (struct mesh) + bufsize * sizeof (int));
+  void* mem = malloc(bufsize * sizeof(struct mesh) + bufsize * sizeof(int));
   struct mesh_allocator alloc = { .buf = mem,
-                                  .free = mem + (bufsize * sizeof (int)),
+                                  .free = mem + (bufsize * sizeof(int)),
                                   .bufsize = bufsize,
                                   .nmeshes = 0,
                                   .nfree = bufsize };
-  sem_init (&alloc.sem, 0, 1);
+  sem_init(&alloc.sem, 0, 1);
   for (int i = 0; i < bufsize; i++)
     {
       alloc.free[i] = bufsize - (i + 1);
@@ -26,59 +27,59 @@ create_mesh_allocator (int bufsize)
 }
 
 int
-alloc_mesh (struct mesh_allocator *alloc)
+alloc_mesh(struct mesh_allocator* alloc)
 {
-  if (sem_wait (&alloc->sem) == -1)
+  if (sem_wait(&alloc->sem) == -1)
     {
       return -1;
     }
 
   if (alloc->nmeshes == alloc->bufsize)
     {
-      sem_post (&alloc->sem);
+      sem_post(&alloc->sem);
       return -1;
     }
 
   int index = alloc->free[--alloc->nfree];
   ++alloc->nmeshes;
-  sem_post (&alloc->sem);
+  sem_post(&alloc->sem);
   return index;
 }
 
 int
-free_mesh (struct mesh_allocator *alloc, int index)
+free_mesh(struct mesh_allocator* alloc, int index)
 {
-  if (sem_wait (&alloc->sem) == -1)
+  if (sem_wait(&alloc->sem) == -1)
     {
       return -1;
     }
 
   if (alloc->nmeshes == 0)
     {
-      sem_post (&alloc->sem);
+      sem_post(&alloc->sem);
       return -1;
     }
 
   alloc->free[alloc->nfree++] = index;
   --alloc->nmeshes;
-  sem_post (&alloc->sem);
+  sem_post(&alloc->sem);
   return 0;
 }
 
 int
-asset_type (const char *path)
+asset_type(const char* path)
 {
-  char *ext = strrchr (path, '.');
+  char* ext = strrchr(path, '.');
 
   if (ext == NULL)
     {
       return -1;
     }
 
-  const char *supported_asset_exts[] = { ".mesh", ".tex" };
+  const char* supported_asset_exts[] = { ".mesh", ".tex" };
   for (int i = 0; i < 2; i++)
     {
-      if (strcmp (supported_asset_exts[i], ext) == 0)
+      if (strcmp(supported_asset_exts[i], ext) == 0)
         {
           return i;
         }
@@ -88,11 +89,11 @@ asset_type (const char *path)
 }
 
 struct texture
-load_texture (const char *filepath)
+load_texture(const char* filepath)
 {
   struct texture tex;
-  tex.data = stbi_load (filepath, &tex.sizeinfo.width, &tex.sizeinfo.height,
-                        &tex.sizeinfo.nchannels, 0);
+  tex.data = stbi_load(filepath, &tex.sizeinfo.width, &tex.sizeinfo.height,
+                       &tex.sizeinfo.nchannels, 0);
   return tex;
 }
 

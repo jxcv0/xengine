@@ -1,6 +1,7 @@
+#include <gtest/gtest.h>
+
 #include "archetype.h"
 #include "system.h"
-#include <gtest/gtest.h>
 
 struct C1
 {
@@ -12,7 +13,7 @@ struct C2
   int i;
 };
 
-TEST (system_tests, execute)
+TEST(system_tests, execute)
 {
   auto arch = new xen::archetype<C1, C2>;
   (void)arch;
