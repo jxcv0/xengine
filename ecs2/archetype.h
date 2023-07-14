@@ -20,6 +20,7 @@ public:
   {
   public:
     using iterator_type = std::forward_iterator_tag;
+
     iterator (archetype_base *base, std::size_t start_index)
         : m_base{ base }, m_index{ start_index }
     {
@@ -31,6 +32,33 @@ public:
     {
       return std::get<T> (
           m_base->get_at_index (m_index, typeid (T).hash_code ()));
+    }
+
+    iterator &
+    operator++ ()
+    {
+      m_index++;
+      return *this;
+    }
+
+    iterator
+    operator++ (int)
+    {
+      iterator tmp = *this;
+      ++(*this);
+      return tmp;
+    }
+
+    friend bool
+    operator== (const iterator &a, const iterator &b)
+    {
+      return a.m_index == b.m_index;
+    }
+
+    friend bool
+    operator!= (const iterator &a, const iterator &b)
+    {
+      return a.m_index != b.m_index;
     }
 
   private:
@@ -45,6 +73,17 @@ public:
   virtual std::size_t type_count () const = 0;
   virtual void *get_type (std::uint64_t entity, std::size_t typehash) = 0;
   virtual void *get_at_index (std::size_t index, std::size_t typehash) = 0;
+  virtual std::size_t size() const = 0;
+
+  iterator begin()
+  {
+    return iterator(this, 0);
+  }
+
+  iterator end()
+  {
+    return iterator(this, size() - 1);
+  }
 
   template <typename T>
   T *
@@ -216,6 +255,12 @@ public:
         }(),
         ...);
     return res;
+  }
+
+  std::size_t
+  size() const override 
+  {
+    return m_entries.size();
   }
 
   /**

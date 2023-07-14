@@ -130,3 +130,28 @@ TEST (archetype_base_tests, get_at_index)
   ASSERT_EQ (b->i, tmp_b.i);
   ASSERT_EQ (c->i, tmp_c.i);
 }
+
+TEST (archetype_base_tests, iterator)
+{
+  auto arch = new xen::archetype<C1, C2>;
+
+  arch->add_entity (0);
+  arch->add_entity (2);
+  arch->add_entity (42);
+
+  C1 &tmp_a = arch->get_component<C1> (0);
+  C1 &tmp_b = arch->get_component<C1> (2);
+  C1 &tmp_c = arch->get_component<C1> (42);
+
+  tmp_a.i = 10;
+  tmp_b.i = 11;
+  tmp_c.i = 12;
+
+  int vals[3] = {10, 11, 12};
+  int i = 0;
+  for (auto it = arch->begin(); it != arch->end(); it++)
+  {
+    C1 c = *it;
+    ASSERT_EQ (vals[i++], c.i);
+  }
+}
