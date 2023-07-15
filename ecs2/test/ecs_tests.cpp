@@ -94,3 +94,25 @@ TEST(ecs_tests, get_archetype)
   ASSERT_TRUE(arch_pv->has_entity(42));
   ASSERT_TRUE(arch_pva->has_entity(43));
 }
+
+TEST(ecs_tests, create_query)
+{
+  auto arch_a = new xen::archetype<cmpnt::assetlist>;
+  auto arch_pv = new xen::archetype<cmpnt::position, cmpnt::velocity>;
+  auto arch_pva
+      = new xen::archetype<cmpnt::position, cmpnt::velocity, cmpnt::assetlist>;
+
+  xen::ecs ecs;
+  ecs.register_archetype(arch_a);
+  ecs.register_archetype(arch_pv);
+  ecs.register_archetype(arch_pva);
+
+  auto q1 = ecs.create_query<cmpnt::position, cmpnt::velocity>();
+
+  int count = 0;
+  for (const auto &i : q1)
+  {
+    count++;
+  }
+  ASSERT_EQ (count, 2);
+}

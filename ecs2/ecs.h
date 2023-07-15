@@ -107,63 +107,65 @@ public:
                                std::shared_ptr<archetype_base> >
     {
     public:
-      using reference = std::shared_ptr<archetype_base>&;
-      using pointer = std::shared_ptr<archetype_base>;
-
-      /*
-            reference
-            operator*() const
-            {
-              return *m_ptr;
-            }
-
-            pointer
-            operator->()
-            {
-              return m_ptr;
-            }
-
-            iterator&
-            operator++()
-            {
-            }
-
-            iterator
-            operator++(int)
-            {
-            }
-
-            friend bool
-            operator==(const iterator& a, const iterator& b)
-            {
-            }
-
-            friend bool
-            operator!=(const iterator& a, const iterator& b)
-            {
-            }
-            */
+      explicit iterator(ArchetypeStorage::iterator iter,
+                        ArchetypeStorage::iterator end)
+          : m_iter{ iter }, m_end{ end }
+      {
+      }
 
       iterator
-      begin()
+      operator++()
       {
+        while (m_iter != m_end && !(*m_iter)->has_components<Components...>())
+        {
+          ++m_iter;
+        }
+        return *this;
+      }
+
+      iterator
+      operator++(int)
+      {
+        iterator retval = *this;
+        ++(*this);
+        return retval;
+      }
+
+      reference operator*()
+      {
+        return *m_iter;
+      }
+
+      friend bool operator==(const iterator &a, const iterator &b)
+      {
+        return a.m_iter == b.m_iter;
+      }
+
+      friend bool operator!=(const iterator &a, const iterator &b)
+      {
+        return a.m_iter != b.m_iter;
       }
 
     private:
-      /* Iterate to the next archetype with Components */
-      std::shared_ptr<archetype_base>
-      get_next()
-      {
-        while (!(*m_ecs_iter)->has_components<Components...>())
-          {
-            m_ecs_iter++;
-          }
-        return *m_ecs_iter;
-      }
+      ArchetypeStorage::iterator m_iter;
+      ArchetypeStorage::iterator m_end;
+    }; /* class iterator */
 
-      ArchetypeStorage::iterator m_ecs_iter;
-    };
+    query(ecs& e) : m_ecs{ e } {}
 
+    iterator
+    begin()
+    {
+      return iterator(m_ecs.begin(), m_ecs.end());
+    }
+
+    iterator
+    end()
+    {
+      return iterator(m_ecs.end(), m_ecs.end());
+    }
+
+    /* Iterate to the next archetype with Components */
   private:
     ecs& m_ecs;
   };
@@ -172,7 +174,19 @@ public:
   query<Components...>
   create_query()
   {
-    return query<Components...>(this);
+    return query<Components...>(*this);
+  }
+
+  auto
+  begin()
+  {
+    return m_archetypes.begin();
+  }
+
+  auto
+  end()
+  {
+    return m_archetypes.end();
   }
 
 private:
