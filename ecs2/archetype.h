@@ -32,13 +32,6 @@ public:
     return false;
   }
 
-  template <typename... Components>
-  bool
-  has_components()
-  {
-    // TODO
-  }
-
   virtual bool
   has_entity(std::uint64_t) const
   {
@@ -74,6 +67,23 @@ public:
   get_component(std::uint64_t entity)
   {
     return static_cast<T*>(get_type(entity, typeid(T).hash_code()));
+  }
+
+  template <typename... Components>
+  bool
+  has_components()
+  {
+    const std::size_t ntypes = sizeof...(Components);
+    std::size_t hascount = 0;
+    (
+        [&] {
+          if (has_type(typeid(Components).hash_code()))
+            {
+              ++hascount;
+            }
+        }(),
+        ...);
+    return hascount == ntypes;
   }
 
   template <typename T>

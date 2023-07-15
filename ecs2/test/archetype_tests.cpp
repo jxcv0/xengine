@@ -59,13 +59,34 @@ TEST(archetype_base_tests, add_entity)
 TEST(archetype_base_tests, has_type)
 {
   xen::archetype_base* arch = new xen::archetype<C1, C2, C3>;
+
   bool res = arch->has_type(typeid(C1).hash_code());
   ASSERT_TRUE(res);
+
   res = arch->has_type(typeid(C2).hash_code());
   ASSERT_TRUE(res);
+
   res = arch->has_type(typeid(C3).hash_code());
   ASSERT_TRUE(res);
+
   res = arch->has_type(typeid(C4).hash_code());
+  ASSERT_FALSE(res);
+}
+
+TEST(archetype_base_tests, has_components)
+{
+  xen::archetype_base* arch = new xen::archetype<C1, C2, C3>;
+
+  bool res = arch->has_components<C1>();
+  ASSERT_TRUE(res);
+
+  res = arch->has_components<C1, C2>();
+  ASSERT_TRUE(res);
+
+  res = arch->has_components<C1, C3>();
+  ASSERT_TRUE(res);
+
+  res = arch->has_components<C1, C2, C4>();
   ASSERT_FALSE(res);
 }
 
