@@ -2,8 +2,9 @@
 #define ARCHETYPE_H_
 
 #include "types.hpp"
+
 #include <cstddef>
-#include <cstdint>
+#include <stdexcept>
 #include <typeindex>
 #include <vector>
 
@@ -47,19 +48,25 @@ struct chunk
   Component&
   get_component()
   {
-    auto* ptr = &m_bytes[m_offset_map[std::type_index(typeid(Component))]];
+    auto* ptr = &m_bytes[m_offset_map.at(std::type_index(typeid(Component)))];
     return *reinterpret_cast<Component*>(ptr);
   }
 
   /**
    * @brief Get a component from the chunk by type index.
-   * 
+   *
+   * @throws std::runtime_exception If the type_index is not found in this
+   * chunk.
    * @param index The type index.
-   * @return void* 
+   * @return void*
    */
   void*
   get_by_type_index(const std::type_index& index)
   {
+    if (!((std::type_index(typeid(ComponentTs)) == index) || ...))
+      {
+        throw std::runtime_error("Type not found in archetype");
+      }
     return &m_bytes[m_offset_map[index]];
   }
 
@@ -124,6 +131,7 @@ struct archetype_storage_base
   {
     (void)entity;
     (void)index;
+    throw std::runtime_error("Unimplemented member function");
     return nullptr;
   }
 };
@@ -149,7 +157,7 @@ public:
   }
 
   /**
-   * @copydoc xen::archetype_storage_base::add_entity(eid_t entity)
+   * @copydoc xen::archetype_storage_base::add_entity
    *
    */
   void
@@ -158,6 +166,10 @@ public:
     m_arr.push_back(chunk<ComponentTs...>(entity));
   }
 
+  /**
+   * @copydoc xen::archetype_storage_base::has_entity
+   *
+   */
   bool
   has_entity(eid_t entity) const override
   {
@@ -175,10 +187,16 @@ public:
   {
     auto it = find_by_entity(entity);
     if (it == m_arr.end())
-    {
-      return nullptr;
-    }
+      {
+        throw std::runtime_error("Entity not found in archetype");
+      }
     return it->get_by_type_index(index);
+  }
+
+  void*
+  at_index(std::size_t i, std::type_index& ti)
+  {
+    return &m_arr.at(i).get_by_type_index(ti);
   }
 
 private:
@@ -200,10 +218,6 @@ private:
   std::vector<chunk<ComponentTs...> > m_arr;
 };
 
-/**
- * @brief TODO
- *
- */
 class archetype
 {
 public:
@@ -236,26 +250,53 @@ public:
     return m_storage->chunk_size();
   }
 
+  /**
+   * @brief Create an entity and copy it's previous component values into this
+   * archetype.
+   *
+   * @tparam PrevCmpntTs The types of the components.
+   * @param entity The entity to add this archetype.
+   * @param cs The components.
+   */
   template <typename... PrevCmpntTs>
   void
   add_entity(eid_t entity, PrevCmpntTs... cs)
   {
     m_storage->add_entity(entity);
-    // (m_storage->set_component(entity, cs), ...);
+    ((get<PrevCmpntTs>(entity) = cs), ...);
   }
 
+  /**
+   * @brief Check if an entity in part of the archetype.
+   *
+   * @param entity The entity.
+   * @return true if entity is of the archetype.
+   * @return false if entity is not part of the archetype.
+   */
   bool
   has_entity(eid_t entity) const
   {
     return m_storage->has_entity(entity);
   }
 
+  /**
+   * @brief Get the number of entities of this archetype.
+   *
+   * @return std::size_t
+   */
   std::size_t
-  size()
+  size() const
   {
     return m_storage->size();
   }
 
+  /**
+   * @brief Access a component belonging to an entity.
+   *
+   * @tparam Component The type of the component to get.
+   * @param entity The entity.
+   * @return Component&
+   */
   template <typename Component>
   Component&
   get(eid_t entity)
@@ -264,12 +305,23 @@ public:
     return *reinterpret_cast<Component*>(ptr);
   }
 
-  void begin();
-  void end();
+  /*
+  auto
+  begin()
+  {
+    return m_storage->begin();
+  }
+
+  auto
+  end()
+  {
+    return m_storage->end();
+  }
+  */
 
 private:
   /* We want to create archetypes with the static create function only */
-  archetype(archetype_storage_base* base) noexcept : m_storage{ base } {}
+  archetype(archetype_storage_base* base) : m_storage{ base } {}
 
 private:
   std::unique_ptr<archetype_storage_base> m_storage;

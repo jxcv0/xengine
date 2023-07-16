@@ -53,3 +53,26 @@ TEST(archetype_tests, get)
   ASSERT_FLOAT_EQ(arch.get<float>(42), 42.01f);
   ASSERT_FLOAT_EQ(arch.get<double>(42), 100.0001f);
 }
+
+TEST(archetype_tests, add_entity_with_vals)
+{
+  struct C1
+  {
+    int i;
+  };
+
+  C1 prev;
+  prev.i = 88;
+
+  xen::archetype arch = xen::archetype::create<int, C1>();
+  arch.add_entity(42, 69, prev);
+  ASSERT_EQ(arch.get<C1>(42).i, 88);
+  ASSERT_EQ(arch.get<int>(42), 69);
+}
+
+TEST(archetype_tests, throw_on_get)
+{
+  xen::archetype arch = xen::archetype::create<int, float>();
+  arch.add_entity(42);
+  ASSERT_THROW(arch.get<char>(44), std::runtime_error);
+}
