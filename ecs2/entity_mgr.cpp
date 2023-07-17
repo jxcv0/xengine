@@ -1,5 +1,5 @@
 #include "entity_mgr.hpp"
-#include <iostream>
+#include <algorithm>
 
 xen::eid_t
 xen::entity_mgr::create_entity()

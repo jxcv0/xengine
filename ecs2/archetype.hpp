@@ -362,7 +362,10 @@ public:
 
 private:
   /* We want to create archetypes with the static create function only */
-  archetype(archetype_storage_base* base) : m_storage{ base } {}
+  archetype(archetype_storage_base* base)
+      : m_storage{ base }
+  {
+  }
 
 private:
   std::unique_ptr<archetype_storage_base> m_storage;

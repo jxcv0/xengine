@@ -2,6 +2,7 @@
 #define ENTITY_MGR_HPP_
 
 #include "types.hpp"
+#include <unordered_map>
 #include <vector>
 
 namespace xen

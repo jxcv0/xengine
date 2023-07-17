@@ -58,9 +58,11 @@ public:
         return it.template get<Component>(entity);
       }
     else
-     {}
+      {
+        /* Move entity out of archetype into new one */
+      }
 
-    /* Entity is already part of an arcetype */
+    /* Entity is already part of an archetype */
     auto arch = *it;
     return arch.template get<Component>(entity);
   }
