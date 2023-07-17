@@ -126,14 +126,23 @@ struct archetype_storage_base
     return 0;
   }
 
-  virtual void*
-  get(eid_t entity, const std::type_index& index)
-  {
-    (void)entity;
-    (void)index;
-    throw std::runtime_error("Unimplemented member function");
-    return nullptr;
-  }
+  /**
+   * @brief Get a pointer to a component by it's entity.
+   * 
+   * @param entity The entity that owns the component
+   * @param index The type index of the component.
+   * @return void* 
+   */
+  virtual void* get(eid_t entity, const std::type_index& index) = 0;
+
+  /**
+   * @brief Get a pointer to a chunk by its index in memory.
+   * 
+   * @param at The index in the array.
+   * @param index The type index of the component.
+   * @return void* 
+   */
+  virtual void* at(std::size_t at, const std::type_index& index) = 0;
 };
 
 /**
@@ -194,9 +203,9 @@ public:
   }
 
   void*
-  at_index(std::size_t i, std::type_index& ti)
+  at(std::size_t at, const std::type_index& index) override
   {
-    return &m_arr.at(i).get_by_type_index(ti);
+    return m_arr.at(at).get_by_type_index(index);
   }
 
 private:
@@ -302,6 +311,14 @@ public:
   get(eid_t entity)
   {
     auto* ptr = m_storage->get(entity, std::type_index(typeid(Component)));
+    return *reinterpret_cast<Component*>(ptr);
+  }
+
+  template <typename Component>
+  Component&
+  at(std::size_t index)
+  {
+    auto* ptr = m_storage->at(index, std::type_index(typeid(Component)));
     return *reinterpret_cast<Component*>(ptr);
   }
 

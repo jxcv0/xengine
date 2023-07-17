@@ -54,6 +54,26 @@ TEST(archetype_tests, get)
   ASSERT_FLOAT_EQ(arch.get<double>(42), 100.0001f);
 }
 
+TEST(archetype_tests, at)
+{
+  xen::archetype arch = xen::archetype::create<int, char, float>();
+  arch.add_entity(10, 100, 't', 42.0f);
+  arch.add_entity(11, 110, 'y', 666.0f);
+  arch.add_entity(12, 120, 'u', 123.456f);
+
+  ASSERT_EQ(arch.at<int>(0), 100);
+  ASSERT_EQ(arch.at<char>(0), 't');
+  ASSERT_EQ(arch.at<float>(0), 42.0f);
+
+  ASSERT_EQ(arch.at<int>(1), 110);
+  ASSERT_EQ(arch.at<char>(1), 'y');
+  ASSERT_EQ(arch.at<float>(1), 666.0f);
+
+  ASSERT_EQ(arch.at<int>(2), 120);
+  ASSERT_EQ(arch.at<char>(2), 'u');
+  ASSERT_EQ(arch.at<float>(2), 123.456f);
+}
+
 TEST(archetype_tests, add_entity_with_vals)
 {
   struct C1
