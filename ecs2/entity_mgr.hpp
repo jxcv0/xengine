@@ -1,5 +1,5 @@
-#ifndef ENTITY_MGR_H_
-#define ENTITY_MGR_H_
+#ifndef ENTITY_MGR_HPP_
+#define ENTITY_MGR_HPP_
 
 #include <algorithm>
 #include <cstddef>
@@ -115,4 +115,4 @@ private:
 
 } /* end of namespace xen */
 
-#endif /* ENTITY_MGR_H_ */
+#endif /* ENTITY_MGR_HPP_ */

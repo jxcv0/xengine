@@ -1,4 +1,4 @@
-#include "entity_mgr.h"
+#include "entity_mgr.hpp"
 
 std::uint64_t
 xen::entity_mgr::create_entity()

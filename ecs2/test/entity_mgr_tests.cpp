@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "entity_mgr.h"
+#include "entity_mgr.hpp"
 
 struct vec3
 {

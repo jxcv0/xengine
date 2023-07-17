@@ -3,11 +3,12 @@ project(ecs2)
 
 set(SOURCES
   archetype.hpp
-  # entity_mgr.cpp
+  entity_mgr.hpp
+  entity_mgr.cpp
+  ecs.hpp
   # entity_mgr.h
   # component_array.h
   # system.h
-  # ecs.h
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
