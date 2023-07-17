@@ -96,3 +96,22 @@ TEST(archetype_tests, throw_on_get)
   arch.add_entity(42);
   ASSERT_THROW(arch.get<char>(44), std::runtime_error);
 }
+
+TEST(archetype_tests, has_types)
+{
+  struct C
+  {
+    float xyz[3];
+  };
+
+  xen::archetype arch
+      = xen::archetype::create<int, float, char, double, long>();
+  bool b = arch.has_types<int>();
+  ASSERT_TRUE(b);
+  b = arch.has_types<int, float, char>();
+  ASSERT_TRUE(b);
+  b = arch.has_types<int, float, C>();
+  ASSERT_FALSE(b);
+  b = arch.has_types<C>();
+  ASSERT_FALSE(b);
+}

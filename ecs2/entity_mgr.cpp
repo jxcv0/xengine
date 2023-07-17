@@ -1,9 +1,10 @@
 #include "entity_mgr.hpp"
+#include <iostream>
 
-std::uint64_t
+xen::eid_t
 xen::entity_mgr::create_entity()
 {
-  std::uint64_t new_id;
+  eid_t new_id;
   if (!m_freelist.empty())
     {
       new_id = m_freelist.back();
@@ -13,19 +14,17 @@ xen::entity_mgr::create_entity()
     {
       new_id = m_counter++;
     }
-  m_map[new_id].clear();
   return new_id;
 }
 
 void
-xen::entity_mgr::delete_entity(std::uint64_t entity)
+xen::entity_mgr::delete_entity(eid_t entity)
 {
-  m_map.erase(entity);
-  --m_counter;
+  m_freelist.push_back(entity);
 }
 
-std::uint64_t
+std::size_t
 xen::entity_mgr::num_entities()
 {
-  return m_counter;
+  return m_counter - m_freelist.size();
 }

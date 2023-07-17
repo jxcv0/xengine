@@ -143,6 +143,8 @@ struct archetype_storage_base
    * @return void*
    */
   virtual void* at(std::size_t at, const std::type_index& index) = 0;
+
+  virtual bool has_type(const std::type_index& ti) = 0;
 };
 
 /**
@@ -206,6 +208,12 @@ public:
   at(std::size_t at, const std::type_index& index) override
   {
     return m_arr.at(at).get_by_type_index(index);
+  }
+
+  bool
+  has_type(const std::type_index& ti) override
+  {
+    return (ti == std::type_index(typeid(ComponentTs)) || ...);
   }
 
 private:
@@ -320,6 +328,22 @@ public:
   {
     auto* ptr = m_storage->at(index, std::type_index(typeid(Component)));
     return *reinterpret_cast<Component*>(ptr);
+  }
+
+  template <typename... ComponentTs>
+  bool
+  has_types()
+  {
+    std::size_t hascount = 0;
+    (
+        [&] {
+          if (m_storage->has_type(std::type_index(typeid(ComponentTs))))
+            {
+              hascount++;
+            }
+        }(),
+        ...);
+    return hascount == sizeof...(ComponentTs);
   }
 
 private:
