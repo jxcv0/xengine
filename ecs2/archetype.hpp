@@ -113,6 +113,8 @@ struct archetype_storage_base
    */
   virtual void add_entity(eid_t entity) = 0;
 
+  virtual void remove_entity(eid_t entity) = 0;
+
   virtual bool
   has_entity(eid_t entity) const
   {
@@ -175,6 +177,12 @@ public:
   add_entity(eid_t entity) override
   {
     m_arr.push_back(chunk<ComponentTs...>(entity));
+  }
+
+  void
+  remove_entity(eid_t entity) override
+  {
+    m_arr.erase(find_by_entity(entity));
   }
 
   /**
@@ -283,6 +291,12 @@ public:
     ((get<PrevCmpntTs>(entity) = cs), ...);
   }
 
+  void
+  remove_entity(eid_t entity)
+  {
+    m_storage->remove_entity(entity);
+  }
+
   /**
    * @brief Check if an entity in part of the archetype.
    *
@@ -332,7 +346,7 @@ public:
 
   template <typename... ComponentTs>
   bool
-  has_types()
+  has_types() const
   {
     std::size_t hascount = 0;
     (

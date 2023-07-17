@@ -28,6 +28,8 @@ TEST(archetype_tests, has_entity)
   ASSERT_FALSE(arch.has_entity(10));
   arch.add_entity(10);
   ASSERT_TRUE(arch.has_entity(10));
+  arch.remove_entity(10);
+  ASSERT_FALSE(arch.has_entity(10));
 }
 
 TEST(archetype_tests, size)

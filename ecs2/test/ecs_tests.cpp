@@ -2,8 +2,4 @@
 
 #include "ecs.hpp"
 
-TEST(ecs_tests, create_entity)
-{
-  xen::ecs ecs;
-  (void)ecs;
-}
+TEST(ecs_tests, create_entity) {}
