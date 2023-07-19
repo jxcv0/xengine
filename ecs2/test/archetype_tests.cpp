@@ -44,3 +44,35 @@ TEST(archetype_tests, get_component)
   ASSERT_EQ(arch.get_component<C2>(42).i, 2);
   ASSERT_EQ(arch.get_component<C3>(42).i, 3);
 }
+
+TEST(archetype_tests, add_remove_entity)
+{
+  xen::archetype arch(42, C1{ 1 }, C2{ 2 }, C3{ 3 });
+  ASSERT_THROW(arch.get_component<C3>(666), std::out_of_range);
+  arch.add_entity(666, C1{ 11 }, C2{ 12 }, C3{ 13 });
+  ASSERT_EQ(arch.get_component<C1>(666).i, 11);
+  ASSERT_EQ(arch.get_component<C2>(666).i, 12);
+  ASSERT_EQ(arch.get_component<C3>(666).i, 13);
+  arch.remove_entity(42);
+  ASSERT_THROW(arch.get_component<C3>(42), std::out_of_range);
+}
+
+TEST(archetype_tests, has_entity)
+{
+  xen::archetype arch(42, C1{ 1 }, C2{ 2 }, C3{ 3 });
+  ASSERT_TRUE(arch.has_entity(42));
+  ASSERT_FALSE(arch.has_entity(666));
+  arch.add_entity(666, C1{ 11 }, C2{ 12 }, C3{ 13 });
+  ASSERT_TRUE(arch.has_entity(42));
+  ASSERT_TRUE(arch.has_entity(666));
+  arch.remove_entity(42);
+  ASSERT_FALSE(arch.has_entity(42));
+  ASSERT_TRUE(arch.has_entity(666));
+}
+
+TEST(archetype_tests, has_component)
+{
+  xen::archetype arch(42, C1{ 1 }, C2{ 2 }, C3{ 3 });
+  ASSERT_TRUE(arch.has_component<C1>());
+  ASSERT_FALSE(arch.has_component<double>());
+}

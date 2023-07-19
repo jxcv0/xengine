@@ -1,0 +1,4 @@
+#ifndef TYPE_REGISTRY_HPP_
+#define TYPE_REGISTRY_HPP_
+
+#endif /* TYPE_REGISTRY_HPP_ */
