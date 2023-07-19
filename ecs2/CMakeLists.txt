@@ -3,10 +3,11 @@ project(ecs2)
 
 set(SOURCES
   types.hpp
-  archetype.hpp
-  entity_mgr.hpp
+  chunk.hpp
+  # archetype.hpp
+  # entity_mgr.hpp
   entity_mgr.cpp
-  ecs.hpp
+  # ecs.hpp
   # system.h
 )
 
