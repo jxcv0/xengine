@@ -4,6 +4,7 @@ project(ecs2)
 set(SOURCES
   types.hpp
   archetype.hpp
+  archetype.cpp
   entity_mgr.hpp
   entity_mgr.cpp
   # ecs.hpp

@@ -1,174 +1,101 @@
 #ifndef ARCHETYPE_H_
 #define ARCHETYPE_H_
 
-#include "types.hpp"
-
-#include <atomic>
+#include <algorithm>
 #include <cstddef>
-#include <initializer_list>
-#include <stdexcept>
+#include <cstdlib>
 #include <typeindex>
 #include <vector>
+
+#include "types.hpp"
 
 namespace xen
 {
 
-struct archetype_storage_base
+struct component_info
 {
-  virtual void add_entity(eid_t) = 0;
-  virtual void remove_entity(eid_t) = 0;
-  virtual bool has_entity(eid_t) const = 0;
-  virtual void* at_offset(std::size_t, eid_t) = 0;
-  virtual std::size_t num_entities() const = 0;
+  std::type_index index;
+  std::size_t size;
+
+  /**
+   * @brief Compare equality of two component_info structures.
+   *
+   * @param i1
+   * @param i2
+   * @return true if both structures contain info about the same type.
+   * @return false if the structure contain info about different types.
+   */
+  friend bool
+  operator==(const component_info& i1, const component_info& i2)
+  {
+    return i1.index == i2.index && i1.size == i2.size;
+  }
 };
 
-template <std::size_t N>
-class archetype_storage : public archetype_storage_base
+template <typename... ComponentTs>
+std::vector<component_info>
+create_component_info()
 {
-public:
-  void
-  add_entity(eid_t entity) override
-  {
-    chunk c;
-    c.entity = entity;
-    m_chunks.push_back(c);
-  }
-
-  void
-  remove_entity(eid_t entity) override
-  {
-    m_chunks.erase(find_by_entity(entity));
-  }
-
-  bool
-  has_entity(eid_t entity) const override
-  {
-    return find_by_entity(entity) != m_chunks.end();
-  }
-
-  void*
-  at_offset(eid_t entity, std::size_t offset) override
-  {
-    auto it = find_by_entity(entity);
-    if (it == m_chunks.end())
-      {
-        throw std::out_of_range("Entity not found in archetype");
-      }
-    return &it->bytes[offset];
-  };
-
-  std::size_t
-  num_entities() const
-  {
-    return m_chunks.size();
-  }
-
-private:
-  auto
-  find_by_entity(eid_t entity)
-  {
-    return std::find_if(m_chunks.begin(), m_chunks.end(),
-                        [=](const auto& c) { return c.entity == entity; });
-  }
-
-  auto
-  find_by_entity(eid_t entity) const
-  {
-    return std::find_if(m_chunks.cbegin(), m_chunks.cend(),
-                        [=](const auto& c) { return c.entity == entity; });
-  }
-
-private:
-  struct chunk
-  {
-    eid_t entity;
-    std::byte bytes[N];
-  };
-
-  std::vector<chunk> m_chunks;
-};
+  std::vector<component_info> res{};
+  ((res.push_back(
+       { std::type_index(typeid(ComponentTs)), sizeof(ComponentTs) })),
+   ...);
+  return res;
+}
 
 class archetype
 {
 public:
-  using offset_map_t = std::unordered_map<std::type_index, std::size_t>;
-
-  template <typename... ComponentTs>
-  archetype(eid_t entity, ComponentTs... vals)
-      : m_offset_map{},
-        m_storage{ new archetype_storage<(sizeof(ComponentTs) + ...)> }
+  /**
+   * @brief A row of one type of component with each entry belonging to a
+   * unique entity.
+   */
+  struct row
   {
-    /* Put byte offsets in offset map */
-    std::size_t offset = 0;
-    (
-        [&] {
-          m_offset_map[std::type_index(typeid(ComponentTs))] = offset;
-          offset += sizeof(ComponentTs);
-        }(),
-        ...);
+    std::type_index index;
+    std::size_t size; /* Stride of the component */
+    std::byte* data;
+  };
 
-    /* Copy values into storage using offsets */
-    m_storage->add_entity(entity);
-    ((*reinterpret_cast<ComponentTs*>(m_storage->at_offset(
-          entity, m_offset_map[std::type_index(typeid(ComponentTs))]))
-      = vals),
-     ...);
-  }
+  /**
+   * @brief Construct a new archetype object.
+   *
+   * @param components The component_info of the types this component has.
+   */
+  archetype(const std::vector<component_info>& components);
 
-  template <typename... ComponentTs>
-  void
-  add_entity(eid_t entity, ComponentTs... vals)
-  {
-    m_storage->add_entity(entity);
-    ((get_component<ComponentTs>(entity) = vals), ...);
-  }
-
-  void
-  remove_entity(eid_t entity)
-  {
-    m_storage->remove_entity(entity);
-  }
+  bool has_component(const std::type_index& index) const;
 
   template <typename Component>
   bool
   has_component() const
   {
-    auto it = std::find_if(
-        m_offset_map.cbegin(), m_offset_map.cend(), [](const auto& kv) {
-          return kv.first == std::type_index(typeid(Component));
-        });
-    return it != m_offset_map.cend();
+    return has_component(std::type_index(typeid(Component)));
   }
 
-  bool
-  has_entity(eid_t entity) const
-  {
-    return m_storage->has_entity(entity);
-  }
+  std::size_t components_size() const;
 
-  std::size_t
-  num_entities() const
-  {
-    return m_storage->num_entities();
-  }
+  std::size_t num_entities() const;
 
-  void*
-  get_component(eid_t entity, const std::type_index& type_index)
-  {
-    return m_storage->at_offset(entity, m_offset_map[type_index]);
-  }
+  void add_entity(eid_t entity);
+
+  std::size_t get_index(eid_t entity) const;
+
+  void* get_component(eid_t entity, const std::type_index& index);
 
   template <typename Component>
   Component&
   get_component(eid_t entity)
   {
-    return *reinterpret_cast<Component*>(
+    return *static_cast<Component*>(
         get_component(entity, std::type_index(typeid(Component))));
   }
 
+  std::vector<component_info> get_component_info() const;
+
 private:
-  offset_map_t m_offset_map; /* first - offset, second - size */
-  std::shared_ptr<archetype_storage_base> m_storage;
+  std::vector<row> m_components;
+  std::vector<eid_t> m_entities;
 };
 
 } /* end of namespace xen */
