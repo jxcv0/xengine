@@ -4,68 +4,52 @@
 #include "archetype.hpp"
 #include "entity_mgr.hpp"
 
+#include <stdexcept>
+
 namespace xen
 {
 
 class ecs
 {
 public:
-  ecs() = default;
-
-  /**
-   * @brief Create an entity with components. A new archetype of the component
-   * types is created if one does not already exist.
-   *
-   * @tparam ComponentTs The component types
-   * @return eid_t
-   */
-  template <typename... ComponentTs>
-  eid_t
-  create_entity()
-  {
-    return m_entities.create_entity();
-  }
-
-  /**
-   * @brief Get the number of archetypes in the ECS.
-   *
-   * @return std::size_t
-   */
-  std::size_t
-  num_archetypes()
-  {
-    return m_archetypes.size();
-  }
+  eid_t create_entity();
 
   template <typename Component>
-  Component&
-  get(eid_t entity)
+  void
+  add_component(eid_t entity, const Component& val)
   {
-    auto it = std::find_if(m_archetypes.begin(), m_archetypes.end(),
-                           [=](const auto& a) { a.has_entity(entity); });
-
-    /* Entity must have no components yet */
+    auto it = find_archetype_by_entity(entiy);
     if (it == m_archetypes.end())
       {
-        archetype new_arch = archetype::create<Component>();
-        new_arch.add_entity(entity);
-        m_archetypes.push_back(new_arch);
-        return new_arch.get<Component>(entity);
+        throw std::runtime_error("Entity not found in archetypes");
       }
 
-    if (it->template has_types<Component>())
+    if (!it->has_component<Component>())
       {
-        return it.template get<Component>(entity);
+        auto cinfo = it->get_component_info();
+        cinfo.push_back(
+            { std::type_index(typeid(Component)), sizeof(Component) });
+        archetype newarch(cinfo);
+        newarch.add_entity(entity);
+        newarch.get_component<Component>(entity) = val;
+
+        /* Copy components over */
+        for (std::size_t i = 0; i < cinfo.size() - 1; i++)
+          {
+            // newarch.get_component(entity, cinfo[i].index);
+          }
+
+        m_archetypes.push_back(newarch);
       }
     else
       {
-        /* Move entity out of archetype into new one */
+        it->get_component<Component>() = val;
+        return;
       }
-
-    /* Entity is already part of an archetype */
-    auto arch = *it;
-    return arch.template get<Component>(entity);
   }
+
+private:
+  auto find_archetype_by_entity(eid_t entity);
 
 private:
   entity_mgr m_entities;

@@ -46,6 +46,14 @@ TEST(archetype_tests, components_size)
   ASSERT_EQ(arch.components_size(), 9);
 }
 
+TEST(archetype_tests, has_entity)
+{
+  xen::archetype arch(xen::create_component_info<float, char, int>());
+  ASSERT_FALSE(arch.has_entity(1));
+  arch.add_entity(1);
+  ASSERT_TRUE(arch.has_entity(1));
+}
+
 TEST(archetype_tests, num_entities)
 {
   xen::archetype arch(xen::create_component_info<float, char, int>());
@@ -77,6 +85,8 @@ TEST(archetype_tests, get_component)
   ASSERT_EQ(
       *static_cast<int*>(arch.get_component(1, std::type_index(typeid(int)))),
       10);
+
+  ASSERT_THROW(arch.get_component(1, std::type_index(typeid(double))), std::out_of_range);
 }
 
 TEST(archetype_tests, get_component_template)
@@ -112,4 +122,7 @@ TEST(archetype_tests, remove_entity)
   arch.remove_entity(2);
   ASSERT_EQ(arch.get_component<int>(1), 1);
   ASSERT_EQ(arch.get_component<int>(3), 3);
+  arch.add_entity(2);
+  ASSERT_EQ(arch.get_component<int>(2),
+            3); /* memmove means that offset 3 is left over */
 }

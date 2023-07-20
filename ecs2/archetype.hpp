@@ -1,9 +1,7 @@
 #ifndef ARCHETYPE_H_
 #define ARCHETYPE_H_
 
-#include <algorithm>
 #include <cstddef>
-#include <cstdlib>
 #include <typeindex>
 #include <vector>
 
@@ -64,8 +62,22 @@ public:
    */
   archetype(const std::vector<component_info>& components);
 
+  /**
+   * @brief Check if the archetype contains a component type.
+   *
+   * @param index The type index of the component type.
+   * @return true
+   * @return false
+   */
   bool has_component(const std::type_index& index) const;
 
+  /**
+   * @brief Check if the archetype has a component.
+   *
+   * @tparam Component The type of the component.
+   * @return true
+   * @return false
+   */
   template <typename Component>
   bool
   has_component() const
@@ -73,18 +85,67 @@ public:
     return has_component(std::type_index(typeid(Component)));
   }
 
+  /**
+   * @brief Get the combined size of the components in the archtype.
+   *
+   * @return std::size_t
+   */
   std::size_t components_size() const;
 
+  /**
+   * @brief Get the number of entities of the archetype.
+   *
+   * @return std::size_t
+   */
   std::size_t num_entities() const;
 
+  /**
+   * @brief Add an entity to the archetype.
+   *
+   * @param entity The entity to add.
+   */
   void add_entity(eid_t entity);
 
+  /**
+   * @brief Remove an entity from the archetype.
+   *
+   * @param entity The entity to remove.
+   */
   void remove_entity(eid_t entity);
 
+  /**
+   * @brief Check if an entity is of the archetype.
+   * 
+   * @param entity The entity to search for.
+   * @return true 
+   * @return false 
+   */
+  bool has_entity(eid_t entity) const;
+
+  /**
+   * @brief Get the index object.
+   *
+   * @param entity
+   * @return std::size_t
+   */
   std::size_t get_index(eid_t entity) const;
 
+  /**
+   * @brief Get a component belonging to an entity with a type index.
+   *
+   * @param entity The entity the component belongs to.
+   * @param index The type index of the component type.
+   * @return void*
+   */
   void* get_component(eid_t entity, const std::type_index& index);
 
+  /**
+   * @brief Get a component belonging to an entity.
+   *
+   * @tparam Component The type of the component
+   * @param entity The entity of the component
+   * @return Component&
+   */
   template <typename Component>
   Component&
   get_component(eid_t entity)
@@ -93,6 +154,11 @@ public:
         get_component(entity, std::type_index(typeid(Component))));
   }
 
+  /**
+   * @brief Get the component info of the types stored in this archetype.
+   *
+   * @return std::vector<component_info>
+   */
   std::vector<component_info> get_component_info() const;
 
 private:

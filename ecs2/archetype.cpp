@@ -1,5 +1,7 @@
 #include "archetype.hpp"
+#include <algorithm>
 #include <cstring>
+#include <stdexcept>
 
 xen::archetype::archetype(const std::vector<xen::component_info>& components)
 {
@@ -67,10 +69,17 @@ xen::archetype::remove_entity(eid_t entity)
       std::size_t offset_of_deleted = row.size * index;
       std::size_t offset_of_next = row.size * (index + 1);
       std::size_t data_size = row.size * m_entities.size();
-      std::size_t size_to_move = data_size - offset_of_next;
-      std::memmove(data + offset_of_next, data + offset_of_deleted, size_to_move);
+      std::memmove(data + offset_of_deleted, data + offset_of_next,
+                   data_size - offset_of_next);
     }
   m_entities.erase(std::find(m_entities.cbegin(), m_entities.cend(), entity));
+}
+
+bool
+xen::archetype::has_entity(eid_t entity) const
+{
+  return m_entities.cend()
+         != std::find(m_entities.cbegin(), m_entities.cend(), entity);
 }
 
 std::size_t
@@ -86,6 +95,10 @@ xen::archetype::get_component(eid_t entity, const std::type_index& index)
 {
   auto it = std::find_if(m_components.begin(), m_components.end(),
                          [&](const auto& row) { return row.index == index; });
+  if (it == m_components.end())
+    {
+      throw std::out_of_range("Component type not in archetype");
+    }
   return it->data + (it->size * get_index(entity));
 }
 

@@ -7,7 +7,8 @@ set(SOURCES
   archetype.cpp
   entity_mgr.hpp
   entity_mgr.cpp
-  # ecs.hpp
+  ecs.hpp
+  ecs.cpp
   # system.h
 )
 

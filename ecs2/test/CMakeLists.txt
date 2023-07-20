@@ -1,7 +1,7 @@
 set(SOURCES
   archetype_tests.cpp
   entity_mgr_tests.cpp
-  # ecs_tests.cpp
+  ecs_tests.cpp
   # component_array_tests.cpp
   # system_tests.cpp
   )
