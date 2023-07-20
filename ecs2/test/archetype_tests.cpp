@@ -99,3 +99,17 @@ TEST(archetype_tests, get_component_info)
   auto info2 = xen::create_component_info<float, char, int>();
   ASSERT_EQ(info1, info2);
 }
+
+TEST(archetype_tests, remove_entity)
+{
+  xen::archetype arch(xen::create_component_info<int>());
+  arch.add_entity(1);
+  arch.add_entity(2);
+  arch.add_entity(3);
+  arch.get_component<int>(1) = 1;
+  arch.get_component<int>(2) = 2;
+  arch.get_component<int>(3) = 3;
+  arch.remove_entity(2);
+  ASSERT_EQ(arch.get_component<int>(1), 1);
+  ASSERT_EQ(arch.get_component<int>(3), 3);
+}

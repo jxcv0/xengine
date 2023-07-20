@@ -79,6 +79,8 @@ public:
 
   void add_entity(eid_t entity);
 
+  void remove_entity(eid_t entity);
+
   std::size_t get_index(eid_t entity) const;
 
   void* get_component(eid_t entity, const std::type_index& index);
