@@ -2,13 +2,11 @@
 
 #include "component_array.h"
 
-struct position
-{
+struct position {
   float vec[3];
 };
 
-TEST(component_array_tests, assign_and_remove)
-{
+TEST(component_array_tests, assign_and_remove) {
   xen::component_array<position> posarr;
   posarr.assign(10);
   posarr.assign(11);
@@ -18,8 +16,7 @@ TEST(component_array_tests, assign_and_remove)
   ASSERT_NO_THROW(posarr.get(11));
 }
 
-TEST(component_array_tests, get_and_set_component)
-{
+TEST(component_array_tests, get_and_set_component) {
   xen::component_array<position> posarr;
   posarr.assign(10);
   position pos = posarr.get(10);

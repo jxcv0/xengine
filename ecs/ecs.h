@@ -16,19 +16,16 @@ typedef uint64_t eid_t;
 /* component id */
 typedef uint64_t cid_t;
 
-struct component_bitset
-{
+struct component_bitset {
   uint64_t sets[4];
 };
 
-struct offset_pair
-{
+struct offset_pair {
   eid_t entity;
   size_t offset;
 };
 
-struct component_array
-{
+struct component_array {
   void* buf;
   struct offset_pair* map;
   size_t num_components;
@@ -36,8 +33,7 @@ struct component_array
   size_t stride;
 };
 
-struct ecs
-{
+struct ecs {
   eid_t num_entities;
   struct component_array* arrays;
   size_t num_component_types;
@@ -80,4 +76,4 @@ size_t count_archetype(struct ecs* ecs, size_t num_components,
 } /* end of extern "C" */
 #endif
 
-#endif // ECS_H_
+#endif  // ECS_H_

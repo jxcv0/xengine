@@ -1,7 +1,6 @@
 #ifndef ARCHETYPE_H_
 #define ARCHETYPE_H_
 
-#include "types.hpp"
 #include <array>
 #include <cstddef>
 #include <cstdlib>
@@ -9,82 +8,55 @@
 #include <typeindex>
 #include <vector>
 
-namespace xen
-{
+#include "types.hpp"
+
+namespace xen {
 
 /**
  * @brief Stores components as an array of bytes.
  *
  */
-class row
-{
-public:
+class row {
+ public:
   row(const std::type_index& index, std::size_t size)
-      : m_index{ index }, m_stride{ size }, m_data{}
-  {
-  }
+      : m_index{index}, m_stride{size}, m_data{} {}
 
-  std::type_index
-  index() const
-  {
-    return m_index;
-  }
+  std::type_index index() const { return m_index; }
 
-  std::byte*
-  operator[](std::size_t i)
-  {
-    return &m_data[(i * m_stride)];
-  }
+  void* operator[](std::size_t i) { return m_data.data() + (i * m_stride); }
 
-  void
-  add()
-  {
+  void add() {
     /* TODO: Is there another way to do this? */
-    for (std::size_t i = 0; i < m_stride; i++)
-      {
-        m_data.push_back(std::byte{});
-      }
+    for (std::size_t i = 0; i < m_stride; i++) {
+      m_data.push_back(std::byte{});
+    }
   }
 
-  void
-  remove(std::size_t index)
-  {
+  void remove(std::size_t index) {
     auto begin = m_data.cbegin() + (index * m_stride);
     auto end = begin + m_stride;
     m_data.erase(begin, end);
   }
 
-  std::size_t
-  stride() const
-  {
-    return m_stride;
-  }
+  std::size_t stride() const { return m_stride; }
 
-  std::size_t
-  size() const
-  {
-    return m_data.size() / m_stride;
-  }
+  std::size_t size() const { return m_data.size() / m_stride; }
 
   template <typename T>
-  T&
-  get_as(std::size_t index)
-  {
-    if (std::type_index(typeid(T)) != m_index)
-      {
-        throw std::runtime_error("Invalid type requested from row");
-      }
-    return *reinterpret_cast<T*>(&m_data[(index * m_stride)]);
+  T& get_as(std::size_t index) {
+    if (std::type_index(typeid(T)) != m_index) {
+      throw std::runtime_error("Invalid type requested from row");
+    }
+    return *reinterpret_cast<T*>((*this)[index]);
   }
 
-private:
+ private:
   const std::type_index m_index;
   const std::size_t m_stride;
   std::vector<std::byte> m_data;
 };
 
-struct component_info
-{
+struct component_info {
   std::type_index index;
   std::size_t size;
 
@@ -96,27 +68,21 @@ struct component_info
    * @return true if both structures contain info about the same type.
    * @return false if the structure contain info about different types.
    */
-  friend bool
-  operator==(const component_info& i1, const component_info& i2)
-  {
+  friend bool operator==(const component_info& i1, const component_info& i2) {
     return i1.index == i2.index && i1.size == i2.size;
   }
 };
 
 template <typename... ComponentTs>
-std::vector<component_info>
-create_component_info()
-{
+std::vector<component_info> create_component_info() {
   std::vector<component_info> res{};
-  ((res.push_back(
-       { std::type_index(typeid(ComponentTs)), sizeof(ComponentTs) })),
+  ((res.push_back({std::type_index(typeid(ComponentTs)), sizeof(ComponentTs)})),
    ...);
   return res;
 }
 
-class archetype
-{
-public:
+class archetype {
+ public:
   /**
    * @brief Construct a new archetype object.
    *
@@ -141,10 +107,29 @@ public:
    * @return false
    */
   template <typename Component>
-  bool
-  has_component() const
-  {
+  bool has_component() const {
     return has_component(std::type_index(typeid(Component)));
+  }
+
+  /**
+   * @brief Check if the archetype has multiple components.
+   *
+   * @tparam ComponentTs The types of the components.
+   * @return true
+   * @return false
+   */
+  template <typename... ComponentTs>
+  bool has_components() const {
+    std::size_t hascount = 0;
+    (
+        [&] {
+          if (has_component<ComponentTs>()) {
+            ++hascount;
+          }
+        }(),
+        ...);
+    return hascount == sizeof...(ComponentTs) &&
+           m_components.size() == sizeof...(ComponentTs);
   }
 
   /**
@@ -218,9 +203,7 @@ public:
    * @return Component&
    */
   template <typename Component>
-  Component&
-  get_component(eid_t entity)
-  {
+  Component& get_component(eid_t entity) {
     return *static_cast<Component*>(
         get_component(entity, std::type_index(typeid(Component))));
   }
@@ -232,7 +215,7 @@ public:
    */
   std::vector<component_info> get_component_info() const;
 
-private:
+ private:
   std::vector<row> m_components;
   std::vector<eid_t> m_entities;
 };

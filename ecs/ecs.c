@@ -4,25 +4,21 @@
 #include <stdlib.h>
 #include <string.h>
 
-eid_t
-create_entity(struct ecs* ecs)
-{
+eid_t create_entity(struct ecs* ecs) {
   /* TODO: do we ever need to delete an entity? */
   assert(ecs->num_entities != UINT64_MAX);
-  ecs->bitsets = realloc(ecs->bitsets, sizeof(struct component_bitset)
-                                           * (ecs->num_entities + 1));
+  ecs->bitsets = realloc(
+      ecs->bitsets, sizeof(struct component_bitset) * (ecs->num_entities + 1));
   memset(&ecs->bitsets[ecs->num_entities].sets, 0,
          sizeof(struct component_bitset));
   return ecs->num_entities++;
 }
 
-cid_t
-create_component_array(struct ecs* ecs, size_t size, size_t nmemb)
-{
+cid_t create_component_array(struct ecs* ecs, size_t size, size_t nmemb) {
   /* This can be increased later if required */
   assert(ecs->num_component_types != MAX_NUM_COMPONENT_TYPES);
-  size_t newsize
-      = sizeof(struct component_array) * (ecs->num_component_types + 1);
+  size_t newsize =
+      sizeof(struct component_array) * (ecs->num_component_types + 1);
   ecs->arrays = realloc(ecs->arrays, newsize);
   assert(ecs->arrays != NULL);
 
@@ -38,129 +34,101 @@ create_component_array(struct ecs* ecs, size_t size, size_t nmemb)
   return ecs->num_component_types++;
 }
 
-void
-set_bitset(struct component_bitset* bitset, cid_t component)
-{
+void set_bitset(struct component_bitset* bitset, cid_t component) {
   const size_t set = component / (sizeof(*bitset->sets) * 8);
   const uint64_t shift = component % (sizeof(*bitset->sets) * 8);
   bitset->sets[set] |= (1LU << shift);
 }
 
-void
-unset_bitset(struct component_bitset* bitset, cid_t component)
-{
+void unset_bitset(struct component_bitset* bitset, cid_t component) {
   const size_t set = component / (sizeof(*bitset->sets) * 8);
   const uint64_t shift = component % (sizeof(*bitset->sets) * 8);
   bitset->sets[set] &= ~(1LU << shift);
 }
 
-int
-map_component(struct ecs* ecs, eid_t entity, cid_t component)
-{
+int map_component(struct ecs* ecs, eid_t entity, cid_t component) {
   struct component_bitset* bitset = &ecs->bitsets[entity];
   set_bitset(bitset, component);
 
   struct component_array* array = &ecs->arrays[component];
-  if (array->num_components * array->stride == array->bufsize)
-    {
-      return -1;
-    }
+  if (array->num_components * array->stride == array->bufsize) {
+    return -1;
+  }
 
   array->map[array->num_components].entity = entity;
-  array->map[array->num_components].offset
-      = array->num_components * array->stride;
+  array->map[array->num_components].offset =
+      array->num_components * array->stride;
   array->num_components++;
   return 0;
 }
 
-static int
-get_last(struct offset_pair* map, struct component_array* arr)
-{
+static int get_last(struct offset_pair* map, struct component_array* arr) {
   size_t last_offset = (arr->num_components - 1) * arr->stride;
-  for (size_t i = 0; i < arr->num_components; i++)
-    {
-      if (arr->map[i].offset == last_offset)
-        {
-          *map = arr->map[i];
-          return 0;
-        }
+  for (size_t i = 0; i < arr->num_components; i++) {
+    if (arr->map[i].offset == last_offset) {
+      *map = arr->map[i];
+      return 0;
     }
+  }
   return -1;
 }
 
-void
-unmap_component(struct ecs* ecs, eid_t entity, cid_t component)
-{
+void unmap_component(struct ecs* ecs, eid_t entity, cid_t component) {
   struct component_bitset* bitset = &ecs->bitsets[entity];
   unset_bitset(bitset, component);
 
   /* TODO: Is this the best way of doing this? */
   struct component_array* array = &ecs->arrays[component];
-  for (size_t i = 0; i < array->num_components; i++)
-    {
-      if (array->map[i].entity == entity)
-        {
-          struct offset_pair last_mapping;
-          assert(get_last(&last_mapping, array) == 0);
-          size_t buffer_offset_to_delete = array->map[i].offset;
-          memcpy(array->buf + buffer_offset_to_delete,
-                 array->buf + last_mapping.offset, array->stride);
-          last_mapping.offset = buffer_offset_to_delete;
-          array->map[i] = last_mapping;
-          --array->num_components;
-          /* Start the search again */
-          unmap_component(ecs, entity, component);
-        }
+  for (size_t i = 0; i < array->num_components; i++) {
+    if (array->map[i].entity == entity) {
+      struct offset_pair last_mapping;
+      assert(get_last(&last_mapping, array) == 0);
+      size_t buffer_offset_to_delete = array->map[i].offset;
+      memcpy(array->buf + buffer_offset_to_delete,
+             array->buf + last_mapping.offset, array->stride);
+      last_mapping.offset = buffer_offset_to_delete;
+      array->map[i] = last_mapping;
+      --array->num_components;
+      /* Start the search again */
+      unmap_component(ecs, entity, component);
     }
+  }
 }
 
-void*
-get_component(struct ecs* ecs, eid_t entity, cid_t component)
-{
+void* get_component(struct ecs* ecs, eid_t entity, cid_t component) {
   struct component_array* array = &ecs->arrays[component];
-  for (size_t i = 0; i < array->num_components; i++)
-    {
-      if (array->map[i].entity == entity)
-        {
-          return array->buf + array->map[i].offset;
-        }
+  for (size_t i = 0; i < array->num_components; i++) {
+    if (array->map[i].entity == entity) {
+      return array->buf + array->map[i].offset;
     }
+  }
   return NULL;
 }
 
-int
-has_component(struct ecs* ecs, eid_t entity, cid_t component)
-{
+int has_component(struct ecs* ecs, eid_t entity, cid_t component) {
   const struct component_bitset* bitset = &ecs->bitsets[entity];
   const size_t set = component / (sizeof(*bitset->sets) * 8);
   const uint64_t shift = component % (sizeof(*bitset->sets) * 8);
   return bitset->sets[set] & (1LU << shift);
 }
 
-int
-is_archetype(struct ecs* ecs, eid_t entity, size_t num_components,
-             cid_t* components)
-{
-  for (size_t i = 0; i < num_components; i++)
-    {
-      if (!has_component(ecs, entity, i))
-        {
-          return 0;
-        }
+int is_archetype(struct ecs* ecs, eid_t entity, size_t num_components,
+                 cid_t* components) {
+  for (size_t i = 0; i < num_components; i++) {
+    if (!has_component(ecs, entity, i)) {
+      return 0;
     }
+  }
   return 1;
 }
 
-size_t
-count_archetype(struct ecs* ecs, size_t num_components, cid_t* archetype)
-{
+size_t count_archetype(struct ecs* ecs, size_t num_components,
+                       cid_t* archetype) {
   size_t num = 0;
-  for (size_t i = 0; i < ecs->num_entities; i++)
-    {
-      if (is_archetype(ecs, i, num_components, archetype))
-        {
-          ++num;
-        }
+  for (size_t i = 0; i < ecs->num_entities; i++) {
+    if (is_archetype(ecs, i, num_components, archetype)) {
+      ++num;
     }
+  }
   return num;
 }

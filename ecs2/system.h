@@ -1,12 +1,9 @@
 #ifndef SYSTEM_H_
 #define SYSTEM_H_
 
-namespace xen
-{
+namespace xen {
 
-class system
-{
-};
+class system {};
 
 } /* end of namespace xen */
 

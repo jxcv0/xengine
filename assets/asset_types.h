@@ -7,15 +7,9 @@
 extern "C" {
 #endif
 
-enum asset_type
-{
-  asset_type_MESH,
-  asset_type_TEXTURE,
-  asset_type_TTF
-};
+enum asset_type { asset_type_MESH, asset_type_TEXTURE, asset_type_TTF };
 
-struct vertex
-{
+struct vertex {
   float position[3];
   float tex_coord[2];
   float normal[3];
@@ -23,8 +17,7 @@ struct vertex
   float bitangent[3];
 };
 
-struct mesh
-{
+struct mesh {
   int model_id;
   struct vertex* vertices;
   unsigned int* indices;
@@ -32,20 +25,16 @@ struct mesh
   unsigned int nindices;
 };
 
-struct model
-{
+struct model {
   int meshes[MAX_NUM_MESHES_PER_MODEL];
   unsigned int nmeshes;
 };
 
 /* An image texture */
-struct texture
-{
-  union
-  {
+struct texture {
+  union {
     int whn[3];
-    struct
-    {
+    struct {
       int width;
       int height;
       int nchannels;
@@ -54,8 +43,7 @@ struct texture
   unsigned char* data;
 };
 
-struct font
-{
+struct font {
   int placeholder;
 };
 
@@ -63,4 +51,4 @@ struct font
 }
 #endif
 
-#endif // ASSET_TYPES_H_
+#endif  // ASSET_TYPES_H_

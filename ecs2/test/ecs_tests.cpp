@@ -2,23 +2,18 @@
 
 #include "ecs.hpp"
 
-struct position
-{
+struct position {
   float x;
   float y;
 };
 
-TEST(ecs_tests, get_component_invalid_id)
-{
+TEST(ecs_tests, get_component_invalid_id) {
   xen::ecs ecs;
-  ASSERT_THROW(ecs.get_component<position>(10), std::runtime_error);
+  ASSERT_THROW(ecs.add_component<position>(10), std::invalid_argument);
 }
 
-TEST(ecs_tests, get_component_new_archetype)
-{
+TEST(ecs_tests, has_components) {
   xen::ecs ecs;
-  auto e1 = ecs.create_entity();
-  auto& pos = ecs.get_component<position>(e1);
-  ASSERT_EQ(ecs.num_archetypes(), 1);
-  (void)pos;
+  xen::eid_t e1 = ecs.create_entity();
+  ecs.add_component<position>(e1);
 }

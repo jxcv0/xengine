@@ -27,8 +27,7 @@ struct asset
 };
 */
 
-struct mesh_allocator
-{
+struct mesh_allocator {
   sem_t sem;
   struct mesh* buf;
   int* free;
@@ -65,4 +64,4 @@ struct font* load_font(struct font* font, const char* filepath,
 }
 #endif
 
-#endif // ASSETMGR_H_
+#endif  // ASSETMGR_H_
