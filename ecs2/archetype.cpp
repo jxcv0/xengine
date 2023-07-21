@@ -7,7 +7,7 @@ xen::archetype::archetype(const std::vector<xen::component_info>& components)
 {
   for (const auto& info : components)
     {
-      m_components.push_back({ info.index, info.size, nullptr });
+      m_components.push_back(row{info.index, info.size});
     }
 }
 
@@ -16,7 +16,7 @@ xen::archetype::has_component(const std::type_index& index) const
 {
   const auto& it
       = std::find_if(m_components.cbegin(), m_components.cend(),
-                     [=](const auto& row) { return row.index == index; });
+                     [=](const auto& row) { return row.index() == index; });
   return it != m_components.cend();
 }
 
@@ -26,15 +26,34 @@ xen::archetype::components_size() const
   std::size_t size = 0;
   for (const auto& row : m_components)
     {
-      size += row.size;
+      size += row.stride();
     }
   return size;
+}
+
+std::size_t
+xen::archetype::size_of(const std::type_index& index) const
+{
+  for (const auto& row : m_components)
+    {
+      if (row.index() == index)
+        {
+          return row.stride();
+        }
+    }
+  return 0;
 }
 
 std::size_t
 xen::archetype::num_entities() const
 {
   return m_entities.size();
+}
+
+std::size_t
+xen::archetype::num_components() const
+{
+  return m_components.size();
 }
 
 void
@@ -49,12 +68,7 @@ xen::archetype::add_entity(eid_t entity)
    */
   for (auto& row : m_components)
     {
-      void* mem = std::realloc(row.data, (m_entities.size() + 1) * row.size);
-      if (mem == nullptr)
-        {
-          throw std::bad_alloc();
-        }
-      row.data = static_cast<std::byte*>(mem);
+      row.add();
     }
   m_entities.push_back(entity);
 }
@@ -65,12 +79,7 @@ xen::archetype::remove_entity(eid_t entity)
   std::size_t index = get_index(entity);
   for (auto& row : m_components)
     {
-      std::byte* data = static_cast<std::byte*>(row.data);
-      std::size_t offset_of_deleted = row.size * index;
-      std::size_t offset_of_next = row.size * (index + 1);
-      std::size_t data_size = row.size * m_entities.size();
-      std::memmove(data + offset_of_deleted, data + offset_of_next,
-                   data_size - offset_of_next);
+      row.remove(index);
     }
   m_entities.erase(std::find(m_entities.cbegin(), m_entities.cend(), entity));
 }
@@ -94,12 +103,12 @@ void*
 xen::archetype::get_component(eid_t entity, const std::type_index& index)
 {
   auto it = std::find_if(m_components.begin(), m_components.end(),
-                         [&](const auto& row) { return row.index == index; });
+                         [&](const auto& row) { return row.index() == index; });
   if (it == m_components.end())
     {
       throw std::out_of_range("Component type not in archetype");
     }
-  return it->data + (it->size * get_index(entity));
+  return (*it)[get_index(entity)];
 }
 
 std::vector<xen::component_info>
@@ -108,7 +117,7 @@ xen::archetype::get_component_info() const
   std::vector<component_info> cinfo{};
   for (const auto& row : m_components)
     {
-      cinfo.push_back({ row.index, row.size });
+      cinfo.push_back({ row.index(), row.stride() });
     }
   return cinfo;
 }

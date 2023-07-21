@@ -2,6 +2,52 @@
 
 #include "archetype.hpp"
 
+TEST(row_tests, add_size)
+{
+  xen::row row(std::type_index(typeid(double)), sizeof(double));
+  ASSERT_EQ(row.size(), 0);
+  row.add();
+  row.add();
+  row.add();
+  ASSERT_EQ(row.size(), 3);
+}
+
+TEST(row_tests, get_as)
+{
+  xen::row row(std::type_index(typeid(double)), sizeof(double));
+  row.add();
+  row.add();
+  row.add();
+  double& d1 = row.get_as<double>(0);
+  d1 = 100.001f;
+  double& d2 = row.get_as<double>(1);
+  d2 = 200.001f;
+  double& d3 = row.get_as<double>(2);
+  d3 = 300.001f;
+  ASSERT_DOUBLE_EQ(*reinterpret_cast<double*>(row[0]), d1);
+  ASSERT_DOUBLE_EQ(*reinterpret_cast<double*>(row[1]), d2);
+  ASSERT_DOUBLE_EQ(*reinterpret_cast<double*>(row[2]), d3);
+}
+
+TEST(row_tests, remove)
+{
+  xen::row row(std::type_index(typeid(double)), sizeof(double));
+  row.add();
+  row.add();
+  row.add();
+  double& d1 = row.get_as<double>(0);
+  d1 = 100.001f;
+  double& d2 = row.get_as<double>(1);
+  d2 = 200.001f;
+  double& d3 = row.get_as<double>(2);
+  d3 = 300.001f;
+  row.remove(1);
+  ASSERT_DOUBLE_EQ(*reinterpret_cast<double*>(row[0]), d1);
+
+  /* d3 is now in the position 2 was in */
+  ASSERT_DOUBLE_EQ(*reinterpret_cast<double*>(row[1]), d3);
+}
+
 TEST(archetype_tests, create_info)
 {
   auto info1 = xen::create_component_info<int>();
@@ -25,6 +71,7 @@ TEST(archetype_tests, has_component)
   };
 
   xen::archetype arch(xen::create_component_info<float, char, position>());
+  ASSERT_EQ(arch.num_components(), 3);
   ASSERT_TRUE(arch.has_component(std::type_index(typeid(char))));
   ASSERT_TRUE(arch.has_component(std::type_index(typeid(position))));
   ASSERT_TRUE(arch.has_component(std::type_index(typeid(float))));
@@ -86,7 +133,8 @@ TEST(archetype_tests, get_component)
       *static_cast<int*>(arch.get_component(1, std::type_index(typeid(int)))),
       10);
 
-  ASSERT_THROW(arch.get_component(1, std::type_index(typeid(double))), std::out_of_range);
+  ASSERT_THROW(arch.get_component(1, std::type_index(typeid(double))),
+               std::out_of_range);
 }
 
 TEST(archetype_tests, get_component_template)
@@ -123,6 +171,4 @@ TEST(archetype_tests, remove_entity)
   ASSERT_EQ(arch.get_component<int>(1), 1);
   ASSERT_EQ(arch.get_component<int>(3), 3);
   arch.add_entity(2);
-  ASSERT_EQ(arch.get_component<int>(2),
-            3); /* memmove means that offset 3 is left over */
 }

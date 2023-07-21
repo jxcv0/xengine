@@ -3,7 +3,8 @@
 
 #include "archetype.hpp"
 #include "entity_mgr.hpp"
-
+#include <algorithm>
+#include <cstring>
 #include <stdexcept>
 
 namespace xen
@@ -14,42 +15,48 @@ class ecs
 public:
   eid_t create_entity();
 
-  template <typename Component>
-  void
-  add_component(eid_t entity, const Component& val)
+  eid_t
+  num_entities() const
   {
-    auto it = find_archetype_by_entity(entiy);
+    return m_entities.num_entities();
+  }
+
+  eid_t
+  num_archetypes() const
+  {
+    return m_archetypes.size();
+  }
+
+  template <typename Component>
+  Component&
+  get_component(eid_t entity)
+  {
+    if (!m_entities.is_valid_id(entity))
+      {
+        throw std::runtime_error("Invalid entity ID");
+      }
+
+    auto it = find_archetype_by_entity(entity);
     if (it == m_archetypes.end())
       {
-        throw std::runtime_error("Entity not found in archetypes");
+        /* create new archetype and add entity */
+        xen::archetype arch(
+            { { std::type_index(typeid(Component)), sizeof(Component) } });
+        arch.add_entity(entity);
+        m_archetypes.push_back(arch);
+        return arch.get_component<Component>(entity);
       }
-
-    if (!it->has_component<Component>())
-      {
-        auto cinfo = it->get_component_info();
-        cinfo.push_back(
-            { std::type_index(typeid(Component)), sizeof(Component) });
-        archetype newarch(cinfo);
-        newarch.add_entity(entity);
-        newarch.get_component<Component>(entity) = val;
-
-        /* Copy components over */
-        for (std::size_t i = 0; i < cinfo.size() - 1; i++)
-          {
-            // newarch.get_component(entity, cinfo[i].index);
-          }
-
-        m_archetypes.push_back(newarch);
-      }
-    else
-      {
-        it->get_component<Component>() = val;
-        return;
-      }
+    return *(new Component);
   }
 
 private:
-  auto find_archetype_by_entity(eid_t entity);
+  auto
+  find_archetype_by_entity(eid_t entity)
+  {
+    return std::find_if(
+        m_archetypes.begin(), m_archetypes.end(),
+        [entity](const auto& arch) { return arch.has_entity(entity); });
+  }
 
 private:
   entity_mgr m_entities;

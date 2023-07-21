@@ -16,7 +16,8 @@ class entity_mgr
 public:
   eid_t create_entity();
   void delete_entity(std::uint64_t entity);
-  std::size_t num_entities();
+  std::size_t num_entities() const;
+  bool is_valid_id(eid_t entity) const;
 
 private:
   std::vector<eid_t> m_freelist;

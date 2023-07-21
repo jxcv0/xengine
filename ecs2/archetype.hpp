@@ -1,14 +1,87 @@
 #ifndef ARCHETYPE_H_
 #define ARCHETYPE_H_
 
+#include "types.hpp"
+#include <array>
 #include <cstddef>
+#include <cstdlib>
+#include <stdexcept>
 #include <typeindex>
 #include <vector>
 
-#include "types.hpp"
-
 namespace xen
 {
+
+/**
+ * @brief Stores components as an array of bytes.
+ *
+ */
+class row
+{
+public:
+  row(const std::type_index& index, std::size_t size)
+      : m_index{ index }, m_stride{ size }, m_data{}
+  {
+  }
+
+  std::type_index
+  index() const
+  {
+    return m_index;
+  }
+
+  std::byte*
+  operator[](std::size_t i)
+  {
+    return &m_data[(i * m_stride)];
+  }
+
+  void
+  add()
+  {
+    /* TODO: Is there another way to do this? */
+    for (std::size_t i = 0; i < m_stride; i++)
+      {
+        m_data.push_back(std::byte{});
+      }
+  }
+
+  void
+  remove(std::size_t index)
+  {
+    auto begin = m_data.cbegin() + (index * m_stride);
+    auto end = begin + m_stride;
+    m_data.erase(begin, end);
+  }
+
+  std::size_t
+  stride() const
+  {
+    return m_stride;
+  }
+
+  std::size_t
+  size() const
+  {
+    return m_data.size() / m_stride;
+  }
+
+  template <typename T>
+  T&
+  get_as(std::size_t index)
+  {
+    if (std::type_index(typeid(T)) != m_index)
+      {
+        throw std::runtime_error("Invalid type requested from row");
+      }
+    return *reinterpret_cast<T*>(&m_data[(index * m_stride)]);
+  }
+
+private:
+  const std::type_index m_index;
+  const std::size_t m_stride;
+  std::vector<std::byte> m_data;
+};
 
 struct component_info
 {
@@ -44,17 +117,6 @@ create_component_info()
 class archetype
 {
 public:
-  /**
-   * @brief A row of one type of component with each entry belonging to a
-   * unique entity.
-   */
-  struct row
-  {
-    std::type_index index;
-    std::size_t size; /* Stride of the component */
-    std::byte* data;
-  };
-
   /**
    * @brief Construct a new archetype object.
    *
@@ -92,12 +154,21 @@ public:
    */
   std::size_t components_size() const;
 
+  std::size_t size_of(const std::type_index& index) const;
+
   /**
    * @brief Get the number of entities of the archetype.
    *
    * @return std::size_t
    */
   std::size_t num_entities() const;
+
+  /**
+   * @brief Get the number of component types of the archetype.
+   *
+   * @return std::size_t
+   */
+  std::size_t num_components() const;
 
   /**
    * @brief Add an entity to the archetype.
@@ -115,10 +186,10 @@ public:
 
   /**
    * @brief Check if an entity is of the archetype.
-   * 
+   *
    * @param entity The entity to search for.
-   * @return true 
-   * @return false 
+   * @return true
+   * @return false
    */
   bool has_entity(eid_t entity) const;
 

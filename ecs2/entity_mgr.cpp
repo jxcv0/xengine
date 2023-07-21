@@ -24,7 +24,14 @@ xen::entity_mgr::delete_entity(eid_t entity)
 }
 
 std::size_t
-xen::entity_mgr::num_entities()
+xen::entity_mgr::num_entities() const
 {
   return m_counter - m_freelist.size();
+}
+
+bool
+xen::entity_mgr::is_valid_id(eid_t entity) const
+{
+  auto it = std::find(m_freelist.cbegin(), m_freelist.cend(), entity);
+  return entity < m_counter && it == m_freelist.cend();
 }
