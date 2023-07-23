@@ -14,6 +14,7 @@ class component_table {
  public:
   using container_type = std::vector<std::pair<Key, T>, Allocator>;
   using size_type = typename container_type::size_type;
+  using value_type = T;
   using reference = T&;
   using const_reference = const T&;
 
@@ -38,14 +39,48 @@ class component_table {
     return m_storage[pos].second;
   }
 
-  class iterator : public std::iterator<std::forward_iterator_tag, T> {
+  class iterator : public std::iterator<std::forward_iterator_tag, value_type> {
    public:
-    explicit iterator(container_type::iterator it) : m_it{it} {}
-    /* TODO: operator == compares eid*/
+    iterator(typename container_type::iterator it) : m_it{it} {}
+
+    iterator operator++() {
+      m_it++;
+      return *this;
+    }
+
+    iterator operator++(int) {
+      auto tmp = *this;
+      ++(*this);
+      return tmp;
+    }
+
+    iterator operator+(std::size_t i) { return iterator(m_it + i); }
+
+    reference operator*() { return m_it->second; }
+
+    friend bool operator==(const iterator& a, const iterator& b) {
+      return a.m_it->first == b.m_it->first;
+    }
+
+    friend bool operator!=(const iterator& a, const iterator& b) {
+      return a.m_it->first != b.m_it->first;
+    }
+
+    friend bool operator<(const iterator& a, const iterator& b) {
+      return a.m_it->first < b.m_it->first;
+    }
+
+    friend bool operator>(const iterator& a, const iterator& b) {
+      return a.m_it->first > b.m_it->first;
+    }
 
    private:
-    container_type::iterator m_it;
+    typename container_type::iterator m_it;
   };
+
+  iterator begin() { return iterator(m_storage.begin()); }
+
+  iterator end() { return iterator(m_storage.end()); }
 
  private:
   container_type m_storage;
