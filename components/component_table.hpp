@@ -7,13 +7,13 @@
 
 namespace xen {
 
-template <typename T, typename Key = std::size_t, typename Compare = std::less<Key>,
+template <typename T, typename Key = std::size_t,
+          typename Compare = std::less<Key>,
           typename Allocator = std::allocator<std::pair<Key, T>>>
 class component_table {
  public:
   using container_type = std::vector<std::pair<Key, T>, Allocator>;
   using size_type = typename container_type::size_type;
-  using value_type = T;
   using reference = T&;
   using const_reference = const T&;
 
@@ -21,8 +21,9 @@ class component_table {
   component_table(size_type count) : m_storage{count} {}
 
   void insert(const Key& key, const T& value) {
-    auto it = std::find_if(m_storage.cbegin(), m_storage.cend(),
-                           [&](const auto& pair) { return Compare{}(key, pair.first); });
+    auto it = std::find_if(
+        m_storage.cbegin(), m_storage.cend(),
+        [&](const auto& pair) { return Compare{}(key, pair.first); });
     m_storage.insert(it, {key, value});
   }
 
@@ -36,6 +37,15 @@ class component_table {
   const_reference operator[](size_type pos) const {
     return m_storage[pos].second;
   }
+
+  class iterator : public std::iterator<std::forward_iterator_tag, T> {
+   public:
+    explicit iterator(container_type::iterator it) : m_it{it} {}
+    /* TODO: operator == compares eid*/
+
+   private:
+    container_type::iterator m_it;
+  };
 
  private:
   container_type m_storage;
