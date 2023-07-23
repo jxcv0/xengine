@@ -1,3 +1,4 @@
+
 ```C
 struct game_state gs;
 
