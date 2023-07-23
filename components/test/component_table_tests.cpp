@@ -2,7 +2,7 @@
 
 #include "component_table.hpp"
 
-TEST(component_table_tests, placeholder) {
+TEST(component_table_tests, insert) {
   xen::component_table<int> table;
   table.insert(0, 0);
   table.insert(10, 10);
