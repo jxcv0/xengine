@@ -12,7 +12,8 @@ template <typename T, typename Key = std::size_t,
           typename Allocator = std::allocator<std::pair<Key, T>>>
 class component_table {
  public:
-  using container_type = std::vector<std::pair<Key, T>, Allocator>;
+  using pair_type = std::pair<Key, T>;
+  using container_type = std::vector<pair_type, Allocator>;
   using size_type = typename container_type::size_type;
   using value_type = T;
   using reference = T&;
@@ -39,48 +40,53 @@ class component_table {
     return m_storage[pos].second;
   }
 
-  class iterator : public std::iterator<std::forward_iterator_tag, value_type> {
+  template <typename InternalIterT>
+  class iterator : public std::iterator<std::forward_iterator_tag, pair_type> {
    public:
-    iterator(typename container_type::iterator it) : m_it{it} {}
+    using iter = iterator<InternalIterT>;
 
-    iterator operator++() {
+    iterator(InternalIterT it) : m_it{it} {}
+
+    iter operator++() {
       m_it++;
       return *this;
     }
 
-    iterator operator++(int) {
+    iter operator++(int) {
       auto tmp = *this;
       ++(*this);
       return tmp;
     }
 
-    iterator operator+(std::size_t i) { return iterator(m_it + i); }
-
+    iter operator+(std::size_t i) { return iterator(m_it + i); }
+    iter operator-(std::size_t i) { return iterator(m_it - i); }
     reference operator*() { return m_it->second; }
 
-    friend bool operator==(const iterator& a, const iterator& b) {
+    friend bool operator==(const iter& a, const iter& b) {
       return a.m_it->first == b.m_it->first;
     }
 
-    friend bool operator!=(const iterator& a, const iterator& b) {
+    friend bool operator!=(const iter& a, const iter& b) {
       return a.m_it->first != b.m_it->first;
     }
 
-    friend bool operator<(const iterator& a, const iterator& b) {
+    friend bool operator<(const iter& a, const iter& b) {
       return a.m_it->first < b.m_it->first;
     }
 
-    friend bool operator>(const iterator& a, const iterator& b) {
+    friend bool operator>(const iter& a, const iter& b) {
       return a.m_it->first > b.m_it->first;
     }
 
    private:
-    typename container_type::iterator m_it;
+    InternalIterT m_it;
   };
 
-  iterator begin() { return iterator(m_storage.begin()); }
+  auto begin() { return iterator(m_storage.begin()); }
+  auto end() { return iterator(m_storage.end()); }
 
-  iterator end() { return iterator(m_storage.end()); }
+  auto cbegin() const { return iterator(m_storage.begin()); }
+  auto cend() const { return iterator(m_storage.end()); }
 
  private:
   container_type m_storage;

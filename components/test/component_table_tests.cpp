@@ -19,12 +19,13 @@ TEST(component_table_tests, iterator) {
   table.insert(5, 5.0f);
   std::vector<float> exp = {0.0, 5.0f, 10.0f};
   auto it = table.begin();
-  for (int i = 0; i < 3; i++)
-  {
+  for (int i = 0; i < 3; i++) {
     ASSERT_EQ(*it, exp[i]);
     ++it;
   }
 
   ASSERT_TRUE(table.begin() < table.begin() + 1);
   ASSERT_TRUE(table.end() > table.begin() + 1);
+  ASSERT_TRUE(table.cbegin() < table.cbegin() + 1);
+  ASSERT_TRUE(table.cend() > table.cbegin() + 1);
 }
