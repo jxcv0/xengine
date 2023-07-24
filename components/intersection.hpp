@@ -22,12 +22,12 @@ class intersection {
   class iterator;
 
   constexpr auto begin() noexcept {
-    return iterator{
-        m_table1.begin(), m_table2.begin(), {m_table1.end(), m_table2.end()}};
+    return iterator{m_table1.begin(), m_table1.end(), m_table2.begin(),
+                    m_table2.end()};
   }
   constexpr auto end() noexcept {
-    return iterator{
-        m_table1.end(), m_table2.end(), {m_table1.end(), m_table2.end()}};
+    return iterator{m_table1.end(), m_table1.end(), m_table2.end(),
+                    m_table2.end()};
   }
 
  private:
@@ -42,20 +42,23 @@ class intersection<C1, C2>::iterator {
   using InputIt2 = decltype(std::declval<table<C2>>().begin());
   using End = sentinel<InputIt1, InputIt2>;
 
-  constexpr iterator(InputIt1 it1, InputIt2 it2, End end) noexcept
-      : m_it1{it1}, m_it2{it2}, m_end{end} {};
+  constexpr iterator(InputIt1 it1, InputIt1 end1, InputIt2 it2,
+                     InputIt2 end2) noexcept
+      : m_it1{it1}, m_end1{end1}, m_it2{it2}, m_end2{end2} {}
 
-  constexpr friend bool operator==(const iterator& a, const iterator& b) {
-    return a.m_it1 == b.m_it1 && b.m_it2 == b.m_it2;
+  constexpr friend bool operator!=(const iterator& a, const iterator& b) {
+    return a.m_it1 != b.m_end1 || b.m_it2 != b.m_end2;
   }
 
   constexpr iterator operator++() noexcept {
-    while (m_it1 != m_it2 || m_end.it1 != m_it2 || m_end.it2 != m_it2) {
+    while (m_it1 != m_it2 && !at_end()) {
       if (m_it1 < m_it2) {
         ++m_it1;
+        continue;
       }
       if (m_it1 > m_it2) {
         ++m_it2;
+        continue;
       }
     }
     return *this;
@@ -71,8 +74,11 @@ class intersection<C1, C2>::iterator {
 
  private:
   InputIt1 m_it1;
+  InputIt1 m_end1;
   InputIt2 m_it2;
-  End m_end;
+  InputIt2 m_end2;
+
+  constexpr bool at_end() { return m_it1 == m_end1 || m_it2 == m_end2; }
 };
 
 }  // namespace xen
