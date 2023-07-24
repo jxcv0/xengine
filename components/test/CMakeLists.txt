@@ -1,5 +1,6 @@
 set(SOURCES
   table_tests.cpp
+  intersection_tests.cpp
   )
 
 add_executable(components_tests ${SOURCES})
