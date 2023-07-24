@@ -61,10 +61,10 @@ class table {
     }
 
     constexpr iter operator+(std::size_t i) noexcept {
-      return iterator(m_it + i);
+      return iterator{m_it + i};
     }
     constexpr iter operator-(std::size_t i) noexcept {
-      return iterator(m_it - i);
+      return iterator{m_it - i};
     }
     constexpr reference operator*() noexcept { return m_it->second; }
 
@@ -96,10 +96,10 @@ class table {
     InternalIterT m_it;
   };
 
-  auto begin() noexcept { return iterator(m_storage.begin()); }
-  auto end() noexcept { return iterator(m_storage.end()); }
-  auto cbegin() const noexcept { return iterator(m_storage.cbegin()); }
-  auto cend() const noexcept { return iterator(m_storage.cend()); }
+  auto begin() noexcept { return iterator{m_storage.begin()}; }
+  auto end() noexcept { return iterator{m_storage.end()}; }
+  auto cbegin() const noexcept { return iterator{m_storage.cbegin()}; }
+  auto cend() const noexcept { return iterator{m_storage.cend()}; }
 
   constexpr auto size() const noexcept { return m_storage.size(); }
 

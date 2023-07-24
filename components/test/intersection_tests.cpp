@@ -20,11 +20,6 @@ TEST(intersection_tests, sentinel) {
   auto [bd, bs] = *begin;
   ASSERT_EQ(bd, 10);
   ASSERT_EQ(bs, 0);
-
-  auto end = i.end();
-  auto [ed, es] = *end;
-  ASSERT_EQ(ed, 40);
-  ASSERT_EQ(es, 30);
 }
 
 TEST(intersection_tests, use_case) {

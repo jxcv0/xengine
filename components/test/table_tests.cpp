@@ -12,6 +12,17 @@ TEST(component_table_tests, insert) {
   ASSERT_EQ(table[2], 10);
 }
 
+TEST(component_table_tests, begin_and_end) {
+  xen::table<float> table;
+  table.insert(0, 0.0f);
+  table.insert(10, 10.0f);
+  table.insert(5, 5.0f);
+  auto begin = table.begin();
+  ASSERT_FLOAT_EQ(*begin, 0.0f);
+  auto last = table.end() - 1;
+  ASSERT_FLOAT_EQ(*last, 10.0f);
+}
+
 TEST(component_table_tests, iterator) {
   xen::table<float> table;
   table.insert(0, 0.0f);

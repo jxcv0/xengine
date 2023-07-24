@@ -7,12 +7,6 @@
 
 namespace xen {
 
-template <typename EndIt1, typename EndIt2>
-struct sentinel {
-  EndIt1 it1;
-  EndIt2 it2;
-};
-
 template <typename C1, typename C2>
 class intersection {
  public:
@@ -36,11 +30,11 @@ class intersection {
 };
 
 template <typename C1, typename C2>
-class intersection<C1, C2>::iterator {
+class intersection<C1, C2>::iterator
+    : std::iterator<std::forward_iterator_tag, std::tuple<C1&, C2&>> {
  public:
   using InputIt1 = decltype(std::declval<table<C1>>().begin());
   using InputIt2 = decltype(std::declval<table<C2>>().begin());
-  using End = sentinel<InputIt1, InputIt2>;
 
   constexpr iterator(InputIt1 it1, InputIt1 end1, InputIt2 it2,
                      InputIt2 end2) noexcept
@@ -51,7 +45,11 @@ class intersection<C1, C2>::iterator {
   }
 
   constexpr iterator operator++() noexcept {
-    while (m_it1 != m_it2 && !at_end()) {
+    while (m_it1 != m_it2) {
+      if (at_end()) {
+        // TODO: this is never true
+        std::cout << "breaking\n";
+      }
       if (m_it1 < m_it2) {
         ++m_it1;
         continue;
@@ -70,7 +68,9 @@ class intersection<C1, C2>::iterator {
     return tmp;
   }
 
-  constexpr auto operator*() { return std::forward_as_tuple(*m_it1, *m_it2); }
+  constexpr std::tuple<C1&, C2&> operator*() {
+    return std::forward_as_tuple(*m_it1, *m_it2);
+  }
 
  private:
   InputIt1 m_it1;
