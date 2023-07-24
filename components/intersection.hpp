@@ -1,6 +1,8 @@
 #ifndef INTERSECT_HPP_
 #define INTERSECT_HPP_
 
+#include <tuple>
+
 #include "table.hpp"
 
 namespace xen {
@@ -47,11 +49,25 @@ class intersection<C1, C2>::iterator {
     return a.m_it1 == b.m_it1 && b.m_it2 == b.m_it2;
   }
 
-  constexpr iterator operator++() {
+  constexpr iterator operator++() noexcept {
     while (m_it1 != m_it2 || m_end.it1 != m_it2 || m_end.it2 != m_it2) {
+      if (m_it1 < m_it2) {
+        ++m_it1;
+      }
+      if (m_it1 > m_it2) {
+        ++m_it2;
+      }
     }
     return *this;
   }
+
+  constexpr iterator operator++(int) noexcept {
+    auto tmp = *this;
+    ++*this;
+    return tmp;
+  }
+
+  constexpr auto operator*() { return std::forward_as_tuple(*m_it1, *m_it2); }
 
  private:
   InputIt1 m_it1;

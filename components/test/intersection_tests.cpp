@@ -2,7 +2,7 @@
 
 #include "intersection.hpp"
 
-TEST(component_table_tests, use_case) {
+TEST(intersection_tests, use_case) {
   xen::table<int> dest;
   dest.insert(1, 10);
   dest.insert(2, 20);
@@ -15,7 +15,10 @@ TEST(component_table_tests, use_case) {
   src.insert(3, 30);
 
   xen::intersection set{dest, src};
-  std::for_each(set.begin(), set.end(), [](auto& [d, s]) { d += s; });
+  std::for_each(set.begin(), set.end(), [](auto t) {
+    auto [d, s] = t;
+    d += s;
+  });
 
   ASSERT_EQ(dest[0], 20);
   ASSERT_EQ(dest[1], 20);
