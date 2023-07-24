@@ -1,5 +1,5 @@
 set(SOURCES
-  component_table_tests.cpp
+  table_tests.cpp
   )
 
 add_executable(components_tests ${SOURCES})

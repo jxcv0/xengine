@@ -3,7 +3,7 @@ project(components)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -Wpedantic")
 set(SOURCES
-  component_table.hpp
+  table.hpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})

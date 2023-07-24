@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 
-#include "component_table.hpp"
+#include "table.hpp"
 
 TEST(component_table_tests, insert) {
-  xen::component_table<int> table;
+  xen::table<int> table;
   table.insert(0, 0);
   table.insert(10, 10);
   table.insert(5, 5);
@@ -13,7 +13,7 @@ TEST(component_table_tests, insert) {
 }
 
 TEST(component_table_tests, iterator) {
-  xen::component_table<float> table;
+  xen::table<float> table;
   table.insert(0, 0.0f);
   table.insert(10, 10.0f);
   table.insert(5, 5.0f);
@@ -31,32 +31,32 @@ TEST(component_table_tests, iterator) {
 }
 
 TEST(component_table_tests, use_case) {
-  xen::component_table<int> dest;
+  xen::table<int> dest;
   dest.insert(1, 10);
   dest.insert(2, 20);
   dest.insert(3, 30);
+  dest.insert(5, 10);
 
-  xen::component_table<int> src;
+  xen::table<int> src;
   src.insert(0, 0);
   src.insert(1, 10);
   src.insert(3, 30);
 
-  [&] {
-    auto dest_it = dest.begin();
-    auto src_it = src.begin();
-    while (dest_it != dest.end() && src_it != src.end()) {
-      if (dest_it == src_it) {
-        *dest_it += *src_it;
-        ++dest_it;
-        ++src_it;
-      } else {
-        if (dest_it < src_it) ++dest_it;
-        if (dest_it > src_it) ++src_it;
-      }
+  auto dest_it = dest.begin();
+  auto src_it = src.begin();
+  while (dest_it != dest.end() && src_it != src.end()) {
+    if (dest_it == src_it) {
+      *dest_it += *src_it;
+      ++dest_it;
+      ++src_it;
+    } else {
+      if (dest_it < src_it) ++dest_it;
+      if (dest_it > src_it) ++src_it;
     }
-  }();
+  }
 
   ASSERT_EQ(dest[0], 20);
   ASSERT_EQ(dest[1], 20);
   ASSERT_EQ(dest[2], 60);
+  ASSERT_EQ(dest[3], 10);
 }

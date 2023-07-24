@@ -10,7 +10,7 @@ namespace xen {
 template <typename T, typename Key = std::size_t,
           typename Compare = std::less<Key>,
           typename Allocator = std::allocator<std::pair<Key, T>>>
-class component_table {
+class table {
  public:
   using pair_type = std::pair<Key, T>;
   using container_type = std::vector<pair_type, Allocator>;
@@ -19,8 +19,8 @@ class component_table {
   using reference = T&;
   using const_reference = const T&;
 
-  component_table() = default;
-  constexpr component_table(size_type count) : m_storage{count} {}
+  table() = default;
+  constexpr table(size_type count) noexcept : m_storage{count} {}
 
   constexpr void insert(const Key& key, const T& value) noexcept {
     auto it = std::find_if(
@@ -30,9 +30,9 @@ class component_table {
   }
 
   constexpr void remove(const Key& key) noexcept {
-    auto it = std::find_if(m_storage.cbegin(), m_storage.cend(),
-                           [=](const auto& pair) { return key == pair.first; });
-    m_storage.erase(it);
+    m_storage.erase(
+        std::find_if(m_storage.cbegin(), m_storage.cend(),
+                     [=](const auto& pair) { return key == pair.first; }));
   }
 
   constexpr reference operator[](size_type pos) noexcept {
@@ -50,7 +50,7 @@ class component_table {
     constexpr explicit iterator(InternalIterT it) noexcept : m_it{it} {}
 
     constexpr iter operator++() noexcept {
-      m_it++;
+      ++m_it;
       return *this;
     }
 
@@ -101,9 +101,7 @@ class component_table {
   auto cbegin() const noexcept { return iterator(m_storage.cbegin()); }
   auto cend() const noexcept { return iterator(m_storage.cend()); }
 
-  constexpr container_type::size_type size() const noexcept {
-    return m_storage.size();
-  }
+  constexpr auto size() const noexcept { return m_storage.size(); }
 
  private:
   container_type m_storage;
