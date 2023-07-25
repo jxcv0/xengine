@@ -78,7 +78,9 @@ class intersection<C1, C2>::iterator
   InputIt2 m_it2;
   InputIt2 m_end2;
 
-  constexpr bool at_end() { return m_it1 == m_end1 || m_it2 == m_end2; }
+  constexpr bool at_end() {
+    return m_it1 == m_end1 || m_it2 == m_end2;
+  }
 };
 
 }  // namespace xen
