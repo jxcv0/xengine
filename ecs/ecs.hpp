@@ -16,6 +16,14 @@ struct archetype_interface {
 
   virtual bool has_component(const std::type_index&) = 0;
   virtual std::size_t num_component_types() = 0;
+  virtual void* get_component(eid_t, const std::type_index&) = 0;
+  virtual void add_entity(eid_t) = 0;
+
+  template <typename T>
+  void* get_component(eid_t entity) {
+    return *reinterpret_cast<T*>(
+        get_component(entity, std::type_index(typeid(T))));
+  }
 
   template <typename... T>
   bool has_components() {
@@ -28,6 +36,12 @@ struct archetype_interface {
         }(),
         ...);
     return count == sizeof...(T);
+  }
+
+  template <typename... T>
+  void add_entity(eid_t entity, T... vals) {
+    add_entity(entity);
+    ((get_component<T>(entity) = vals), ...);
   }
 };
 
@@ -42,18 +56,43 @@ class archetype : public archetype_interface {
  public:
   static constexpr std::size_t num_types = sizeof...(T);
 
-  bool has_component(const std::type_index& index) {
+  bool has_component(const std::type_index& index) override {
     return ((index == std::type_index(typeid(T))) || ...);
   }
 
   std::size_t num_component_types() override { return num_types; }
 
-  void add_entity(eid_t entity, T... vals) {
-    m_table.emplace_back({entity, std::tuple<T...>{vals...}});
+  void* get_component(eid_t entity, const std::type_index& index) override {
+    auto it = find_by_entity(entity);
+    void* ptr;
+    if (it != m_table.cend()) {
+      (
+          [&] {
+            if (std::type_index(typeid(T)) == index) {
+              ptr = &std::get<T>(it->second);
+            }
+          }(),
+          ...);
+    }
+    return ptr;
+  }
+
+  void add_entity(eid_t entity) override {
+    m_table.emplace_back(entity, std::tuple<T...>{});
   }
 
  private:
   table<T...> m_table;
+
+  constexpr auto find_by_entity(eid_t entity) const {
+    return std::find_if(m_table.cbegin(), m_table.cend(),
+                        [=](const auto& e) { return e.first == entity; });
+  }
+
+  constexpr auto find_by_entity(eid_t entity) {
+    return std::find_if(m_table.begin(), m_table.end(),
+                        [=](const auto& e) { return e.first == entity; });
+  }
 };
 
 class ecs {
