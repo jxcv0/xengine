@@ -4,6 +4,7 @@
 #include <atomic>
 #include <cstdint>
 #include <memory>
+#include <stdexcept>
 #include <tuple>
 #include <typeindex>
 
@@ -20,7 +21,7 @@ struct archetype_interface {
   virtual void add_entity(eid_t) = 0;
 
   template <typename T>
-  void* get_component(eid_t entity) {
+  T& get_component(eid_t entity) {
     return *reinterpret_cast<T*>(
         get_component(entity, std::type_index(typeid(T))));
   }
@@ -73,12 +74,23 @@ class archetype : public archetype_interface {
             }
           }(),
           ...);
+    } else {
+      throw std::out_of_range("Entity not found");
     }
     return ptr;
   }
 
   void add_entity(eid_t entity) override {
     m_table.emplace_back(entity, std::tuple<T...>{});
+  }
+
+  template <typename U>
+  U& get_component(eid_t entity) {
+    auto it = find_by_entity(entity);
+    if (it == m_table.end()) {
+      throw std::out_of_range("Entity not found");
+    }
+    return std::get<U>(it->second);
   }
 
  private:
@@ -100,14 +112,30 @@ class ecs {
   ecs() : m_archetypes{}, m_counter{0} {}
 
   template <typename... T>
-  void create_entity(T... vals) {
+  eid_t create_entity(T... vals) {
     auto it = find_archetype<T...>();
+    eid_t entity = m_counter;
     if (it != m_archetypes.cend()) {
-      it->add_entity(m_counter++, vals...);
+      (*it)->add_entity(entity, vals...);
     } else {
       m_archetypes.emplace_back(new archetype<T...>);
-      m_archetypes.back()->add_entity(m_counter++, vals...);
+      m_archetypes.back()->add_entity(entity, vals...);
     }
+    ++m_counter;
+    return entity;
+  }
+
+  template <typename... T>
+  auto get_archetype() {
+    auto it = std::find_if(m_archetypes.begin(), m_archetypes.end(),
+                           [](const auto& arch) {
+                             return arch->template has_components<T...>() &&
+                                    arch->num_component_types() == sizeof...(T);
+                           });
+    if (it == m_archetypes.end()) {
+      throw std::runtime_error("Archetype not found");
+    }
+    return std::static_pointer_cast<archetype<T...>>(*it);
   }
 
  private:
@@ -118,7 +146,7 @@ class ecs {
   constexpr auto find_archetype() const noexcept {
     return std::find_if(
         m_archetypes.cbegin(), m_archetypes.cend(),
-        [](const auto& arch) { return arch.template has_components<T...>(); });
+        [](const auto& arch) { return arch->template has_components<T...>(); });
   }
 };
 
