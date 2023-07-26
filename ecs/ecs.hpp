@@ -3,6 +3,7 @@
 
 #include <atomic>
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <stdexcept>
 #include <tuple>
@@ -63,6 +64,10 @@ class archetype : public archetype_interface {
 
   std::size_t num_component_types() override { return num_types; }
 
+  void add_entity(eid_t entity) override {
+    m_table.emplace_back(entity, std::tuple<T...>{});
+  }
+
   void* get_component(eid_t entity, const std::type_index& index) override {
     auto it = find_by_entity(entity);
     void* ptr;
@@ -78,10 +83,6 @@ class archetype : public archetype_interface {
       throw std::out_of_range("Entity not found");
     }
     return ptr;
-  }
-
-  void add_entity(eid_t entity) override {
-    m_table.emplace_back(entity, std::tuple<T...>{});
   }
 
   template <typename U>

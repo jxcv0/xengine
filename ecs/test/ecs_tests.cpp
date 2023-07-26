@@ -42,4 +42,5 @@ TEST(ecs_tests, create_entity) {
   ASSERT_EQ(arch->get_component<int>(e1), 10);
   ASSERT_FLOAT_EQ(arch->get_component<float>(e1), 1.0f);
   ASSERT_EQ(arch->get_component<struct c>(e1).i, 111);
+  ASSERT_EQ(e1, 0);
 }
