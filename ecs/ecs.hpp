@@ -17,7 +17,7 @@ struct archetype_interface {
   virtual ~archetype_interface() {}
 
   virtual bool has_component(const std::type_index&) = 0;
-  virtual std::size_t num_component_types() = 0;
+  virtual std::size_t num_component_types() const noexcept = 0;
   virtual void* get_component(eid_t, const std::type_index&) = 0;
   virtual void add_entity(eid_t) = 0;
 
@@ -56,13 +56,13 @@ using table = std::vector<entry<T...>>;
 template <typename... T>
 class archetype : public archetype_interface {
  public:
-  static constexpr std::size_t num_types = sizeof...(T);
-
   bool has_component(const std::type_index& index) override {
     return ((index == std::type_index(typeid(T))) || ...);
   }
 
-  std::size_t num_component_types() override { return num_types; }
+  std::size_t num_component_types() const noexcept override {
+    return sizeof...(T);
+  }
 
   void add_entity(eid_t entity) override {
     m_table.emplace_back(entity, std::tuple<T...>{});
@@ -97,12 +97,12 @@ class archetype : public archetype_interface {
  private:
   table<T...> m_table;
 
-  constexpr auto find_by_entity(eid_t entity) const {
+  constexpr auto find_by_entity(eid_t entity) const noexcept {
     return std::find_if(m_table.cbegin(), m_table.cend(),
                         [=](const auto& e) { return e.first == entity; });
   }
 
-  constexpr auto find_by_entity(eid_t entity) {
+  constexpr auto find_by_entity(eid_t entity) noexcept {
     return std::find_if(m_table.begin(), m_table.end(),
                         [=](const auto& e) { return e.first == entity; });
   }
