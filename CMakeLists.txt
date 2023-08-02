@@ -19,6 +19,7 @@ if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     GIT_REPOSITORY https://github.com/google/googletest.git
     GIT_TAG v1.13.0
   )
+  FetchContent_MakeAvailable(googletest)
 endif()
 
 FetchContent_Declare(
@@ -33,7 +34,6 @@ FetchContent_Declare(
   GIT_TAG 3.3.8
 )
 
-FetchContent_MakeAvailable(googletest)
 FetchContent_MakeAvailable(la)
 FetchContent_MakeAvailable(glfw)
 
