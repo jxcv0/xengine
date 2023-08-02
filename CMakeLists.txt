@@ -1,16 +1,25 @@
 cmake_minimum_required(VERSION 3.16)
 project(xengine)
 
-set(CMAKE_BUILD_TYPE Debug)
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Debug)
+endif()
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20 -Wall -Werror -Wextra -Wpedantic")
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+set(CMAKE_CXX_FLAGS_DEBUG "-ggdb")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 include(FetchContent)
-FetchContent_Declare(
-  googletest
-  GIT_REPOSITORY https://github.com/google/googletest.git
-  GIT_TAG v1.13.0
-)
+
+if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+  set(XENGINE_BUILD_TESTS TRUE)
+  FetchContent_Declare(
+    googletest
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG v1.13.0
+  )
+endif()
 
 FetchContent_Declare(
   la
