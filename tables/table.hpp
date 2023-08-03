@@ -29,6 +29,7 @@
 #include <cstring>
 #include <iterator>
 #include <vector>
+#include <mutex>
 
 namespace xen {
 
@@ -73,12 +74,17 @@ class table {
   auto begin() { return m_arr.begin(); }
   auto end() { return m_arr.end(); }
 
+  std::mutex& mutex() { return m_mutex; }
+
  private:
+  std::mutex m_mutex;
   std::vector<std::pair<eid_t, T>> m_arr;
 };
 
 template <typename T1, typename T2, typename Func>
 void iterate_tables(table<T1>& t1, table<T2>& t2, Func f) {
+  std::lock_guard(t1.mutex());
+  std::lock_guard(t2.mutex());
   auto it1 = std::begin(t1);
   auto it2 = std::begin(t2);
   // TODO parallelize
