@@ -83,8 +83,8 @@ class table {
 
 template <typename T1, typename T2, typename Func>
 void iterate_tables(table<T1>& t1, table<T2>& t2, Func f) {
-  std::lock_guard(t1.mutex());
-  std::lock_guard(t2.mutex());
+  std::lock_guard lk1(t1.mutex());
+  std::lock_guard lk2(t2.mutex());
   auto it1 = std::begin(t1);
   auto it2 = std::begin(t2);
   // TODO parallelize
@@ -96,6 +96,27 @@ void iterate_tables(table<T1>& t1, table<T2>& t2, Func f) {
     } else {
       if (it1->first < it2->first) ++it1;
       if (it1->first > it2->first) ++it2;
+    }
+  }
+}
+
+template <typename T1, typename T2, typename T3, typename Func>
+void iterate_tables(table<T1>& t1, table<T2>& t2, table<T3>& t3, Func f) {
+  std::lock_guard lk1(t1.mutex());
+  std::lock_guard lk2(t2.mutex());
+  std::lock_guard lk3(t3.mutex());
+  auto it1 = std::begin(t1);
+  auto it2 = std::begin(t2);
+  auto it3 = std::begin(t2);
+  // TODO parallelize
+  while (it1 != std::end(t1) && it2 != std::end(t2) && it3 != std::end(t3)) {
+    if (it1->first == it2->first && it2->first == it3.first) {
+      f(it1->second, it2->second, it3->second);
+      ++it1; ++it2; ++it3;
+    } else {
+      if (it1->first < it2->first || it1->first < it3->first) ++it1;
+      if (it2->first < it1->first || it2->first < it3->first) ++it2;
+      if (it3->first < it1->first || it3->first < it2->first) ++it3;
     }
   }
 }
