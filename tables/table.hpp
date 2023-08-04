@@ -56,6 +56,21 @@ class table {
     m_arr.insert(it, {entity, val});
   }
 
+  void insert(eid_t entity)
+  {
+    auto it = m_arr.cbegin();
+    for (; it != m_arr.cend(); ++it) {
+      if (entity == it->first) {
+        return;  // no duplucates
+      }
+
+      if (entity < it->first) {
+        break;
+      }
+    }
+    m_arr.insert(it, {entity, T{}});
+  }
+
   void remove(eid_t entity) {
     auto it = m_arr.cbegin();
     for (; it != m_arr.cend(); ++it) {
@@ -107,10 +122,10 @@ void iterate_tables(table<T1>& t1, table<T2>& t2, table<T3>& t3, Func f) {
   std::lock_guard lk3(t3.mutex());
   auto it1 = std::begin(t1);
   auto it2 = std::begin(t2);
-  auto it3 = std::begin(t2);
+  auto it3 = std::begin(t3);
   // TODO parallelize
   while (it1 != std::end(t1) && it2 != std::end(t2) && it3 != std::end(t3)) {
-    if (it1->first == it2->first && it2->first == it3.first) {
+    if (it1->first == it2->first && it2->first == it3->first) {
       f(it1->second, it2->second, it3->second);
       ++it1; ++it2; ++it3;
     } else {
