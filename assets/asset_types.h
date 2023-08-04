@@ -19,8 +19,8 @@ struct vertex {
 
 struct mesh {
   int model_id;
-  struct vertex* vertices;
-  unsigned int* indices;
+  struct vertex *vertices;
+  unsigned int *indices;
   unsigned int nvertices;
   unsigned int nindices;
 };
@@ -40,7 +40,7 @@ struct texture {
       int nchannels;
     } sizeinfo;
   };
-  unsigned char* data;
+  unsigned char *data;
 };
 
 struct font {
@@ -51,4 +51,4 @@ struct font {
 }
 #endif
 
-#endif  // ASSET_TYPES_H_
+#endif // ASSET_TYPES_H_

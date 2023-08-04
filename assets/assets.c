@@ -10,7 +10,7 @@
 #include "stb_image.h"
 
 struct mesh_allocator create_mesh_allocator(int bufsize) {
-  void* mem = malloc(bufsize * sizeof(struct mesh) + bufsize * sizeof(int));
+  void *mem = malloc(bufsize * sizeof(struct mesh) + bufsize * sizeof(int));
   struct mesh_allocator alloc = {.buf = mem,
                                  .free = mem + (bufsize * sizeof(int)),
                                  .bufsize = bufsize,
@@ -23,7 +23,7 @@ struct mesh_allocator create_mesh_allocator(int bufsize) {
   return alloc;
 }
 
-int alloc_mesh(struct mesh_allocator* alloc) {
+int alloc_mesh(struct mesh_allocator *alloc) {
   if (sem_wait(&alloc->sem) == -1) {
     return -1;
   }
@@ -39,7 +39,7 @@ int alloc_mesh(struct mesh_allocator* alloc) {
   return index;
 }
 
-int free_mesh(struct mesh_allocator* alloc, int index) {
+int free_mesh(struct mesh_allocator *alloc, int index) {
   if (sem_wait(&alloc->sem) == -1) {
     return -1;
   }
@@ -55,14 +55,14 @@ int free_mesh(struct mesh_allocator* alloc, int index) {
   return 0;
 }
 
-int asset_type(const char* path) {
-  char* ext = strrchr(path, '.');
+int asset_type(const char *path) {
+  char *ext = strrchr(path, '.');
 
   if (ext == NULL) {
     return -1;
   }
 
-  const char* supported_asset_exts[] = {".mesh", ".tex"};
+  const char *supported_asset_exts[] = {".mesh", ".tex"};
   for (int i = 0; i < 2; i++) {
     if (strcmp(supported_asset_exts[i], ext) == 0) {
       return i;
@@ -72,7 +72,7 @@ int asset_type(const char* path) {
   return -1;
 }
 
-struct texture load_texture(const char* filepath) {
+struct texture load_texture(const char *filepath) {
   struct texture tex;
   tex.data = stbi_load(filepath, &tex.sizeinfo.width, &tex.sizeinfo.height,
                        &tex.sizeinfo.nchannels, 0);

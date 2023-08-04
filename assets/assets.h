@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-typedef void* (*allocator)(size_t);
+typedef void *(*allocator)(size_t);
 
 /*
 struct asset
@@ -29,8 +29,8 @@ struct asset
 
 struct mesh_allocator {
   sem_t sem;
-  struct mesh* buf;
-  int* free;
+  struct mesh *buf;
+  int *free;
   const unsigned int bufsize;
   unsigned int nmeshes;
   unsigned int nfree;
@@ -39,10 +39,10 @@ struct mesh_allocator {
 struct mesh_allocator create_mesh_allocator(int bufsize);
 
 /* allocate a mesh and get the index */
-int alloc_mesh(struct mesh_allocator* alloc);
+int alloc_mesh(struct mesh_allocator *alloc);
 
 /* Free a mesh at index */
-int free_mesh(struct mesh_allocator* alloc, int index);
+int free_mesh(struct mesh_allocator *alloc, int index);
 
 /**
  * @brief Get the type of an asset based on a file extension.
@@ -50,18 +50,18 @@ int free_mesh(struct mesh_allocator* alloc, int index);
  * @param filepath The filepath to extract the asset type from
  * @return The type of the asset with the filepath.
  */
-int asset_type(const char* filepath);
+int asset_type(const char *filepath);
 
-struct texture load_texture(const char* filepath);
+struct texture load_texture(const char *filepath);
 
-struct model load_model(int id, const char* filepath, struct mesh* mesh_buf,
-                        unsigned int* nmeshes);
+struct model load_model(int id, const char *filepath, struct mesh *mesh_buf,
+                        unsigned int *nmeshes);
 
-struct font* load_font(struct font* font, const char* filepath,
+struct font *load_font(struct font *font, const char *filepath,
                        allocator alloc_font);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  // ASSETMGR_H_
+#endif // ASSETMGR_H_

@@ -34,7 +34,7 @@ TEST(table_tests, iterate_two_tables) {
   src.insert(3, 30);
   src.insert(6, 1000);
 
-  iterate_tables(dest, src, [](int& i1, int& i2) { i1 += i2; });
+  iterate_tables(dest, src, [](int &i1, int &i2) { i1 += i2; });
 
   ASSERT_EQ(dest[0], 20);
   ASSERT_EQ(dest[1], 20);
@@ -59,9 +59,7 @@ TEST(table_tests, iterate_three_tables) {
   t3.insert(1, 2);
   t3.insert(3, 2);
 
-  iterate_tables(t1, t2, t3, [](int& i1, int& i2, int& i3) {
-    i1 = i2 * i3;
-  });
+  iterate_tables(t1, t2, t3, [](int &i1, int &i2, int &i3) { i1 = i2 * i3; });
 
   ASSERT_EQ(t1[0], 20);
   ASSERT_EQ(t1[1], 0);
